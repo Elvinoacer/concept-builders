@@ -3,13 +3,13 @@ import React from "react";
 
 const Notifications = () => {
   return (
-    <section className="mt-8">
-      <h3 className="text-gray-800 text-xl font-bold leading-tight tracking-[-0.015em] mb-4 dark:text-white">
+    <section className="mt-4 md:mt-8">
+      <h3 className="text-gray-800 text-lg md:text-xl font-bold leading-tight tracking-[-0.015em] mb-2 md:mb-4 dark:text-white">
         Notifications
       </h3>
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:divide-gray-700">
         <div className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
-          <div className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400 flex items-center justify-center rounded-full bg-blue-100 shrink-0 size-12 dark:bg-blue-900">
+          <div className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400 flex items-center justify-center rounded-full bg-blue-100 shrink-0 size-10 md:size-12 dark:bg-blue-900">
             <span className="material-symbols-outlined">update</span>
           </div>
           <div className="flex-1">

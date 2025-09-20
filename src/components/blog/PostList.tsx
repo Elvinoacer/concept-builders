@@ -7,7 +7,7 @@ const PostList = () => {
   return (
     <div>
       <h2
-        className="text-2xl font-bold tracking-tight mb-6"
+        className="text-xl md:text-2xl font-bold tracking-tight mb-4 md:mb-6"
         style={{
           background: "linear-gradient(to right, #0B2545, #134E4A)",
           WebkitBackgroundClip: "text",

@@ -4,9 +4,9 @@ import Image from "next/image";
 
 const Location = () => {
   return (
-    <div className="mt-12">
+    <div className="mt-8 md:mt-12">
       <h3
-        className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text"
+        className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text"
       >
         Our Location
       </h3>
@@ -14,9 +14,9 @@ const Location = () => {
         <Image
           src={location.image}
           alt="Our Location"
-          width={600}
-          height={400}
-          className="rounded-lg"
+          width={300}
+          height={200}
+          className="rounded-lg w-full h-auto"
         />
       </div>
     </div>

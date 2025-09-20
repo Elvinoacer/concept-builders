@@ -6,11 +6,11 @@ import { costsData } from "@/lib/costs-data";
 
 const CostsPage = () => {
   return (
-    <div className="flex-1 p-10">
+    <div className="flex-1 p-4 md:p-10">
       <div className="flex flex-col gap-8">
         <CostsHeader />
         <section>
-          <h2 className="text-xl font-bold leading-tight tracking-tight mb-4">
+          <h2 className="text-lg md:text-xl font-bold leading-tight tracking-tight mb-2 md:mb-4">
             Current Month Overview
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

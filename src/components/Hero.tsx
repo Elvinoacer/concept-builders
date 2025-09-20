@@ -63,17 +63,17 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </motion.div>
             </AnimatePresence>
-            <div className="relative flex min-h-[520px] flex-col items-start justify-end gap-8 px-12 pb-12">
+            <div className="relative flex min-h-[520px] flex-col items-start justify-end gap-8 px-6 md:px-12 pb-8 md:pb-12">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 className="flex flex-col gap-4 text-left max-w-2xl"
               >
-                <h1 className="text-white text-5xl font-bold leading-tight tracking-tight @[480px]:text-6xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.5)]">
+                <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight @[480px]:text-6xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.5)]">
                   {slides[currentSlide].title}
                 </h1>
-                <p className="text-gray-200 text-lg @[480px]:text-xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.5)]">
+                <p className="text-gray-200 text-base md:text-lg @[480px]:text-xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.5)]">
                   {slides[currentSlide].description}
                 </p>
               </motion.div>
@@ -87,10 +87,10 @@ const Hero = () => {
                   search
                 </span>
                 <input
-                  className="form-input flex w-full h-16 resize-none overflow-hidden rounded-md border border-gray-300 bg-white pl-12 pr-32 text-lg text-slate-800 placeholder:text-gray-400 focus:border-[#1193d4] focus:ring-[#1193d4] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500"
+                  className="form-input flex w-full h-14 md:h-16 resize-none overflow-hidden rounded-md border border-gray-300 bg-white pl-12 pr-28 md:pr-32 text-base md:text-lg text-slate-800 placeholder:text-gray-400 focus:border-[#1193d4] focus:ring-[#1193d4] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500"
                   placeholder="Search house plans, styles, or features"
                 />
-                <button className="absolute right-2 top-1/2 -translate-y-1/2 flex h-12 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 px-6 text-base font-bold text-white shadow-sm hover:from-blue-700 hover:to-cyan-500 transition-all">
+                <button className="absolute right-2 top-1/2 -translate-y-1/2 flex h-10 md:h-12 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 px-4 md:px-6 text-sm md:text-base font-bold text-white shadow-sm hover:from-blue-700 hover:to-cyan-500 transition-all">
                   Search
                 </button>
               </motion.div>

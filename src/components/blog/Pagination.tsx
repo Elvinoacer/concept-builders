@@ -11,7 +11,7 @@ import {
 
 const Pagination = () => {
   return (
-    <div className="flex items-center justify-center pt-8">
+    <div className="flex items-center justify-center pt-4 md:pt-8">
       <ShadcnPagination>
         <PaginationContent>
           <PaginationItem>

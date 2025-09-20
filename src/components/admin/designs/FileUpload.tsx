@@ -3,18 +3,18 @@
 
 const FileUpload = () => {
   return (
-    <div className="mb-8">
-      <h2 className="text-2xl font-bold text-foreground mb-4">File Upload</h2>
+    <div className="mb-4 md:mb-8">
+      <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">File Upload</h2>
       <div className="flex flex-col items-center justify-center w-full">
         <label
           htmlFor="dropzone-file"
-          className="flex flex-col items-center justify-center w-full h-48 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted"
+          className="flex flex-col items-center justify-center w-full h-32 md:h-48 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted"
         >
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <span className="material-symbols-outlined text-6xl text-muted-foreground">
+            <span className="material-symbols-outlined text-4xl md:text-6xl text-muted-foreground">
               cloud_upload
             </span>
-            <p className="mb-2 text-lg text-foreground font-bold">
+            <p className="mb-2 text-base md:text-lg text-foreground font-bold">
               <span className="font-semibold">Drag and drop files here</span>
             </p>
             <p className="text-sm text-muted-foreground">

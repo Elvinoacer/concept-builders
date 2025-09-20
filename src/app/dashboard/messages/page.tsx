@@ -14,7 +14,7 @@ const MessagesPage = () => {
   return (
     <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
       <ChatHeader project={project} />
-      <div className="flex-1 flex flex-col p-8">
+      <div className="flex-1 flex flex-col p-4 md:p-8">
         <MessageList messages={messages} />
         <MessageInput />
       </div>

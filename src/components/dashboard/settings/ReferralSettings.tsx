@@ -6,13 +6,13 @@ import { referralInfo } from "@/lib/settings";
 const ReferralSettings = () => {
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+      <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">
         Referral Program
       </h2>
-      <p className="text-gray-500 dark:text-gray-400 mt-1">
+      <p className="text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">
         Share your referral link and earn rewards.
       </p>
-      <div className="mt-6 space-y-6">
+      <div className="mt-4 md:mt-6 space-y-6">
         <div>
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Your Referral Code
@@ -33,18 +33,18 @@ const ReferralSettings = () => {
           { label: "Total Referrals", value: referralInfo.totalReferrals },
           {
             label: "Earned Bonus",
-            value: `$${referralInfo.earnedBonus.toFixed(2)}`,
+            value: `${referralInfo.earnedBonus.toFixed(2)}`,
           },
           {
             label: "Pending Bonus",
-            value: `$${referralInfo.pendingBonus.toFixed(2)}`,
+            value: `${referralInfo.pendingBonus.toFixed(2)}`,
           },
         ].map(({ label, value }) => (
           <div key={label}>
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {label}
             </p>
-            <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <p className="mt-1 text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100">
               {value}
             </p>
           </div>

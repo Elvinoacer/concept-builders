@@ -36,7 +36,7 @@ const OrdersTable = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4 md:mb-6 gap-4">
         <div className="relative w-full max-w-md">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
             search
@@ -47,14 +47,14 @@ const OrdersTable = () => {
             type="search"
           />
         </div>
-        <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
+        <div className="flex gap-2 w-full md:w-auto">
+          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 w-full justify-center">
             <span className="material-symbols-outlined text-base">
               filter_list
             </span>
             Filter
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
+          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 w-full justify-center">
             <span className="material-symbols-outlined text-base">
               ios_share
             </span>
@@ -66,22 +66,22 @@ const OrdersTable = () => {
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
             <tr>
-              <th scope="col" className="px-6 py-3 font-medium">
+              <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
                 Order ID
               </th>
-              <th scope="col" className="px-6 py-3 font-medium">
+              <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
                 Client
               </th>
-              <th scope="col" className="px-6 py-3 font-medium">
+              <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
                 Date
               </th>
-              <th scope="col" className="px-6 py-3 font-medium">
+              <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
                 Amount
               </th>
-              <th scope="col" className="px-6 py-3 font-medium">
+              <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
                 Status
               </th>
-              <th scope="col" className="px-6 py-3 font-medium text-right">
+              <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium text-right">
                 Actions
               </th>
             </tr>
@@ -95,14 +95,14 @@ const OrdersTable = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="bg-white border-b hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
               >
-                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                <td className="px-3 py-2 md:px-6 md:py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   {order.orderId}
                 </td>
-                <td className="px-6 py-4">{order.client}</td>
-                <td className="px-6 py-4">{order.date}</td>
-                <td className="px-6 py-4">{order.amount}</td>
-                <td className="px-6 py-4">{getStatusChip(order.status)}</td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-3 py-2 md:px-6 md:py-4">{order.client}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4">{order.date}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4">{order.amount}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4">{getStatusChip(order.status)}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4 text-right">
                   <a
                     href="#"
                     className="font-medium text-primary hover:underline dark:text-blue-400"

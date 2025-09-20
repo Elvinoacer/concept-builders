@@ -10,7 +10,7 @@ const OrdersTabs = () => {
       transition={{ duration: 0.5, delay: 0.1 }}
       className="border-b border-gray-200 dark:border-gray-800"
     >
-      <div className="flex gap-6 px-1">
+      <div className="flex gap-4 md:gap-6 px-1 overflow-x-auto whitespace-nowrap">
         <a
           href="#"
           className="flex flex-col items-center justify-center border-b-2 border-b-primary text-primary pb-3 pt-2 dark:text-blue-400 dark:border-b-blue-400"

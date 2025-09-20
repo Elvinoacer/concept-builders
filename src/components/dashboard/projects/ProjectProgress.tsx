@@ -10,11 +10,11 @@ const ProjectProgress = ({
 }) => {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <div className="flex items-center justify-between mb-2 md:mb-4">
+        <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">
           Construction Progress
         </h2>
-        <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400">
+        <span className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400">
           {progress}%
         </span>
       </div>

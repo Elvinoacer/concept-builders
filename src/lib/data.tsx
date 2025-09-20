@@ -4,11 +4,11 @@ import { SVGProps } from "react";
 export const navLinks = [
   { href: "/", label: "Home" },
   { href: "/design-showcase", label: "Design Showcase" },
-  { href: "#", label: "Plans" },
-  { href: "#", label: "Design" },
-  { href: "#", label: "Build" },
-  { href: "#", label: "Blog" },
-  { href: "#", label: "Contact" },
+  { href: "/designs", label: "Plans" },
+  { href: "/custom-design", label: "Custom Design" },
+  { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export const categories = [

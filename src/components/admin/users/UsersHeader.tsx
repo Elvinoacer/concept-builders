@@ -8,13 +8,13 @@ const UsersHeader = ({ activeTab }: { activeTab: string }) => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex items-center justify-between mb-8"
+      className="flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-4"
     >
-      <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+      <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
         Team Management
       </h2>
-      <div className="flex items-center gap-4">
-        <div className="relative w-72">
+      <div className="flex items-center gap-4 w-full md:w-auto flex-col sm:flex-row">
+        <div className="relative w-full md:w-72">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
             search
           </span>
@@ -24,7 +24,7 @@ const UsersHeader = ({ activeTab }: { activeTab: string }) => {
             type="text"
           />
         </div>
-        <button className="flex items-center gap-2 rounded-md bg-gradient-to-r from-dark-blue to-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:to-primary-dark transition-colors">
+        <button className="flex items-center gap-2 rounded-md bg-gradient-to-r from-dark-blue to-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:to-primary-dark transition-colors w-full sm:w-auto justify-center">
           <span className="material-symbols-outlined">add</span>
           Add Member
         </button>

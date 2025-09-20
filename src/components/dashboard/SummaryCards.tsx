@@ -11,7 +11,7 @@ const SummaryCards = () => {
             <p className="text-gray-500 text-sm font-medium dark:text-gray-400">
               Total Projects
             </p>
-            <h3 className="text-gray-800 text-2xl font-bold mt-1 dark:text-white">
+            <h3 className="text-gray-800 text-xl md:text-2xl font-bold mt-0.5 md:mt-1 dark:text-white">
               24
             </h3>
             <p className="text-green-500 text-sm mt-1 flex items-center">
@@ -34,7 +34,7 @@ const SummaryCards = () => {
             <p className="text-gray-500 text-sm font-medium dark:text-gray-400">
               Active Clients
             </p>
-            <h3 className="text-gray-800 text-2xl font-bold mt-1 dark:text-white">
+            <h3 className="text-gray-800 text-xl md:text-2xl font-bold mt-0.5 md:mt-1 dark:text-white">
               18
             </h3>
             <p className="text-green-500 text-sm mt-1 flex items-center">
@@ -57,7 +57,7 @@ const SummaryCards = () => {
             <p className="text-gray-500 text-sm font-medium dark:text-gray-400">
               Revenue
             </p>
-            <h3 className="text-gray-800 text-2xl font-bold mt-1 dark:text-white">
+            <h3 className="text-gray-800 text-xl md:text-2xl font-bold mt-0.5 md:mt-1 dark:text-white">
               $42.8K
             </h3>
             <p className="text-green-500 text-sm mt-1 flex items-center">
@@ -80,7 +80,7 @@ const SummaryCards = () => {
             <p className="text-gray-500 text-sm font-medium dark:text-gray-400">
               Tasks Completed
             </p>
-            <h3 className="text-gray-800 text-2xl font-bold mt-1 dark:text-white">
+            <h3 className="text-gray-800 text-xl md:text-2xl font-bold mt-0.5 md:mt-1 dark:text-white">
               89%
             </h3>
             <p className="text-green-500 text-sm mt-1 flex items-center">

@@ -3,10 +3,10 @@ import { mission, vision } from "@/lib/about-data";
 
 const MissionVision = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-      <div className="bg-white p-8 rounded-lg shadow-sm dark:bg-gray-800">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-8 md:mb-16">
+      <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm dark:bg-gray-800">
         <h2
-          className="text-2xl font-bold leading-tight tracking-[-0.015em] mb-4"
+          className="text-xl md:text-2xl font-bold leading-tight tracking-[-0.015em] mb-4"
           style={{
             background: "linear-gradient(to right, #0B2545, #134E4A)",
             WebkitBackgroundClip: "text",

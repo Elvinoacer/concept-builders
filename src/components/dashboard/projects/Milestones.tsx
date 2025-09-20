@@ -17,8 +17,8 @@ const Milestones = ({ milestones }: { milestones: any[] }) => {
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden dark:bg-gray-800 dark:border-gray-700">
-      <div className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <div className="p-4 md:p-6">
+        <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">
           Milestones
         </h2>
       </div>
@@ -27,19 +27,19 @@ const Milestones = ({ milestones }: { milestones: any[] }) => {
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
                 scope="col"
               >
                 Milestone
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
                 scope="col"
               >
                 Status
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
                 scope="col"
               >
                 Due Date
@@ -52,10 +52,10 @@ const Milestones = ({ milestones }: { milestones: any[] }) => {
                 key={milestone.id}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                <td className="whitespace-nowrap px-3 py-2 md:px-6 md:py-4 text-sm font-medium text-gray-900 dark:text-white">
                   {milestone.name}
                 </td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                <td className="whitespace-nowrap px-3 py-2 md:px-6 md:py-4 text-sm text-gray-500 dark:text-gray-400">
                   <span
                     className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getStatusClasses(
                       milestone.statusColor
@@ -64,7 +64,7 @@ const Milestones = ({ milestones }: { milestones: any[] }) => {
                     {milestone.status}
                   </span>
                 </td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                <td className="whitespace-nowrap px-3 py-2 md:px-6 md:py-4 text-sm text-gray-500 dark:text-gray-400">
                   {milestone.dueDate}
                 </td>
               </tr>

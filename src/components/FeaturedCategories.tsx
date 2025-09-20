@@ -1,10 +1,10 @@
 
-import { categories } from "@/lib/designs";
+import { categories } from "@/lib/categories";
 
 const FeaturedCategories = () => {
   return (
-    <section className="py-16">
-      <h2 className="text-slate-800 text-3xl font-bold tracking-tight mb-8 dark:text-white">
+    <section className="py-12 md:py-16">
+      <h2 className="text-slate-800 text-2xl md:text-3xl font-bold tracking-tight mb-8 dark:text-white">
         Featured Categories
       </h2>
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">

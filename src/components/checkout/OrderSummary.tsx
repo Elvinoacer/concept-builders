@@ -21,7 +21,7 @@ const OrderSummary = ({ items }) => {
       <CardContent className="space-y-4">
         {items.map((item) => (
           <div key={item.id} className="flex items-center gap-4">
-            <div className="h-16 w-16 flex-shrink-0 rounded-md bg-cover bg-center">
+            <div className="h-12 w-12 md:h-16 md:w-16 flex-shrink-0 rounded-md bg-cover bg-center">
               <Image src={item.image} alt={item.name} width={64} height={64} className="rounded-md" />
             </div>
             <div className="flex-grow">

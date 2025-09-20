@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 
-const FilterAside = () => {
+const FilterAside = ({ onClose }: { onClose?: () => void }) => {
   return (
     <motion.aside
       className="w-full md:pr-8"
@@ -12,6 +12,12 @@ const FilterAside = () => {
       transition={{ duration: 0.5 }}
     >
       <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Filters</h2>
+          <button onClick={onClose} className="md:hidden">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
         <div>
           <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Price Range</h3>
           <div className="flex items-center gap-2">

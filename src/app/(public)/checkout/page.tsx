@@ -13,9 +13,9 @@ const CheckoutPage = () => {
       style={{ fontFamily: '"Work Sans", "Noto Sans", sans-serif' }}
     >
       <div className="layout-container flex h-full grow flex-col">
-        <main className="flex flex-1 justify-center bg-gray-50 py-12 dark:bg-gray-900">
+        <main className="flex flex-1 justify-center bg-gray-50 py-8 md:py-12 dark:bg-gray-900">
           <div className="w-full max-w-4xl px-4">
-            <div className="mb-8 flex items-center gap-2 text-sm font-medium">
+            <div className="mb-4 md:mb-8 flex items-center gap-2 text-sm font-medium">
               <a className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" href="/cart">
                 Cart
               </a>

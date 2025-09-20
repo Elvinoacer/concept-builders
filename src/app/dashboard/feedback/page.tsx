@@ -33,7 +33,7 @@ const FeedbackPage = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -41,17 +41,17 @@ const FeedbackPage = () => {
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-4 md:mb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center dark:bg-green-900">
                 <span className="material-symbols-outlined text-3xl text-green-600 dark:text-green-400">
                   check_circle
                 </span>
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4 dark:text-white">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 dark:text-white">
               Thank You for Your Feedback!
             </h1>
-            <p className="text-gray-600 mb-8 dark:text-gray-400">
+            <p className="text-gray-600 mb-4 md:mb-8 dark:text-gray-400">
               Your feedback has been received and will help us improve our
               service. We appreciate you taking the time to share your thoughts
               with us.
@@ -69,17 +69,17 @@ const FeedbackPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 dark:text-white">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 dark:text-white">
             Share Your Feedback
           </h1>
-          <p className="text-gray-600 mb-8 dark:text-gray-400">
+          <p className="text-gray-600 mb-4 md:mb-8 dark:text-gray-400">
             We'd love to hear your thoughts, suggestions, or concerns. Your
             feedback helps us improve our service.
           </p>
@@ -89,17 +89,17 @@ const FeedbackPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white rounded-xl shadow-sm p-6 mb-8 dark:bg-gray-800 dark:border dark:border-gray-700"
+          className="bg-white rounded-xl shadow-sm p-6 mb-4 md:mb-8 dark:bg-gray-800 dark:border dark:border-gray-700"
         >
-          <h2 className="text-xl font-semibold text-gray-900 mb-6 dark:text-white">
+          <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-6 dark:text-white">
             How would you rate your experience?
           </h2>
-          <div className="flex justify-center gap-4 mb-8">
+          <div className="flex justify-center gap-4 mb-4 md:mb-8">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 onClick={() => setRating(star)}
-                className={`text-3xl transition-all transform hover:scale-110 ${
+                className={`text-2xl md:text-3xl transition-all transform hover:scale-110 ${
                   star <= rating
                     ? "text-yellow-400"
                     : "text-gray-300 dark:text-gray-600"
@@ -134,10 +134,10 @@ const FeedbackPage = () => {
                       : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:border-gray-500"
                   }`}
                 >
-                  <span className="material-symbols-outlined mb-2">
+                  <span className="material-symbols-outlined mb-1 md:mb-2">
                     {category.icon}
                   </span>
-                  <span className="text-xs font-medium">{category.label}</span>
+                  <span className="text-xs md:text-sm font-medium">{category.label}</span>
                 </button>
               ))}
             </div>

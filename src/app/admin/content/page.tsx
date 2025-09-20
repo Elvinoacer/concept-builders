@@ -5,7 +5,7 @@ import ContentTabs from "@/components/admin/content/ContentTabs";
 
 const ContentPage = () => {
   return (
-    <div className="w-full max-w-7xl mx-auto bg-background text-foreground p-8">
+    <div className="w-full max-w-7xl mx-auto bg-background text-foreground p-4 md:p-8">
       <ContentHeader />
       <ContentTabs />
       <ContentTable />

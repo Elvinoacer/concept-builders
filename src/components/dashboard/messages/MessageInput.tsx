@@ -4,8 +4,8 @@ import Image from "next/image";
 
 const MessageInput = () => {
   return (
-    <div className="mt-6 flex items-center gap-4">
-      <div className="w-10 h-10 rounded-full bg-cover bg-center shrink-0">
+    <div className="mt-4 md:mt-6 flex items-center gap-4">
+      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-cover bg-center shrink-0">
         <Image
           src="https://img.freepik.com/premium-vector/person-with-blue-shirt-that-says-name-person_1029948-7040.jpg"
           alt="User avatar"
@@ -16,7 +16,7 @@ const MessageInput = () => {
       </div>
       <div className="flex-1 relative">
         <input
-          className="w-full h-12 px-4 pr-20 rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-400"
+          className="w-full h-10 md:h-12 px-4 pr-20 rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-400"
           placeholder="Type a message..."
           type="text"
         />

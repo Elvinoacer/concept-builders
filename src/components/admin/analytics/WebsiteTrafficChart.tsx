@@ -14,12 +14,12 @@ const WebsiteTrafficChart = () => {
       className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 p-6 shadow-sm"
     >
       <div className="flex flex-col">
-        <h3 className="text-chart-1 text-lg font-semibold">
+        <h3 className="text-chart-1 text-base md:text-lg font-semibold">
           Website Traffic
         </h3>
         <p className="text-gray-500 dark:text-gray-400 text-sm">Last 30 Days</p>
       </div>
-      <div className="h-64">
+      <div className="h-48 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={websiteTrafficData}>
                 <defs>

@@ -26,9 +26,9 @@ const SettingsPage = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <SettingsHeader />
-      <div className="mt-8">
+      <div className="mt-4 md:mt-8">
         <SettingsTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-        <div className="mt-8 bg-white dark:bg-gray-900 p-8 rounded-xl border border-gray-200 dark:border-gray-800">
+        <div className="mt-4 md:mt-8 bg-white dark:bg-gray-900 p-4 md:p-8 rounded-xl border border-gray-200 dark:border-gray-800">
           {renderContent()}
         </div>
       </div>

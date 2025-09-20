@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 const ContactForm = () => {
   return (
-    <div className="rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
+    <div className="rounded-lg bg-white p-6 md:p-8 shadow-lg dark:bg-gray-800">
       <form action="#" className="space-y-6" method="POST">
         <div>
           <label className="block text-sm font-medium text-gray-800 dark:text-gray-300" htmlFor="name">

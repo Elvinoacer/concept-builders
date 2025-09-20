@@ -12,7 +12,8 @@ This file lists all the pages in the Concept Builders project.
 - `/contact` - Contact Page
 - `/custom-design` - Custom Design Page
 - `/designs` - Designs Page
-- `/designs/<id>` - Design Detail Page
+- `/designs/[id]` - Design Detail Page
+- `/design-showcase` - Design Showcase Page
 - `/maintenance` - Maintenance Page
 - `/order-confirmation` - Order Confirmation Page
 - `/privacy` - Privacy Policy Page

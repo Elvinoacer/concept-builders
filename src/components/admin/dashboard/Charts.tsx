@@ -8,12 +8,12 @@ const Charts = () => {
       <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-md p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h3 className="text-lg font-semibold dark:text-white">Sales Performance</h3>
+            <h3 className="text-base md:text-lg font-semibold dark:text-white">Sales Performance</h3>
             <p className="text-gray-400 dark:text-gray-500 text-sm">Last 6 Months</p>
           </div>
-          <p className="text-3xl font-bold dark:text-white">${adminStats.totalSales.toLocaleString()}</p>
+          <p className="text-2xl md:text-3xl font-bold dark:text-white">${adminStats.totalSales.toLocaleString()}</p>
         </div>
-        <div className="h-80">
+        <div className="h-64 md:h-80">
           <svg fill="none" height="100%" preserveAspectRatio="none" viewBox="0 0 500 300" width="100%" xmlns="http://www.w3.org/2000/svg">
             <path d="M40 280 H460" className="stroke-gray-200 dark:stroke-gray-700" strokeWidth="2"></path>
             <path d="M40 20 V280" className="stroke-gray-200 dark:stroke-gray-700" strokeWidth="2"></path>
@@ -42,12 +42,12 @@ const Charts = () => {
       <div className="bg-white dark:bg-gray-800 rounded-md p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h3 className="text-lg font-semibold dark:text-white">Client Acquisition</h3>
+            <h3 className="text-base md:text-lg font-semibold dark:text-white">Client Acquisition</h3>
             <p className="text-gray-400 dark:text-gray-500 text-sm">Last 6 Months</p>
           </div>
-          <p className="text-3xl font-bold dark:text-white">120</p>
+          <p className="text-2xl md:text-3xl font-bold dark:text-white">120</p>
         </div>
-        <div className="h-80 flex items-end justify-around">
+        <div className="h-64 md:h-80 flex items-end justify-around">
           <div className="flex flex-col items-center gap-2">
             <div className="w-8 bg-gray-100 dark:bg-gray-700 rounded-t-md" style={{ height: '20%' }}></div>
             <p className="text-xs text-gray-400 dark:text-gray-500">Jan</p>

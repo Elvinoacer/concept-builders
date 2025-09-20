@@ -37,7 +37,7 @@ const DesignsTable = () => {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="bg-card rounded-md border border-border overflow-hidden"
     >
-      <div className="mb-6 p-4">
+      <div className="mb-4 p-3 md:mb-6 md:p-4">
         <div className="relative">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
             search
@@ -49,45 +49,46 @@ const DesignsTable = () => {
           />
         </div>
       </div>
-      <table className="w-full">
-        <thead className="bg-muted border-b border-border">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Design Name
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Price
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Last Updated
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"></th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {designsData.map((design, index) => (
-            <motion.tr
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                {design.name}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {getStatusChip(design.status)}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                {design.price}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                {design.lastUpdated}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-muted border-b border-border">
+            <tr>
+              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Design Name
+              </th>
+              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Price
+              </th>
+              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Last Updated
+              </th>
+              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {designsData.map((design, index) => (
+              <motion.tr
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                  {design.name}
+                </td>
+                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap">
+                  {getStatusChip(design.status)}
+                </td>
+                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  {design.price}
+                </td>
+                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  {design.lastUpdated}
+                </td>
+                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-right text-sm font-medium">
                 <a href="#" className="text-primary hover:text-opacity-80">
                   Edit
                 </a>

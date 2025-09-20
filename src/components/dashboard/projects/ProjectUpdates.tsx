@@ -5,13 +5,13 @@ import Image from "next/image";
 const ProjectUpdates = ({ projectManager }: { projectManager: any }) => {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-white">
+      <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-2 md:mb-4 dark:text-white">
         Project Updates
       </h2>
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-4 mb-2 md:mb-4">
         <Image
           alt={projectManager.name}
-          className="h-12 w-12 rounded-full object-cover"
+          className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover"
           src={projectManager.avatar}
           width={48}
           height={48}
@@ -29,7 +29,7 @@ const ProjectUpdates = ({ projectManager }: { projectManager: any }) => {
         <p className="font-semibold dark:text-white">Latest Update:</p>
         <p>{projectManager.latestUpdate}</p>
       </div>
-      <button className="mt-4 w-full flex items-center justify-center gap-2 rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:from-blue-700 hover:to-cyan-500 transition-colors">
+      <button className="mt-2 md:mt-4 w-full flex items-center justify-center gap-2 rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:from-blue-700 hover:to-cyan-500 transition-colors">
         <span className="material-symbols-outlined text-base">
           {" "}
           chat_bubble{" "}

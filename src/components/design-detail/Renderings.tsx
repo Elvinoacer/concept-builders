@@ -1,18 +1,17 @@
-import { designs } from "@/lib/designs";
-import Image from "next/image";
-
-const Renderings = ({ design }: { design: (typeof designs)[0] }) => {
+const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
   return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Renderings</h2>
-      <div className="grid grid-cols-1 gap-4">
-        {design.renderings.map((rendering, index) => (
-          <div key={index} className="relative w-full h-96">
-            <Image src={rendering} alt={`${design.name} Rendering ${index + 1}`} layout="fill" objectFit="contain" />
-          </div>
+    <section className="mb-8 md:mb-12">
+      <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 dark:text-white">3D Renderings</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {renderings.map((rendering, index) => (
+          <div
+            key={index}
+            className="h-48 md:h-64 rounded-lg bg-cover bg-center"
+            style={{ backgroundImage: `url(${rendering.url})` }}
+          ></div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

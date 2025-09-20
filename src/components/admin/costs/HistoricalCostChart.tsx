@@ -20,10 +20,10 @@ const HistoricalCostChart = () => {
       transition={{ duration: 0.5, delay: 0.1 }}
       className="bg-white dark:bg-gray-800 rounded-md p-6 border border-gray-200 dark:border-gray-700 shadow-sm"
     >
-      <div className="flex flex-col sm:flex-row justify-between items-start mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start mb-4 md:mb-6">
         <div>
           <p className="text-gray-600 dark:text-gray-400">Total Operational Costs</p>
-          <p className="text-4xl font-bold tracking-tight dark:text-white">$400.00</p>
+          <p className="text-3xl md:text-4xl font-bold tracking-tight dark:text-white">$400.00</p>
           <div className="flex items-center text-sm">
             <p className="text-gray-600 dark:text-gray-400 mr-2">Last 12 Months</p>
             <div className="flex items-center text-green-500 font-medium">
@@ -49,7 +49,7 @@ const HistoricalCostChart = () => {
           </button>
         </div>
       </div>
-      <div className="h-80">
+      <div className="h-64 md:h-80">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={historicalCostData}>
             <defs>

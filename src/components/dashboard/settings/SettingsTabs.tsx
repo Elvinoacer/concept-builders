@@ -11,7 +11,7 @@ const SettingsTabs = ({ activeTab, setActiveTab }) => {
 
   return (
     <div className="border-b border-gray-200 dark:border-gray-700">
-      <nav aria-label="Tabs" className="-mb-px flex space-x-8">
+      <nav aria-label="Tabs" className="-mb-px flex space-x-4 md:space-x-8 overflow-x-auto whitespace-nowrap">
         {tabs.map((tab) => (
           <button
             key={tab.id}

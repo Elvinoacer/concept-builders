@@ -6,7 +6,7 @@ const OrdersPage = () => {
   return (
     <div className="flex flex-col flex-1 dark:bg-gray-900">
       <OrdersHeader />
-      <main className="flex-1 p-6 dark:bg-gray-900">
+      <main className="flex-1 p-4 md:p-6 dark:bg-gray-900">
         <OrdersTabs />
         <OrdersTable />
       </main>

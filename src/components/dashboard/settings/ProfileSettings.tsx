@@ -6,13 +6,13 @@ import { userProfile } from "@/lib/settings";
 const ProfileSettings = () => {
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+      <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">
         Personal Information
       </h2>
-      <p className="text-gray-500 dark:text-gray-400 mt-1">
+      <p className="text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">
         Update your personal details here.
       </p>
-      <form className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 max-w-2xl">
+      <form className="mt-4 md:mt-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 max-w-2xl">
         <div className="md:col-span-2">
           <label
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"

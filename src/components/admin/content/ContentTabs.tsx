@@ -9,9 +9,9 @@ const ContentTabs = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="mb-6"
+      className="mb-4 md:mb-6"
     >
-      <div className="flex border-b border-border">
+      <div className="flex border-b border-border overflow-x-auto whitespace-nowrap">
         <a
           href="#"
           className="flex items-center justify-center border-b-2 border-primary text-primary py-3 px-4"

@@ -6,7 +6,7 @@ import Location from "@/components/contact/Location";
 
 const ContactPage = () => {
   return (
-    <main className="flex-1 bg-gray-50 py-16 lg:py-24 dark:bg-gray-900">
+    <main className="flex-1 bg-gray-50 py-8 md:py-12 lg:py-16 dark:bg-gray-900">
       <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:gap-24">
           <div className="flex flex-col">

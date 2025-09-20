@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 const CheckoutForm = () => {
   return (
     <div>
-      <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Checkout</h2>
+      <h2 className="mb-4 md:mb-6 text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Checkout</h2>
       <div className="space-y-6">
         <Card>
           <CardHeader>

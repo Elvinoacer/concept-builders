@@ -3,12 +3,12 @@ import Link from "next/link";
 
 const MaintenancePage = () => {
   return (
-    <main className="flex flex-1 items-center justify-center py-20 px-4 sm:px-6 lg:px-8 dark:bg-gray-900">
+    <main className="flex flex-1 items-center justify-center py-12 md:py-20 px-4 sm:px-6 lg:px-8 dark:bg-gray-900">
       <div className="w-full max-w-lg text-center">
         <img
           alt="Under Maintenance Illustration"
-          className="mx-auto h-64 w-auto dark:invert"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkPkMBONXZcs5CeSgLF5eAYNN1SRdPacpcgdHtTZAkAmObRSFRuAvoQbN4tpEfWiIZraNQg5UzTqeYVqOs-fIpvv38VE7hFusBkMzCdIlCycVXAZyEIl4MWv5OYKLEyP_zNu74DHzu6reQAhwLtGQg1dZtFCSWnFDiTi61sIOzeH1hyhl09DAUn92clLEn-xV9KVTU_GE3ugdlbGasguZ1XQLe46LH-gxM3pxsXvACobPQ9331HldA3qEhhiLbZ0fZNvahTvW_-N1T"
+          className="mx-auto h-48 md:h-64 w-auto dark:invert"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkPkMBONXZcs5CeSgLF5eAYNN1SRdPacpcgdHtTZAkAmObRSFRuAvoQbN4tpEfWiIZraNQg5UzTqeYVqOs-fIpvv38VE7hFusBkMzCdIlCycVXAZyEIl4MWv5OYKLEyP_zNu74DHzu6reQAhwLtGQg1dZtFCSWnFDiTi61sIOzeH1hyhl09DAUn92clLEn-xV9KVTU_GE3ugdlbGasguZ1XQJvACobPQ9331HldA3qEhhiLbZ0fZNvahTvW_-N1T"
         />
         <div className="mt-8">
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl dark:text-white">

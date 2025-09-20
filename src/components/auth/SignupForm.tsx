@@ -7,8 +7,8 @@ const SignupForm = ({ setAuthMode }) => {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Create an Account</h2>
-      <p className="text-gray-600 mt-2 mb-8 dark:text-gray-400">Get started with a free account.</p>
+      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Create an Account</h2>
+      <p className="text-gray-600 mt-2 mb-4 md:mb-8 dark:text-gray-400">Get started with a free account.</p>
       <form className="flex flex-col gap-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="name">Name</label>

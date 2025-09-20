@@ -4,7 +4,7 @@ import React from 'react';
 const OrderSummary = ({ orderNumber, orderDate, total }) => {
   return (
     <div>
-      <h3 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight mb-4">Order Summary</h3>
+      <h3 className="text-gray-900 dark:text-white text-base md:text-lg font-bold leading-tight tracking-tight mb-2 md:mb-4">Order Summary</h3>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <p className="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Order Number</p>

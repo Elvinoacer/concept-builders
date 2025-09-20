@@ -11,7 +11,7 @@ const DesignsPage = () => {
   const [activeTab, setActiveTab] = useState("all");
 
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-4 md:p-8">
       <DesignsHeader activeTab={activeTab} />
       <DesignsTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       {activeTab === "all" ? <DesignsTable /> : <FoldersPage />}

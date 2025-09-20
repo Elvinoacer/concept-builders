@@ -6,9 +6,9 @@ const NewPlans = () => {
   const newDesigns = designs.slice(3, 6);
 
   return (
-    <section className="py-12 bg-gray-50 dark:bg-gray-900">
+    <section className="py-8 md:py-12 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8 dark:text-white">New Plans</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 dark:text-white">New Plans</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {newDesigns.map((design) => (
             <div key={design.id} className="border rounded-lg overflow-hidden shadow-lg dark:bg-gray-800 dark:border-gray-700">

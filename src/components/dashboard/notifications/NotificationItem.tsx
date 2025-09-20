@@ -30,16 +30,16 @@ const NotificationItem = ({ notification }: { notification: any }) => {
   };
 
   return (
-    <div className="flex items-center gap-4 px-6 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors last:border-b-0 dark:border-gray-700 dark:hover:bg-gray-700">
+    <div className="flex items-center gap-4 px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors last:border-b-0 dark:border-gray-700 dark:hover:bg-gray-700">
       <div
-        className={`flex items-center justify-center rounded-full shrink-0 size-12 ${getColorClasses(
+        className={`flex items-center justify-center rounded-full shrink-0 size-10 md:size-12 ${getColorClasses(
           notification.color
         )}`}
       >
         <span className="material-symbols-outlined">{notification.icon}</span>
       </div>
       <div className="flex-grow">
-        <p className="text-gray-800 font-medium dark:text-white">
+        <p className="text-gray-800 text-sm md:text-base font-medium dark:text-white">
           {notification.title}
         </p>
         <p className="text-gray-500 text-sm dark:text-gray-400">

@@ -34,7 +34,7 @@ const OrderConfirmationPage = () => {
       style={{ fontFamily: '"Work Sans", "Noto Sans", sans-serif' }}
     >
       <div className="layout-container flex h-full grow flex-col">
-        <main className="flex flex-1 justify-center py-12 px-4 bg-gray-50 dark:bg-gray-900">
+        <main className="flex flex-1 justify-center py-8 md:py-12 px-4 bg-gray-50 dark:bg-gray-900">
           <div className="layout-content-container flex flex-col w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <ConfirmationHeader orderNumber={order.orderNumber} />
             <div className="px-8 md:px-12 py-6 border-t border-gray-200 dark:border-gray-700">

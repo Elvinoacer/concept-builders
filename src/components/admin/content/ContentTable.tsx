@@ -31,7 +31,7 @@ const ContentTable = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
             <svg
@@ -51,15 +51,15 @@ const ContentTable = () => {
           />
         </div>
       </div>
-      <div className="bg-card rounded-lg shadow-sm border border overflow-hidden">
+      <div className="bg-card rounded-lg shadow-sm border border overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-muted">
             <tr className="text-left text-muted-foreground">
-              <th className="px-6 py-3 font-medium">Title</th>
-              <th className="px-6 py-3 font-medium">Author</th>
-              <th className="px-6 py-3 font-medium">Status</th>
-              <th className="px-6 py-3 font-medium">Published Date</th>
-              <th className="px-6 py-3 font-medium text-right">Actions</th>
+              <th className="px-3 py-2 md:px-6 md:py-3 font-medium">Title</th>
+              <th className="px-3 py-2 md:px-6 md:py-3 font-medium">Author</th>
+              <th className="px-3 py-2 md:px-6 md:py-3 font-medium">Status</th>
+              <th className="px-3 py-2 md:px-6 md:py-3 font-medium">Published Date</th>
+              <th className="px-3 py-2 md:px-6 md:py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -71,15 +71,15 @@ const ContentTable = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="hover:bg-muted"
               >
-                <td className="px-6 py-4 text-foreground font-medium">
+                <td className="px-3 py-2 md:px-6 md:py-4 text-foreground font-medium">
                   {post.title}
                 </td>
-                <td className="px-6 py-4 text-muted-foreground">{post.author}</td>
-                <td className="px-6 py-4">{getStatusChip(post.status)}</td>
-                <td className="px-6 py-4 text-muted-foreground">
+                <td className="px-3 py-2 md:px-6 md:py-4 text-muted-foreground">{post.author}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4">{getStatusChip(post.status)}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4 text-muted-foreground">
                   {post.publishedDate}
                 </td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-3 py-2 md:px-6 md:py-4 text-right">
                   <a
                     href="#"
                     className="font-medium text-primary hover:text-primary-dark"

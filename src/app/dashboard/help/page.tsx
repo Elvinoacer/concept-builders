@@ -148,19 +148,19 @@ const HelpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-8 md:mb-12"
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-4 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-white">
             Help & Support
           </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto dark:text-gray-400">
+          <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto dark:text-gray-400">
             Find answers to common questions, browse documentation, or get in
             touch with our support team.
           </p>
@@ -171,7 +171,7 @@ const HelpPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="mb-12"
+          className="mb-8 md:mb-12"
         >
           <div className="relative max-w-2xl mx-auto">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
@@ -192,7 +192,7 @@ const HelpPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 md:mb-16"
         >
           {contactMethods.map((method, index) => (
             <motion.div
@@ -200,7 +200,7 @@ const HelpPage = () => {
               whileHover={{ y: -5 }}
               className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
             >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 dark:bg-blue-900">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 dark:bg-blue-900">
                 <span className="material-symbols-outlined text-blue-600 dark:text-blue-400">
                   {method.icon}
                 </span>
@@ -226,9 +226,9 @@ const HelpPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-16"
+          className="mb-8 md:mb-16"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 dark:text-white">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-8 dark:text-white">
             Knowledge Base
           </h2>
 
@@ -281,9 +281,9 @@ const HelpPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="mb-16"
+          className="mb-8 md:mb-16"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 dark:text-white">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-8 dark:text-white">
             Frequently Asked Questions
           </h2>
           <div className="space-y-4">
@@ -327,7 +327,7 @@ const HelpPage = () => {
           transition={{ duration: 0.5, delay: 0.5 }}
           className="bg-gradient-to-r from-blue-600 to-cyan-400 rounded-xl p-8 text-center text-white"
         >
-          <h2 className="text-2xl font-bold mb-4">Still need help?</h2>
+          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Still need help?</h2>
           <p className="mb-6 opacity-90">
             Our support team is here to assist you
           </p>

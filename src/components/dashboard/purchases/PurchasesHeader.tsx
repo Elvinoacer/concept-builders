@@ -4,11 +4,11 @@ import React from "react";
 
 const PurchasesHeader = () => {
   return (
-    <div className="mb-8">
-      <h2 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+    <div className="mb-4 md:mb-8">
+      <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
         My Purchased Designs
       </h2>
-      <p className="mt-2 text-gray-600 dark:text-gray-400">
+      <p className="mt-1 md:mt-2 text-gray-600 dark:text-gray-400">
         Access your purchased house plans, download files, and manage your
         receipts.
       </p>

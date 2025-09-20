@@ -9,13 +9,13 @@ const PasswordSettings = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+      <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">
         Change Password
       </h2>
-      <p className="text-gray-500 dark:text-gray-400 mt-1">
+      <p className="text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">
         Update your password here.
       </p>
-      <form className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 max-w-2xl">
+      <form className="mt-4 md:mt-6 grid grid-cols-1 gap-x-6 gap-y-6 max-w-2xl">
         {[
           {
             id: "current-password",
@@ -52,7 +52,7 @@ const PasswordSettings = () => {
             <button
               type="button"
               onClick={() => setter(!state)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 top-6"
+              className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 top-4 md:top-6"
             >
               <span className="material-symbols-outlined">
                 {state ? "visibility_off" : "visibility"}

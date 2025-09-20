@@ -5,18 +5,18 @@ import { Button } from "@/components/ui/button";
 
 const FeaturedPost = () => {
   return (
-    <div className="p-4 @container bg-white rounded-lg border border-gray-200 shadow-sm mb-8 dark:bg-gray-800 dark:border-gray-700">
+    <div className="p-3 md:p-4 @container bg-white rounded-lg border border-gray-200 shadow-sm mb-8 dark:bg-gray-800 dark:border-gray-700">
       <div className="flex flex-col items-stretch justify-start rounded-lg @xl:flex-row @xl:items-start">
-        <div className="w-full @xl:w-1/2 bg-center bg-no-repeat aspect-video bg-cover rounded-md">
+        <div className="w-full md:w-1/2 bg-center bg-no-repeat aspect-video bg-cover rounded-md">
           <Image
             src={featuredPost.image}
             alt={featuredPost.title}
-            width={500}
-            height={300}
-            className="rounded-md"
+            width={300}
+            height={180}
+            className="rounded-md w-full h-auto"
           />
         </div>
-        <div className="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-2 py-4 @xl:pl-6">
+        <div className="flex w-full md:w-1/2 min-w-72 grow flex-col items-stretch justify-center gap-2 py-4 @xl:pl-6">
           <p
             className="text-sm font-bold leading-normal"
             style={{
@@ -27,10 +27,10 @@ const FeaturedPost = () => {
           >
             Featured
           </p>
-          <h3 className="text-gray-900 text-xl font-bold leading-tight tracking-tight dark:text-white">
+          <h3 className="text-lg md:text-xl font-bold leading-tight tracking-tight dark:text-white">
             {featuredPost.title}
           </h3>
-          <p className="text-gray-500 text-base font-normal leading-relaxed flex-grow dark:text-gray-400">
+          <p className="text-sm md:text-base font-normal leading-relaxed flex-grow dark:text-gray-400">
             {featuredPost.description}
           </p>
           <Button className="mt-2 max-w-fit">Read More</Button>

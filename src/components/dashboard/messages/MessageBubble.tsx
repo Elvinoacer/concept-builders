@@ -8,7 +8,7 @@ const MessageBubble = ({ message }: { message: any }) => {
   return (
     <div className={`flex items-start gap-4 ${isSent ? "justify-end" : ""}`}>
       {!isSent && (
-        <div className="w-10 h-10 rounded-full bg-cover bg-center shrink-0">
+        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-cover bg-center shrink-0">
           <Image
             src={message.sender.avatar}
             alt={message.sender.name}
@@ -34,13 +34,13 @@ const MessageBubble = ({ message }: { message: any }) => {
               : "bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border dark:border-gray-700"
           } p-4 rounded-lg ${
             isSent ? "rounded-tr-none" : "rounded-tl-none"
-          } max-w-lg`}
+          } max-w-xs md:max-w-lg`}
         >
           <p className="text-sm">{message.content}</p>
         </div>
         {message.attachment && (
-          <div className="bg-white p-3 rounded-lg max-w-lg flex items-center gap-3 shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
-            <div className="w-12 h-12 rounded-lg bg-cover bg-center">
+          <div className="bg-white p-3 rounded-lg max-w-xs md:max-w-lg flex items-center gap-3 shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-cover bg-center">
               <Image
                 src={message.attachment.preview}
                 alt={message.attachment.name}
@@ -64,7 +64,7 @@ const MessageBubble = ({ message }: { message: any }) => {
         )}
       </div>
       {isSent && (
-        <div className="w-10 h-10 rounded-full bg-cover bg-center shrink-0">
+        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-cover bg-center shrink-0">
           <Image
             src={message.sender.avatar}
             alt={message.sender.name}

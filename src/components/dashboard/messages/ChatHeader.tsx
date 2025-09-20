@@ -20,16 +20,16 @@ const ChatHeader = ({
 
   return (
     <div className="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-      <div className="px-8 py-6">
-        <p className="text-2xl font-bold text-gray-800 dark:text-white">
+      <div className="px-4 py-4 md:px-8 md:py-6">
+        <p className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">
           Project: {project.title}
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Project ID: {project.id}
         </p>
       </div>
-      <div className="px-8">
-        <div className="flex border-b border-gray-200 dark:border-gray-700">
+      <div className="px-4 md:px-8">
+        <div className="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto whitespace-nowrap">
           {navItems.map((item) => (
             <a
               key={item.id}

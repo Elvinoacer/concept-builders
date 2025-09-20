@@ -16,8 +16,8 @@ const FeaturedDesigns = () => {
   };
 
   return (
-    <section className="mb-12">
-      <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-6">Featured Designs</h2>
+    <section className="mb-8 md:mb-12">
+      <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-6">Featured Designs</h2>
       <div className="relative">
         <div
           ref={scrollContainerRef}

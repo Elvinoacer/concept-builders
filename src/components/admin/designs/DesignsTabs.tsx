@@ -9,9 +9,9 @@ const DesignsTabs = ({ activeTab, setActiveTab }) => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="border-b border-border mb-6"
+      className="border-b border-border mb-4 md:mb-6"
     >
-      <nav className="flex gap-8">
+      <nav className="flex gap-4 md:gap-8 overflow-x-auto whitespace-nowrap">
         <a
           href="#"
           onClick={() => setActiveTab("all")}

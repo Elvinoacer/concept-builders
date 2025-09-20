@@ -9,9 +9,9 @@ const ContentHeader = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex items-center justify-between mb-8"
+      className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4"
     >
-      <h1 className="text-3xl font-bold text-foreground">Content Management</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-foreground">Content Management</h1>
       <button className="flex items-center justify-center gap-2 h-10 px-5 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-sm font-bold leading-normal tracking-wide rounded-md hover:to-primary/80 transition-colors">
         <svg
           className="bi bi-plus-lg"

@@ -86,10 +86,10 @@ const ProjectsPage = () => {
   };
 
   return (
-    <div className="mx-auto max-w-6xl p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="mx-auto max-w-6xl p-4 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <ProjectsHeader title={project.title} description={project.description} />
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-4 md:space-y-8">
           <ProjectProgress
             progress={project.progress}
             estimatedCompletion={project.estimatedCompletion}
@@ -97,7 +97,7 @@ const ProjectsPage = () => {
           <Milestones milestones={project.milestones} />
           <Payments payments={project.payments} />
         </div>
-        <div className="lg:col-span-1 space-y-8">
+        <div className="lg:col-span-1 space-y-4 md:space-y-8">
           <ProjectUpdates projectManager={project.projectManager} />
           <ProjectImages images={project.images} />
         </div>

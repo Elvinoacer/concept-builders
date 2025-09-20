@@ -14,9 +14,9 @@ const UsersTabs = ({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="border-b border-gray-200 mb-6 dark:border-gray-800"
+      className="border-b border-gray-200 mb-4 md:mb-6 dark:border-gray-800"
     >
-      <nav className="flex gap-8">
+      <nav className="flex gap-4 md:gap-8 overflow-x-auto whitespace-nowrap">
         <button
           onClick={() => setActiveTab("clients")}
           className={`pb-3 border-b-2 text-sm font-semibold ${

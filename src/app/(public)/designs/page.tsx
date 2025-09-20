@@ -1,6 +1,7 @@
 "use client";
 import DesignCard from "@/components/DesignCard";
-import { categories, designs } from "@/lib/designs";
+import { designs } from "@/lib/designs";
+import { categories } from "@/lib/categories";
 import { useEffect, useState } from "react";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -36,13 +37,13 @@ const AllDesignsPage = () => {
       }}
     >
       <div className="layout-container flex h-full grow flex-col">
-        <main className="flex-1 px-16 lg:px-24 xl:px-40 py-12 bg-gray-50 dark:bg-gray-900">
+        <main className="flex-1 px-4 py-8 md:px-16 lg:px-24 xl:px-40 md:py-12 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-7xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 tracking-tight dark:text-white">All Designs</h1>
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight dark:text-white">All Designs</h1>
+              <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
                 <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full md:w-[180px]">
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>

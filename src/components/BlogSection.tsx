@@ -4,16 +4,16 @@ import { blogPosts } from "@/lib/data";
 
 const BlogSection = () => {
   return (
-    <section className="py-16">
-      <h2 className="text-slate-800 text-3xl font-bold tracking-tight mb-12 dark:text-white">
+    <section className="py-12 md:py-16">
+      <h2 className="text-slate-800 text-2xl md:text-3xl font-bold tracking-tight mb-12 dark:text-white">
         From Our Blog
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {blogPosts.map((post, index) => (
-          <div key={index} className="group flex items-center gap-6 rounded-lg">
-            <div className="w-1/3 flex-shrink-0 overflow-hidden rounded-lg">
+          <div key={index} className="group flex flex-col md:flex-row items-center gap-6 rounded-lg">
+            <div className="w-full md:w-1/3 flex-shrink-0 overflow-hidden rounded-lg">
               <div
-                className="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
+                className="w-full bg-center bg-no-repeat aspect-video md:aspect-square bg-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
                 style={{ backgroundImage: `url("${post.imageUrl}")` }}
               ></div>
             </div>

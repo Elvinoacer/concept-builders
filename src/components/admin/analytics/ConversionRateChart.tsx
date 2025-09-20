@@ -12,13 +12,13 @@ const ConversionRateChart = () => {
       className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 p-6 shadow-sm"
     >
       <div className="flex flex-col">
-        <h3 className="text-chart-4 text-lg font-semibold">
+        <h3 className="text-chart-4 text-base md:text-lg font-semibold">
           Conversion Rate
         </h3>
         <p className="text-gray-500 dark:text-gray-400 text-sm">Last 30 days</p>
       </div>
-      <div className="flex h-64 items-center justify-center">
-        <div className="relative h-48 w-48">
+      <div className="flex h-48 md:h-64 items-center justify-center">
+        <div className="relative h-32 w-32 md:h-48 md:w-48">
           <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
             <path
               className="text-muted"
@@ -37,7 +37,7 @@ const ConversionRateChart = () => {
             ></path>
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-3xl font-bold text-chart-1">5.2%</p>
+            <p className="text-2xl md:text-3xl font-bold text-chart-1">5.2%</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">Converted</p>
           </div>
         </div>
