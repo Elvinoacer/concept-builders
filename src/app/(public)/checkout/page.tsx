@@ -1,7 +1,5 @@
 "use client";
 import React from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { cart } from "@/lib/cart";

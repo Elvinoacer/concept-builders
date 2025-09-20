@@ -1,13 +1,14 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Design } from "@/lib/designs";
 
-const DesignCard = ({ design }) => {
+const DesignCard = ({ design }: { design: Design }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const cardRef = useRef(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
@@ -74,7 +75,7 @@ const DesignCard = ({ design }) => {
             }}
           >
             <Image
-              src={design.images && design.images.length > 0 ? design.images[0] : "/placeholder.jpg"}
+              src={design.image ? design.image : "/placeholder.jpg"}
               alt={design.name}
               fill
               className="object-cover"
@@ -118,19 +119,19 @@ const DesignCard = ({ design }) => {
 
           {/* Stats */}
           <div className="flex justify-between items-center mb-4">
-            <p className="text-2xl font-bold text-blue-300">${design.price}</p>
+            <p className="text-2xl font-bold text-blue-300">${design.pricing.pdf}</p>
             <div className="flex items-center gap-4 text-sm text-gray-300">
               <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
                 <span className="material-symbols-outlined text-base">bed</span>
-                <span>{design.bedrooms}</span>
+                <span>{design.details.bedrooms}</span>
               </div>
               <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
                 <span className="material-symbols-outlined text-base">bathtub</span>
-                <span>{design.bathrooms}</span>
+                <span>{design.details.bathrooms}</span>
               </div>
               <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
                 <span className="material-symbols-outlined text-base">square_foot</span>
-                <span>{design.area} sqft</span>
+                <span>{design.details.area} sqft</span>
               </div>
             </div>
           </div>

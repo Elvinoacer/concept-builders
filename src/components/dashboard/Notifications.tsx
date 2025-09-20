@@ -17,7 +17,7 @@ const Notifications = () => {
               Project Update
             </p>
             <p className="text-gray-500 text-sm dark:text-gray-400">
-              Your project 'Modern Retreat' has been updated.
+              Your project &apos;Modern Retreat&apos; has been updated.
             </p>
           </div>
           <span className="text-xs text-gray-400 dark:text-gray-500">
@@ -33,7 +33,7 @@ const Notifications = () => {
               New Design
             </p>
             <p className="text-gray-500 text-sm dark:text-gray-400">
-              New design 'Coastal Breeze' is now available.
+              New design &apos;Coastal Breeze&apos; is now available.
             </p>
           </div>
           <span className="text-xs text-gray-400 dark:text-gray-500">

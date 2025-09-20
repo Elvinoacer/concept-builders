@@ -1,8 +1,8 @@
 // components/dashboard/purchases/PurchaseRow.jsx
 "use client";
-import React from "react";
+import { Purchase } from "@/lib/types";
 
-const PurchaseRow = ({ design }) => {
+const PurchaseRow = ({ design }: { design: Purchase }) => {
   return (
     <tr>
       <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap">

@@ -8,7 +8,7 @@ const HowItWorks = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div>
             <h3 className="text-xl font-semibold mb-2 dark:text-gray-200">1. Choose a Plan</h3>
-            <p className="dark:text-gray-400">Browse our collection of house plans and find the one that's right for you.</p>
+            <p className="dark:text-gray-400">Browse our collection of house plans and find the one that&apos;s right for you.</p>
           </div>
           <div>
             <h3 className="text-xl font-semibold mb-2 dark:text-gray-200">2. Purchase & Download</h3>

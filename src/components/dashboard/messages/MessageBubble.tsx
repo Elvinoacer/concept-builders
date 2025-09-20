@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
+import { Message } from "@/lib/types";
 import Image from "next/image";
 
-const MessageBubble = ({ message }: { message: any }) => {
+const MessageBubble = ({ message }: { message: Message }) => {
   const isSent = message.type === "sent";
 
   return (

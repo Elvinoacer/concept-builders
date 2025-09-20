@@ -11,7 +11,7 @@ const DashboardPage = () => {
           Dashboard
         </h2>
         <p className="text-gray-500 mt-0.5 md:mt-1 dark:text-gray-400">
-          Welcome back, Sophia! Here's a summary of your account.
+          Welcome back, Sophia! Here&apos;s a summary of your account.
         </p>
       </header>
       <SummaryCards />

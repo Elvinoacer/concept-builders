@@ -17,7 +17,7 @@ const NewPlans = () => {
                 <h3 className="text-xl font-semibold mb-2 dark:text-white">{design.name}</h3>
                 <p className="text-gray-600 dark:text-gray-400">{design.category}</p>
                 <div className="flex justify-between items-center mt-4">
-                  <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text">${design.price}</p>
+                  <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text">${design.pricing.pdf}</p>
                   <button className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-cyan-500 transition-all">View Details</button>
                 </div>
               </div>

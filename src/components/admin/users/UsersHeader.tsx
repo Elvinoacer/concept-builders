@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-const UsersHeader = ({ activeTab }: { activeTab: string }) => {
+const UsersHeader = () => {
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}

@@ -1,7 +1,8 @@
 
 import Image from "next/image";
+import { BlogPost } from "@/lib/types";
 
-const PostListItem = ({ post }) => {
+const PostListItem = ({ post }: { post: BlogPost }) => {
   return (
     <a
       className="flex flex-col md:flex-row items-center gap-4 md:gap-6 bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:shadow-lg"

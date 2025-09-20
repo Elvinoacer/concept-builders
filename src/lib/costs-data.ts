@@ -1,5 +1,7 @@
 
-export const costsData = [
+import { Cost } from "./types";
+
+export const costsData: Cost[] = [
   {
     service: "DigitalOcean Usage",
     cost: "$250.00",

@@ -3,7 +3,12 @@
 
 import { motion } from "framer-motion";
 
-const DesignsTabs = ({ activeTab, setActiveTab }) => {
+interface DesignsTabsProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+const DesignsTabs = ({ activeTab, setActiveTab }: DesignsTabsProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}

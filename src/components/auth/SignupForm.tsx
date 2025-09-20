@@ -2,7 +2,7 @@
 'use client';
 import React, { useState } from 'react';
 
-const SignupForm = ({ setAuthMode }) => {
+const SignupForm = ({ setAuthMode }: { setAuthMode: React.Dispatch<React.SetStateAction<string>> }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (

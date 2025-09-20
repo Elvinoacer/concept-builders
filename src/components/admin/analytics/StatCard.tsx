@@ -3,7 +3,15 @@
 
 import { motion } from "framer-motion";
 
-const StatCard = ({ label, value, change, changeType, color }) => {
+interface StatCardProps {
+  label: string;
+  value: string;
+  change: string;
+  changeType: "increase" | "decrease";
+  color: string;
+}
+
+const StatCard = ({ label, value, change, changeType, color }: StatCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

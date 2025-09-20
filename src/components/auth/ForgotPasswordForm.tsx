@@ -2,12 +2,12 @@
 'use client';
 import React from 'react';
 
-const ForgotPasswordForm = ({ setAuthMode }) => {
+const ForgotPasswordForm = ({ setAuthMode }: { setAuthMode: React.Dispatch<React.SetStateAction<string>> }) => {
 
   return (
     <div>
       <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Forgot your password?</h2>
-      <p className="text-gray-600 mt-2 mb-4 md:mb-8 dark:text-gray-400">No problem! Enter your email address below and we'll send you a link to reset it.</p>
+      <p className="text-gray-600 mt-2 mb-4 md:mb-8 dark:text-gray-400">No problem! Enter your email address below and we&apos;ll send you a link to reset it.</p>
       <form className="flex flex-col gap-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="email">Email</label>

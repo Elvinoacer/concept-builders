@@ -3,7 +3,11 @@
 
 import { motion } from "framer-motion";
 
-const DesignsHeader = ({ activeTab }) => {
+interface DesignsHeaderProps {
+  activeTab: string;
+}
+
+const DesignsHeader = ({ activeTab }: DesignsHeaderProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}

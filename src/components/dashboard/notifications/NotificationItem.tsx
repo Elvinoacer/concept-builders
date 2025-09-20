@@ -1,7 +1,14 @@
 "use client";
 import React from "react";
 
-const NotificationItem = ({ notification }: { notification: any }) => {
+interface Notification {
+  color: string;
+  icon: string;
+  title: string;
+  description: string;
+}
+
+const NotificationItem = ({ notification }: { notification: Notification }) => {
   const getColorClasses = (color: string) => {
     switch (color) {
       case "blue":

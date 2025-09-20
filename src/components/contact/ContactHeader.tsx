@@ -8,7 +8,7 @@ const ContactHeader = () => {
         Get in Touch
       </h1>
       <p className="mt-4 text-base md:text-lg text-gray-600 dark:text-gray-400">
-        We're here to help. Reach out to us with any questions or feedback.
+        We&apos;re here to help. Reach out to us with any questions or feedback.
       </p>
     </div>
   );

@@ -106,7 +106,7 @@ const Hero = () => {
                 >
                   <span className="sr-only">Go to slide {index + 1}</span>
                 </button>
-              ))}"
+              ))}
             </div>
           </div>
         </div>

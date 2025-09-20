@@ -1,7 +1,5 @@
 "use client";
 import React from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import ConfirmationHeader from "@/components/order-confirmation/ConfirmationHeader";
 import OrderSummary from "@/components/order-confirmation/OrderSummary";
 import ItemsPurchased from "@/components/order-confirmation/ItemsPurchased";

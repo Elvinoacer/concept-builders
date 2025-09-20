@@ -1,7 +1,15 @@
 "use client";
 import React from "react";
 
-const Milestones = ({ milestones }: { milestones: any[] }) => {
+interface Milestone {
+  id: number;
+  name: string;
+  status: string;
+  statusColor: string;
+  dueDate: string;
+}
+
+const Milestones = ({ milestones }: { milestones: Milestone[] }) => {
   const getStatusClasses = (statusColor: string) => {
     switch (statusColor) {
       case "green":

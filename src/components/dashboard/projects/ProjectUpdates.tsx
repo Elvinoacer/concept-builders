@@ -2,7 +2,14 @@
 import React from "react";
 import Image from "next/image";
 
-const ProjectUpdates = ({ projectManager }: { projectManager: any }) => {
+interface ProjectManager {
+  name: string;
+  role: string;
+  avatar: string;
+  latestUpdate: string;
+}
+
+const ProjectUpdates = ({ projectManager }: { projectManager: ProjectManager }) => {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700">
       <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-2 md:mb-4 dark:text-white">

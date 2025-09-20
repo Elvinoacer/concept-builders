@@ -114,6 +114,7 @@ const TeamTable = () => {
           </tbody>
         </table>
       </div>
+    </motion.div>
   );
 };
 

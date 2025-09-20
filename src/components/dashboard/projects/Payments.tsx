@@ -1,7 +1,16 @@
 "use client";
 import React from "react";
 
-const Payments = ({ payments }: { payments: any[] }) => {
+interface Payment {
+  id: number;
+  name: string;
+  amount: number;
+  status: string;
+  statusColor: string;
+  date: string;
+}
+
+const Payments = ({ payments }: { payments: Payment[] }) => {
   const getStatusClasses = (statusColor: string) => {
     switch (statusColor) {
       case "green":

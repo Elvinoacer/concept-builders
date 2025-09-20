@@ -1,7 +1,5 @@
 import BlogSection from "@/components/BlogSection";
 import FeaturedCategories from "@/components/FeaturedCategories";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import BestSellingPlans from "@/components/BestSellingPlans";

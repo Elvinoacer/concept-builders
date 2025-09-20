@@ -89,14 +89,15 @@ const DesignsTable = () => {
                   {design.lastUpdated}
                 </td>
                 <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-right text-sm font-medium">
-                <a href="#" className="text-primary hover:text-opacity-80">
-                  Edit
-                </a>
-              </td>
-            </motion.tr>
-          ))}
-        </tbody>
-      </table>
+                  <a href="#" className="text-primary hover:text-opacity-80">
+                    Edit
+                  </a>
+                </td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </motion.div>
   );
 };

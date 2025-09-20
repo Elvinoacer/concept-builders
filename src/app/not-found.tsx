@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 
 const NotFoundPage = () => {
   return (
@@ -15,7 +16,7 @@ const NotFoundPage = () => {
               Page Not Found
             </h1>
             <p className="text-base text-gray-600 dark:text-gray-400">
-              Sorry, we couldn't find the page you're looking for. It might have
+              Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have
               been moved or deleted.
             </p>
             <div className="mt-4 flex items-center gap-4">
@@ -38,10 +39,12 @@ const NotFoundPage = () => {
 
           {/* Right section - Illustration */}
           <div className="flex justify-center">
-            <img
+            <Image
               alt="Illustration of a lost page"
               className="rounded-lg object-cover w-full max-w-sm h-auto shadow-lg"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQv8C5M0nsiiF8KYyiPQBm-cFN80mVBTcZxukVJIGX6yN0qBYrQJ10JaVm5m9Z9mCHJ446JDo4oiL7Eumtx8URpFsvvLQYabqyOFhiD9vzDJ_gYAH8fLJJGvL9AotJusXyM2MNi7s6avkQYquvWTZ4tuNoV9gancbILY_3x1wuc8WGNRLTWfzq1Tx0QKfXYMtmrgO24e9x0YzkANSWo2dKUVChrWjgXXIzIuF6oipI0iNkBDtjs-rePulzQ1RpD8TI2o25EiER7uMj"
+              width={400}
+              height={400}
             />
           </div>
         </div>

@@ -3,7 +3,15 @@
 
 import { motion } from "framer-motion";
 
-const CostCard = ({ service, cost, change, changeType, icon }) => {
+interface CostCardProps {
+  service: string;
+  cost: string;
+  change: string;
+  changeType: "increase" | "decrease";
+  icon: string;
+}
+
+const CostCard = ({ service, cost, change, changeType, icon }: CostCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

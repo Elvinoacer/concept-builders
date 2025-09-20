@@ -11,7 +11,7 @@ const Testimonials = () => {
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="border rounded-lg p-6 shadow-lg text-center dark:bg-gray-800 dark:border-gray-700">
               <Image src={testimonial.image} alt={testimonial.name} width={100} height={100} className="w-24 h-24 rounded-full mx-auto mb-4" />
-              <p className="text-gray-600 italic dark:text-gray-400">"{testimonial.testimonial}"</p>
+              <p className="text-gray-600 italic dark:text-gray-400">&quot;{testimonial.testimonial}&quot;</p>
               <p className="text-lg font-semibold mt-4 dark:text-white">{testimonial.name}</p>
             </div>
           ))}

@@ -19,9 +19,9 @@ const AllDesignsPage = () => {
     }
 
     if (sortOrder === "price-asc") {
-      newFilteredDesigns.sort((a, b) => a.price - b.price);
+      newFilteredDesigns.sort((a, b) => a.pricing.pdf - b.pricing.pdf);
     } else if (sortOrder === "price-desc") {
-      newFilteredDesigns.sort((a, b) => b.price - a.price);
+      newFilteredDesigns.sort((a, b) => b.pricing.pdf - a.pricing.pdf);
     } else {
       newFilteredDesigns.sort((a, b) => a.name.localeCompare(b.name));
     }

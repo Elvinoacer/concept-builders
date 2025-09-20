@@ -10,7 +10,7 @@ const UsersPage = () => {
 
   return (
     <div className="flex-1 p-4 md:p-8 dark:bg-gray-900">
-      <UsersHeader activeTab={activeTab} />
+      <UsersHeader />
       <UsersTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       {activeTab === "team" ? <TeamTable /> : <div>Clients Table</div>}
     </div>

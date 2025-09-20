@@ -1,5 +1,7 @@
 
-export const statsData = [
+import { Stat } from "./types";
+
+export const statsData: Stat[] = [
   {
     label: "Traffic",
     value: "12,345",

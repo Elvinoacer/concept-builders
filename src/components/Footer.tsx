@@ -1,6 +1,6 @@
 
 import Link from "next/link";
-import { footerLinks, socialLinks } from "@/lib/data.tsx";
+import { footerLinks, socialLinks } from "@/lib/data";
 import Image from "next/image";
 
 const Footer = () => {

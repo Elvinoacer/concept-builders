@@ -1,4 +1,6 @@
-export const messages = [
+import { Message } from './types';
+
+export const messages: Message[] = [
   {
     id: 1,
     sender: {

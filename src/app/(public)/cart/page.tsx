@@ -8,14 +8,14 @@ import { useState } from "react";
 const CartPage = () => {
   const [cart, setCart] = useState(initialCart);
 
-  const handleRemoveItem = (id) => {
+  const handleRemoveItem = (id: number) => {
     setCart((prevCart) => ({
       ...prevCart,
       items: prevCart.items.filter((item) => item.id !== id),
     }));
   };
 
-  const handleQuantityChange = (id, quantity) => {
+  const handleQuantityChange = (id: number, quantity: number) => {
     setCart((prevCart) => ({
       ...prevCart,
       items: prevCart.items.map((item) =>

@@ -80,7 +80,7 @@ const FeedbackPage = () => {
             Share Your Feedback
           </h1>
           <p className="text-gray-600 mb-4 md:mb-8 dark:text-gray-400">
-            We'd love to hear your thoughts, suggestions, or concerns. Your
+            We&apos;d love to hear your thoughts, suggestions, or concerns. Your
             feedback helps us improve our service.
           </p>
         </motion.div>
@@ -150,7 +150,7 @@ const FeedbackPage = () => {
             <textarea
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Tell us what's on your mind..."
+              placeholder="Tell us what&apos;s on your mind..."
               rows={6}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400 dark:focus:border-blue-400"
               required
@@ -165,7 +165,7 @@ const FeedbackPage = () => {
                 required
               />
               <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                I'd like to receive updates about my feedback
+                I&apos;d like to receive updates about my feedback
               </span>
             </label>
           </div>
@@ -215,7 +215,7 @@ const FeedbackPage = () => {
               </h3>
               <p className="text-blue-700 text-sm dark:text-blue-300">
                 Your feedback is reviewed by our team regularly. We use it to
-                prioritize improvements and new features. While we can't respond
+                prioritize improvements and new features. While we can&apos;t respond
                 to every submission, we read them all and appreciate your input.
               </p>
             </div>
