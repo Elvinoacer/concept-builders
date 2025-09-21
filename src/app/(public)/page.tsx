@@ -15,7 +15,7 @@ export default function Home() {
       }}
     >
       <div className="layout-container flex h-full grow flex-col">
-        <main className="flex-1 px-16 py-12">
+        <main className="flex-1 px-4 sm:px-8 md:px-12 lg:px-16 py-8 md:py-12">
           <Hero />
           <FeaturedCategories />
           <HowItWorks />
