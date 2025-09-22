@@ -1,25 +1,31 @@
-'use client';
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import Image from 'next/image';
+"use client";
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const navLinks = [
-  { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-  { href: '/dashboard/purchases', label: 'My Purchases', icon: 'shopping_bag' },
-  { href: '/dashboard/wishlist', label: 'Wishlist', icon: 'favorite' },
-  { href: '/designs', label: 'Browse Designs', icon: 'search' },
-  { href: '/custom-design', label: 'Custom Design', icon: 'edit' },
-  { href: '/dashboard/messages', label: 'Messages', icon: 'chat' },
-  { href: '/dashboard/settings', label: 'Settings', icon: 'settings' },
+  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+  { href: "/dashboard/purchases", label: "My Purchases", icon: "shopping_bag" },
+  { href: "/dashboard/wishlist", label: "Wishlist", icon: "favorite" },
+  { href: "/designs", label: "Browse Designs", icon: "search" },
+  { href: "/custom-design", label: "Custom Design", icon: "edit" },
+  { href: "/dashboard/messages", label: "Messages", icon: "chat" },
+  { href: "/dashboard/settings", label: "Settings", icon: "settings" },
 ];
 
 const helpLinks = [
-  { href: '/dashboard/help', label: 'Help and Support', icon: 'help' },
-  { href: '/dashboard/feedback', label: 'Feedback', icon: 'campaign' },
+  { href: "/dashboard/help", label: "Help and Support", icon: "help" },
+  { href: "/dashboard/feedback", label: "Feedback", icon: "campaign" },
 ];
 
-const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, setIsSidebarOpen: (isOpen: boolean) => void }) => {
+const Sidebar = ({
+  isSidebarOpen,
+  setIsSidebarOpen,
+}: {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (isOpen: boolean) => void;
+}) => {
   const pathname = usePathname();
 
   const handleLinkClick = () => {
@@ -29,8 +35,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, 
   };
 
   return (
-    <aside 
-      className={`flex flex-col w-64 bg-white border-r border-gray-200 p-4 dark:bg-gray-800 dark:border-gray-700 transition-transform duration-300 ease-in-out md:relative md:translate-x-0 fixed top-0 left-0 h-full z-40 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+    <aside
+      className={`flex flex-col w-64 bg-white border-r border-gray-200 p-4 dark:bg-gray-800 dark:border-gray-700 transition-transform duration-300 ease-in-out md:relative md:translate-x-0 fixed top-0 left-0 h-full z-40 ${
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
       <div className="flex items-center gap-4 text-gray-800 pb-4 border-b border-gray-200 dark:border-gray-700 dark:text-white">
         <Image
           src="/images/concept-builders-logo-free-bg.png"
@@ -50,7 +59,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, 
               key={link.href}
               href={link.href}
               onClick={handleLinkClick}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${isActive ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}`}>
+              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              }`}
+            >
               <span className="material-symbols-outlined">{link.icon}</span>
               <p>{link.label}</p>
             </Link>
@@ -65,7 +79,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, 
               key={link.href}
               href={link.href}
               onClick={handleLinkClick}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${isActive ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}`}>
+              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              }`}
+            >
               <span className="material-symbols-outlined">{link.icon}</span>
               <p>{link.label}</p>
             </Link>
@@ -74,7 +93,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, 
       </div>
       <div className="mt-auto">
         <Link
-          href="/"
+          href="/auth"
           onClick={handleLinkClick}
           className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-all dark:text-gray-300 dark:hover:bg-gray-700"
         >
