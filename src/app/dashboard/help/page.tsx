@@ -1,79 +1,79 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const HelpPage = () => {
-  const [activeCategory, setActiveCategory] = useState("getting-started");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState('getting-started');
+  const [searchQuery, setSearchQuery] = useState('');
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
 
   const categories = [
     {
-      id: "getting-started",
-      title: "Getting Started",
-      icon: "rocket_launch",
+      id: 'getting-started',
+      title: 'Getting Started',
+      icon: 'rocket_launch',
       articles: [
         {
           id: 1,
-          title: "Creating Your First Project",
-          content: "Learn how to create your first project from scratch...",
+          title: 'Creating Your First Project',
+          content: 'Learn how to create your first project from scratch...',
         },
         {
           id: 2,
-          title: "Account Setup Guide",
-          content: "Complete guide to setting up your account...",
+          title: 'Account Setup Guide',
+          content: 'Complete guide to setting up your account...',
         },
       ],
     },
     {
-      id: "billing",
-      title: "Billing & Payments",
-      icon: "payments",
+      id: 'billing',
+      title: 'Billing & Payments',
+      icon: 'payments',
       articles: [
         {
           id: 3,
-          title: "Payment Methods",
-          content: "How to add and manage payment methods...",
+          title: 'Payment Methods',
+          content: 'How to add and manage payment methods...',
         },
         {
           id: 4,
-          title: "Subscription Plans",
-          content: "Understanding different subscription tiers...",
+          title: 'Subscription Plans',
+          content: 'Understanding different subscription tiers...',
         },
       ],
     },
     {
-      id: "design",
-      title: "Design Tools",
-      icon: "palette",
+      id: 'design',
+      title: 'Design Tools',
+      icon: 'palette',
       articles: [
         {
           id: 5,
-          title: "Using the Design Editor",
-          content: "Master the design editor tools and features...",
+          title: 'Using the Design Editor',
+          content: 'Master the design editor tools and features...',
         },
         {
           id: 6,
-          title: "Templates Library",
-          content: "How to use and customize templates...",
+          title: 'Templates Library',
+          content: 'How to use and customize templates...',
         },
       ],
     },
     {
-      id: "technical",
-      title: "Technical Support",
-      icon: "support_agent",
+      id: 'technical',
+      title: 'Technical Support',
+      icon: 'support_agent',
       articles: [
         {
           id: 7,
-          title: "System Requirements",
-          content: "Minimum system requirements for optimal performance...",
+          title: 'System Requirements',
+          content: 'Minimum system requirements for optimal performance...',
         },
         {
           id: 8,
-          title: "Troubleshooting",
-          content: "Common issues and their solutions...",
+          title: 'Troubleshooting',
+          content: 'Common issues and their solutions...',
         },
       ],
     },
@@ -82,64 +82,64 @@ const HelpPage = () => {
   const faqs = [
     {
       id: 1,
-      question: "How do I reset my password?",
+      question: 'How do I reset my password?',
       answer:
         'You can reset your password by clicking "Forgot Password" on the login page. We\'ll send a reset link to your email address.',
     },
     {
       id: 2,
-      question: "Can I cancel my subscription anytime?",
+      question: 'Can I cancel my subscription anytime?',
       answer:
-        "Yes, you can cancel your subscription at any time from your account settings. Your access will continue until the end of your current billing period.",
+        'Yes, you can cancel your subscription at any time from your account settings. Your access will continue until the end of your current billing period.',
     },
     {
       id: 3,
-      question: "How many projects can I create?",
+      question: 'How many projects can I create?',
       answer:
-        "The number of projects depends on your subscription plan. Free users can create up to 3 projects, while paid plans offer unlimited projects.",
+        'The number of projects depends on your subscription plan. Free users can create up to 3 projects, while paid plans offer unlimited projects.',
     },
     {
       id: 4,
-      question: "Is my data secure?",
+      question: 'Is my data secure?',
       answer:
-        "Yes, we use industry-standard encryption and security measures to protect your data. All data is stored on secure servers with regular backups.",
+        'Yes, we use industry-standard encryption and security measures to protect your data. All data is stored on secure servers with regular backups.',
     },
     {
       id: 5,
-      question: "How do I export my designs?",
+      question: 'How do I export my designs?',
       answer:
-        "You can export designs in various formats (PNG, JPG, PDF) from the export menu in the design editor. Higher resolution exports are available for paid plans.",
+        'You can export designs in various formats (PNG, JPG, PDF) from the export menu in the design editor. Higher resolution exports are available for paid plans.',
     },
   ];
 
   const contactMethods = [
     {
-      icon: "mail",
-      title: "Email Support",
-      description: "Get help via email within 24 hours",
-      contact: "support@conceptbuilders.com",
-      action: "mailto:support@conceptbuilders.com",
+      icon: 'mail',
+      title: 'Email Support',
+      description: 'Get help via email within 24 hours',
+      contact: 'support@conceptbuilders.com',
+      action: 'mailto:support@conceptbuilders.com',
     },
     {
-      icon: "chat",
-      title: "Live Chat",
-      description: "Instant help from our support team",
-      contact: "Available 9AM-6PM EST",
-      action: "#chat",
+      icon: 'chat',
+      title: 'Live Chat',
+      description: 'Instant help from our support team',
+      contact: 'Available 9AM-6PM EST',
+      action: '#chat',
     },
     {
-      icon: "forum",
-      title: "Community Forum",
-      description: "Get help from other users",
-      contact: "Join 10,000+ members",
-      action: "#forum",
+      icon: 'forum',
+      title: 'Community Forum',
+      description: 'Get help from other users',
+      contact: 'Join 10,000+ members',
+      action: '#forum',
     },
     {
-      icon: "video_library",
-      title: "Video Tutorials",
-      description: "Watch step-by-step guides",
-      contact: "100+ tutorials available",
-      action: "#tutorials",
+      icon: 'video_library',
+      title: 'Video Tutorials',
+      description: 'Watch step-by-step guides',
+      contact: '100+ tutorials available',
+      action: '#tutorials',
     },
   ];
 
@@ -148,24 +148,16 @@ const HelpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+    <div className="dark:bg-gray-900 min-h-screen p-4 md:p-8">
+      <header className="mb-8">
+        <h2 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight dark:text-white">
+          Help & Support
+        </h2>
+        <p className="text-gray-500 mt-0.5 md:mt-1 dark:text-gray-400">
+          Find answers to common questions, browse documentation, or get in touch with our support team.
+        </p>
+      </header>
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8 md:mb-12"
-        >
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 dark:text-white">
-            Help & Support
-          </h1>
-          <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto dark:text-gray-400">
-            Find answers to common questions, browse documentation, or get in
-            touch with our support team.
-          </p>
-        </motion.div>
-
         {/* Search Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -240,8 +232,8 @@ const HelpPage = () => {
                 onClick={() => setActiveCategory(category.id)}
                 className={`flex items-center gap-3 px-6 py-3 rounded-lg whitespace-nowrap transition-colors ${
                   activeCategory === category.id
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
               >
                 <span className="material-symbols-outlined">
@@ -300,13 +292,13 @@ const HelpPage = () => {
                     {faq.question}
                   </span>
                   <span className="material-symbols-outlined text-gray-400 transform transition-transform dark:text-gray-500">
-                    {activeFAQ === faq.id ? "expand_less" : "expand_more"}
+                    {activeFAQ === faq.id ? 'expand_less' : 'expand_more'}
                   </span>
                 </button>
                 {activeFAQ === faq.id && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
+                    animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     className="px-6 pb-4"
                   >

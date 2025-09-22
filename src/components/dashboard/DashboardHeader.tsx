@@ -1,32 +1,23 @@
-"use client";
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { ModeToggle } from "@/components/ui/mode-toggle";
+'use client';
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ModeToggle } from '@/components/ui/mode-toggle';
 
 const DashboardHeader = () => {
-  const navLinks = [
-    { href: "#", label: "Explore" },
-    { href: "#", label: "Design" },
-    { href: "#", label: "Build" },
-    { href: "#", label: "Finance" },
-  ];
-
   return (
     <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-gray-200 px-10 h-16 bg-white dark:bg-gray-800 dark:border-gray-700">
-      <div></div>
+      <div className="flex items-center gap-4">
+        <div className="relative w-64">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+          <input
+            type="text"
+            placeholder="Search for designs..."
+            className="w-full h-10 pl-10 pr-4 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
       <div className="flex flex-1 justify-end items-center gap-6">
-        <nav className="flex items-center gap-8">
-          {navLinks.map((link, index) => (
-            <Link
-              key={index}
-              className="text-gray-600 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r from-blue-600 to-cyan-400 text-sm font-medium dark:text-gray-300 dark:hover:text-blue-400"
-              href={link.href}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
         <div className="flex items-center gap-3">
           <ModeToggle />
           <Link href="/dashboard/notifications">

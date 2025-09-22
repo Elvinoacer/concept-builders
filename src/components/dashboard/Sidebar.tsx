@@ -1,22 +1,22 @@
-"use client";
-import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import Image from "next/image";
+'use client';
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 const navLinks = [
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { href: "/dashboard/purchases", label: "My Purchases", icon: "shopping_bag" },
-  { href: "/dashboard/projects", label: "Projects", icon: "construction" },
-  { href: "/dashboard/designs", label: "Designs", icon: "design_services" },
-  { href: "/custom-design", label: "Custom Design", icon: "edit" },
-  { href: "/dashboard/messages", label: "Messages", icon: "chat" },
-  { href: "/dashboard/settings", label: "Settings", icon: "settings" },
+  { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+  { href: '/dashboard/purchases', label: 'My Purchases', icon: 'shopping_bag' },
+  { href: '/dashboard/wishlist', label: 'Wishlist', icon: 'favorite' },
+  { href: '/designs', label: 'Browse Designs', icon: 'search' },
+  { href: '/custom-design', label: 'Custom Design', icon: 'edit' },
+  { href: '/dashboard/messages', label: 'Messages', icon: 'chat' },
+  { href: '/dashboard/settings', label: 'Settings', icon: 'settings' },
 ];
 
 const helpLinks = [
-  { href: "/dashboard/help", label: "Help and Support", icon: "help" },
-  { href: "/dashboard/feedback", label: "Feedback", icon: "campaign" },
+  { href: '/dashboard/help', label: 'Help and Support', icon: 'help' },
+  { href: '/dashboard/feedback', label: 'Feedback', icon: 'campaign' },
 ];
 
 const Sidebar = () => {
@@ -44,8 +44,8 @@ const Sidebar = () => {
               href={link.href}
               className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
             >
               <span className="material-symbols-outlined">{link.icon}</span>
@@ -63,8 +63,8 @@ const Sidebar = () => {
               href={link.href}
               className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
             >
               <span className="material-symbols-outlined">{link.icon}</span>

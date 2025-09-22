@@ -1,7 +1,7 @@
-"use client";
-import Notifications from "@/components/dashboard/Notifications";
-import QuickActions from "@/components/dashboard/QuickActions";
-import SummaryCards from "@/components/dashboard/SummaryCards";
+'use client';
+import Notifications from '@/components/dashboard/Notifications';
+import PurchasedDesigns from '@/components/dashboard/PurchasedDesigns';
+import RecommendedDesigns from '@/components/dashboard/RecommendedDesigns';
 
 const DashboardPage = () => {
   return (
@@ -14,8 +14,8 @@ const DashboardPage = () => {
           Welcome back, Sophia! Here&apos;s a summary of your account.
         </p>
       </header>
-      <SummaryCards />
-      <QuickActions />
+      <PurchasedDesigns />
+      <RecommendedDesigns />
       <Notifications />
     </div>
   );

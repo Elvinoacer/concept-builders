@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const FeedbackPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState("general");
+  const [selectedCategory, setSelectedCategory] = useState('general');
   const [rating, setRating] = useState(0);
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const categories = [
-    { id: "general", label: "General Feedback", icon: "chat" },
-    { id: "bug", label: "Bug Report", icon: "bug_report" },
-    { id: "feature", label: "Feature Request", icon: "lightbulb" },
-    { id: "ui", label: "UI/UX Feedback", icon: "palette" },
-    { id: "performance", label: "Performance", icon: "speed" },
+    { id: 'general', label: 'General Feedback', icon: 'chat' },
+    { id: 'bug', label: 'Bug Report', icon: 'bug_report' },
+    { id: 'feature', label: 'Feature Request', icon: 'lightbulb' },
+    { id: 'ui', label: 'UI/UX Feedback', icon: 'palette' },
+    { id: 'performance', label: 'Performance', icon: 'speed' },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,13 +27,13 @@ const FeedbackPage = () => {
 
     setIsSubmitting(false);
     setIsSubmitted(true);
-    setFeedback("");
+    setFeedback('');
     setRating(0);
   };
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+      <div className="dark:bg-gray-900 min-h-screen p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -69,22 +69,16 @@ const FeedbackPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+    <div className="dark:bg-gray-900 min-h-screen p-4 md:p-8">
+      <header className="mb-8">
+        <h2 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight dark:text-white">
+          Share Your Feedback
+        </h2>
+        <p className="text-gray-500 mt-0.5 md:mt-1 dark:text-gray-400">
+          We&apos;d love to hear your thoughts, suggestions, or concerns.
+        </p>
+      </header>
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 dark:text-white">
-            Share Your Feedback
-          </h1>
-          <p className="text-gray-600 mb-4 md:mb-8 dark:text-gray-400">
-            We&apos;d love to hear your thoughts, suggestions, or concerns. Your
-            feedback helps us improve our service.
-          </p>
-        </motion.div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -101,11 +95,11 @@ const FeedbackPage = () => {
                 onClick={() => setRating(star)}
                 className={`text-2xl md:text-3xl transition-all transform hover:scale-110 ${
                   star <= rating
-                    ? "text-yellow-400"
-                    : "text-gray-300 dark:text-gray-600"
+                    ? 'text-yellow-400'
+                    : 'text-gray-300 dark:text-gray-600'
                 }`}
               >
-                {star <= rating ? "★" : "☆"}
+                {star <= rating ? '★' : '☆'}
               </button>
             ))}
           </div>
@@ -130,8 +124,8 @@ const FeedbackPage = () => {
                   onClick={() => setSelectedCategory(category.id)}
                   className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all ${
                     selectedCategory === category.id
-                      ? "border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-400"
-                      : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:border-gray-500"
+                      ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-400'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:border-gray-500'
                   }`}
                 >
                   <span className="material-symbols-outlined mb-1 md:mb-2">
@@ -182,15 +176,15 @@ const FeedbackPage = () => {
                   Submitting...
                 </div>
               ) : (
-                "Submit Feedback"
+                'Submit Feedback'
               )}
             </button>
             <button
               type="button"
               onClick={() => {
-                setFeedback("");
+                setFeedback('');
                 setRating(0);
-                setSelectedCategory("general");
+                setSelectedCategory('general');
               }}
               className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
