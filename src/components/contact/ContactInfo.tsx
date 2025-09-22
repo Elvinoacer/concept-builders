@@ -11,7 +11,21 @@ const ContactInfo = () => {
           </div>
           <div>
             <h3 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white">{item.title}</h3>
-            <p className="text-gray-600 dark:text-gray-400">{item.value}</p>
+            {item.title === "Live Chat" ? (
+              <a href="https://wa.me/254725869507" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
+                {item.value}
+              </a>
+            ) : item.title === "Phone" ? (
+              <a href="tel:254725869507" className="text-blue-600 hover:underline dark:text-blue-400">
+                {item.value}
+              </a>
+            ) : item.title === "Email" ? (
+              <a href="mailto:support@conceptbuilders.com" className="text-blue-600 hover:underline dark:text-blue-400">
+                {item.value}
+              </a>
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400">{item.value}</p>
+            )}
           </div>
         </div>
       ))}

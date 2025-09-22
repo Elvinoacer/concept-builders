@@ -30,13 +30,13 @@ const DesignDetailPage = () => {
               <Renderings renderings={design.renderings} />
               <FloorPlan floorPlanUrl={design.floorPlanUrl} />
               <DesignTabs design={design} />
-              <RelatedDesigns relatedDesigns={design.relatedDesigns} />
             </div>
 
             <div className="lg:col-span-1">
               <PurchaseSidebar design={design} />
             </div>
           </div>
+          <RelatedDesigns relatedDesigns={design.relatedDesigns} />
         </div>
       </main>
     </ThemeProvider>

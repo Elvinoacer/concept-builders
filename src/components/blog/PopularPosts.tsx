@@ -1,23 +1,26 @@
-
-import { popularPosts } from "@/lib/blog-data";
+import { blogPostsData } from "@/lib/blog-data";
 import Image from "next/image";
 
 const PopularPosts = () => {
+  const popularPosts = blogPostsData
+    .filter(post => post.status === 'Published' && post.image)
+    .sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime())
+    .slice(0, 3)
+    .map(post => ({
+      ...post,
+      date: post.publishedDate
+    }));
+
   return (
     <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
       <h3
-        className="text-lg md:text-xl font-bold tracking-tight mb-4"
-        style={{
-          background: "linear-gradient(to right, #0B2545, #134E4A)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
+        className="text-lg md:text-xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-400"
       >
         Popular Posts
       </h3>
       <div className="space-y-4">
         {popularPosts.map((post, index) => (
-          <a key={index} className="flex items-center gap-4 group" href="#">
+          <a key={index} className="flex items-center gap-4 group" href={`/blog/${post.slug}`}>
             <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-md h-12 w-12 md:h-16 md:w-16 flex-shrink-0">
               <Image
                 src={post.image}

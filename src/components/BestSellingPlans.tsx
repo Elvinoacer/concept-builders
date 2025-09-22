@@ -1,6 +1,7 @@
 import React from "react";
 import { designs } from "@/lib/designs";
 import Image from "next/image";
+import Link from "next/link";
 
 const BestSellingPlans = () => {
   const bestSellingDesigns = designs.slice(0, 3);
@@ -37,9 +38,9 @@ const BestSellingPlans = () => {
                   <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text">
                     ${design.pricing.pdf}
                   </p>
-                  <button className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-lg hover:from-blue-700 hover:to-cyan-500 transition-all">
+                  <Link href={`/designs/${design.id}`} className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-lg hover:from-blue-700 hover:to-cyan-500 transition-all">
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { designsData } from "@/lib/designs-data";
@@ -62,7 +61,7 @@ const DesignsTable = () => {
               <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Price
               </th>
-              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th className="hidden md:table-cell px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Last Updated
               </th>
               <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"></th>
@@ -72,6 +71,7 @@ const DesignsTable = () => {
             {designsData.map((design, index) => (
               <motion.tr
                 key={index}
+                className="hover:bg-muted"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -85,7 +85,7 @@ const DesignsTable = () => {
                 <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm text-muted-foreground">
                   {design.price}
                 </td>
-                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm text-muted-foreground">
+                <td className="hidden md:table-cell px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm text-muted-foreground">
                   {design.lastUpdated}
                 </td>
                 <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -1,7 +1,7 @@
 
 import AboutHeader from "@/components/about/AboutHeader";
 import MissionVision from "@/components/about/MissionVision";
-import Team from "@/components/about/Team";
+import OurValues from "@/components/about/OurValues";
 
 const AboutPage = () => {
   return (
@@ -9,7 +9,7 @@ const AboutPage = () => {
       <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
         <AboutHeader />
         <MissionVision />
-        <Team />
+        <OurValues />
       </div>
     </div>
   );

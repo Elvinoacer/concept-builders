@@ -1,13 +1,13 @@
-
 "use client";
 
 import { motion } from "framer-motion";
 
 interface DesignsHeaderProps {
   activeTab: string;
+  onNewDesignClick: () => void;
 }
 
-const DesignsHeader = ({ activeTab }: DesignsHeaderProps) => {
+const DesignsHeader = ({ activeTab, onNewDesignClick }: DesignsHeaderProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -17,7 +17,9 @@ const DesignsHeader = ({ activeTab }: DesignsHeaderProps) => {
     >
       <h2 className="text-2xl md:text-3xl font-bold text-foreground">Designs</h2>
       {activeTab === "all" && (
-        <button className="flex items-center justify-center gap-2 rounded-md h-10 px-4 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-sm font-medium shadow-sm hover:to-primary/80 transition-colors">
+        <button 
+          onClick={onNewDesignClick}
+          className="flex items-center justify-center gap-2 rounded-md h-10 px-4 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-sm font-medium shadow-sm hover:to-primary/80 transition-colors">
           <span className="material-symbols-outlined">add</span>
           <span>New Design</span>
         </button>

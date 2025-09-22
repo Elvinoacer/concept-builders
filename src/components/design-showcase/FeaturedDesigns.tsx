@@ -21,12 +21,12 @@ const FeaturedDesigns = () => {
       <div className="relative">
         <div
           ref={scrollContainerRef}
-          className="flex snap-x snap-mandatory overflow-x-auto pb-6 -mx-4 px-4 gap-6 scrollbar-hide"
+          className="flex snap-x snap-mandatory overflow-x-auto pb-6 -mx-4 px-4 gap-6 scrollbar-hide touch-pan-x"
         >
           {featuredDesigns.map((design, index) => (
             <motion.div
               key={index}
-              className="group w-80 min-w-[80%] sm:min-w-[45%] md:min-w-[30%] lg:min-w-[23%] snap-start flex-shrink-0"
+              className="group w-[80%] sm:w-[45%] md:w-[30%] lg:w-[23%] flex-shrink-0 snap-start"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -48,7 +48,7 @@ const FeaturedDesigns = () => {
             </motion.div>
           ))}
         </div>
-        <div className="absolute top-1/2 -translate-y-1/2 left-0">
+        <div className="hidden md:block absolute top-1/2 -translate-y-1/2 left-0">
           <button
             onClick={() => scroll(-300)}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 hover:bg-primary/20 dark:hover:bg-primary/30 hover:text-primary transition-colors"
@@ -56,7 +56,7 @@ const FeaturedDesigns = () => {
             <span className="material-symbols-outlined">chevron_left</span>
           </button>
         </div>
-        <div className="absolute top-1/2 -translate-y-1/2 right-0">
+        <div className="hidden md:block absolute top-1/2 -translate-y-1/2 right-0">
           <button
             onClick={() => scroll(300)}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 hover:bg-primary/20 dark:hover:bg-primary/30 hover:text-primary transition-colors"

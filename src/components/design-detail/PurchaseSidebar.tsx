@@ -39,6 +39,10 @@ const PurchaseSidebar: React.FC<PurchaseSidebarProps> = ({ design }) => {
     return basePrice + fileTypePrice + optionsPrice;
   }, [design.basePrice, selectedFileType, calculatorOptions]);
 
+  const totalKesPrice = useMemo(() => {
+    return totalPrice * 130;
+  }, [totalPrice]);
+
   return (
     <div className="sticky top-24 space-y-6">
       <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
@@ -87,18 +91,23 @@ const PurchaseSidebar: React.FC<PurchaseSidebarProps> = ({ design }) => {
 
         <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <p className="text-lg font-medium text-gray-600 dark:text-gray-400">Total Price:</p>
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={totalPrice}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="text-4xl font-extrabold text-gray-900 dark:text-white"
-            >
-              ${totalPrice.toLocaleString()}
-            </motion.p>
-          </AnimatePresence>
+          <div>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={totalPrice}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="text-4xl font-extrabold text-gray-900 dark:text-white text-right"
+              >
+                ${totalPrice.toLocaleString()}
+              </motion.p>
+            </AnimatePresence>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-right">
+              KES {totalKesPrice.toLocaleString()}
+            </p>
+          </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">

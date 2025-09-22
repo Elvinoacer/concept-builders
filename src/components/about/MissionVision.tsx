@@ -6,12 +6,7 @@ const MissionVision = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-8 md:mb-16">
       <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm dark:bg-gray-800">
         <h2
-          className="text-xl md:text-2xl font-bold leading-tight tracking-[-0.015em] mb-4"
-          style={{
-            background: "linear-gradient(to right, #0B2545, #134E4A)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
+          className="text-xl md:text-2xl font-bold leading-tight tracking-[-0.015em] mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-400"
         >
           {mission.title}
         </h2>
@@ -21,12 +16,7 @@ const MissionVision = () => {
       </div>
       <div className="bg-white p-8 rounded-lg shadow-sm dark:bg-gray-800">
         <h2
-          className="text-2xl font-bold leading-tight tracking-[-0.015em] mb-4"
-          style={{
-            background: "linear-gradient(to right, #0B2545, #134E4A)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
+          className="text-2xl font-bold leading-tight tracking-[-0.015em] mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-400"
         >
           {vision.title}
         </h2>

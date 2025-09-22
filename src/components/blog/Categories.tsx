@@ -1,16 +1,11 @@
 
-import { categories } from "@/lib/blog-data";
+import { categories } from "@/lib/categories";
 
 const Categories = () => {
   return (
     <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
       <h3
-        className="text-lg md:text-xl font-bold tracking-tight mb-4"
-        style={{
-          background: "linear-gradient(to right, #0B2545, #134E4A)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
+        className="text-lg md:text-xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-400"
       >
         Categories
       </h3>
@@ -21,7 +16,7 @@ const Categories = () => {
               className="text-gray-600 hover:text-primary hover:font-medium transition-all text-base dark:text-gray-400 dark:hover:text-primary"
               href="#"
             >
-              {category}
+              {category.name}
             </a>
           </li>
         ))}

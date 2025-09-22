@@ -21,15 +21,15 @@ const RelatedDesigns = ({ relatedDesigns }) => {
                   style={{ backgroundImage: `url(${design.imageUrl})` }}
                 ></div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <motion.div
-                className="absolute bottom-0 left-0 p-6 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                className="absolute bottom-0 left-0 p-6 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all duration-500"
                 initial={{ y: 20 }}
                 whileHover={{ y: 0 }}
               >
                 <h3 className="text-xl font-bold text-white">{design.name}</h3>
                 <p className="text-sm text-gray-200 mt-1">{design.description}</p>
-                <p className="text-lg font-bold text-[var(--primary-color)] mt-2">{design.price}</p>
+                <p className="text-lg font-bold text-blue-400 mt-2">{design.price}</p>
               </motion.div>
             </div>
           </motion.div>

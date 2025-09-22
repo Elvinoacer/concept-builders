@@ -20,10 +20,10 @@ const FolderStructure = () => {
               <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
                 Name
               </th>
-              <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
+              <th scope="col" className="hidden md:table-cell px-2 py-2 md:px-4 md:py-3 sm:px-6">
                 Last Modified
               </th>
-              <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
+              <th scope="col" className="hidden md:table-cell px-2 py-2 md:px-4 md:py-3 sm:px-6">
                 Size
               </th>
               <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
@@ -49,10 +49,10 @@ const FolderStructure = () => {
                   </span>
                   <span className="truncate max-w-[100px] sm:max-w-[200px]">{folder.name}</span>
                 </th>
-                <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
+                <td className="hidden md:table-cell px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
                   {folder.lastModified}
                 </td>
-                <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
+                <td className="hidden md:table-cell px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
                   {folder.size}
                 </td>
                 <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 text-right">

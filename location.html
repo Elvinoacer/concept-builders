@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Location Finder</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      :root {
+        --primary: #4361ee;
+        --secondary: #3a0ca3;
+        --accent: #7209b7;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --success: #4cc9f0;
+        --warning: #f72585;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--secondary) 0%,
+          var(--primary) 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: var(--dark);
+      }
+
+      .container {
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        width: 100%;
+        max-width: 500px;
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(to right, var(--primary), var(--accent));
+        color: white;
+        padding: 25px 20px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 0.9rem;
+      }
+
+      .content {
+        padding: 25px 20px;
+        text-align: center;
+      }
+
+      .location-icon {
+        font-size: 4rem;
+        color: var(--primary);
+        margin: 20px 0;
+      }
+
+      .coordinates {
+        background: linear-gradient(to right, #e9ecef, #f8f9fa);
+        border-radius: 10px;
+        padding: 20px;
+        margin: 25px 0;
+        text-align: center;
+        font-size: 1.1rem;
+        border: 1px dashed #ced4da;
+      }
+
+      .coordinate {
+        display: flex;
+        justify-content: space-between;
+        margin: 15px 0;
+        padding: 10px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .coordinate-label {
+        font-weight: 600;
+        color: var(--dark);
+      }
+
+      .coordinate-value {
+        font-family: "Courier New", monospace;
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(to right, var(--primary), var(--accent));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 15px;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn-copy {
+        background: linear-gradient(to right, #20c997, #0ca678);
+        margin-top: 10px;
+      }
+
+      .message {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+
+      .success {
+        background-color: rgba(76, 201, 240, 0.2);
+        color: #0c5460;
+        border: 1px solid #b8daff;
+      }
+
+      .error {
+        background-color: rgba(247, 37, 133, 0.2);
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .info {
+        background-color: rgba(67, 97, 238, 0.1);
+        color: #004085;
+        border: 1px solid #b8daff;
+        font-size: 0.85rem;
+        margin-top: 20px;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left-color: var(--primary);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .footer {
+        text-align: center;
+        padding: 15px;
+        font-size: 0.8rem;
+        color: #6c757d;
+        border-top: 1px solid #e9ecef;
+      }
+
+      /* Mobile-specific styles */
+      @media (max-width: 768px) {
+        .container {
+          border-radius: 15px;
+        }
+
+        .header {
+          padding: 20px 15px;
+        }
+
+        .header h1 {
+          font-size: 1.5rem;
+        }
+
+        .content {
+          padding: 20px 15px;
+        }
+
+        .location-icon {
+          font-size: 3.5rem;
+        }
+
+        .coordinates {
+          padding: 15px;
+        }
+
+        .btn {
+          padding: 14px;
+          font-size: 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 10px;
+        }
+
+        .header h1 {
+          font-size: 1.3rem;
+        }
+
+        .header p {
+          font-size: 0.8rem;
+        }
+
+        .content {
+          padding: 15px 10px;
+        }
+
+        .location-icon {
+          font-size: 3rem;
+        }
+
+        .coordinate {
+          flex-direction: column;
+          text-align: center;
+          gap: 5px;
+        }
+      }
+
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .container {
+          background-color: #222831;
+          color: #eeeeee;
+        }
+
+        .coordinates {
+          background: linear-gradient(to right, #30475e, #222831);
+          color: #eeeeee;
+          border-color: #455d7a;
+        }
+
+        .coordinate {
+          background-color: #393e46;
+          color: #eeeeee;
+        }
+
+        .coordinate-label {
+          color: #eeeeee;
+        }
+
+        .footer {
+          color: #aaaaaa;
+          border-top-color: #30475e;
+        }
+
+        .success {
+          background-color: rgba(76, 201, 240, 0.3);
+          color: #a5d8ff;
+          border-color: #4cc9f0;
+        }
+
+        .error {
+          background-color: rgba(247, 37, 133, 0.3);
+          color: #ffb8c6;
+          border-color: #f72585;
+        }
+
+        .info {
+          background-color: rgba(67, 97, 238, 0.2);
+          color: #a5b4fc;
+          border-color: #4361ee;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1><i class="fas fa-map-marker-alt"></i> Location Finder</h1>
+        <p>Get your current latitude and longitude coordinates</p>
+      </div>
+
+      <div class="content">
+        <div class="location-icon">
+          <i class="fas fa-location-crosshairs"></i>
+        </div>
+
+        <p>
+          Click the button below to retrieve your current location coordinates.
+        </p>
+
+        <div class="message info">
+          <i class="fas fa-info-circle"></i> Your location data is processed
+          locally and never stored or shared.
+        </div>
+
+        <button class="btn" id="getLocation">
+          <i class="fas fa-map-marked-alt"></i> Get My Location
+        </button>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Detecting your location...</p>
+        </div>
+
+        <div class="coordinates" id="coordinates" style="display: none">
+          <h3><i class="fas fa-globe-americas"></i> Your Coordinates</h3>
+          <div class="coordinate">
+            <span class="coordinate-label">Latitude:</span>
+            <span class="coordinate-value" id="latitude">-</span>
+          </div>
+          <div class="coordinate">
+            <span class="coordinate-label">Longitude:</span>
+            <span class="coordinate-value" id="longitude">-</span>
+          </div>
+
+          <button class="btn btn-copy" id="copyCoords">
+            <i class="far fa-copy"></i> Copy Coordinates
+          </button>
+        </div>
+
+        <div class="message success" id="successMessage" style="display: none">
+          <i class="fas fa-check-circle"></i> Coordinates copied to clipboard!
+        </div>
+
+        <div class="message error" id="errorMessage" style="display: none">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span id="errorText">Error message</span>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Uses browser's Geolocation API | Accuracy depends on your device</p>
+      </div>
+    </div>
+
+    <script>
+      // DOM Elements
+      const getLocationBtn = document.getElementById("getLocation");
+      const loadingDiv = document.getElementById("loading");
+      const coordinatesDiv = document.getElementById("coordinates");
+      const latitudeSpan = document.getElementById("latitude");
+      const longitudeSpan = document.getElementById("longitude");
+      const copyCoordsBtn = document.getElementById("copyCoords");
+      const successMessage = document.getElementById("successMessage");
+      const errorMessage = document.getElementById("errorMessage");
+      const errorText = document.getElementById("errorText");
+
+      // Check if geolocation is supported
+      if (!navigator.geolocation) {
+        showError("Geolocation is not supported by your browser");
+        getLocationBtn.disabled = true;
+      }
+
+      // Get location when button is clicked
+      getLocationBtn.addEventListener("click", getLocation);
+
+      // Copy coordinates to clipboard
+      copyCoordsBtn.addEventListener("click", copyCoordinates);
+
+      function getLocation() {
+        // Reset messages
+        hideMessages();
+        coordinatesDiv.style.display = "none";
+
+        // Show loading
+        loadingDiv.style.display = "block";
+        getLocationBtn.disabled = true;
+
+        // Get current position
+        navigator.geolocation.getCurrentPosition(
+          // Success callback
+          function (position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            // Update UI with coordinates
+            latitudeSpan.textContent = lat.toFixed(6);
+            longitudeSpan.textContent = lng.toFixed(6);
+
+            // Show coordinates
+            coordinatesDiv.style.display = "block";
+
+            // Hide loading
+            loadingDiv.style.display = "none";
+            getLocationBtn.disabled = false;
+
+            // Log to console (for debugging)
+            console.log(`Latitude: ${lat}, Longitude: ${lng}`);
+          },
+          // Error callback
+          function (error) {
+            loadingDiv.style.display = "none";
+            getLocationBtn.disabled = false;
+
+            let errorMsg = "Unknown error occurred";
+
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMsg =
+                  "Location access denied. Please allow location access and try again.";
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMsg = "Location information is unavailable.";
+                break;
+              case error.TIMEOUT:
+                errorMsg = "Location request timed out. Please try again.";
+                break;
+            }
+
+            showError(errorMsg);
+          },
+          // Options
+          {
+            enableHighAccuracy: true,
+            timeout: 10000, // 10 seconds
+            maximumAge: 60000, // 1 minute
+          }
+        );
+      }
+
+      function copyCoordinates() {
+        const lat = latitudeSpan.textContent;
+        const lng = longitudeSpan.textContent;
+        const coords = `${lat}, ${lng}`;
+
+        // Use Clipboard API if available
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(coords)
+            .then(() => {
+              showSuccess();
+            })
+            .catch((err) => {
+              // Fallback for older browsers
+              fallbackCopy(coords);
+            });
+        } else {
+          // Fallback for older browsers
+          fallbackCopy(coords);
+        }
+      }
+
+      function fallbackCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+
+        try {
+          document.execCommand("copy");
+          showSuccess();
+        } catch (err) {
+          showError("Failed to copy coordinates");
+        }
+
+        document.body.removeChild(textArea);
+      }
+
+      function showSuccess() {
+        hideMessages();
+        successMessage.style.display = "block";
+
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+          successMessage.style.display = "none";
+        }, 3000);
+      }
+
+      function showError(message) {
+        hideMessages();
+        errorText.textContent = message;
+        errorMessage.style.display = "block";
+      }
+
+      function hideMessages() {
+        successMessage.style.display = "none";
+        errorMessage.style.display = "none";
+      }
+    </script>
+  </body>
+</html>

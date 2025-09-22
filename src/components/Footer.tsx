@@ -22,6 +22,22 @@ const Footer = () => {
               Your partner in building the future. Discover, purchase, and
               actualize your dream home with us.
             </p>
+            <div className="mt-4">
+              <h4 className="text-lg font-semibold mb-4 dark:text-white">Subscribe to our newsletter</h4>
+              <form className="flex flex-col gap-2">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                />
+                <button
+                  type="submit"
+                  className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-[#2563eb] to-[#26c6da] text-white font-semibold hover:from-blue-700 hover:to-cyan-500 transition-all"
+                >
+                  Subscribe
+                </button>
+              </form>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-8 md:col-span-3 md:grid-cols-3">
             <div>

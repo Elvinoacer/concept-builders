@@ -26,7 +26,12 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
             className="relative mx-auto mt-20 max-w-2xl rounded-lg bg-white p-8 shadow-xl dark:bg-gray-900 overflow-y-auto max-h-[80vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">Search Designs</h2>
+                        <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Search Designs</h2>
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
             <div className="grid grid-cols-1 gap-6">
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-2xl"> search </span>
@@ -60,7 +65,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
                   <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Farmhouse</label>
                 </div>
               </div>
-              <button className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-cyan-400 py-3 font-bold text-white transition hover:from-blue-700 hover:to-cyan-500">Search</button>
+              <button onClick={onClose} className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-cyan-400 py-3 font-bold text-white transition hover:from-blue-700 hover:to-cyan-500">Search</button>
             </div>
           </motion.div>
         </motion.div>

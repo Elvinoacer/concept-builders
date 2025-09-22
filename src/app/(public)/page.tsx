@@ -1,3 +1,4 @@
+import Marquee from "@/components/Marquee";
 import BlogSection from "@/components/BlogSection";
 import FeaturedCategories from "@/components/FeaturedCategories";
 import Hero from "@/components/Hero";
@@ -17,6 +18,7 @@ export default function Home() {
       <div className="layout-container flex h-full grow flex-col">
         <main className="flex-1 px-4 sm:px-8 md:px-12 lg:px-16 py-8 md:py-12">
           <Hero />
+          <Marquee />
           <FeaturedCategories />
           <HowItWorks />
           <BestSellingPlans />

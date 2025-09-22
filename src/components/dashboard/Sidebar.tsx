@@ -19,11 +19,18 @@ const helpLinks = [
   { href: '/dashboard/feedback', label: 'Feedback', icon: 'campaign' },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, setIsSidebarOpen: (isOpen: boolean) => void }) => {
   const pathname = usePathname();
 
+  const handleLinkClick = () => {
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
+  };
+
   return (
-    <aside className="flex flex-col w-64 bg-white border-r border-gray-200 p-4 dark:bg-gray-800 dark:border-gray-700">
+    <aside 
+      className={`flex flex-col w-64 bg-white border-r border-gray-200 p-4 dark:bg-gray-800 dark:border-gray-700 transition-transform duration-300 ease-in-out md:relative md:translate-x-0 fixed top-0 left-0 h-full z-40 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="flex items-center gap-4 text-gray-800 pb-4 border-b border-gray-200 dark:border-gray-700 dark:text-white">
         <Image
           src="/images/concept-builders-logo-free-bg.png"
@@ -35,19 +42,15 @@ const Sidebar = () => {
           Concept Builders
         </h2>
       </div>
-      <nav className="flex flex-col gap-3 flex-1 pt-4">
+      <nav className="flex flex-col gap-3 flex-1 pt-4 overflow-y-auto">
         {navLinks.map((link) => {
           const isActive = pathname === link.href;
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-              }`}
-            >
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${isActive ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}`}>
               <span className="material-symbols-outlined">{link.icon}</span>
               <p>{link.label}</p>
             </Link>
@@ -61,12 +64,8 @@ const Sidebar = () => {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-              }`}
-            >
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${isActive ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}`}>
               <span className="material-symbols-outlined">{link.icon}</span>
               <p>{link.label}</p>
             </Link>
@@ -76,6 +75,7 @@ const Sidebar = () => {
       <div className="mt-auto">
         <Link
           href="/"
+          onClick={handleLinkClick}
           className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-all dark:text-gray-300 dark:hover:bg-gray-700"
         >
           <span className="material-symbols-outlined">logout</span>

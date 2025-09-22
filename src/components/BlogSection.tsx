@@ -1,43 +1,114 @@
+'use client';
+
 import Link from "next/link";
-import { blogPosts } from "@/lib/data";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { blogPosts as simpleBlogPosts } from "@/lib/data";
+import { blogPostsData } from "@/lib/blog-data";
+
+// Combine data to get images and richer details
+const combinedPosts = blogPostsData
+  .filter(p => p.status === 'Published')
+  .map((post, index) => {
+    const readingTime = Math.ceil(post.title.length / 15) + 2; // Deterministic reading time
+    return {
+      ...post,
+      imageUrl: simpleBlogPosts[index % simpleBlogPosts.length].imageUrl,
+      link: "#", // Placeholder link
+      readingTime: `${readingTime} min read`,
+    };
+  });
+
+const featuredPost = combinedPosts[0];
+const secondaryPosts = combinedPosts.slice(1, 3);
 
 const BlogSection = () => {
+  const cardVariants = {
+    offscreen: { y: 50, opacity: 0 },
+    onscreen: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", bounce: 0.4, duration: 0.8 },
+    },
+  };
+
   return (
-    <section className="py-8 md:py-12 lg:py-16">
-      <h2 className="text-slate-800 text-2xl md:text-3xl font-bold tracking-tight mb-8 md:mb-12 dark:text-white">
-        From Our Blog
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-        {blogPosts.map((post, index) => (
-          <div
-            key={index}
-            className="group flex flex-col md:flex-row items-start gap-6 rounded-lg"
+    <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-950">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">From Our Blog</h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">Insights, trends, and inspiration for your home-building journey.</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+          {/* Featured Post */}
+          <motion.div
+            initial="offscreen"
+            whileInView="onscreen"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={cardVariants}
+            className="group bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden border border-gray-200 dark:border-gray-700"
           >
-            <div className="w-full md:w-1/3 flex-shrink-0 overflow-hidden rounded-lg">
-              <div
-                className="w-full bg-center bg-no-repeat aspect-video md:aspect-square bg-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                style={{ backgroundImage: `url("${post.imageUrl}")` }}
-              ></div>
+            <div className="relative h-80 w-full overflow-hidden">
+              <Image
+                src={featuredPost.imageUrl}
+                alt={featuredPost.title}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
             </div>
-            <div className="flex flex-col gap-3 flex-1">
-              <h3 className="text-slate-800 text-xl font-semibold leading-tight group-hover:text-[#1193d4] transition-colors dark:text-gray-200 dark:group-hover:text-primary">
-                {post.title}
+            <div className="p-6 md:p-8">
+              <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center mb-2">
+                <span>{featuredPost.publishedDate}</span>
+                <span className="mx-2">•</span>
+                <span>{featuredPost.readingTime}</span>
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 leading-tight">
+                <Link href={featuredPost.link} className="hover:text-blue-600 transition-colors duration-300">{featuredPost.title}</Link>
               </h3>
-              <p className="text-slate-500 text-base dark:text-gray-400 line-clamp-2">
-                {post.description}
-              </p>
-              <Link
-                className="text-base font-semibold flex items-center gap-2 group bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mt-2"
-                href={post.link}
-              >
+              <p className="text-gray-600 dark:text-gray-400 mb-4">By {featuredPost.author}</p>
+              <Link href={featuredPost.link} className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
                 Read More
-                <span className="material-symbols-outlined transition-transform group-hover:translate-x-1 text-sm">
-                  arrow_forward
-                </span>
               </Link>
             </div>
+          </motion.div>
+
+          {/* Secondary Posts */}
+          <div className="flex flex-col gap-8 md:gap-12">
+            {secondaryPosts.map((post) => (
+              <motion.div
+                key={post.title}
+                initial="offscreen"
+                whileInView="onscreen"
+                viewport={{ once: true, amount: 0.5 }}
+                variants={cardVariants}
+                className="group bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex items-center border border-gray-200 dark:border-gray-700 overflow-hidden"
+              >
+                <div className="relative h-full w-1/3 md:w-48 flex-shrink-0 overflow-hidden">
+                  <Image
+                    src={post.imageUrl}
+                    alt={post.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    sizes="33vw"
+                  />
+                </div>
+                <div className="p-6">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    <span>{post.publishedDate}</span>
+                    <span className="mx-1.5">•</span>
+                    <span>{post.readingTime}</span>
+                  </div>
+                  <h4 className="font-bold text-lg leading-tight text-gray-900 dark:text-white mb-2">
+                    <Link href={post.link} className="hover:text-blue-600 transition-colors duration-300">{post.title}</Link>
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">By {post.author}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </section>
   );

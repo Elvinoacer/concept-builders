@@ -14,7 +14,7 @@ const VersionControl = () => {
               <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
                 Version
               </th>
-              <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
+              <th scope="col" className="hidden md:table-cell px-2 py-2 md:px-4 md:py-3 sm:px-6">
                 Date
               </th>
               <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
@@ -40,7 +40,7 @@ const VersionControl = () => {
                 >
                   {version.version}
                 </th>
-                <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
+                <td className="hidden md:table-cell px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
                   {version.date}
                 </td>
                 <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 max-w-[150px] sm:max-w-[300px] truncate">

@@ -71,9 +71,12 @@ export interface Cost {
 
 export interface BlogPost {
   title: string;
+  slug: string;
   author: string;
   status: string;
   publishedDate: string;
+  content: string;
+  image: string;
 }
 
 export interface Purchase {
