@@ -34,12 +34,12 @@ const MessageBubble = ({ message }: { message: Message }) => {
               : "bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border dark:border-gray-700"
           } p-4 rounded-lg ${
             isSent ? "rounded-tr-none" : "rounded-tl-none"
-          } max-w-xs md:max-w-lg`}
+          } max-w-[80%] md:max-w-lg`}
         >
           <p className="text-sm">{message.content}</p>
         </div>
         {message.attachment && (
-          <div className="bg-white p-3 rounded-lg max-w-xs md:max-w-lg flex items-center gap-3 shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+          <div className="bg-white p-3 rounded-lg max-w-[80%] md:max-w-lg flex items-center gap-3 shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-cover bg-center">
               <Image
                 src={message.attachment.preview}

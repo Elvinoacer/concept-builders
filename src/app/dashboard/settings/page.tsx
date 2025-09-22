@@ -22,7 +22,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="dark:bg-gray-900 min-h-screen p-4 md:p-8">
+    <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8">
       <header className="mb-8">
         <h2 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight dark:text-white">
           Settings

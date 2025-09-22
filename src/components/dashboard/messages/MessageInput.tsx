@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const MessageInput = () => {
   return (
-    <div className="mt-4 md:mt-6 flex items-center gap-4">
+    <div className="mt-4 md:mt-6 flex items-center gap-4 bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700">
       <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-cover bg-center shrink-0">
         <Image
           src="https://img.freepik.com/premium-vector/person-with-blue-shirt-that-says-name-person_1029948-7040.jpg"
@@ -24,7 +24,7 @@ const MessageInput = () => {
           <button className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
             <span className="material-symbols-outlined">attach_file</span>
           </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-400 text-white rounded-lg text-sm font-medium hover:from-blue-700 hover:to-cyan-500 ml-2">
+          <button className="px-2 py-1 md:px-4 md:py-2 bg-gradient-to-r from-blue-600 to-cyan-400 text-white rounded-lg text-sm font-medium hover:from-blue-700 hover:to-cyan-500 ml-2">
             Send
           </button>
         </div>

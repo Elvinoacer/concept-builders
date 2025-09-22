@@ -69,7 +69,7 @@ const FeedbackPage = () => {
   }
 
   return (
-    <div className="dark:bg-gray-900 min-h-screen p-4 md:p-8">
+    <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8">
       <header className="mb-8">
         <h2 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight dark:text-white">
           Share Your Feedback
@@ -116,7 +116,7 @@ const FeedbackPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-3 dark:text-gray-300">
               Category
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
               {categories.map((category) => (
                 <button
                   key={category.id}
