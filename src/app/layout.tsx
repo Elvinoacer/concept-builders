@@ -8,6 +8,21 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Concept Builders",
   description: "Build Your Dream Home",
+  icons: {
+    icon: "/images/concept-builders-logo-free-bg.png",
+  },
+  openGraph: {
+    title: "Concept Builders",
+    description: "Build Your Dream Home",
+    images: [
+      {
+        url: "/images/concept-builders-logo-free-bg.png",
+        width: 800,
+        height: 600,
+        alt: "Concept Builders Logo",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
