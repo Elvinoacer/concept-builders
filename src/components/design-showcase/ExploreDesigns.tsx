@@ -1,7 +1,7 @@
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import FilterAside from "./FilterAside";
 import DesignCard from "./DesignCard";
 import { allDesigns } from "@/lib/design-showcase-data";
@@ -17,16 +17,38 @@ import {
 const ITEMS_PER_PAGE = 8;
 
 const ExploreDesigns = () => {
+  const searchParams = useSearchParams();
+  const category = searchParams.get('category');
+  const searchQuery = searchParams.get('search');
+  const minPrice = searchParams.get('minPrice');
+  const maxPrice = searchParams.get('maxPrice');
+  const bedrooms = searchParams.get('bedrooms');
+  const styles = searchParams.get('styles');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const totalPages = Math.ceil(allDesigns.length / ITEMS_PER_PAGE);
+  const filteredDesigns = allDesigns.filter(design => {
+    const categoryMatch = category ? design.category === category : true;
+    const searchMatch = searchQuery
+      ? design.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        design.description.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    const minPriceMatch = minPrice ? design.price >= parseInt(minPrice) : true;
+    const maxPriceMatch = maxPrice ? design.price <= parseInt(maxPrice) : true;
+    const bedroomsMatch = bedrooms && bedrooms !== 'Any' ? (bedrooms === '4+' ? design.bedrooms >= 4 : design.bedrooms === parseInt(bedrooms)) : true;
+    const stylesMatch = styles ? styles.split(',').includes(design.style) : true;
+
+    return categoryMatch && searchMatch && minPriceMatch && maxPriceMatch && bedroomsMatch && stylesMatch;
+  });
+
+  const totalPages = Math.ceil(filteredDesigns.length / ITEMS_PER_PAGE);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const paginatedDesigns = allDesigns.slice(
+  const paginatedDesigns = filteredDesigns.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );

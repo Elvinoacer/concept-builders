@@ -4,6 +4,7 @@ import PurchasedDesigns from '@/components/dashboard/PurchasedDesigns';
 import RecommendedDesigns from '@/components/dashboard/RecommendedDesigns';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useSearch } from '@/lib/SearchContext';
 
 const stats = [
   { name: 'Purchased Plans', value: '3', icon: 'shopping_bag' },
@@ -11,6 +12,8 @@ const stats = [
 ];
 
 const DashboardPage = () => {
+  const { searchQuery } = useSearch();
+
   return (
     <div className="dark:bg-gray-950 min-h-screen p-4 sm:p-6 md:p-8">
       <header className="mb-8">
@@ -59,7 +62,7 @@ const DashboardPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
         <div className="lg:col-span-2">
-          <PurchasedDesigns />
+          <PurchasedDesigns searchQuery={searchQuery} />
         </div>
         <div className="space-y-8">
           <RecommendedDesigns />

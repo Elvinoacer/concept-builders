@@ -1,10 +1,31 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const DesignGallery = ({ images }: { images: { url: string, type: string }[] }) => {
-  const mainImage = images[0];
-  const thumbnails = images.slice(1);
+  const [selectedImage, setSelectedImage] = useState(images[0]);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (isPlaying) {
+      const interval = setInterval(() => {
+        const currentIndex = images.findIndex(img => img.url === selectedImage.url);
+        const nextIndex = (currentIndex + 1) % images.length;
+        setSelectedImage(images[nextIndex]);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying, selectedImage, images]);
+
+  const handleThumbnailClick = (image: { url: string, type: string }) => {
+    setSelectedImage(image);
+    setIsPlaying(false);
+  };
+
+  const handlePlayPauseClick = () => {
+    setIsPlaying(!isPlaying);
+  };
 
   return (
     <div className="relative group mb-4">
@@ -15,21 +36,27 @@ const DesignGallery = ({ images }: { images: { url: string, type: string }[] }) 
       >
         <div
           className="w-full h-full bg-center bg-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
-          style={{ backgroundImage: `url(${mainImage.url})` }}
+          style={{ backgroundImage: `url(${selectedImage.url})` }}
         ></div>
         <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button className="text-white bg-gradient-to-r from-blue-600 to-cyan-400 rounded-full p-3 hover:from-blue-700 hover:to-cyan-500 transition-all">
-            <span className="material-symbols-outlined text-4xl">play_arrow</span>
+          <button 
+            className="text-white bg-gradient-to-r from-blue-600 to-cyan-400 rounded-full p-3 hover:from-blue-700 hover:to-cyan-500 transition-all"
+            onClick={handlePlayPauseClick}
+          >
+            <span className="material-symbols-outlined text-4xl">
+              {isPlaying ? 'pause' : 'play_arrow'}
+            </span>
           </button>
         </div>
       </motion.div>
 
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mt-4">
-        {thumbnails.map((image, index) => (
+        {images.map((image, index) => (
           <motion.div
             key={index}
-            className="aspect-square rounded-md overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl relative group/thumb"
+            className={`aspect-square rounded-md overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl relative group/thumb border-2 ${selectedImage.url === image.url ? 'border-primary ring-2 ring-primary' : 'border-transparent'}`}
             whileHover={{ scale: 1.1, zIndex: 10 }}
+            onClick={() => handleThumbnailClick(image)}
           >
             <div
               className="w-full h-full bg-center bg-cover"

@@ -4,8 +4,22 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ModeToggle } from '@/components/ui/mode-toggle';
+import { useSearch } from '@/lib/SearchContext';
 
-const DashboardHeader = ({ setIsSidebarOpen }: { setIsSidebarOpen: (isOpen: boolean) => void }) => {
+const DashboardHeader = ({ 
+  setIsSidebarOpen
+}: { 
+  setIsSidebarOpen: (isOpen: boolean) => void
+}) => {
+  const { searchQuery, setSearchQuery, resultsRef } = useSearch();
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="flex-shrink-0 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-gray-200 px-4 sm:px-6 lg:px-8 h-16 bg-white dark:bg-gray-800 dark:border-gray-700">
       <div className="flex items-center gap-4">
@@ -15,14 +29,16 @@ const DashboardHeader = ({ setIsSidebarOpen }: { setIsSidebarOpen: (isOpen: bool
         >
           <span className="material-symbols-outlined text-3xl">menu</span>
         </button>
-        <div className="relative hidden sm:block">
+        <form className="relative hidden sm:block" onSubmit={handleSearchSubmit}>
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
           <input
             type="text"
             placeholder="Search..."
             className="w-full h-10 pl-10 pr-4 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-        </div>
+        </form>
       </div>
       <div className="flex items-center gap-4">
         <ModeToggle />

@@ -3,6 +3,7 @@ import React from 'react';
 import { purchasedDesigns } from '@/lib/purchases-data';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useSearch } from '@/lib/SearchContext';
 
 // Augment data for demonstration purposes
 const augmentedDesigns = purchasedDesigns.map((design, index) => ({
@@ -11,12 +12,18 @@ const augmentedDesigns = purchasedDesigns.map((design, index) => ({
   purchasedAddOns: index === 0 ? ['Structural Plan', 'Bill of Quantities (BOQ)', 'Video', 'Architectural Plan'] : ['Video'],
 }));
 
-const PurchasedDesigns = () => {
+const PurchasedDesigns = ({ searchQuery }: { searchQuery: string }) => {
+  const { resultsRef } = useSearch();
+
+  const filteredDesigns = augmentedDesigns.filter(design =>
+    design.name.toLowerCase().includes((searchQuery || '').toLowerCase())
+  );
+
   return (
-    <section>
+    <section ref={resultsRef as React.RefObject<HTMLDivElement>}>
       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">My Purchased Designs</h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {augmentedDesigns.map((design, index) => (
+        {filteredDesigns.map((design, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 20 }}

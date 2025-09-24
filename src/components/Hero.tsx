@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const slides = [
   {
@@ -27,6 +28,8 @@ const slides = [
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,6 +40,13 @@ const Hero = () => {
 
   const goToSlide = (slideIndex: number) => {
     setCurrentSlide(slideIndex);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/design-showcase?search=${searchQuery}`);
+    }
   };
 
   return (
@@ -78,11 +88,12 @@ const Hero = () => {
                   {slides[currentSlide].description}
                 </p>
               </motion.div>
-              <motion.div
+              <motion.form
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="relative w-full max-w-xl"
+                onSubmit={handleSearch}
               >
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">
                   search
@@ -90,11 +101,13 @@ const Hero = () => {
                 <input
                   className="form-input flex w-full h-12 md:h-14 resize-none overflow-hidden rounded-md border border-gray-300 bg-white pl-10 pr-24 md:pr-28 text-sm md:text-base text-slate-800 placeholder:text-gray-400 focus:border-[#1193d4] focus:ring-[#1193d4] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500"
                   placeholder="Search house plans..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button className="absolute right-1 top-1/2 -translate-y-1/2 flex h-10 md:h-11 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 px-3 md:px-4 text-xs md:text-sm font-bold text-white shadow-sm hover:from-blue-700 hover:to-cyan-500 transition-all">
+                <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 flex h-10 md:h-11 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 px-3 md:px-4 text-xs md:text-sm font-bold text-white shadow-sm hover:from-blue-700 hover:to-cyan-500 transition-all">
                   Search
                 </button>
-              </motion.div>
+              </motion.form>
             </div>
             <div className="absolute bottom-3 right-3 flex gap-2">
               {slides.map((_, index) => (

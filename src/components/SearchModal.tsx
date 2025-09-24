@@ -1,7 +1,8 @@
-
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -9,6 +10,34 @@ interface SearchModalProps {
 }
 
 const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
+  const [keyword, setKeyword] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [bedrooms, setBedrooms] = useState('Any');
+  const [styles, setStyles] = useState<string[]>([]);
+
+  const router = useRouter();
+
+  const handleStyleChange = (style: string) => {
+    setStyles(prevStyles => 
+      prevStyles.includes(style) 
+        ? prevStyles.filter(s => s !== style) 
+        : [...prevStyles, style]
+    );
+  };
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (keyword) params.set('search', keyword);
+    if (minPrice) params.set('minPrice', minPrice);
+    if (maxPrice) params.set('maxPrice', maxPrice);
+    if (bedrooms !== 'Any') params.set('bedrooms', bedrooms);
+    if (styles.length > 0) params.set('styles', styles.join(','));
+
+    router.push(`/design-showcase?${params.toString()}`);
+    onClose();
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -26,7 +55,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
             className="relative mx-auto mt-20 max-w-2xl rounded-lg bg-white p-8 shadow-xl dark:bg-gray-900 overflow-y-auto max-h-[80vh]"
             onClick={(e) => e.stopPropagation()}
           >
-                        <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Search Designs</h2>
               <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                 <span className="material-symbols-outlined">close</span>
@@ -35,37 +64,65 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
             <div className="grid grid-cols-1 gap-6">
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-2xl"> search </span>
-                <input className="w-full rounded-full border-transparent bg-gray-100 dark:bg-gray-800 py-3 pl-12 pr-6 text-base text-slate-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary focus:ring-primary shadow-sm" placeholder="Search by keyword..." type="search"/>
+                <input 
+                  className="w-full rounded-full border-transparent bg-gray-100 dark:bg-gray-800 py-3 pl-12 pr-6 text-base text-slate-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary focus:ring-primary shadow-sm" 
+                  placeholder="Search by keyword..." 
+                  type="search"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                />
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Price Range</h3>
                 <div className="flex items-center gap-2">
-                  <input className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4" placeholder="Min" type="number"/>
+                  <input 
+                    className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4" 
+                    placeholder="Min" 
+                    type="number"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                  />
                   <span className="text-gray-500">-</span>
-                  <input className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4" placeholder="Max" type="number"/>
+                  <input 
+                    className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4" 
+                    placeholder="Max" 
+                    type="number"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                  />
                 </div>
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Bedrooms</h3>
                 <div className="flex flex-wrap gap-2">
-                  <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700">Any</button>
-                  <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700">1</button>
-                  <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700">2</button>
-                  <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700">3</button>
-                  <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700">4+</button>
+                  {['Any', '1', '2', '3', '4+'].map(num => (
+                    <button 
+                      key={num}
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${bedrooms === num ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white' : 'bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'}`}
+                      onClick={() => setBedrooms(num)}
+                    >
+                      {num}
+                    </button>
+                  ))}
                 </div>
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Architectural Style</h3>
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Modern</label>
-                  <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Contemporary</label>
-                  <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Traditional</label>
-                  <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Coastal</label>
-                  <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Farmhouse</label>
+                  {['Modern', 'Contemporary', 'Traditional', 'Coastal', 'Farmhouse'].map(style => (
+                    <label key={style} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <input 
+                        className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" 
+                        type="checkbox" 
+                        checked={styles.includes(style)}
+                        onChange={() => handleStyleChange(style)}
+                      />
+                      {style}
+                    </label>
+                  ))}
                 </div>
               </div>
-              <button onClick={onClose} className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-cyan-400 py-3 font-bold text-white transition hover:from-blue-700 hover:to-cyan-500">Search</button>
+              <button onClick={handleSearch} className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-cyan-400 py-3 font-bold text-white transition hover:from-blue-700 hover:to-cyan-500">Search</button>
             </div>
           </motion.div>
         </motion.div>
