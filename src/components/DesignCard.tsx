@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Design } from "@/lib/designs";
+import { Design } from "@/lib/dummydata";
 
 const DesignCard = ({ design }: { design: Design }) => {
   const [isHovered, setIsHovered] = useState(false);

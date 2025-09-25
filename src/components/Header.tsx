@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from "next/link";
-import { navLinks } from "@/lib/data";
+import { navLinks } from "@/lib/dummydata";
 import Image from "next/image";
 import { ModeToggle } from "./ui/mode-toggle";
 import SearchModal from './SearchModal';
@@ -15,7 +15,7 @@ const Header = () => {
   return (
     <>
       <header className="flex items-center justify-between border-b border-solid border-b-gray-200 px-4 md:px-10 py-4 dark:bg-gray-900 dark:border-b-gray-800 sticky top-0 z-50 bg-white">
-        <div className="flex items-center gap-4 md:gap-10">
+        <div className="flex items-center gap-4 md:gap-6 lg:gap-10">
           <Link href="/" className="flex items-center gap-3 text-slate-800">
             <Image
               src="/images/concept-builders-logo-free-bg.png"
@@ -24,15 +24,15 @@ const Header = () => {
               height={60}
               className="w-12 h-12 md:w-[60px] md:h-[60px]"
             />
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text hidden sm:block">
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text hidden sm:block whitespace-nowrap">
               Concept Builders
             </h1>
           </Link>
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-8">
             {navLinks.map((link, index) => (
               <Link
                 key={index}
-                className="text-slate-600 text-base font-medium hover:text-[#1193d4] transition-colors dark:text-gray-300 dark:hover:text-primary"
+                className="text-slate-600 text-sm lg:text-base font-medium hover:text-[#1193d4] transition-colors dark:text-gray-300 dark:hover:text-primary whitespace-nowrap"
                 href={link.href}
               >
                 {link.label}

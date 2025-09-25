@@ -1,5 +1,5 @@
 import React from "react";
-import { designs } from "@/lib/designs";
+import { designs } from "@/lib/dummydata";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -41,10 +41,7 @@ const NewPlans = () => {
                   <span>{design.details.bathrooms} Baths</span>
                   <span>{design.details.area} sqft</span>
                 </div>
-                <div className="flex justify-between items-center mt-4">
-                  <p className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text">
-                    ${design.pricing.pdf}
-                  </p>
+                <div className="mt-6 text-center">
                   <Link href={`/designs/${design.id}`} className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold px-5 py-3 rounded-lg hover:from-blue-700 hover:to-cyan-500 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                     View Details
                   </Link>

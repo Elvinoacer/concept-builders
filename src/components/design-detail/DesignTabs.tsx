@@ -3,19 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const tabs = [
-  { id: 'description', label: 'Description' },
-  { id: 'plan-details', label: 'Plan Details' },
-  { id: 'building-cost-estimates', label: 'Building Cost Estimates' },
-  { id: 'faq-support', label: 'FAQ & Support' },
-  { id: 'reviews', label: 'Reviews' },
-];
-
-const icons = {
-  Basic: '🏠',
-  Standard: '🏡',
-  Premium: '🏛️',
-};
+import { designTabs as tabs, designTabIcons as icons } from "@/lib/dummydata";
 
 const DesignTabs = ({ design }) => {
   const [activeTab, setActiveTab] = useState(tabs[0].id);

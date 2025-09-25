@@ -3,8 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { blogPosts as simpleBlogPosts } from "@/lib/data";
-import { blogPostsData } from "@/lib/blog-data";
+import { blogPosts as simpleBlogPosts, blogPostsData } from "@/lib/dummydata";
 
 // Combine data to get images and richer details
 const combinedPosts = blogPostsData

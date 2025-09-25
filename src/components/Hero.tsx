@@ -4,27 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-const slides = [
-  {
-    title: "Build Your Dream Home",
-    description:
-      "Explore our curated collection of house plans and start your journey to homeownership today.",
-    image: "/images/banner-1.png",
-  },
-  {
-    title: "Luxurious and Affordable Designs",
-    description:
-      "Find the perfect balance of luxury and affordability with our wide range of house plans.",
-    image: "/images/banner-2.png",
-  },
-  {
-    title: "Customizable Plans to Fit Your Needs",
-    description:
-      "Our team of experts can help you customize any of our plans to create your perfect home.",
-    image: "/images/banner-3.png",
-  },
-];
+import { slides } from "@/lib/dummydata";
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);

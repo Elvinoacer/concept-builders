@@ -1,6 +1,5 @@
-
 import Link from "next/link";
-import { footerLinks, socialLinks } from "@/lib/data";
+import { footerLinks, socialLinks } from "@/lib/dummydata";
 import Image from "next/image";
 
 const Footer = () => {
@@ -16,14 +15,18 @@ const Footer = () => {
                 width={80}
                 height={80}
               />
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text">Concept Builders</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text">
+                Concept Builders
+              </span>
             </div>
             <p className="text-[#9CA3AF] text-sm dark:text-gray-400">
               Your partner in building the future. Discover, purchase, and
               actualize your dream home with us.
             </p>
             <div className="mt-4">
-              <h4 className="text-lg font-semibold mb-4 dark:text-white">Subscribe to our newsletter</h4>
+              <h4 className="text-lg font-semibold mb-4 dark:text-white">
+                Subscribe to our newsletter
+              </h4>
               <form className="flex flex-col gap-2">
                 <input
                   type="email"
@@ -41,7 +44,9 @@ const Footer = () => {
           </div>
           <div className="grid grid-cols-2 gap-8 md:col-span-3 md:grid-cols-3">
             <div>
-              <h4 className="text-lg font-semibold mb-4 dark:text-white">About Us</h4>
+              <h4 className="text-lg font-semibold mb-4 dark:text-white">
+                About Us
+              </h4>
               <ul className="space-y-3">
                 {footerLinks.about.map((link, index) => (
                   <li key={index}>
@@ -56,7 +61,9 @@ const Footer = () => {
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4 dark:text-white">Legal & Policy</h4>
+              <h4 className="text-lg font-semibold mb-4 dark:text-white">
+                Legal & Policy
+              </h4>
               <ul className="space-y-3">
                 {footerLinks.legal.map((link, index) => (
                   <li key={index}>
@@ -71,7 +78,9 @@ const Footer = () => {
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4 dark:text-white">Contact Us</h4>
+              <h4 className="text-lg font-semibold mb-4 dark:text-white">
+                Contact Us
+              </h4>
               <ul className="space-y-3">
                 {footerLinks.contact.map((link, index) => (
                   <li key={index}>
@@ -92,11 +101,15 @@ const Footer = () => {
         </div>
         <div className="mt-12 border-t border-gray-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 dark:border-gray-800">
           <p className="text-[#9CA3AF] text-sm dark:text-gray-400">
-            © 2024 Concept Builders. All rights reserved.
+            © {new Date().getFullYear()} Concept Builders. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             {socialLinks.map((link, index) => (
-              <Link key={index} href={link.href} className="text-[#9CA3AF] hover:text-[#1193d4] transition-colors dark:text-gray-400 dark:hover:text-primary">
+              <Link
+                key={index}
+                href={link.href}
+                className="text-[#9CA3AF] hover:text-[#1193d4] transition-colors dark:text-gray-400 dark:hover:text-primary"
+              >
                 <link.icon className="h-5 w-5" />
               </Link>
             ))}

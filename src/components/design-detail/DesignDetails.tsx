@@ -5,14 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export function DesignDetails({ description, planDetails, costBreakdown, totalEstimatedCost, faq, drawingSets, reviews }) {
   const [activeTab, setActiveTab] = useState("description");
 
-  const tabs = [
-    { id: "description", label: "Description" },
-    { id: "plan-details", label: "Plan Details" },
-    { id: "construction-cost", label: "Construction Cost" },
-    { id: "faq-support", label: "FAQ & Support" },
-    { id: "drawing-sets", label: "Drawing Sets" },
-    { id: "reviews", label: "Reviews" },
-  ];
+  import { designDetailsTabs as tabs } from "@/lib/dummydata";
 
   return (
     <div className="mt-12">

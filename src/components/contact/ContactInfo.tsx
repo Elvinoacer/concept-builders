@@ -1,5 +1,5 @@
 
-import { contactInfo } from "@/lib/contact-data";
+import { contactInfo } from "@/lib/dummydata";
 
 const ContactInfo = () => {
   return (
@@ -12,11 +12,11 @@ const ContactInfo = () => {
           <div>
             <h3 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white">{item.title}</h3>
             {item.title === "Live Chat" ? (
-              <a href="https://wa.me/254725869507" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
+              <a href="https://wa.me/254741360865" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
                 {item.value}
               </a>
             ) : item.title === "Phone" ? (
-              <a href="tel:254725869507" className="text-blue-600 hover:underline dark:text-blue-400">
+              <a href="tel:254741360865" className="text-blue-600 hover:underline dark:text-blue-400">
                 {item.value}
               </a>
             ) : item.title === "Email" ? (

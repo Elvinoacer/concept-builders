@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const RelatedDesigns = ({ relatedDesigns }) => {
   return (
-    <section className="mt-8 md:mt-16">
+    <section className="mt-8 md:mt-16 isolate">
       <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center tracking-tight dark:text-white">You may also like</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 [perspective:1000px]">
         {relatedDesigns.map((design, index) => (

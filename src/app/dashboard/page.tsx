@@ -6,10 +6,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearch } from '@/lib/SearchContext';
 
-const stats = [
-  { name: 'Purchased Plans', value: '3', icon: 'shopping_bag' },
-  { name: 'Wishlisted Items', value: '8', icon: 'favorite' },
-];
+import { stats } from '@/lib/dummydata';
 
 const DashboardPage = () => {
   const { searchQuery } = useSearch();

@@ -1,7 +1,7 @@
 "use client";
 import CartItemList from "@/components/cart/CartItemList";
 import OrderSummary from "@/components/cart/OrderSummary";
-import { cart as initialCart } from "@/lib/cart";
+import { cart as initialCart } from "@/lib/dummydata/cart";
 import Link from "next/link";
 import { useState } from "react";
 

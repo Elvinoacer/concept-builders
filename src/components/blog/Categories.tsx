@@ -1,5 +1,5 @@
 
-import { categories } from "@/lib/categories";
+import { categories } from "@/lib/dummydata";
 
 const Categories = () => {
   return (

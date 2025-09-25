@@ -1,4 +1,4 @@
-import { designs } from "@/lib/designs";
+import { designs } from "@/lib/dummydata";
 import Image from "next/image";
 
 const ImageGallery = ({ design }: { design: (typeof designs)[0] }) => {

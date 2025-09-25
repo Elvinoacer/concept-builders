@@ -1,4 +1,4 @@
-import { blogPostsData } from "@/lib/blog-data";
+import { blogPostsData } from "@/lib/dummydata";
 import Image from "next/image";
 
 const PopularPosts = () => {

@@ -1,17 +1,15 @@
+import { Toaster } from "sonner";
+import { SearchProvider } from "@/lib/SearchContext";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import React from "react";
 
-export default function PublicLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
+    <SearchProvider>
       <Header />
       <main>{children}</main>
+      <Toaster />
       <Footer />
-    </div>
+    </SearchProvider>
   );
 }

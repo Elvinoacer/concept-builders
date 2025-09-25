@@ -1,7 +1,6 @@
 "use client";
 import DesignCard from "@/components/DesignCard";
-import { designs } from "@/lib/designs";
-import { categories } from "@/lib/categories";
+import { designs, categories } from "@/lib/dummydata";
 import { useEffect, useState } from "react";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

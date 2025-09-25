@@ -4,17 +4,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PricingCalculator from './PricingCalculator';
 import CostEstimate from './CostEstimate';
-import { Design, CalculatorOption } from '@/lib/types';
-
-interface PurchaseSidebarProps {
-  design: Design;
-}
-
-const fileTypePrices = {
-  PDF: 0,
-  CAD: 100,
-  'PDF & CAD': 150,
-};
+import { Design, CalculatorOption, fileTypePrices } from '@/lib/dummydata';
 
 const PurchaseSidebar: React.FC<PurchaseSidebarProps> = ({ design }) => {
   const [selectedFileType, setSelectedFileType] = useState('PDF');
@@ -128,7 +118,7 @@ const PurchaseSidebar: React.FC<PurchaseSidebarProps> = ({ design }) => {
           </motion.button>
         </div>
       </div>
-      <CostEstimate estimates={design.buildingCostEstimates} />
+      <CostEstimate estimates={design.buildingCostEstimates} design={design} />
     </div>
   );
 };

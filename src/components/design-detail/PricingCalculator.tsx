@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { CalculatorOption } from '@/lib/types';
+import { CalculatorOption } from '@/lib/dummydata';
 
 interface PricingCalculatorProps {
   options: CalculatorOption[];

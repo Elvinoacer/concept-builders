@@ -1,5 +1,5 @@
 
-import { blogPostsData } from "@/lib/blog-data";
+import { blogPostsData } from "@/lib/dummydata";
 import PostListItem from "./PostListItem";
 import Pagination from "./Pagination";
 

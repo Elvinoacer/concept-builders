@@ -1,11 +1,28 @@
 'use client';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import PaymentForm from './PaymentForm';
+import { cart } from '@/lib/dummydata/cart';
 
 const CheckoutForm = () => {
+  const [paymentStatus, setPaymentStatus] = React.useState<string | null>(null);
+
+  const total = useMemo(() => {
+    return cart.items.reduce((acc, item) => acc + item.price, 0);
+  }, []);
+
+  const handlePaymentSuccess = (details: any) => {
+    setPaymentStatus(`Payment successful! Transaction ID: ${details.id}`);
+  };
+
+  const handlePaymentError = (error: any) => {
+    setPaymentStatus("Payment failed. Please try again.");
+    console.error("Payment Error:", error);
+  };
+
   return (
     <div>
       <h2 className="mb-4 md:mb-6 text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Checkout</h2>
@@ -76,6 +93,15 @@ const CheckoutForm = () => {
                 <Label htmlFor="intasend">Intasend</Label>
               </div>
             </RadioGroup>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Pay with Card</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {paymentStatus && <div>{paymentStatus}</div>}
+            <PaymentForm />
           </CardContent>
         </Card>
       </div>

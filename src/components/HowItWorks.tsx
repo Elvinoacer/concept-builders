@@ -2,27 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-
-const steps = [
-  {
-    number: 1,
-    title: 'Explore & Discover',
-    description: "Browse our curated collection of house plans. Use filters to find the perfect design that fits your lifestyle and budget.",
-    icon: 'search',
-  },
-  {
-    number: 2,
-    title: 'Purchase & Customize',
-    description: 'Securely purchase your chosen plan. Opt for our customization services to tweak the design to your exact specifications.',
-    icon: 'shopping_cart',
-  },
-  {
-    number: 3,
-    title: 'Download & Build',
-    description: 'Instantly download your complete architectural drawings and partner with your local builder to bring your dream home to life.',
-    icon: 'construction',
-  },
-];
+import { steps } from '@/lib/dummydata';
 
 const HowItWorks = () => {
   const cardVariants = {

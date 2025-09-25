@@ -7,6 +7,7 @@ import Image from "next/image";
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
   { href: "/dashboard/purchases", label: "My Purchases", icon: "shopping_bag" },
+  { href: "/dashboard/projects", label: "Projects", icon: "business_center" },
   { href: "/dashboard/wishlist", label: "Wishlist", icon: "favorite" },
   { href: "/designs", label: "Browse Designs", icon: "search" },
   { href: "/custom-design", label: "Custom Design", icon: "edit" },

@@ -1,5 +1,5 @@
 
-import { values } from "@/lib/values-data";
+import { values } from "@/lib/dummydata";
 import Image from "next/image";
 
 const OurValues = () => {

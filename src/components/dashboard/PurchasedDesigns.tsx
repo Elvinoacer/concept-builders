@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { purchasedDesigns } from '@/lib/purchases-data';
+import { purchasedDesigns } from '@/lib/dummydata';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useSearch } from '@/lib/SearchContext';

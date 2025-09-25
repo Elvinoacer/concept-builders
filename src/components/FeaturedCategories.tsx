@@ -1,4 +1,4 @@
-import { categories } from "@/lib/categories";
+import { categories } from "@/lib/dummydata";
 import Link from "next/link";
 
 const FeaturedCategories = () => {

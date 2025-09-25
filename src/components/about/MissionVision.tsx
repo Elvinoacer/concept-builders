@@ -1,5 +1,5 @@
 
-import { mission, vision } from "@/lib/about-data";
+import { mission, vision } from "@/lib/dummydata";
 
 const MissionVision = () => {
   return (

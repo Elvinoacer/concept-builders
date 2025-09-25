@@ -1,14 +1,16 @@
 
+import { contactHeader } from "@/lib/dummydata";
+
 const ContactHeader = () => {
   return (
     <div className="mb-4 md:mb-8">
       <h1
         className="text-4xl font-extrabold tracking-tighter sm:text-5xl bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text"
       >
-        Get in Touch
+        {contactHeader.title}
       </h1>
       <p className="mt-4 text-base md:text-lg text-gray-600 dark:text-gray-400">
-        We&apos;re here to help. Reach out to us with any questions or feedback.
+        {contactHeader.description}
       </p>
     </div>
   );

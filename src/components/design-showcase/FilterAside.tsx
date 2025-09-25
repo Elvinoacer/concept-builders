@@ -1,9 +1,36 @@
-
 'use client';
 
 import { motion } from 'framer-motion';
+import { ReadonlyURLSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
-const FilterAside = ({ onClose }: { onClose?: () => void }) => {
+interface FilterAsideProps {
+  onClose?: () => void;
+  searchParams: ReadonlyURLSearchParams;
+  updateSearchParams: (name: string, value: string | null) => void;
+  handleClearFilters: () => void;
+}
+
+const architecturalStyles = ['Modern', 'Contemporary', 'Traditional', 'Coastal', 'Farmhouse'];
+const bedroomOptions = ['Any', '1', '2', '3', '4+'];
+
+const FilterAside: React.FC<FilterAsideProps> = ({ onClose, searchParams, updateSearchParams, handleClearFilters }) => {
+  const currentMinPrice = searchParams.get('minPrice') || '';
+  const currentMaxPrice = searchParams.get('maxPrice') || '';
+  const currentBedrooms = searchParams.get('bedrooms') || 'Any';
+  const currentStyles = searchParams.get('styles')?.split(',') || [];
+  const currentMinSize = searchParams.get('minSize') || '500'; // Default min size
+
+  const handleStyleChange = (style: string, isChecked: boolean) => {
+    let newStyles = [...currentStyles];
+    if (isChecked) {
+      newStyles.push(style);
+    } else {
+      newStyles = newStyles.filter(s => s !== style);
+    }
+    updateSearchParams('styles', newStyles.length > 0 ? newStyles.join(',') : null);
+  };
+
   return (
     <motion.aside
       className="w-full md:pr-8"
@@ -21,40 +48,79 @@ const FilterAside = ({ onClose }: { onClose?: () => void }) => {
         <div>
           <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Price Range</h3>
           <div className="flex items-center gap-2">
-            <input className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4" placeholder="Min" type="number"/>
+            <input
+              className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4"
+              placeholder="Min"
+              type="number"
+              value={currentMinPrice}
+              onChange={(e) => updateSearchParams('minPrice', e.target.value)}
+            />
             <span className="text-gray-500">-</span>
-            <input className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4" placeholder="Max" type="number"/>
+            <input
+              className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4"
+              placeholder="Max"
+              type="number"
+              value={currentMaxPrice}
+              onChange={(e) => updateSearchParams('maxPrice', e.target.value)}
+            />
           </div>
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Bedrooms</h3>
           <div className="flex flex-wrap gap-2">
-            <button className="px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-600 to-cyan-400 text-white">Any</button>
-            <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700">1</button>
-            <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700">2</button>
-            <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700">3</button>
-            <button className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700">4+</button>
+            {bedroomOptions.map(option => (
+              <button
+                key={option}
+                onClick={() => updateSearchParams('bedrooms', option === 'Any' ? null : option)}
+                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                  currentBedrooms === option
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-400 text-white'
+                    : 'bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
           </div>
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Architectural Style</h3>
           <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Modern</label>
-            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Contemporary</label>
-            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Traditional</label>
-            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Coastal</label>
-            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"><input className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary" type="checkbox"/>Farmhouse</label>
+            {architecturalStyles.map(style => (
+              <label key={style} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <input
+                  className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary"
+                  type="checkbox"
+                  checked={currentStyles.includes(style)}
+                  onChange={(e) => handleStyleChange(style, e.target.checked)}
+                />
+                {style}
+              </label>
+            ))}
           </div>
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Size (sq. ft.)</h3>
-          <input className="w-full" max="5000" min="500" step="100" type="range"/>
+          <input
+            className="w-full"
+            max="5000"
+            min="500"
+            step="100"
+            type="range"
+            value={currentMinSize}
+            onChange={(e) => updateSearchParams('minSize', e.target.value)}
+          />
           <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-            <span>500</span>
+            <span>{currentMinSize}</span>
             <span>5000+</span>
           </div>
         </div>
-        <button className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-cyan-400 py-2.5 font-bold text-white transition hover:from-blue-700 hover:to-cyan-500">Apply Filters</button>
+        <button
+          onClick={handleClearFilters}
+          className="w-full rounded-lg bg-gray-200 dark:bg-gray-700 py-2.5 font-bold text-slate-800 dark:text-gray-200 transition hover:bg-gray-300 dark:hover:bg-gray-600"
+        >
+          Clear Filters
+        </button>
       </div>
     </motion.aside>
   );

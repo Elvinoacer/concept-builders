@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const OrderSummary = ({ items }) => {
   const subtotal = useMemo(() => {
@@ -41,9 +42,11 @@ const OrderSummary = ({ items }) => {
       </div>
 
       <div className="mt-8">
-        <Button className="w-full py-3 text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-400 text-white hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 transform hover:scale-105">
-          Proceed to Checkout
-        </Button>
+        <Link href="/checkout">
+          <Button className="w-full py-3 text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-400 text-white hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 transform hover:scale-105">
+            Proceed to Checkout
+          </Button>
+        </Link>
       </div>
 
       <div className="mt-6 flex items-center justify-center text-center text-sm text-slate-500 dark:text-gray-400">

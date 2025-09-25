@@ -1,106 +1,86 @@
 "use client";
-import React from "react";
-import ProjectsHeader from "@/components/dashboard/projects/ProjectsHeader";
-import ProjectProgress from "@/components/dashboard/projects/ProjectProgress";
-import Milestones from "@/components/dashboard/projects/Milestones";
-import Payments from "@/components/dashboard/projects/Payments";
-import ProjectUpdates from "@/components/dashboard/projects/ProjectUpdates";
-import ProjectImages from "@/components/dashboard/projects/ProjectImages";
+import React, { useEffect } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import useProjectsStore from "@/lib/store/projects";
 
 const ProjectsPage = () => {
-  const project = {
-    title: "Modern Residence",
-    description:
-      "Track the progress of your construction project in real-time.",
-    progress: 65,
-    estimatedCompletion: "December 15, 2024",
-    milestones: [
-      {
-        id: 1,
-        name: "Foundation",
-        status: "Completed",
-        dueDate: "July 15, 2024",
-        statusColor: "green",
-      },
-      {
-        id: 2,
-        name: "Framing",
-        status: "Completed",
-        dueDate: "August 10, 2024",
-        statusColor: "green",
-      },
-      {
-        id: 3,
-        name: "Electrical & Plumbing",
-        status: "In Progress",
-        dueDate: "September 20, 2024",
-        statusColor: "blue",
-      },
-      {
-        id: 4,
-        name: "Drywall & Interior Finishing",
-        status: "Upcoming",
-        dueDate: "October 15, 2024",
-        statusColor: "gray",
-      },
-    ],
-    payments: [
-      {
-        id: 1,
-        name: "Initial Deposit",
-        amount: 50000,
-        status: "Paid",
-        date: "June 1, 2024",
-        statusColor: "green",
-      },
-      {
-        id: 2,
-        name: "Framing Payment",
-        amount: 75000,
-        status: "Paid",
-        date: "August 15, 2024",
-        statusColor: "green",
-      },
-      {
-        id: 3,
-        name: "Electrical & Plumbing",
-        amount: 100000,
-        status: "Pending",
-        date: "September 25, 2024",
-        statusColor: "yellow",
-      },
-    ],
-    projectManager: {
-      name: "Sarah Johnson",
-      role: "Project Manager",
-      avatar:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuB2TmWZUcPN69p5Qy1aMNVcJB5gFntvVRbo8khiwk82iEW22UiorsvEEqUZs_8pygYwU00c8QPWP7_gbRybJtVbXj-nYj5Y3T0OaSjIAmmjAMZ1nIz5Soi7hvNQ9hDgtuqH7GSAc5kRJAGLo84PUbBGBfMaKL8bam5KCFLerlxvjwPS_cdXelMKLLChC7M0iZWCLD9lh-E44Bm6_rc6nMpodU-XYinxfdWFiSNrjCm6Fi35ja3VUhULb4f_-a-GoedJRbP-ReKmDIae",
-      latestUpdate:
-        "The framing is complete, and electrical and plumbing installations are underway. We are on schedule and within budget. Next steps include drywall installation and interior finishing.",
-    },
-    images: [
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCL-7fQD68DyrwHs8gWgu5H2MI3bVnmXSZJ89j1v3JPRUMu2addHM65nQxW4G7DRhr7hpqxy1fed4M0xNiyq6t_yncrG55oYQKxcv-ne1sVOQLAw8e-JtyHcjjq49tr2Dw9kp1UaIzzGI4OC64Hp8CgrKcGP2kDMgCiwwjj2sbl4KTK3-eFaJPJY8zk4b3H1iadaGK5mYnFSWUchIvKeRbCcMfCfNg3wq_q4v6FZlXYgUQG5D_4IUMKyhrLrHsqGexhEjlylNObhhVb",
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDJHHv7bC_VqgBTice09JLElRWiL22lXmBe2Tf4D9vvbDfIFlucdeo4WwgDviGFcaNKW1M0nCMJJAUvDPr6_eEcYP2nhl5vLtiqt7BtotNqqdJMkX2yyOR6Gh67trqNHGkt7oq7VsTPSO-rxiTl6bKDRI--L3ZFL3NTpAuFke0od4NU6L94LT4jtpVEFaQaMB8NlHxIgyLl7Hw--hZkeLvhMP2IdgFXcT4V8h9Mo2gQpciteKp79s7bOso9ZDamm7RNfRL094pN70GM",
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuD00lPQXMC2AavxwY0ur6WMZK-YObkrHMXfXkpE7MrYRG-5UzyPFaIzf3Rh3mDR6SOmCeiQztj-smMNQAOamwav_ZFI6Wq-OyofDA8KNB1Mgivk9iThGzjRppHTzDQVYOefPIxydrscoLfVyB8gKSsFMj_Vyu09mz0umGwShP29ee2Zu2gKxMvXq5XjWcvrusFD1tC42RsID3r5jQRFmlSnGeu0dA95dxSYnEiVJHqAMR2Dd99icavHeuOn4jsbgNAil3Lmqyjnqnap",
-    ],
-  };
+  const { projects, fetchProjects, loading } = useProjectsStore();
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="mx-auto max-w-6xl p-4 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <ProjectsHeader title={project.title} description={project.description} />
-      <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-4 md:space-y-8">
-          <ProjectProgress
-            progress={project.progress}
-            estimatedCompletion={project.estimatedCompletion}
-          />
-          <Milestones milestones={project.milestones} />
-          <Payments payments={project.payments} />
+    <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8">
+      <header className="mb-8 flex items-center justify-between">
+        <div>
+          <h2 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight dark:text-white">
+            My Projects
+          </h2>
+          <p className="text-gray-500 mt-1 dark:text-gray-400">
+            Here are the projects you are currently working on.
+          </p>
         </div>
-        <div className="lg:col-span-1 space-y-4 md:space-y-8">
-          <ProjectUpdates projectManager={project.projectManager} />
-          <ProjectImages images={project.images} />
-        </div>
+        <Link href="/dashboard/projects/new">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors"
+          >
+            New Project
+          </motion.button>
+        </Link>
+      </header>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {projects.map((project, index) => (
+          <Link href={`/dashboard/projects/${project.id}`} key={project.id}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden group"
+            >
+              <div className="relative h-48">
+                <img
+                  src={project.imageUrl}
+                  alt={project.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div
+                  className={`absolute top-2 right-2 px-2 py-1 text-xs font-bold text-white rounded-full bg-${project.statusColor}-500`}
+                >
+                  {project.status}
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
+                  {project.name}
+                </h3>
+                <div className="mt-2">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      Progress
+                    </span>
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">
+                      {project.progress}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                    <div
+                      className={`bg-${project.statusColor}-500 h-2.5 rounded-full`}
+                      style={{ width: `${project.progress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </Link>
+        ))}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { adminStats } from '@/lib/admin';
+import { adminStats } from '@/lib/dummydata';
 
 const Charts = () => {
   return (

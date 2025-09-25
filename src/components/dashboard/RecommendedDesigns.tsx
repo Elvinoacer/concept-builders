@@ -1,6 +1,6 @@
 'use client';
 import React, { useRef, useState, useEffect } from 'react';
-import { designs } from '@/lib/designs';
+import { designs } from '@/lib/dummydata';
 import DesignCard from '@/components/DesignCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
