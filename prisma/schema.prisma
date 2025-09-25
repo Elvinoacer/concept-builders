@@ -24,6 +24,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   orders        Order[]
+  projects      Project[]
 }
 
 model Account {

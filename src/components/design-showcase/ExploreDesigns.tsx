@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import FilterAside from "./FilterAside";
 import DesignCard from "./DesignCard";
-import { allDesigns } from "@/lib/dummydata";
+import { designs as allDesigns } from "@/lib/dummydata";
 import {
   Pagination,
   PaginationContent,

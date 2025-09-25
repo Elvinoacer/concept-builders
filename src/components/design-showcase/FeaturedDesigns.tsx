@@ -2,7 +2,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { featuredDesigns } from "@/lib/dummydata";
+import { designs as featuredDesigns } from "@/lib/dummydata";
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 

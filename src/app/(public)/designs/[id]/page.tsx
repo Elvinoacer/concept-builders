@@ -6,10 +6,16 @@ import FloorPlan from '@/components/design-detail/FloorPlan';
 import PurchaseSidebar from '@/components/design-detail/PurchaseSidebar';
 import RelatedDesigns from '@/components/design-detail/RelatedDesigns';
 import Renderings from '@/components/design-detail/Renderings';
-import { design } from '@/lib/dummydata';
+import { designs } from '@/lib/dummydata';
 import { ThemeProvider } from '@/components/theme-provider';
 
-const DesignDetailPage = () => {
+const DesignDetailPage = ({ params }: { params: { id: string } }) => {
+  const design = designs.find((d) => d.id === parseInt(params.id));
+
+  if (!design) {
+    return <div>Design not found</div>;
+  }
+
   return (
     <ThemeProvider
       attribute="class"

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useMemo } from 'react';
-import { purchasedDesigns } from '@/lib/purchases-data';
+import { purchasedDesigns } from '@/lib/dummydata';
 import { motion, AnimatePresence } from 'framer-motion';
 import PurchaseListItem from '@/components/dashboard/PurchaseListItem';
 

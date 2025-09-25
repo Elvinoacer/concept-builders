@@ -1,7 +1,7 @@
 
 "use client";
 
-import { blogPostsData } from "@/lib/blog-data";
+import { blogPostsData } from "@/lib/dummydata";
 import { motion } from "framer-motion";
 import Pagination from "./Pagination";
 
