@@ -1,17 +1,41 @@
 "use client";
 
-import { folderData } from "@/lib/folder-data";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 const FolderStructure = () => {
+  const [folders, setFolders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFolders = async () => {
+      try {
+        const response = await fetch("/api/designs/folders");
+        const data = await response.json();
+        setFolders(data);
+      } catch (error) {
+        console.error("Error fetching folders:", error);
+      }
+      setLoading(false);
+    };
+
+    fetchFolders();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="mb-4 md:mb-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl md:text-2xl font-bold text-foreground">Folder Structure</h2>
-        <button className="flex items-center gap-2 min-w-[84px] cursor-pointer rounded-md h-10 px-4 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-sm font-bold">
-          <span className="material-symbols-outlined">create_new_folder</span>
-          <span className="truncate">New Folder</span>
-        </button>
       </div>
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
         <table className="w-full min-w-full text-sm text-left text-gray-500">
@@ -23,16 +47,13 @@ const FolderStructure = () => {
               <th scope="col" className="hidden md:table-cell px-2 py-2 md:px-4 md:py-3 sm:px-6">
                 Last Modified
               </th>
-              <th scope="col" className="hidden md:table-cell px-2 py-2 md:px-4 md:py-3 sm:px-6">
-                Size
-              </th>
               <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
                 <span className="sr-only">Actions</span>
               </th>
             </tr>
           </thead>
           <tbody>
-            {folderData.map((folder, index) => (
+            {folders.map((folder, index) => (
               <motion.tr
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -50,18 +71,14 @@ const FolderStructure = () => {
                   <span className="truncate max-w-[100px] sm:max-w-[200px]">{folder.name}</span>
                 </th>
                 <td className="hidden md:table-cell px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
-                  {folder.lastModified}
-                </td>
-                <td className="hidden md:table-cell px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
-                  {folder.size}
+                  {formatDate(folder.updatedAt)}
                 </td>
                 <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 text-right">
-                  <a
-                    href="#"
-                    className="font-medium text-primary hover:underline whitespace-nowrap"
-                  >
-                    View
-                  </a>
+                  <Link href={`/admin/designs/folders/${folder.id}`} legacyBehavior>
+                    <a className="font-medium text-primary hover:underline whitespace-nowrap">
+                      View
+                    </a>
+                  </Link>
                 </td>
               </motion.tr>
             ))}

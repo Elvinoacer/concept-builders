@@ -1,17 +1,16 @@
-"use client";
-import React, { useState } from "react";
-import { testimonials as initialTestimonials } from "@/lib/dummydata";
+'use client';
+import { useEffect, useState } from 'react';
+import useLandingPageStore from '@/lib/store/landing-page';
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Add a title to the testimonial data
-const testimonials = initialTestimonials.map((t, i) => ({
-  ...t,
-  title: i % 2 === 0 ? "Homeowner" : "Real Estate Developer",
-}));
-
 const Testimonials = () => {
+  const { testimonials, fetchLandingPageData } = useLandingPageStore();
   const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    fetchLandingPageData();
+  }, [fetchLandingPageData]);
 
   const nextTestimonial = () => {
     setIndex((prev) => (prev + 1) % testimonials.length);
@@ -40,10 +39,9 @@ const Testimonials = () => {
 
   const [direction, setDirection] = useState(0);
 
-  const paginate = (newDirection: number) => {
-    setDirection(newDirection);
-    setIndex(index + newDirection);
-  };
+  if (!testimonials.length) {
+    return null;
+  }
 
   return (
     <section className="py-16 md:py-24 bg-white dark:bg-gray-950">
@@ -78,13 +76,13 @@ const Testimonials = () => {
                   format_quote
                 </span>
                 <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg italic mb-6 text-center">
-                  {testimonials[index].testimonial}
+                  {testimonials[index].quote}
                 </p>
                 <div className="flex items-center justify-center">
                   <div className="relative w-14 h-14 mr-4">
                     <Image
                       src={testimonials[index].image}
-                      alt={testimonials[index].name}
+                      alt={testimonials[index].author}
                       fill
                       className="rounded-full object-cover"
                       sizes="56px"
@@ -92,10 +90,10 @@ const Testimonials = () => {
                   </div>
                   <div>
                     <p className="font-bold text-lg text-gray-900 dark:text-white">
-                      {testimonials[index].name}
+                      {testimonials[index].author}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {testimonials[index].title}
+                      {/* The title is not in the new schema, so I will remove it */}
                     </p>
                   </div>
                 </div>

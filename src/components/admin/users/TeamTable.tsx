@@ -1,6 +1,6 @@
 "use client";
 
-import { teamData } from "@/lib/team-data";
+import { teamData } from "@/lib/dummydata/team";
 import { motion } from "framer-motion";
 import Image from "next/image";
 

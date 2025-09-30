@@ -1,7 +1,7 @@
-
 "use client";
 
 import { motion } from "framer-motion";
+import { designTabs } from "@/lib/dummydata";
 
 interface DesignsTabsProps {
   activeTab: string;
@@ -17,28 +17,20 @@ const DesignsTabs = ({ activeTab, setActiveTab }: DesignsTabsProps) => {
       className="border-b border-border mb-4 md:mb-6"
     >
       <nav className="flex gap-4 md:gap-8 overflow-x-auto whitespace-nowrap">
-        <a
-          href="#"
-          onClick={() => setActiveTab("all")}
-          className={`pb-3 border-b-2 text-sm font-semibold ${
-            activeTab === "all"
-              ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          All Designs
-        </a>
-        <a
-          href="#"
-          onClick={() => setActiveTab("folders")}
-          className={`pb-3 border-b-2 text-sm font-medium ${
-            activeTab === "folders"
-              ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Folders
-        </a>
+        {designTabs.map((tab) => (
+          <a
+            key={tab.id}
+            href="#"
+            onClick={() => setActiveTab(tab.id)}
+            className={`pb-3 border-b-2 text-sm font-semibold ${
+              activeTab === tab.id
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {tab.label}
+          </a>
+        ))}
       </nav>
     </motion.div>
   );

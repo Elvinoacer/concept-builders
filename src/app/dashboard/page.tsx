@@ -1,12 +1,11 @@
-'use client';
-import Notifications from '@/components/dashboard/Notifications';
-import PurchasedDesigns from '@/components/dashboard/PurchasedDesigns';
-import RecommendedDesigns from '@/components/dashboard/RecommendedDesigns';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { useSearch } from '@/lib/SearchContext';
+"use client";
+import Notifications from "@/components/dashboard/Notifications";
+import PurchasedDesigns from "@/components/dashboard/PurchasedDesigns";
+import RecommendedDesigns from "@/components/dashboard/RecommendedDesigns";
+import { useSearch } from "@/lib/SearchContext";
+import { motion } from "framer-motion";
 
-import { stats } from '@/lib/dummydata';
+import { stats } from "@/lib/dummydata";
 
 const DashboardPage = () => {
   const { searchQuery } = useSearch();
@@ -16,7 +15,7 @@ const DashboardPage = () => {
       <header className="mb-8">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -24,7 +23,7 @@ const DashboardPage = () => {
             >
               Welcome Back, Sophia!
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -33,12 +32,11 @@ const DashboardPage = () => {
               Here&apos;s a summary of your account and recent activity.
             </motion.p>
           </div>
-          
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:gap-6">
           {stats.map((stat, index) => (
-            <motion.div 
+            <motion.div
               key={stat.name}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -46,11 +44,17 @@ const DashboardPage = () => {
               className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-4"
             >
               <div className="bg-blue-100 dark:bg-blue-900/50 p-2 sm:p-3 rounded-full">
-                <span className="material-symbols-outlined text-2xl sm:text-3xl text-blue-600 dark:text-blue-400">{stat.icon}</span>
+                <span className="material-symbols-outlined text-2xl sm:text-3xl text-blue-600 dark:text-blue-400">
+                  {stat.icon}
+                </span>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">{stat.value}</p>
-                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">{stat.name}</p>
+                <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
+                  {stat.value}
+                </p>
+                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                  {stat.name}
+                </p>
               </div>
             </motion.div>
           ))}

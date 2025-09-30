@@ -20,11 +20,15 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  password      String?
+  hashedPassword      String?
   accounts      Account[]
   sessions      Session[]
   orders        Order[]
   projects      Project[]
+  role          Role      @default(CLIENT)
+  reviews       Review[]
+  wishlist      Design[]
+  folders       Folder[]
 }
 
 model Account {
@@ -63,24 +67,66 @@ model VerificationToken {
 }
 
 model Category {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  image       String?
-  designs     Design[]
+  id      String   @id @default(cuid())
+  name    String   @unique
+  image   String?
+  designs Design[]
+}
+
+model Folder {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  designs   Design[]
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Design {
-  id            String      @id @default(cuid())
-  name          String
-  description   String
-  images        Json
-  price         Float
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  categoryId    String
-  category      Category    @relation(fields: [categoryId], references: [id])
-  orderItems    OrderItem[]
-  salesCount    Int         @default(0)
+  id                    String      @id @default(cuid())
+  name                  String
+  description           String
+  basePrice             Float
+  priceRange            String
+  images                Json
+  renderings            Json
+  floorPlanUrl          String?
+  planDetails           Json
+  faqs                  Json
+  buildingCostEstimates Json
+  reviews               Review[]
+  relatedDesigns        Design[]    @relation("RelatedDesigns")
+  relatedTo             Design[]    @relation("RelatedDesigns")
+  tags                  Json
+  fileTypes             Json
+  drawingSetsOptions    Json
+  calculatorOptions     Json?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  categoryId            String
+  category              Category    @relation(fields: [categoryId], references: [id])
+  orderItems            OrderItem[]
+  salesCount            Int         @default(0)
+  users                 User[]
+  bedrooms              Int?
+  bathrooms             Int?
+  area                  Int?
+  floors                Int?
+  folderId              String?
+  folder                Folder?     @relation(fields: [folderId], references: [id])
+  files                 String[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  designId  String
+  design    Design   @relation(fields: [designId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model Testimonial {
@@ -99,6 +145,7 @@ model Post {
   image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  author    String?
 }
 
 model Order {
@@ -107,15 +154,17 @@ model Order {
   user      User        @relation(fields: [userId], references: [id])
   createdAt DateTime    @default(now())
   items     OrderItem[]
+  status    OrderStatus @default(PENDING)
+  amount    Float
 }
 
 model OrderItem {
-  id        String @id @default(cuid())
-  orderId   String
-  order     Order  @relation(fields: [orderId], references: [id])
-  designId  String
-  design    Design @relation(fields: [designId], references: [id])
-  quantity  Int
+  id       String @id @default(cuid())
+  orderId  String
+  order    Order  @relation(fields: [orderId], references: [id])
+  designId String
+  design   Design @relation(fields: [designId], references: [id])
+  quantity Int
 }
 
 model Project {
@@ -129,4 +178,17 @@ model Project {
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+enum Role {
+  CLIENT
+  TEAM
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  REFUND_REQUESTED
+  REFUNDED
 }

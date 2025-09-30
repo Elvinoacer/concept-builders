@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF to HTML Content Extractor</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load PDF.js Libraries via CDN -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.1.365/pdf.min.mjs"
+      type="module"
+    ></script>
+    <style>
+      /* Custom styles for better aesthetics */
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+      }
+      .container-card {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      .loading-ring {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left-color: #3b82f6;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body class="p-4 md:p-8 min-h-screen flex justify-center items-start">
+    <div class="w-full max-w-4xl">
+      <!-- Application Header -->
+      <header class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">PDF Text Extractor</h1>
+        <p class="text-gray-600 mt-2">
+          This tool uses PDF.js to extract all text content from an uploaded PDF
+          and convert it into HTML paragraphs.
+        </p>
+      </header>
+
+      <!-- Input Card -->
+      <div class="container-card bg-white p-6 rounded-xl mb-8">
+        <label
+          for="pdfInput"
+          class="block text-lg font-medium text-gray-700 mb-3"
+        >
+          1. Select a PDF File
+        </label>
+        <input
+          type="file"
+          id="pdfInput"
+          accept=".pdf"
+          class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+        />
+      </div>
+
+      <!-- Conversion Output & Status Card -->
+      <div class="container-card bg-white p-6 rounded-xl">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+          2. Extracted HTML Content
+        </h2>
+
+        <div
+          id="statusMessage"
+          class="flex items-center text-blue-600 font-medium mb-4 hidden"
+        >
+          <div class="loading-ring mr-3"></div>
+          Processing PDF... Please wait.
+        </div>
+
+        <div
+          id="errorMessage"
+          class="bg-red-100 text-red-700 p-4 rounded-lg hidden"
+          role="alert"
+        >
+          An error occurred during processing. Please ensure the file is a valid
+          PDF.
+        </div>
+
+        <div
+          id="outputContainer"
+          class="mt-4 border border-gray-200 rounded-lg p-4 bg-gray-50 max-h-96 overflow-y-auto"
+        >
+          <p id="placeholderText" class="text-gray-400 italic">
+            The extracted text content will appear here after uploading a file.
+          </p>
+
+          <!-- This is where the extracted text content will be inserted -->
+          <div id="extractedContent" class="space-y-4"></div>
+        </div>
+
+        <!-- Action Button: Copy HTML -->
+        <button
+          id="copyButton"
+          disabled
+          class="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Copy Extracted Text to Clipboard
+        </button>
+      </div>
+    </div>
+
+    <script type="module">
+      // Import PDF.js worker and core library
+      import { getDocument } from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.1.365/pdf.min.mjs";
+
+      // Set the worker source path (REQUIRED by PDF.js)
+      const pdfWorker =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.1.365/pdf.worker.min.mjs";
+
+      // --- DOM Elements ---
+      const pdfInput = document.getElementById("pdfInput");
+      const statusMessage = document.getElementById("statusMessage");
+      const errorMessage = document.getElementById("errorMessage");
+      const placeholderText = document.getElementById("placeholderText");
+      const extractedContent = document.getElementById("extractedContent");
+      const copyButton = document.getElementById("copyButton");
+
+      // --- Utility Functions ---
+
+      /**
+       * Converts the file to a typed array buffer required by PDF.js.
+       * @param {File} file - The selected file object.
+       * @returns {Promise<Uint8Array>} The PDF file data as a Uint8Array.
+       */
+      function readFileAsArrayBuffer(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(new Uint8Array(reader.result));
+          reader.onerror = () => reject(reader.error);
+          reader.readAsArrayBuffer(file);
+        });
+      }
+
+      /**
+       * Displays a temporary success message in a custom modal style.
+       */
+      function showCopySuccessMessage() {
+        const originalText = copyButton.textContent;
+        copyButton.textContent = "Copied to Clipboard! 🎉";
+        copyButton.classList.remove("bg-green-500", "hover:bg-green-600");
+        copyButton.classList.add("bg-indigo-500");
+
+        setTimeout(() => {
+          copyButton.textContent = originalText;
+          copyButton.classList.add("bg-green-500", "hover:bg-green-600");
+          copyButton.classList.remove("bg-indigo-500");
+        }, 2000);
+      }
+
+      // --- Main Conversion Logic ---
+
+      /**
+       * Processes the uploaded PDF file to extract text content.
+       * @param {File} file - The uploaded PDF file.
+       */
+      async function convertPdfToHtml(file) {
+        // Reset UI state
+        extractedContent.innerHTML = "";
+        placeholderText.classList.add("hidden");
+        errorMessage.classList.add("hidden");
+        statusMessage.classList.remove("hidden");
+        copyButton.disabled = true;
+
+        try {
+          // 1. Read the file into an ArrayBuffer
+          const pdfData = await readFileAsArrayBuffer(file);
+
+          // 2. Initialize the PDF document proxy
+          const pdfDocument = await getDocument({
+            data: pdfData,
+            workerSrc: pdfWorker,
+          }).promise;
+
+          let fullTextContent = "";
+
+          // 3. Iterate through all pages
+          for (let i = 1; i <= pdfDocument.numPages; i++) {
+            const page = await pdfDocument.getPage(i);
+
+            // 4. Extract text content
+            const textContent = await page.getTextContent();
+
+            // Add a page divider for clarity in the output
+            fullTextContent += `<h3 class="text-lg font-semibold border-b pb-1 mb-2 text-blue-700">Page ${i}</h3>`;
+
+            // 5. Convert text items into HTML paragraphs
+            let pageText = textContent.items
+              .map((item) => item.str)
+              .join(" ") // Basic joining; spacing is simplified here
+              .trim();
+
+            // Simple attempt to break text into logical paragraphs (by line break pattern)
+            // Note: This is a heuristic and may not perfectly match the PDF's logical structure.
+            const paragraphs = pageText.split(/(\n\s*\n)+/g).filter(Boolean);
+
+            paragraphs.forEach((p) => {
+              // Create a clean paragraph element
+              fullTextContent += `<p class="text-gray-700 leading-relaxed break-words">${p
+                .replace(/\s+/g, " ")
+                .trim()}</p>`;
+            });
+
+            // Add a vertical separator
+            fullTextContent +=
+              '<div class="h-6 border-l border-gray-300 mx-auto my-4"></div>';
+          }
+
+          // Remove the last separator
+          fullTextContent = fullTextContent.substring(
+            0,
+            fullTextContent.lastIndexOf("<div")
+          );
+
+          // 6. Update the display and enable copy
+          extractedContent.innerHTML = fullTextContent;
+          copyButton.disabled = false;
+        } catch (error) {
+          console.error("PDF Processing Error:", error);
+          errorMessage.classList.remove("hidden");
+          placeholderText.classList.remove("hidden");
+          placeholderText.textContent =
+            "Failed to process the PDF. See console for details.";
+          copyButton.disabled = true;
+        } finally {
+          statusMessage.classList.add("hidden");
+        }
+      }
+
+      // --- Event Listeners ---
+
+      pdfInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          convertPdfToHtml(file);
+        }
+      });
+
+      copyButton.addEventListener("click", () => {
+        const htmlToCopy = extractedContent.innerHTML;
+
+        // Use the older document.execCommand('copy') for better compatibility in iFrames
+        const tempTextArea = document.createElement("textarea");
+        tempTextArea.value = htmlToCopy;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+
+        try {
+          document.execCommand("copy");
+          showCopySuccessMessage();
+        } catch (err) {
+          console.error("Could not copy text: ", err);
+        } finally {
+          document.body.removeChild(tempTextArea);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { wishlistDesigns } from '@/lib/wishlist-data';
+import { wishlistDesigns } from '@/lib/dummydata/wishlist-data';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 

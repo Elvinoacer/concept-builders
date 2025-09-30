@@ -1,10 +1,14 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { BuildingCostEstimate, Design, costEstimateIcons, costBreakdown } from '@/lib/dummydata';
+import { Button } from '@/components/ui/button';
+import PricingCalculatorModal from './PricingCalculatorModal';
 
 const CostEstimate: React.FC<CostEstimateProps> = ({ estimates, design }) => {
   const [openBreakdown, setOpenBreakdown] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const newEstimates = estimates.filter(e => e.name === 'Basic' || e.name === 'Premium').map(e => e.name === 'Premium' ? {...e, name: 'Luxury'} : e);
+  const newEstimates = (estimates || []).filter(e => e.name === 'Basic' || e.name === 'Premium').map(e => e.name === 'Premium' ? {...e, name: 'Luxury'} : e);
 
   return (
     <>
@@ -20,7 +24,7 @@ const CostEstimate: React.FC<CostEstimateProps> = ({ estimates, design }) => {
               className="p-4 border-l-4 border-blue-500 rounded-r-lg bg-gray-50 dark:bg-gray-700/50"
             >
               <div className="flex items-start gap-4">
-                  <div className="text-3xl">{icons[estimate.name]}</div>
+                  <div className="text-3xl">{costEstimateIcons[estimate.name]}</div>
                   <div className='flex-1'>
                       <h3 className="font-bold text-lg text-gray-900 dark:text-white">{estimate.name}</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{estimate.description}</p>

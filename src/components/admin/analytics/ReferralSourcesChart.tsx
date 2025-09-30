@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { referralSourcesData } from "@/lib/analytics-data";
+import { referralSourcesData } from "@/lib/dummydata";
 import { motion } from "framer-motion";
 
 const ReferralSourcesChart = () => {

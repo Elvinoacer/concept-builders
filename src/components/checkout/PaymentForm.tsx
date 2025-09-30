@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 
-export default function PaymentForm() {
+export default function PaymentForm({ designId }: { designId: string }) {
     const [error, setError] = useState(null);
 
     const createOrder = async (data: any, actions: any) => {
         try {
-            const res = await fetch('/api/paypal/create-order', { method: 'POST' });
+            const res = await fetch('/api/paypal/create-order', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ designId })
+            });
             const { orderID } = await res.json();
             return orderID;
         } catch (err) {

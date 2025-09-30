@@ -6,7 +6,7 @@ import FloorPlan from '@/components/design-detail/FloorPlan';
 import PurchaseSidebar from '@/components/design-detail/PurchaseSidebar';
 import RelatedDesigns from '@/components/design-detail/RelatedDesigns';
 import Renderings from '@/components/design-detail/Renderings';
-import { designs } from '@/lib/dummydata';
+import { purchasedDesigns as designs } from '@/lib/dummydata';
 import { ThemeProvider } from '@/components/theme-provider';
 
 const DesignDetailPage = ({ params }: { params: { id: string } }) => {

@@ -1,0 +1,126 @@
+:root {
+  --editor-bg: #fff;
+  --editor-text: #000;
+  --editor-border: #ccc;
+  --editor-button-bg: transparent;
+  --editor-button-hover-bg: #e0e0e0;
+  --editor-button-active-bg: #d0d0d0;
+  --editor-group-border: #ccc;
+}
+
+[data-theme='dark'] {
+  --editor-bg: #333;
+  --editor-text: #fff;
+  --editor-border: #555;
+  --editor-button-bg: transparent;
+  --editor-button-hover-bg: #555;
+  --editor-button-active-bg: #777;
+  --editor-group-border: #555;
+}
+
+.tiptap .ProseMirror {
+  background-color: var(--editor-bg);
+  color: var(--editor-text);
+  border: 1px solid var(--editor-border);
+  padding: 10px;
+}
+
+.menu-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--editor-border);
+  border-bottom: none;
+  background-color: var(--editor-bg);
+}
+
+.menu-group {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+  padding-right: 8px;
+  border-right: 1px solid var(--editor-group-border);
+}
+
+.menu-group:last-child {
+  border-right: none;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+.menu-bar button {
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-right: 6px;
+  background-color: var(--editor-button-bg);
+  color: var(--editor-text);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.menu-bar button:hover {
+  background-color: var(--editor-button-hover-bg);
+}
+
+.menu-bar button.is-active {
+  background-color: var(--editor-button-active-bg);
+  color: var(--editor-text);
+}
+
+.ProseMirror h1 {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.ProseMirror h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+}
+
+.ProseMirror p {
+  font-size: 1em;
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+
+.ProseMirror strong {
+  font-weight: bold;
+}
+
+.ProseMirror code {
+  background-color: #eee;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+}
+
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}

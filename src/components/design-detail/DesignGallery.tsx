@@ -4,6 +4,14 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const DesignGallery = ({ images }: { images: { url: string, type: string }[] }) => {
+  if (!images || images.length === 0) {
+    return (
+      <div className="aspect-video md:aspect-[4/3] rounded-lg bg-gray-200 flex items-center justify-center">
+        <p className="text-gray-500">No images available</p>
+      </div>
+    );
+  }
+
   const [selectedImage, setSelectedImage] = useState(images[0]);
   const [isPlaying, setIsPlaying] = useState(false);
 

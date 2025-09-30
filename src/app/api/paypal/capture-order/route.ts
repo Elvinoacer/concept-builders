@@ -1,3 +1,6 @@
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import prisma from "@/lib/prisma"
 const paypal = require('@paypal/checkout-server-sdk');
 
 // Reuse the same getPaypalClient function from above
@@ -10,6 +13,17 @@ function getPaypalClient() {
 }
 
 export async function POST(req: Request) {
+    const session = await getServerSession(authOptions)
+
+    if (!session) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
+
     const { orderID } = await req.json();
 
     if (!orderID) {
@@ -27,7 +41,20 @@ export async function POST(req: Request) {
         request.requestBody({});
 
         const capture = await client.execute(request);
-        // Here, you can save capture details to your DB, send email receipt, etc.
+        const designId = capture.result.purchase_units[0].custom_id;
+
+        const order = await prisma.order.create({
+            data: {
+                userId: session.user.id,
+                items: {
+                    create: {
+                        designId: designId,
+                        quantity: 1
+                    }
+                }
+            }
+        })
+
         return new Response(JSON.stringify({ captureID: capture.result.id, status: capture.result.status }), {
             status: 200,
             headers: {

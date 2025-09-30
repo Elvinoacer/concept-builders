@@ -2,9 +2,13 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+
 import FilterAside from "./FilterAside";
+
 import DesignCard from "./DesignCard";
+
 import { designs as allDesigns } from "@/lib/dummydata";
+import { designShowcaseData } from "@/lib/dummydata/designShowcase";
 import {
   Pagination,
   PaginationContent,
@@ -83,13 +87,13 @@ const ExploreDesigns = () => {
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case 'Newest':
+        case designShowcaseData.sortByOptions[0]: // Newest
           return b.id - a.id; // Assuming higher ID means newer
-        case 'Popular':
+        case designShowcaseData.sortByOptions[1]: // Popular
           return Math.random() - 0.5; // Placeholder for popularity
-        case 'Price (Low to High)':
+        case designShowcaseData.sortByOptions[2]: // Price (Low to High)
           return a.price - b.price;
-        case 'Price (High to Low)':
+        case designShowcaseData.sortByOptions[3]: // Price (High to Low)
           return b.price - a.price;
         default:
           return 0;
@@ -118,13 +122,13 @@ const ExploreDesigns = () => {
   return (
     <section ref={sectionRef}>
       <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white shrink-0 self-start">Explore All Designs</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white shrink-0 self-start">{designShowcaseData.exploreDesignsTitle}</h2>
         <div className="w-full flex flex-col md:flex-row items-center gap-4">
           <div className="relative w-full">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-2xl"> search </span>
             <input
               className="w-full rounded-full border-transparent bg-white dark:bg-gray-800 py-3 pl-12 pr-6 text-base text-slate-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary focus:ring-primary shadow-sm"
-              placeholder="Search designs..."
+              placeholder={designShowcaseData.searchPlaceholder}
               type="search"
               value={searchQuery || ''}
               onChange={handleSearchChange}
@@ -135,18 +139,17 @@ const ExploreDesigns = () => {
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex items-center justify-center gap-2 rounded-lg bg-gray-200 dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors shrink-0">
               <span className="material-symbols-outlined text-xl">filter_list</span>
-              <span>Filters</span>
+              <span>{designShowcaseData.filtersButtonText}</span>
             </button>
             <div className="relative flex-1">
               <select
                 className="appearance-none w-full rounded-lg border-transparent bg-gray-200 dark:bg-gray-800 py-2.5 pl-4 pr-10 text-sm text-slate-800 dark:text-gray-100 focus:border-primary focus:ring-primary shrink-0"
-                value={sortBy || 'Newest'}
+                value={sortBy || designShowcaseData.sortByOptions[0]}
                 onChange={handleSortChange}
               >
-                <option>Newest</option>
-                <option>Popular</option>
-                <option>Price (Low to High)</option>
-                <option>Price (High to Low)</option>
+                {designShowcaseData.sortByOptions.map((option) => (
+                  <option key={option}>{option}</option>
+                ))}
               </select>
               <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">expand_more</span>
             </div>

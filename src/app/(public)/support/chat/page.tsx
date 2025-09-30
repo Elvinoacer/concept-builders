@@ -5,25 +5,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-
-const initialMessages = [
-    { id: 1, author: 'Support Team', text: 'Hello! Welcome to Concept Builders support. How can we help you today?', time: '10:30 AM', avatar: '/images/concept-builders-logo-free-bg.png' },
-    { id: 2, author: 'You', text: 'Hi, I have a question about modifying a plan.', time: '10:31 AM' },
-    { id: 3, author: 'Support Team', text: 'Of course! I can help with that. Which plan are you interested in?', time: '10:32 AM', avatar: '/images/concept-builders-logo-free-bg.png' },
-];
+import { initialChatMessages, Message } from '@/lib/dummydata';
 
 const SupportChatPage = () => {
-    const [messages, setMessages] = useState(initialMessages);
+    const [messages, setMessages] = useState<Message[]>(initialChatMessages);
     const [newMessage, setNewMessage] = useState('');
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
         if (newMessage.trim() === '') return;
 
-        const userMessage = {
+        const userMessage: Message = {
             id: messages.length + 1,
-            author: 'You',
-            text: newMessage,
+            type: 'sent',
+            sender: {
+                name: 'You',
+                avatar: ''
+            },
+            content: newMessage,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
 
@@ -32,12 +31,15 @@ const SupportChatPage = () => {
 
         // Simulate a support reply
         setTimeout(() => {
-            const supportReply = {
+            const supportReply: Message = {
                 id: messages.length + 2,
-                author: 'Support Team',
-                text: 'Thank you for your message. An agent will be with you shortly to discuss the modifications.',
+                type: 'received',
+                sender: {
+                    name: 'Support Team',
+                    avatar: '/images/concept-builders-logo-free-bg.png'
+                },
+                content: 'Thank you for your message. An agent will be with you shortly to discuss the modifications.',
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                avatar: '/images/concept-builders-logo-free-bg.png'
             };
             setMessages(prev => [...prev, supportReply]);
         }, 1500);
@@ -68,14 +70,14 @@ const SupportChatPage = () => {
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.8 }}
                                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                                    className={`flex items-end gap-3 ${msg.author === 'You' ? 'justify-end' : ''}`}
+                                    className={`flex items-end gap-3 ${msg.sender.name === 'You' ? 'justify-end' : ''}`}
                                 >
-                                    {msg.author !== 'You' && (
-                                        <Image src={msg.avatar} alt={msg.author} width={32} height={32} className="rounded-full self-start" />
+                                    {msg.sender.name !== 'You' && (
+                                        <Image src={msg.sender.avatar} alt={msg.sender.name} width={32} height={32} className="rounded-full self-start" />
                                     )}
-                                    <div className={`max-w-md p-3 rounded-2xl ${msg.author === 'You' ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'}`}>
-                                        <p className="text-sm">{msg.text}</p>
-                                        <p className={`text-xs mt-1 opacity-70 ${msg.author === 'You' ? 'text-blue-100' : ''}`}>{msg.time}</p>
+                                    <div className={`max-w-md p-3 rounded-2xl ${msg.sender.name === 'You' ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'}`}>
+                                        <p className="text-sm">{msg.content}</p>
+                                        <p className={`text-xs mt-1 opacity-70 ${msg.sender.name === 'You' ? 'text-blue-100' : ''}`}>{msg.time}</p>
                                     </div>
                                 </motion.div>
                             ))}

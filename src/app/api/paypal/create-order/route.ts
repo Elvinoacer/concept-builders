@@ -10,6 +10,8 @@ function getPaypalClient() {
 }
 
 export async function POST(req: Request) {
+    const { designId } = await req.json();
+
     try {
         const client = getPaypalClient();
         const request = new paypal.orders.OrdersCreateRequest();
@@ -20,7 +22,8 @@ export async function POST(req: Request) {
                 amount: {
                     currency_code: 'USD',
                     value: '100.00'  // Fixed $100
-                }
+                },
+                custom_id: designId
             }]
         });
 

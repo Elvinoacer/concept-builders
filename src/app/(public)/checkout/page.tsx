@@ -1,20 +1,14 @@
-"use client";
+
 import React from "react";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { cart } from "@/lib/dummydata/cart";
-import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+
+import PayPalProviderWrapper from "@/components/PayPalProviderWrapper";
 
 const CheckoutPage = () => {
-  const initialOptions = {
-    "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
-    currency: "USD",
-    intent: "capture",
-    components: "buttons",
-  };
-
   return (
-    <PayPalScriptProvider options={initialOptions}>
+    <PayPalProviderWrapper>
       <div
         className="relative flex h-auto min-h-screen w-full flex-col bg-white group/design-root overflow-x-hidden dark:bg-gray-950"
         style={{ fontFamily: '"Work Sans", "Noto Sans", sans-serif' }}
@@ -41,7 +35,7 @@ const CheckoutPage = () => {
           </main>
         </div>
       </div>
-    </PayPalScriptProvider>
+    </PayPalProviderWrapper>
   );
 };
 

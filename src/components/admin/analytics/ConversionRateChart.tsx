@@ -1,7 +1,7 @@
-
 "use client";
 
 import { motion } from "framer-motion";
+import { conversionRateData } from "@/lib/dummydata";
 
 const ConversionRateChart = () => {
   return (
@@ -32,12 +32,12 @@ const ConversionRateChart = () => {
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
               fill="none"
               stroke="currentColor"
-              strokeDasharray="52, 100"
+              strokeDasharray={`${conversionRateData.converted}, 100`}
               strokeWidth="3"
             ></path>
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-2xl md:text-3xl font-bold text-chart-1">5.2%</p>
+            <p className="text-2xl md:text-3xl font-bold text-chart-1">{conversionRateData.rate}%</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">Converted</p>
           </div>
         </div>

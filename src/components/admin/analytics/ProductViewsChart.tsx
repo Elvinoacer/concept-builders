@@ -1,7 +1,7 @@
 
 "use client";
 
-import { productViewsData } from "@/lib/analytics-data";
+import { productViewsData } from "@/lib/dummydata";
 import { motion } from "framer-motion";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 

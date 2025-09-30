@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import PayPalProviderWrapper from "@/components/PayPalProviderWrapper";
+import Providers from "./Providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,7 +51,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <PayPalProviderWrapper>
+            <Providers>{children}</Providers>
+          </PayPalProviderWrapper>
         </ThemeProvider>
       </body>
     </html>

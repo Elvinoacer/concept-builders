@@ -1,10 +1,15 @@
-import React from "react";
-import { designs } from "@/lib/dummydata";
+'use client';
+import { useEffect } from 'react';
+import useLandingPageStore from '@/lib/store/landing-page';
 import Image from "next/image";
 import Link from "next/link";
 
 const BestSellingPlans = () => {
-  const bestSellingDesigns = designs.slice(0, 3);
+  const { bestSellingPlans, fetchLandingPageData } = useLandingPageStore();
+
+  useEffect(() => {
+    fetchLandingPageData();
+  }, [fetchLandingPageData]);
 
   return (
     <section className="py-8 md:py-12 bg-white dark:bg-gray-950">
@@ -13,14 +18,14 @@ const BestSellingPlans = () => {
           Best Selling Plans
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {bestSellingDesigns.map((design) => (
+          {bestSellingPlans.map((design) => (
             <div
               key={design.id}
               className="border rounded-lg overflow-hidden shadow-lg dark:bg-gray-800 dark:border-gray-700 transition-transform hover:scale-[1.02]"
             >
               <div className="relative h-48 sm:h-56 md:h-64 w-full">
                 <Image
-                  src={design.image}
+                  src={design.images[0].url}
                   alt={design.name}
                   fill
                   className="object-cover"
@@ -32,7 +37,7 @@ const BestSellingPlans = () => {
                   {design.name}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
-                  {design.category}
+                  {design.category?.name}
                 </p>
                 <div className="mt-6 text-center">
                   <Link

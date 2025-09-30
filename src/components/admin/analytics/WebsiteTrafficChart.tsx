@@ -1,7 +1,7 @@
 
 "use client";
 
-import { websiteTrafficData } from "@/lib/analytics-data";
+import { websiteTrafficData } from "@/lib/dummydata";
 import { motion } from "framer-motion";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 

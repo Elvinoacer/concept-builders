@@ -2,7 +2,7 @@
 import React from "react";
 import NotificationsHeader from "@/components/dashboard/notifications/NotificationsHeader";
 import NotificationList from "@/components/dashboard/notifications/NotificationList";
-import { notifications } from "@/lib/notifications";
+import { notifications } from "@/lib/dummydata/notifications";
 
 const NotificationsPage = () => {
   return (

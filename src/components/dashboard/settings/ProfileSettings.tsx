@@ -1,7 +1,7 @@
 // components/dashboard/settings/ProfileSettings.jsx
 "use client";
 import React from "react";
-import { userProfile } from "@/lib/settings";
+import { userProfile } from "@/lib/dummydata/settings-data";
 
 const ProfileSettings = () => {
   return (

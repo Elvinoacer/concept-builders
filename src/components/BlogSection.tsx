@@ -1,27 +1,24 @@
 'use client';
-
+import { useEffect } from 'react';
+import useLandingPageStore from '@/lib/store/landing-page';
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { blogPosts as simpleBlogPosts, blogPostsData } from "@/lib/dummydata";
-
-// Combine data to get images and richer details
-const combinedPosts = blogPostsData
-  .filter(p => p.status === 'Published')
-  .map((post, index) => {
-    const readingTime = Math.ceil(post.title.length / 15) + 2; // Deterministic reading time
-    return {
-      ...post,
-      imageUrl: simpleBlogPosts[index % simpleBlogPosts.length].imageUrl,
-      link: "#", // Placeholder link
-      readingTime: `${readingTime} min read`,
-    };
-  });
-
-const featuredPost = combinedPosts[0];
-const secondaryPosts = combinedPosts.slice(1, 3);
 
 const BlogSection = () => {
+  const { recentPosts, fetchLandingPageData } = useLandingPageStore();
+
+  useEffect(() => {
+    fetchLandingPageData();
+  }, [fetchLandingPageData]);
+
+  if (!recentPosts.length) {
+    return null;
+  }
+
+  const featuredPost = recentPosts[0];
+  const secondaryPosts = recentPosts.slice(1, 3);
+
   const cardVariants = {
     offscreen: { y: 50, opacity: 0 },
     onscreen: {
@@ -50,7 +47,7 @@ const BlogSection = () => {
           >
             <div className="relative h-80 w-full overflow-hidden">
               <Image
-                src={featuredPost.imageUrl}
+                src={featuredPost.image}
                 alt={featuredPost.title}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -59,15 +56,13 @@ const BlogSection = () => {
             </div>
             <div className="p-6 md:p-8">
               <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center mb-2">
-                <span>{featuredPost.publishedDate}</span>
-                <span className="mx-2">•</span>
-                <span>{featuredPost.readingTime}</span>
+                {/* The date is not in the new schema, so I will remove it */}
               </div>
               <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 leading-tight">
-                <Link href={featuredPost.link} className="hover:text-blue-600 transition-colors duration-300">{featuredPost.title}</Link>
+                <Link href={`/blog/${featuredPost.id}`} className="hover:text-blue-600 transition-colors duration-300">{featuredPost.title}</Link>
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">By {featuredPost.author}</p>
-              <Link href={featuredPost.link} className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">By {/* The author is not in the new schema, so I will remove it */}</p>
+              <Link href={`/blog/${featuredPost.id}`} className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
                 Read More
               </Link>
             </div>
@@ -86,7 +81,7 @@ const BlogSection = () => {
               >
                 <div className="relative h-full w-1/3 md:w-48 flex-shrink-0 overflow-hidden">
                   <Image
-                    src={post.imageUrl}
+                    src={post.image}
                     alt={post.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -95,14 +90,12 @@ const BlogSection = () => {
                 </div>
                 <div className="p-6">
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                    <span>{post.publishedDate}</span>
-                    <span className="mx-1.5">•</span>
-                    <span>{post.readingTime}</span>
+                    {/* The date is not in the new schema, so I will remove it */}
                   </div>
                   <h4 className="font-bold text-lg leading-tight text-gray-900 dark:text-white mb-2">
-                    <Link href={post.link} className="hover:text-blue-600 transition-colors duration-300">{post.title}</Link>
+                    <Link href={`/blog/${post.id}`} className="hover:text-blue-600 transition-colors duration-300">{post.title}</Link>
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">By {post.author}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">By {/* The author is not in the new schema, so I will remove it */}</p>
                 </div>
               </motion.div>
             ))}

@@ -3,6 +3,7 @@
 
 import { useRef } from 'react';
 import { designs as featuredDesigns } from "@/lib/dummydata";
+import { designShowcaseData } from "@/lib/dummydata/designShowcase";
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
@@ -17,7 +18,7 @@ const FeaturedDesigns = () => {
 
   return (
     <section className="mb-8 md:mb-12">
-      <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-6">Featured Designs</h2>
+      <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-6">{designShowcaseData.featuredDesignsTitle}</h2>
       <div className="relative">
         <div
           ref={scrollContainerRef}

@@ -1,0 +1,25 @@
+export const designShowcaseData = {
+  featuredDesignsTitle: "Featured Designs",
+  exploreDesignsTitle: "Explore All Designs",
+  searchPlaceholder: "Search designs...",
+  filtersButtonText: "Filters",
+  sortByOptions: [
+    "Newest",
+    "Popular",
+    "Price (Low to High)",
+    "Price (High to Low)",
+  ],
+  filterAside: {
+    title: "Filters",
+    priceRangeTitle: "Price Range",
+    minPricePlaceholder: "Min",
+    maxPricePlaceholder: "Max",
+    bedroomsTitle: "Bedrooms",
+    bedroomOptions: ['Any', '1', '2', '3', '4+'],
+    architecturalStyleTitle: "Architectural Style",
+    architecturalStyles: ['Modern', 'Contemporary', 'Traditional', 'Coastal', 'Farmhouse'],
+    sizeTitle: "Size (sq. ft.)",
+    maxSizeText: "5000+",
+    clearFiltersButtonText: "Clear Filters",
+  },
+};

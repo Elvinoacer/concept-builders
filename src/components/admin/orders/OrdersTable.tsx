@@ -1,6 +1,6 @@
 "use client";
 
-import { ordersData } from "@/lib/orders-data";
+import { ordersData } from "@/lib/dummydata/orders";
 import { motion } from "framer-motion";
 import Pagination from "./Pagination";
 

@@ -1,19 +1,20 @@
+
 import Image from "next/image";
 import Link from "next/link";
-import { BlogPost } from "@/lib/types";
+import { Post } from "@/generated/prisma";
 
-const PostListItem = ({ post }: { post: BlogPost }) => {
+const PostListItem = ({ post }: { post: Post }) => {
   // Create a short description from the content, stripping HTML tags.
   const description = post.content.replace(/<[^>]*>?/gm, '').trim().substring(0, 100) + '...';
 
   return (
     <Link
-      href={`/blog/${post.slug}`}
+      href={`/blog/${post.id}`}
       className="flex flex-col bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:shadow-lg overflow-hidden"
     >
       <div className="w-full aspect-video">
         <Image
-          src={post.image}
+          src={post.image || ''}
           alt={post.title}
           width={300}
           height={200}
@@ -28,7 +29,7 @@ const PostListItem = ({ post }: { post: BlogPost }) => {
           {description}
         </p>
         <p className="text-gray-500 text-sm font-normal leading-normal dark:text-gray-400">
-          {post.publishedDate}
+          {new Date(post.createdAt).toLocaleDateString()}
         </p>
       </div>
     </Link>

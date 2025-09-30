@@ -1,11 +1,27 @@
 // components/dashboard/settings/PasswordSettings.jsx
 "use client";
 import React, { useState } from "react";
+import { passwordFields } from "@/lib/dummydata/settings-data";
 
 const PasswordSettings = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const stateMap = {
+    "current-password": {
+      state: showCurrentPassword,
+      setter: setShowCurrentPassword,
+    },
+    "new-password": {
+      state: showNewPassword,
+      setter: setShowNewPassword,
+    },
+    "confirm-password": {
+      state: showConfirmPassword,
+      setter: setShowConfirmPassword,
+    },
+  };
 
   return (
     <div>
@@ -16,26 +32,7 @@ const PasswordSettings = () => {
         Update your password here.
       </p>
       <form className="mt-4 md:mt-6 grid grid-cols-1 gap-x-6 gap-y-6 max-w-2xl">
-        {[
-          {
-            id: "current-password",
-            label: "Current Password",
-            state: showCurrentPassword,
-            setter: setShowCurrentPassword,
-          },
-          {
-            id: "new-password",
-            label: "New Password",
-            state: showNewPassword,
-            setter: setShowNewPassword,
-          },
-          {
-            id: "confirm-password",
-            label: "Confirm New Password",
-            state: showConfirmPassword,
-            setter: setShowConfirmPassword,
-          },
-        ].map(({ id, label, state, setter }) => (
+        {passwordFields.map(({ id, label }) => (
           <div key={id} className="relative">
             <label
               className="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -47,15 +44,15 @@ const PasswordSettings = () => {
               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm h-11 px-4 pr-12"
               id={id}
               name={id}
-              type={state ? "text" : "password"}
+              type={stateMap[id].state ? "text" : "password"}
             />
             <button
               type="button"
-              onClick={() => setter(!state)}
+              onClick={() => stateMap[id].setter(!stateMap[id].state)}
               className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 top-4 md:top-6"
             >
               <span className="material-symbols-outlined">
-                {state ? "visibility_off" : "visibility"}
+                {stateMap[id].state ? "visibility_off" : "visibility"}
               </span>
             </button>
           </div>

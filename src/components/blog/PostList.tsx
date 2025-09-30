@@ -1,9 +1,8 @@
 
-import { blogPostsData } from "@/lib/dummydata";
 import PostListItem from "./PostListItem";
-import Pagination from "./Pagination";
+import { Post } from "@/generated/prisma";
 
-const PostList = () => {
+const PostList = ({ posts }: { posts: Post[] }) => {
   return (
     <div>
       <h2
@@ -12,13 +11,10 @@ const PostList = () => {
         All Posts
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {blogPostsData
-          .filter((post) => post.status === "Published" && post.image)
-          .map((post, index) => (
-            <PostListItem key={index} post={post} />
-          ))}
+        {posts.map((post, index) => (
+          <PostListItem key={index} post={post} />
+        ))}
       </div>
-      <Pagination />
     </div>
   );
 };

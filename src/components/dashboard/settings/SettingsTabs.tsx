@@ -1,13 +1,10 @@
 // components/dashboard/settings/SettingsTabs.jsx
 "use client";
 import React from "react";
+import { settingsTabs } from "@/lib/dummydata/settings-data";
 
 const SettingsTabs = ({ activeTab, setActiveTab }) => {
-  const tabs = [
-    { id: "profile", name: "Profile" },
-    { id: "password", name: "Password" },
-    { id: "referrals", name: "Referrals" },
-  ];
+  const tabs = settingsTabs
 
   return (
     <div className="border-b border-gray-200 dark:border-gray-700">

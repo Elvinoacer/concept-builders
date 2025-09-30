@@ -3,7 +3,7 @@ import React from 'react';
 import ChatHeader from '@/components/dashboard/messages/ChatHeader';
 import MessageList from '@/components/dashboard/messages/MessageList';
 import MessageInput from '@/components/dashboard/messages/MessageInput';
-import { messages } from '@/lib/messages';
+import { messages } from "@/lib/dummydata/messages";
 
 const MessagesPage = () => {
   const project = {

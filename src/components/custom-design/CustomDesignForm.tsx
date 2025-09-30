@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { customDesignForm } from "@/lib/dummydata/customDesign";
 
 const CustomDesignForm = () => {
   return (
@@ -16,13 +17,13 @@ const CustomDesignForm = () => {
     >
       <form className="space-y-8">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <Input type="text" id="name" placeholder="Full Name" />
-          <Input type="email" id="email" placeholder="Email Address" />
+          <Input type="text" id="name" placeholder={customDesignForm.fullNamePlaceholder} />
+          <Input type="email" id="email" placeholder={customDesignForm.emailPlaceholder} />
         </div>
-        <Input type="tel" id="phone" placeholder="Phone Number" />
+        <Input type="tel" id="phone" placeholder={customDesignForm.phonePlaceholder} />
         <Textarea
           id="description"
-          placeholder="Describe your dream home, including desired style, number of rooms, square footage, and any special features..."
+          placeholder={customDesignForm.descriptionPlaceholder}
         />
         <div>
           
@@ -47,18 +48,18 @@ const CustomDesignForm = () => {
                   htmlFor="file-upload"
                   className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary dark:bg-gray-800 dark:text-gray-300"
                 >
-                  <span>Upload a file</span>
+                  <span>{customDesignForm.uploadFileText}</span>
                   <Input id="file-upload" type="file" className="sr-only" />
                 </label>
-                <p className="pl-1">or drag and drop</p>
+                <p className="pl-1">{customDesignForm.dragAndDropText}</p>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, PDF up to 10MB</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{customDesignForm.fileTypeText}</p>
             </div>
           </div>
         </div>
         <div>
           <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white hover:from-blue-700 hover:to-cyan-500">
-            Submit Request
+            {customDesignForm.submitButtonText}
           </Button>
         </div>
       </form>

@@ -1,7 +1,7 @@
-
 "use client";
 
 import { motion } from "framer-motion";
+import { designStatusOptions } from "@/lib/dummydata";
 
 interface NewDesignFormProps {
   onClose: () => void;
@@ -43,9 +43,9 @@ const NewDesignForm = ({ onClose }: NewDesignFormProps) => {
             <div>
               <label htmlFor="status" className="block text-sm font-medium text-muted-foreground">Status</label>
               <select id="status" className="mt-1 block w-full border border-border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-card">
-                <option>Draft</option>
-                <option>Published</option>
-                <option>Archived</option>
+                {designStatusOptions.map((option) => (
+                  <option key={option}>{option}</option>
+                ))}
               </select>
             </div>
           </div>

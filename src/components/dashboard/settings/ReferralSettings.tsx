@@ -1,7 +1,7 @@
 // components/dashboard/settings/ReferralSettings.jsx
 "use client";
 import React from "react";
-import { referralInfo } from "@/lib/settings";
+import { referralInfo } from "@/lib/dummydata/settings-data";
 
 const ReferralSettings = () => {
   return (

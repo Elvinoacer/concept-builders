@@ -1,33 +1,31 @@
 "use client";
 
-import { designsData } from "@/lib/designs-data";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import DesignsList from "./DesignsList";
 
 const DesignsTable = () => {
-  const getStatusChip = (status: string) => {
-    switch (status) {
-      case "Published":
-        return (
-          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success text-success-foreground">
-            {status}
-          </span>
-        );
-      case "Draft":
-        return (
-          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning text-warning-foreground">
-            {status}
-          </span>
-        );
-      case "Archived":
-        return (
-          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-muted text-muted-foreground">
-            {status}
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
+  const [designs, setDesigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDesigns = async () => {
+      try {
+        const response = await fetch("/api/designs");
+        const data = await response.json();
+        setDesigns(data);
+      } catch (error) {
+        console.error("Error fetching designs:", error);
+      }
+      setLoading(false);
+    };
+
+    fetchDesigns();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <motion.div
@@ -48,56 +46,7 @@ const DesignsTable = () => {
           />
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-muted border-b border-border">
-            <tr>
-              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Design Name
-              </th>
-              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Price
-              </th>
-              <th className="hidden md:table-cell px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Last Updated
-              </th>
-              <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {designsData.map((design, index) => (
-              <motion.tr
-                key={index}
-                className="hover:bg-muted"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                  {design.name}
-                </td>
-                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap">
-                  {getStatusChip(design.status)}
-                </td>
-                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm text-muted-foreground">
-                  {design.price}
-                </td>
-                <td className="hidden md:table-cell px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm text-muted-foreground">
-                  {design.lastUpdated}
-                </td>
-                <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <a href="#" className="text-primary hover:text-opacity-80">
-                    Edit
-                  </a>
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DesignsList designs={designs} />
     </motion.div>
   );
 };

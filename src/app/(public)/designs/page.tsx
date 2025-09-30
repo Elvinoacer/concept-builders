@@ -1,6 +1,7 @@
 "use client";
 import DesignCard from "@/components/DesignCard";
 import { designs, categories } from "@/lib/dummydata";
+import { designsPageData } from "@/lib/dummydata/designsPage";
 import { useEffect, useState } from "react";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -39,14 +40,14 @@ const AllDesignsPage = () => {
         <main className="flex-1 px-4 py-8 md:px-16 lg:px-24 xl:px-40 md:py-12 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight dark:text-white">All Designs</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight dark:text-white">{designsPageData.pageTitle}</h1>
               <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
                 <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
                   <SelectTrigger className="w-full md:w-[180px]">
-                    <SelectValue placeholder="All Categories" />
+                    <SelectValue placeholder={designsPageData.categorySelectPlaceholder} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="All">All Categories</SelectItem>
+                    <SelectItem value="All">{designsPageData.allCategoriesOption}</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.name} value={category.name}>
                         {category.name}
@@ -56,12 +57,12 @@ const AllDesignsPage = () => {
                 </Select>
                 <Select onValueChange={setSortOrder} defaultValue={sortOrder}>
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Sort by Name" />
+                    <SelectValue placeholder={designsPageData.sortBySelectPlaceholder} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="name">Sort by Name</SelectItem>
-                    <SelectItem value="price-asc">Sort by Price (Low to High)</SelectItem>
-                    <SelectItem value="price-desc">Sort by Price (High to Low)</SelectItem>
+                    <SelectItem value="name">{designsPageData.sortByNameOption}</SelectItem>
+                    <SelectItem value="price-asc">{designsPageData.sortByPriceAscOption}</SelectItem>
+                    <SelectItem value="price-desc">{designsPageData.sortByPriceDescOption}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

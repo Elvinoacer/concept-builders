@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { designDetailPageData } from "@/lib/dummydata/designDetailPage";
 
 const Breadcrumbs = ({ designName }: { designName: string }) => {
   return (
@@ -6,7 +7,7 @@ const Breadcrumbs = ({ designName }: { designName: string }) => {
       <ol className="list-none p-0 inline-flex items-center">
         <li className="flex items-center">
           <Link href="/designs" className="text-gray-500 hover:text-[var(--primary-color)] transition-colors dark:text-gray-400 dark:hover:text-[var(--primary-color)]">
-            Designs
+            {designDetailPageData.breadcrumbs.designsLink}
           </Link>
           <span className="material-symbols-outlined mx-2 text-gray-400">chevron_right</span>
         </li>

@@ -1,26 +1,25 @@
-import { blogPostsData } from "@/lib/dummydata";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Post } from "@/generated/prisma";
 
-const FeaturedPost = () => {
-  const featuredPost = blogPostsData.find(post => post.status === 'Published' && post.image);
-
-  if (!featuredPost) {
+const FeaturedPost = ({ post }: { post: Post }) => {
+  if (!post) {
     return null; // Or some fallback UI
   }
 
   // Create a short description from the content, stripping HTML tags.
-  const description = featuredPost.content.replace(/<[^>]*>?/gm, '').trim().substring(0, 120) + '...';
+  const description = post.content.replace(/<[^>]*>?/gm, '').trim().substring(0, 120) + '...';
 
   return (
-    <Link href={`/blog/${featuredPost.slug}`}>
+    <Link href={`/blog/${post.id}`}>
       <div className="p-3 md:p-4 @container bg-white rounded-lg border border-gray-200 shadow-sm mb-8 dark:bg-gray-800 dark:border-gray-700 hover:shadow-md transition-shadow duration-200">
         <div className="flex flex-col items-center justify-center rounded-lg @xl:flex-row @xl:items-center">
           <div className="w-full md:w-1/2 bg-center bg-no-repeat aspect-video bg-cover rounded-md">
             <Image
-              src={featuredPost.image}
-              alt={featuredPost.title}
+              src={post.image || ''}
+              alt={post.title}
               width={300}
               height={180}
               className="rounded-md w-full h-auto"
@@ -33,7 +32,7 @@ const FeaturedPost = () => {
               Featured
             </p>
             <h3 className="text-lg md:text-xl font-bold leading-tight tracking-tight dark:text-white">
-              {featuredPost.title}
+              {post.title}
             </h3>
             <p className="text-sm md:text-base font-normal leading-relaxed dark:text-gray-400">
               {description}

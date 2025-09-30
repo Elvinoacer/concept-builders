@@ -1,107 +1,110 @@
 'use client';
-import React, { useMemo } from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import PaymentForm from './PaymentForm';
 import { cart } from '@/lib/dummydata/cart';
+import { checkoutForm } from '@/lib/dummydata/checkout';
+import PayPalButton from '@/components/PayPalButton';
 
 const CheckoutForm = () => {
-  const [paymentStatus, setPaymentStatus] = React.useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState('card');
 
-  const total = useMemo(() => {
-    return cart.items.reduce((acc, item) => acc + item.price, 0);
-  }, []);
-
-  const handlePaymentSuccess = (details: any) => {
-    setPaymentStatus(`Payment successful! Transaction ID: ${details.id}`);
+  const handlePaymentSuccess = (order) => {
+    console.log('Payment successful:', order);
+    // Handle successful payment, e.g., redirect to order confirmation page
   };
 
-  const handlePaymentError = (error: any) => {
-    setPaymentStatus("Payment failed. Please try again.");
-    console.error("Payment Error:", error);
+  const handlePaymentError = (error) => {
+    console.error('Payment error:', error);
+    // Handle payment error
   };
+
+  const totalAmount = cart.items.reduce((acc, item) => acc + item.price, 0);
 
   return (
     <div>
-      <h2 className="mb-4 md:mb-6 text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Checkout</h2>
+      <h2 className="mb-4 md:mb-6 text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{checkoutForm.title}</h2>
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Shipping Information</CardTitle>
+            <CardTitle>{checkoutForm.shippingInformation.title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input id="address" placeholder="123 Maple Street" />
+              <Label htmlFor="address">{checkoutForm.shippingInformation.address.label}</Label>
+              <Input id="address" placeholder={checkoutForm.shippingInformation.address.placeholder} />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
-                <Input id="city" placeholder="Anytown" />
+                <Label htmlFor="city">{checkoutForm.shippingInformation.city.label}</Label>
+                <Input id="city" placeholder={checkoutForm.shippingInformation.city.placeholder} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
-                <Input id="state" placeholder="CA" />
+                <Label htmlFor="state">{checkoutForm.shippingInformation.state.label}</Label>
+                <Input id="state" placeholder={checkoutForm.shippingInformation.state.placeholder} />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="zip">Zip Code</Label>
-              <Input id="zip" placeholder="90210" />
+              <Label htmlFor="zip">{checkoutForm.shippingInformation.zip.label}</Label>
+              <Input id="zip" placeholder={checkoutForm.shippingInformation.zip.placeholder} />
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Payment Method</CardTitle>
+            <CardTitle>{checkoutForm.paymentMethod.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <RadioGroup defaultValue="card" className="space-y-4">
+            <RadioGroup defaultValue="card" className="space-y-4" onValueChange={setPaymentMethod}>
               <div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="card" id="card" />
-                  <Label htmlFor="card">Credit Card</Label>
+                  <Label htmlFor="card">{checkoutForm.paymentMethod.creditCard}</Label>
                 </div>
-                <div className="space-y-4 pl-7 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Name on Card</Label>
-                    <Input id="name" placeholder="Jane Doe" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="card-number">Card Number</Label>
-                    <Input id="card-number" placeholder="**** **** **** 1234" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+                {paymentMethod === 'card' && (
+                  <div className="space-y-4 pl-7 pt-4">
                     <div className="space-y-2">
-                      <Label htmlFor="expiration">Expiration</Label>
-                      <Input id="expiration" placeholder="MM/YY" />
+                      <Label htmlFor="name">{checkoutForm.paymentMethod.nameOnCard.label}</Label>
+                      <Input id="name" placeholder={checkoutForm.paymentMethod.nameOnCard.placeholder} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="cvv">CVV</Label>
-                      <Input id="cvv" placeholder="123" />
+                      <Label htmlFor="card-number">{checkoutForm.paymentMethod.cardNumber.label}</Label>
+                      <Input id="card-number" placeholder={checkoutForm.paymentMethod.cardNumber.placeholder} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="expiration">{checkoutForm.paymentMethod.expiration.label}</Label>
+                        <Input id="expiration" placeholder={checkoutForm.paymentMethod.expiration.placeholder} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="cvv">{checkoutForm.paymentMethod.cvv.label}</Label>
+                        <Input id="cvv" placeholder={checkoutForm.paymentMethod.cvv.placeholder} />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="paypal" id="paypal" />
-                <Label htmlFor="paypal">PayPal</Label>
+                <Label htmlFor="paypal">{checkoutForm.paymentMethod.paypal}</Label>
               </div>
+              {paymentMethod === 'paypal' && (
+                <div className="p-4">
+                  <PayPalButton
+                    amount={totalAmount}
+                    onPaymentSuccess={handlePaymentSuccess}
+                    onPaymentError={handlePaymentError}
+                    designId="placeholder-design-id" // Placeholder for now
+                  />
+                </div>
+              )}
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="intasend" id="intasend" />
-                <Label htmlFor="intasend">Intasend</Label>
+                <Label htmlFor="intasend">{checkoutForm.paymentMethod.intasend}</Label>
               </div>
             </RadioGroup>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Pay with Card</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {paymentStatus && <div>{paymentStatus}</div>}
-            <PaymentForm />
           </CardContent>
         </Card>
       </div>

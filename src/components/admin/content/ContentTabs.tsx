@@ -1,7 +1,7 @@
-
 "use client";
 
 import { motion } from "framer-motion";
+import { contentTabsData } from "@/lib/dummydata";
 
 const ContentTabs = () => {
   return (
@@ -12,24 +12,21 @@ const ContentTabs = () => {
       className="mb-4 md:mb-6"
     >
       <div className="flex border-b border-border overflow-x-auto whitespace-nowrap">
-        <a
-          href="#"
-          className="flex items-center justify-center border-b-2 border-primary text-primary py-3 px-4"
-        >
-          <p className="text-sm font-semibold">Blog Posts</p>
-        </a>
-        <a
-          href="#"
-          className="flex items-center justify-center border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-border py-3 px-4"
-        >
-          <p className="text-sm font-medium">Static Pages</p>
-        </a>
-        <a
-          href="#"
-          className="flex items-center justify-center border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-border py-3 px-4"
-        >
-          <p className="text-sm font-medium">Policy Pages</p>
-        </a>
+        {contentTabsData.map((tab, index) => (
+          <a
+            key={tab.name}
+            href="#"
+            className={`flex items-center justify-center border-b-2 py-3 px-4 ${
+              index === 0
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+            }`}
+          >
+            <p className={`text-sm ${index === 0 ? "font-semibold" : "font-medium"}`}>
+              {tab.name}
+            </p>
+          </a>
+        ))}
       </div>
     </motion.div>
   );
