@@ -1,25 +1,34 @@
 "use client";
 
-import { ordersData } from "@/lib/dummydata/orders";
 import { motion } from "framer-motion";
-import Pagination from "./Pagination";
+import Pagination from "@/components/ui/Pagination";
+import { useState } from "react";
 
-const OrdersTable = () => {
+const OrdersTable = ({ orders }: { orders: any[] }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
   const getStatusChip = (status: string) => {
     switch (status) {
-      case "Paid":
+      case "PAID":
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
             {status}
           </span>
         );
-      case "Refund Requested":
+      case "PENDING":
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+            {status}
+          </span>
+        );
+      case "REFUND_REQUESTED":
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
             {status}
           </span>
         );
-      case "Refunded":
+      case "REFUNDED":
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
             {status}
@@ -30,38 +39,16 @@ const OrdersTable = () => {
     }
   };
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = orders.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 md:mb-6 gap-4">
-        <div className="relative w-full max-w-md">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
-            search
-          </span>
-          <input
-            className="form-input w-full rounded-lg border-gray-300 bg-white pl-10 pr-4 py-2.5 text-sm focus:border-primary focus:ring-primary dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400"
-            placeholder="Search orders by ID, client..."
-            type="search"
-          />
-        </div>
-        <div className="flex gap-2 w-full md:w-auto">
-          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 w-full justify-center">
-            <span className="material-symbols-outlined text-base">
-              filter_list
-            </span>
-            Filter
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 w-full justify-center">
-            <span className="material-symbols-outlined text-base">
-              ios_share
-            </span>
-            Export
-          </button>
-        </div>
-      </div>
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 mt-4 dark:bg-gray-800 dark:border-gray-700">
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
@@ -87,7 +74,7 @@ const OrdersTable = () => {
             </tr>
           </thead>
           <tbody>
-            {ordersData.map((order, index) => (
+            {currentItems.map((order, index) => (
               <motion.tr
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -96,11 +83,11 @@ const OrdersTable = () => {
                 className="bg-white border-b hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 <td className="px-3 py-2 md:px-6 md:py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  {order.orderId}
+                  {order.id}
                 </td>
-                <td className="px-3 py-2 md:px-6 md:py-4">{order.client}</td>
-                <td className="px-3 py-2 md:px-6 md:py-4">{order.date}</td>
-                <td className="px-3 py-2 md:px-6 md:py-4">{order.amount}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4">{order.user ? order.user.name : 'N/A'}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4">{new Date(order.createdAt).toLocaleDateString()}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4">${order.amount.toFixed(2)}</td>
                 <td className="px-3 py-2 md:px-6 md:py-4">{getStatusChip(order.status)}</td>
                 <td className="px-3 py-2 md:px-6 md:py-4 text-right">
                   <a
@@ -115,7 +102,12 @@ const OrdersTable = () => {
           </tbody>
         </table>
       </div>
-      <Pagination />
+      <Pagination
+        totalItems={orders.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </motion.div>
   );
 };

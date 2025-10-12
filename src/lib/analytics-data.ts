@@ -60,3 +60,19 @@ export const referralSourcesData = [
   { name: "Direct", value: 520, percentage: 45 },
   { name: "Other", value: 310, percentage: 25 },
 ];
+
+export const conversionRateData = {
+  converted: 80,
+  rate: 5.2,
+};
+
+export const textChartColors = [
+  "text-blue-500",
+  "text-green-500",
+  "text-yellow-500",
+  "text-red-500",
+  "text-purple-500",
+  "text-pink-500",
+  "text-indigo-500",
+  "text-gray-500",
+];

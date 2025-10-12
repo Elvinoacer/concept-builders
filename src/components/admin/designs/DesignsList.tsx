@@ -61,10 +61,8 @@ const DesignsList = ({ designs }) => {
                 {formatDate(design.updatedAt)}
               </td>
               <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 text-right">
-                <Link href={`/admin/designs/${design.id}`} legacyBehavior>
-                  <a className="font-medium text-primary hover:underline whitespace-nowrap">
-                    Edit
-                  </a>
+                <Link href={`/admin/designs/${design.id}`} className="font-medium text-primary hover:underline whitespace-nowrap">
+                  View
                 </Link>
               </td>
             </motion.tr>

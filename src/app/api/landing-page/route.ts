@@ -5,19 +5,35 @@ export async function GET() {
   try {
     const featuredCategories = await prisma.category.findMany({
       take: 4,
-      include: {
+      select: {
+        id: true,
+        name: true,
+        image: true,
         _count: {
           select: { designs: true },
         },
       },
     });
 
-    const bestSellingPlans = await prisma.design.findMany({
-      orderBy: {
-        salesCount: 'desc',
+    const designs = await prisma.design.findMany({
+      include: {
+        orderItems: true,
+        files: {
+          where: {
+            type: 'IMAGE',
+          },
+        },
       },
-      take: 4,
     });
+
+    const designsWithSalesCount = designs.map((design) => ({
+      ...design,
+      salesCount: design.orderItems.length,
+    }));
+
+    const bestSellingPlans = designsWithSalesCount
+      .sort((a, b) => b.salesCount - a.salesCount)
+      .slice(0, 4);
 
     const newPlans = await prisma.design.findMany({
       orderBy: {

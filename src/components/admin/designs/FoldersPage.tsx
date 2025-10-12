@@ -1,8 +1,7 @@
-import FileUpload from "./FileUpload";
 import FolderStructure from "./FolderStructure";
 import VersionControl from "./VersionControl";
 
-const FoldersPage = () => {
+const FoldersPage = ({ folders, loading }) => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="">
@@ -12,8 +11,8 @@ const FoldersPage = () => {
           DigitalOcean Spaces, and version control.
         </p>
       </div>
-      <FolderStructure />
-      <FileUpload />
+      <FolderStructure folders={folders} loading={loading} />
+      
       <VersionControl />
     </div>
   );

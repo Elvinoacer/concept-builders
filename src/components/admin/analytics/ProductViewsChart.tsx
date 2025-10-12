@@ -5,7 +5,7 @@ import { productViewsData } from "@/lib/dummydata";
 import { motion } from "framer-motion";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-const ProductViewsChart = () => {
+const ProductViewsChart = ({ data }: { data: any[] }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -19,7 +19,7 @@ const ProductViewsChart = () => {
       </div>
       <div className="h-48 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={productViewsData}>
+            <BarChart data={data}>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />

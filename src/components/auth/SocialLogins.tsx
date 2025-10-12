@@ -2,6 +2,11 @@ import React from 'react';
 import { signIn } from 'next-auth/react';
 
 const SocialLogins = () => {
+  const handleSignIn = (provider: string) => {
+    const referral = sessionStorage.getItem('referral');
+    signIn(provider, { callbackUrl: '/', referral: referral });
+  };
+
   return (
     <div>
       <div className="relative my-4 md:my-6">
@@ -14,7 +19,7 @@ const SocialLogins = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <button
-          onClick={() => signIn('google')}
+          onClick={() => handleSignIn('google')}
           className="flex items-center justify-center w-full rounded-md border border-gray-300 bg-white py-2.5 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
         >
           <svg aria-hidden="true" className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -26,7 +31,7 @@ const SocialLogins = () => {
           Google
         </button>
         <button
-          onClick={() => signIn('facebook')}
+          onClick={() => handleSignIn('facebook')}
           className="flex items-center justify-center w-full rounded-md border border-gray-300 bg-white py-2.5 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
         >
           <svg aria-hidden="true" className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">

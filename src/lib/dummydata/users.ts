@@ -1,5 +1,6 @@
 
 export const usersTabsData = [
-  { name: "Clients", id: "clients" },
-  { name: "Team", id: "team" },
+  { name: "All", id: "All" },
+  { name: "Clients", id: "Clients" },
+  { name: "Team", id: "Team" },
 ];

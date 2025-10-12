@@ -9,9 +9,10 @@ interface CostCardProps {
   change: string;
   changeType: "increase" | "decrease";
   icon: string;
+  details?: string; // Add this line
 }
 
-const CostCard = ({ service, cost, change, changeType, icon }: CostCardProps) => {
+const CostCard = ({ service, cost, change, changeType, icon, details }: CostCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -26,6 +27,7 @@ const CostCard = ({ service, cost, change, changeType, icon }: CostCardProps) =>
         </span>
       </div>
       <p className="text-3xl font-bold mt-1 dark:text-white">{cost}</p>
+      {details && <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">{details}</p>}
       <div
         className={`flex items-center text-sm font-medium ${
           changeType === "increase" ? "text-green-500" : "text-red-500"

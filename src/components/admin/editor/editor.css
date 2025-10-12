@@ -8,7 +8,7 @@
   --editor-group-border: #ccc;
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   --editor-bg: #333;
   --editor-text: #fff;
   --editor-border: #555;
@@ -123,4 +123,214 @@
   left: 0;
   width: 100%;
   height: 100%;
+}
+.image-component-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.image-component-wrapper.align-left {
+  align-items: flex-start;
+}
+
+.image-component-wrapper.align-center {
+  align-items: center;
+}
+
+.image-component-wrapper.align-right {
+  align-items: flex-end;
+}
+
+.image-controls {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+/* menu bar styles */
+
+/* Enhanced MenuBar Styles */
+.menu-bar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.menu-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.menu-group:last-child {
+  margin-bottom: 0;
+}
+
+.menu-bar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #2d3748;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  min-width: 44px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.menu-bar button:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.menu-bar button:active {
+  transform: translateY(0);
+}
+
+.menu-bar button.is-active {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+}
+
+.menu-bar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.menu-bar button:disabled:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Tooltip styles */
+.menu-bar button::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: #1f2937;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.menu-bar button::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  border: 4px solid transparent;
+  border-top-color: #1f2937;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.menu-bar button:hover::before,
+.menu-bar button:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-12px);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .menu-bar {
+    background: linear-gradient(135deg, #4c51bf 0%, #7e22ce 100%);
+  }
+
+  .menu-bar button {
+    background: rgba(45, 55, 72, 0.9);
+    color: #e2e8f0;
+  }
+
+  .menu-bar button:hover {
+    background: #2d3748;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .menu-bar {
+    padding: 12px;
+  }
+
+  .menu-group {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .menu-bar button {
+    min-width: 40px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
+/* Animation for active states */
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(79, 70, 229, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+  }
+}
+
+.menu-bar button.is-active {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Focus states for accessibility */
+.menu-bar button:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar for dropdowns */
+.dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
 }

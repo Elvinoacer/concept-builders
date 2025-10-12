@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from "next/link";
-import { navLinks } from "@/lib/dummydata";
+import { navLinks } from "@/lib/dummydata/index";
 import Image from "next/image";
 import { ModeToggle } from "./ui/mode-toggle";
 import SearchModal from './SearchModal';

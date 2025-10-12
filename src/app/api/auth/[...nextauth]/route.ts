@@ -5,6 +5,8 @@ import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server'; // Import NextRequest
 
 async function refreshAccessToken(token: any) {
   try {
@@ -17,6 +19,8 @@ async function refreshAccessToken(token: any) {
         refresh_token: token.refreshToken,
       });
 
+    console.log("Refreshing access token; url:", url);
+
     const response = await fetch(url, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -27,8 +31,11 @@ async function refreshAccessToken(token: any) {
     const refreshedTokens = await response.json();
 
     if (!response.ok) {
+      console.error("Error refreshing access token:", refreshedTokens);
       throw refreshedTokens;
     }
+
+    console.log("Refreshed tokens successfully");
 
     return {
       ...token,
@@ -37,7 +44,7 @@ async function refreshAccessToken(token: any) {
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
     };
   } catch (error) {
-    console.log(error);
+    console.error("Error in refreshAccessToken:", error);
 
     return {
       ...token,
@@ -72,24 +79,84 @@ export const authOptions: AuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, account, user }) {
+    async signIn({ user, account, profile, isNewUser }) {
+      const ipAddress = globalThis.tempSignInIp || 'Unknown';
+      delete globalThis.tempSignInIp; // Clean up
+
+      await prisma.loginHistory.create({
+        data: {
+          userId: user.id,
+          ipAddress: ipAddress,
+        },
+      });
+
+      if (isNewUser) {
+        const cookieStore = cookies();
+        const referral = cookieStore.get('referral')?.value;
+        if (referral) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { referralSource: referral },
+          });
+        }
+      }
+      return true;
+    },
+    async signOut({ token }) {
+      // @ts-ignore
+      const userId = token.impersonator?.id || token.user?.id;
+      if (userId) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { impersonatingUserId: null },
+        });
+      }
+    },
+    async jwt ({ token, account, user }) {
+      console.log("--- JWT CALLBACK ENTERED ---");
+      console.log("JWT callback triggered");
       // Initial sign in
       if (account && user) {
-        return {
-          accessToken: account.access_token,
-          accessTokenExpires: Date.now() + (account.expires_at ?? 0) * 1000,
-          refreshToken: account.refresh_token,
-          user,
-        };
+        console.log("Initial sign in");
+        token.user = user;
+        token.accessToken = account.access_token;
+        token.accessTokenExpires = Date.now() + (account.expires_at ?? 0) * 1000;
+        token.refreshToken = account.refresh_token;
       }
 
-      // Return previous token if the access token has not expired yet
+      // @ts-ignore
+      const userForCheck = token.impersonator || token.user;
+      console.log("User for check:", userForCheck?.email);
+
+      if (userForCheck) {
+        // @ts-ignore
+        const userFromDb = await prisma.user.findUnique({ where: { id: userForCheck.id } });
+        console.log("User from DB:", userFromDb?.email, "Impersonating:", userFromDb?.impersonatingUserId);
+
+        // @ts-ignore
+        if (userFromDb?.impersonatingUserId) {
+          console.log("Admin is impersonating, fetching impersonated user");
+          const impersonatedUser = await prisma.user.findUnique({ where: { id: userFromDb.impersonatingUserId } });
+          if (impersonatedUser) {
+            console.log("Impersonated user found:", impersonatedUser.email);
+            token.user = impersonatedUser;
+            token.impersonator = userFromDb;
+          }
+        } else if (token.impersonator) {
+          console.log("Exiting impersonation");
+          // Exiting impersonation
+          token.user = token.impersonator;
+          delete token.impersonator;
+        }
+      }
+
       // @ts-ignore
       if (Date.now() < token.accessTokenExpires) {
+        console.log("Access token is valid");
         return token;
       }
 
-      // Access token has expired, try to update it
+      console.log("Access token expired, refreshing...");
       // @ts-ignore
       return refreshAccessToken(token);
     },
@@ -100,6 +167,8 @@ export const authOptions: AuthOptions = {
       session.accessToken = token.accessToken;
       // @ts-ignore
       session.error = token.error;
+      // @ts-ignore
+      session.impersonator = token.impersonator;
 
       return session;
     },
@@ -108,4 +177,25 @@ export const authOptions: AuthOptions = {
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST };
+async function getHandler(req: NextRequest, context: any) {
+  if (req.nextUrl.pathname.includes('callback') && req.method === 'GET') {
+    const forwarded = req.headers.get('x-forwarded-for');
+    const ip = forwarded
+      ? (Array.isArray(forwarded)
+          ? forwarded[0]
+          : forwarded.split(/\s*,\s*/)[0])
+      : req.headers.get('x-real-ip') || req.ip || 'Unknown';
+
+    globalThis.tempSignInIp = ip;
+  }
+
+  // @ts-ignore
+  return await handler(req, context);
+}
+
+async function postHandler(req: NextRequest, context: any) {
+  // @ts-ignore
+  return await handler(req, context);
+}
+
+export { getHandler as GET, postHandler as POST };

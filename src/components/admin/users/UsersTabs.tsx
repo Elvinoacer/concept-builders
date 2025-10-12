@@ -20,10 +20,10 @@ const UsersTabs = ({
       <nav className="flex gap-4 md:gap-8 overflow-x-auto whitespace-nowrap">
         {usersTabsData.map((tab) => (
           <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            key={tab.name}
+            onClick={() => setActiveTab(tab.name)}
             className={`pb-3 border-b-2 text-sm font-semibold ${
-              activeTab === tab.id
+              activeTab === tab.name
                 ? "border-primary text-primary dark:text-blue-400 dark:border-blue-400"
                 : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
             }`}

@@ -25,7 +25,7 @@ const BestSellingPlans = () => {
             >
               <div className="relative h-48 sm:h-56 md:h-64 w-full">
                 <Image
-                  src={design.images[0].url}
+                  src={design.files && design.files.length > 0 ? design.files[0].url : '/images/default-avatar.png'}
                   alt={design.name}
                   fill
                   className="object-cover"

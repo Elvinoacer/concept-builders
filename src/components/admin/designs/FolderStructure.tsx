@@ -1,28 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-const FolderStructure = () => {
-  const [folders, setFolders] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchFolders = async () => {
-      try {
-        const response = await fetch("/api/designs/folders");
-        const data = await response.json();
-        setFolders(data);
-      } catch (error) {
-        console.error("Error fetching folders:", error);
-      }
-      setLoading(false);
-    };
-
-    fetchFolders();
-  }, []);
-
+const FolderStructure = ({ folders, loading }) => {
   const formatDate = (dateString: string) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -74,10 +55,8 @@ const FolderStructure = () => {
                   {formatDate(folder.updatedAt)}
                 </td>
                 <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 text-right">
-                  <Link href={`/admin/designs/folders/${folder.id}`} legacyBehavior>
-                    <a className="font-medium text-primary hover:underline whitespace-nowrap">
-                      View
-                    </a>
+                  <Link href={`/admin/designs/folders/${folder.id}`} className="font-medium text-primary hover:underline whitespace-nowrap">
+                    View
                   </Link>
                 </td>
               </motion.tr>

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { conversionRateData } from "@/lib/dummydata";
 
-const ConversionRateChart = () => {
+const ConversionRateChart = ({ data }: { data: any }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,7 +37,7 @@ const ConversionRateChart = () => {
             ></path>
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-2xl md:text-3xl font-bold text-chart-1">{conversionRateData.rate}%</p>
+            <p className="text-2xl md:text-3xl font-bold text-chart-1">{data.rate}%</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">Converted</p>
           </div>
         </div>

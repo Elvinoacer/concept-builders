@@ -29,6 +29,20 @@ model User {
   reviews       Review[]
   wishlist      Design[]
   folders       Folder[]
+  status        UserStatus @default(ACTIVE)
+  loginHistory  LoginHistory[]
+  impersonatingUserId String?
+  referralSource String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model LoginHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  ipAddress String
 }
 
 model Account {
@@ -40,6 +54,7 @@ model Account {
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
+  refresh_token_expires_in Int?
   token_type        String?
   scope             String?
   id_token          String? @db.Text
@@ -56,6 +71,7 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 model VerificationToken {
@@ -83,40 +99,56 @@ model Folder {
   user      User     @relation(fields: [userId], references: [id])
 }
 
+
 model Design {
-  id                    String      @id @default(cuid())
-  name                  String
-  description           String
-  basePrice             Float
-  priceRange            String
-  images                Json
-  renderings            Json
-  floorPlanUrl          String?
-  planDetails           Json
-  faqs                  Json
-  buildingCostEstimates Json
-  reviews               Review[]
-  relatedDesigns        Design[]    @relation("RelatedDesigns")
-  relatedTo             Design[]    @relation("RelatedDesigns")
-  tags                  Json
-  fileTypes             Json
-  drawingSetsOptions    Json
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  basePrice   Float
+  priceRange  String
+  bedrooms    Int?
+  bathrooms   Int?
+  area        Float?
+  floors      Int?
+  planDetails String[]
+  files       File[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  folder      Folder?  @relation(fields: [folderId], references: [id])
+  folderId    String?
+
+  buildingCostEstimates Json?
   calculatorOptions     Json?
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
-  categoryId            String
-  category              Category    @relation(fields: [categoryId], references: [id])
-  orderItems            OrderItem[]
-  salesCount            Int         @default(0)
-  users                 User[]
-  bedrooms              Int?
-  bathrooms             Int?
-  area                  Int?
-  floors                Int?
-  folderId              String?
-  folder                Folder?     @relation(fields: [folderId], references: [id])
-  files                 String[]
+
+  wishlistedBy User[]
+  category     Category? @relation(fields: [categoryId], references: [id])
+  categoryId   String?
+  reviews      Review[]
+  orderItems   OrderItem[]
+  views        Int      @default(0)
 }
+
+model File {
+  id               String   @id @default(cuid())
+  url              String
+  type             FileType
+  design           Design   @relation(fields: [designId], references: [id])
+  designId         String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  version          Int      @default(1)
+  isLatest         Boolean  @default(true)
+  originalFileName String?
+  fileIdentifier   String?
+}
+
+enum FileType {
+  CAD
+  PDF
+  IMAGE
+  FLOOR_PLAN
+}
+
 
 model Review {
   id        String   @id @default(cuid())
@@ -163,7 +195,7 @@ model OrderItem {
   orderId  String
   order    Order  @relation(fields: [orderId], references: [id])
   designId String
-  design   Design @relation(fields: [designId], references: [id])
+  design   Design @relation(fields: [designId], references: [id], onDelete: Cascade)
   quantity Int
 }
 
@@ -186,9 +218,20 @@ enum Role {
   ADMIN
 }
 
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
 enum OrderStatus {
   PENDING
   PAID
   REFUND_REQUESTED
   REFUNDED
+}
+
+model ReferralVisit {
+  id        String   @id @default(cuid())
+  source    String
+  createdAt DateTime @default(now())
 }

@@ -1,19 +1,38 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import BlogHeader from "@/components/blog/BlogHeader";
 import FeaturedPost from "@/components/blog/FeaturedPost";
 import PostList from "@/components/blog/PostList";
 import Sidebar from "@/components/blog/Sidebar";
 import { Post } from "@/generated/prisma";
 
-async function getPosts() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/blog`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch posts");
-  }
-  return res.json();
-}
+const BlogPage = () => {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const BlogPage = async () => {
-  const posts: Post[] = await getPosts();
+  useEffect(() => {
+    const getPosts = async () => {
+      try {
+        const res = await fetch(`/api/blog`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+        const data = await res.json();
+        setPosts(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getPosts();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex-1 px-4 py-8 md:px-10 dark:bg-gray-950">

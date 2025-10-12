@@ -1,14 +1,61 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const categories = await prisma.category.findMany();
-    return NextResponse.json(categories);
+    const search = request.nextUrl.searchParams.get("search") || "";
+    const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
+    const limit = parseInt(request.nextUrl.searchParams.get("limit") || "10");
+    const skip = (page - 1) * limit;
+
+    const where = search
+      ? {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        }
+      : {};
+
+    const categories = await prisma.category.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: {
+        name: "asc",
+      },
+    });
+
+    const totalCategories = await prisma.category.count({ where });
+
+    return NextResponse.json({
+      categories,
+      totalPages: Math.ceil(totalCategories / limit),
+    });
   } catch (error) {
     console.error("Error fetching categories:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { name } = body;
+
+    if (!name) {
+      return new NextResponse("Missing category name", { status: 400 });
+    }
+
+    const newCategory = await prisma.category.create({
+      data: {
+        name,
+      },
+    });
+
+    return NextResponse.json(newCategory, { status: 201 });
+  } catch (error) {
+    console.error("Error creating category:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

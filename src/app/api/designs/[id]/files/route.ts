@@ -1,27 +1,34 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { v4 as uuidv4 } from 'uuid'; // Import uuid
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { id } = params;
-    const { fileUrl } = await request.json();
+    const { fileUrl, fileType, originalFileName } = await request.json();
+    const designId = params.id;
 
-    if (!fileUrl) {
-      return new NextResponse("Missing fileUrl", { status: 400 });
+    if (!fileUrl || !fileType || !originalFileName) {
+      return new NextResponse("Missing fileUrl, fileType, or originalFileName", { status: 400 });
     }
 
-    const updatedDesign = await prisma.design.update({
-      where: { id },
+    const newFile = await prisma.file.create({
       data: {
-        files: {
-          push: fileUrl,
-        },
+        url: fileUrl,
+        type: fileType,
+        designId: designId,
+        version: 1,
+        isLatest: true,
+        originalFileName: originalFileName,
+        fileIdentifier: uuidv4(), // Generate a new fileIdentifier for the first version
       },
     });
 
-    return NextResponse.json(updatedDesign, { status: 200 });
+    return NextResponse.json(newFile, { status: 200 });
   } catch (error) {
-    console.error("Error adding file to design:", error);
+    console.error("Error updating design with file:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

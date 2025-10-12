@@ -1,6 +1,9 @@
+import { Toaster } from 'sonner';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
+
 import { ThemeProvider } from "@/components/theme-provider";
 import PayPalProviderWrapper from "@/components/PayPalProviderWrapper";
 import Providers from "./Providers";
@@ -27,8 +30,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
+
+  export default function RootLayout({  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
@@ -43,6 +46,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
         />
+        <Script src="/track.js" strategy="afterInteractive" />
       </head>
       <body className={inter.className}>
         <ThemeProvider
@@ -53,6 +57,7 @@ export default function RootLayout({
         >
           <PayPalProviderWrapper>
             <Providers>{children}</Providers>
+            <Toaster />
           </PayPalProviderWrapper>
         </ThemeProvider>
       </body>

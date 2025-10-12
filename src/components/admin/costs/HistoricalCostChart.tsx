@@ -1,7 +1,8 @@
 
 "use client";
 
-import { historicalCostData } from "@/lib/costs-data";
+import { useEffect, useState } from 'react';
+// import { historicalCostData } from "@/lib/costs-data"; // Removed as we will fetch dynamically
 import { motion } from "framer-motion";
 import {
   Area,
@@ -13,6 +14,39 @@ import {
 } from "recharts";
 
 const HistoricalCostChart = () => {
+  const [activeTimePeriod, setActiveTimePeriod] = useState('1Y');
+  const [historicalData, setHistoricalData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHistoricalData = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/admin/historical-costs?timePeriod=${activeTimePeriod}`);
+        if (!res.ok) {
+          throw new Error('Failed to fetch historical cost data');
+        }
+        const data = await res.json();
+        setHistoricalData(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistoricalData();
+  }, [activeTimePeriod]);
+
+  if (loading) {
+    return <div className="h-64 md:h-80 flex items-center justify-center">Loading historical data...</div>;
+  }
+
+  if (error) {
+    return <div className="h-64 md:h-80 flex items-center justify-center text-red-500">Error: {error}</div>;
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -35,23 +69,35 @@ const HistoricalCostChart = () => {
           </div>
         </div>
         <div className="flex items-center gap-2 mt-4 sm:mt-0">
-          <button className="px-3 py-1.5 text-sm font-medium text-foreground bg-muted rounded-md hover:bg-muted/80">
+          <button
+            onClick={() => setActiveTimePeriod('1M')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md ${activeTimePeriod === '1M' ? 'text-primary-foreground bg-primary' : 'text-foreground bg-muted hover:bg-muted/80'}`}
+          >
             1M
           </button>
-          <button className="px-3 py-1.5 text-sm font-medium text-foreground bg-muted rounded-md hover:bg-muted/80">
+          <button
+            onClick={() => setActiveTimePeriod('6M')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md ${activeTimePeriod === '6M' ? 'text-primary-foreground bg-primary' : 'text-foreground bg-muted hover:bg-muted/80'}`}
+          >
             6M
           </button>
-          <button className="px-3 py-1.5 text-sm font-medium text-primary-foreground bg-primary rounded-md">
+          <button
+            onClick={() => setActiveTimePeriod('1Y')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md ${activeTimePeriod === '1Y' ? 'text-primary-foreground bg-primary' : 'text-foreground bg-muted hover:bg-muted/80'}`}
+          >
             1Y
           </button>
-          <button className="px-3 py-1.5 text-sm font-medium text-foreground bg-muted rounded-md hover:bg-muted/80">
+          <button
+            onClick={() => setActiveTimePeriod('All')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md ${activeTimePeriod === 'All' ? 'text-primary-foreground bg-primary' : 'text-foreground bg-muted hover:bg-muted/80'}`}
+          >
             All
           </button>
         </div>
       </div>
       <div className="h-64 md:h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={historicalCostData}>
+          <AreaChart data={historicalData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8} />

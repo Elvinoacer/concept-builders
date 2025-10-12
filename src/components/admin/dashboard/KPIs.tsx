@@ -1,12 +1,18 @@
 'use client';
 import React from 'react';
-import { adminStats } from '@/lib/dummydata';
 
-const KPIs = () => {
+const kpis = [
+  { title: 'Total Revenue', key: 'totalSales', prefix: '$', change: '+12.5%', icon: 'monetization_on' },
+  { title: 'Total Visitors', key: 'totalVisitors', prefix: '', change: '+8.2%', icon: 'people' },
+  { title: 'Conversion Rate', key: 'conversionRate', suffix: '%', change: '-1.8%', icon: 'touch_app' },
+  { title: 'Total Orders', key: 'totalOrders', prefix: '', change: '+5.3%', icon: 'shopping_cart' },
+];
+
+const KPIs = ({ stats }) => {
   return (
     <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-      {adminStats.kpis.map((kpi) => {
-        const value = adminStats[kpi.key];
+      {kpis.map((kpi) => {
+        const value = stats[kpi.key];
         const formattedValue = typeof value === 'number' ? value.toLocaleString() : value;
         const changeIsPositive = kpi.change.startsWith('+');
 

@@ -1,24 +1,11 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function POST(request: Request) {
+export async function GET() {
   try {
-    const { title, content, excerpt, image, author } = await request.json();
-
-    const post = await prisma.post.create({
-      data: {
-        title,
-        content,
-        excerpt,
-        image,
-        author,
-      },
-    });
-
-    return NextResponse.json(post);
+    const posts = await prisma.post.findMany();
+    return NextResponse.json(posts);
   } catch (error) {
-    console.error('Error creating post:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

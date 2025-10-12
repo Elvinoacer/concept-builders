@@ -126,11 +126,8 @@ export const designDetailsTabs = [
 ];
 
 export const designTabs = [
-  { id: "description", label: "Description" },
-  { id: "plan-details", label: "Plan Details" },
-  { id: "building-cost-estimates", label: "Building Cost Estimates" },
-  { id: "faq-support", label: "FAQ & Support" },
-  { id: "reviews", label: "Reviews" },
+  { id: "all", label: "All" },
+  { id: "folders", label: "Folders" },
 ];
 
 export const designTabIcons = {
@@ -551,6 +548,7 @@ export const designs: DesignCard[] = [
 
 export const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/categories", label: "Categories" },
   { href: "/design-showcase", label: "Design Showcase" },
   { href: "/designs", label: "Plans" },
   { href: "/custom-design", label: "Custom Design" },

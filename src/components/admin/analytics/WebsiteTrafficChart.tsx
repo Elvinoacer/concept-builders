@@ -5,7 +5,7 @@ import { websiteTrafficData } from "@/lib/dummydata";
 import { motion } from "framer-motion";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-const WebsiteTrafficChart = () => {
+const WebsiteTrafficChart = ({ data }: { data: any[] }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -21,7 +21,7 @@ const WebsiteTrafficChart = () => {
       </div>
       <div className="h-48 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={websiteTrafficData}>
+            <AreaChart data={data}>
                 <defs>
                     <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8}/>

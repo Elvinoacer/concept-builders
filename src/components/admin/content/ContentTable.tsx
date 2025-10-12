@@ -1,11 +1,11 @@
 
 "use client";
 
-import { blogPostsData } from "@/lib/dummydata";
+
 import { motion } from "framer-motion";
 import Pagination from "./Pagination";
 
-const ContentTable = () => {
+const ContentTable = ({ blogPostsData }) => {
   const getStatusChip = (status: string) => {
     switch (status) {
       case "Published":
@@ -63,32 +63,80 @@ const ContentTable = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {blogPostsData.map((post, index) => (
-              <motion.tr
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="hover:bg-muted"
-              >
-                <td className="px-3 py-2 md:px-6 md:py-4 text-foreground font-medium">
-                  {post.title}
+            {blogPostsData && blogPostsData.length > 0 ? (
+              blogPostsData.map((post, index) => (
+                <motion.tr
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="hover:bg-muted/50"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-10 w-10">
+                        <Image
+                          className="h-10 w-10 rounded-full object-cover"
+                          src={post.image || "/images/default-post.png"}
+                          alt={post.title}
+                          width={40}
+                          height={40}
+                        />
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-foreground">
+                          {post.title}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {post.author}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {new Date(post.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button className="text-primary hover:text-primary-dark">
+                      Edit
+                    </button>
+                    <button className="text-destructive hover:text-destructive-dark ml-4">
+                      Delete
+                    </button>
+                  </td>
+                </motion.tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="px-6 py-24 text-center text-muted-foreground">
+                  <div className="flex flex-col items-center gap-4">
+                    <svg
+                      className="w-16 h-16 text-muted-foreground/50"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <h3 className="text-xl font-semibold">No Blog Posts Yet</h3>
+                    <p className="text-sm">
+                      It looks like there are no blog posts. Get started by creating one.
+                    </p>
+                    <a href="/admin/content/import" className="mt-4 inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-lg">
+                      Create a New Post
+                    </a>
+                  </div>
                 </td>
-                <td className="px-3 py-2 md:px-6 md:py-4 text-muted-foreground">{post.author}</td>
-                <td className="px-3 py-2 md:px-6 md:py-4">{getStatusChip(post.status)}</td>
-                <td className="px-3 py-2 md:px-6 md:py-4 text-muted-foreground">
-                  {post.publishedDate}
-                </td>
-                <td className="px-3 py-2 md:px-6 md:py-4 text-right">
-                  <a
-                    href="#"
-                    className="font-medium text-primary hover:text-primary-dark"
-                  >
-                    Edit
-                  </a>
-                </td>
-              </motion.tr>
-            ))}
+              </tr>
+            )}
+              
+            
           </tbody>
         </table>
       </div>

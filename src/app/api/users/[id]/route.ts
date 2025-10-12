@@ -1,13 +1,20 @@
 
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
     const user = await prisma.user.findUnique({
       where: { id: params.id },
+      include: {
+        accounts: true,
+        orders: true,
+        projects: true,
+        reviews: true,
+        wishlist: true,
+        folders: true,
+        loginHistory: true,
+      },
     });
     if (!user) {
       return new NextResponse('Not Found', { status: 404 });
@@ -26,6 +33,17 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       data,
     });
     return NextResponse.json(updatedUser);
+  } catch (error) {
+    return new NextResponse('Internal Server Error', { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  try {
+    await prisma.user.delete({
+      where: { id: params.id },
+    });
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
     return new NextResponse('Internal Server Error', { status: 500 });
   }

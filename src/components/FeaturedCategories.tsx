@@ -22,7 +22,7 @@ const FeaturedCategories = () => {
               <div className="overflow-hidden rounded-lg">
                 <div
                   className="w-full bg-center bg-no-repeat aspect-[4/3] bg-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                  style={{ backgroundImage: `url("${category.image}")` }}
+                  style={{ backgroundImage: `url("${category.image || '/images/default-avatar.png'}")` }}
                 ></div>
               </div>
               <div>

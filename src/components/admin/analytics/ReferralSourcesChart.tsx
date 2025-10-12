@@ -4,7 +4,7 @@ import React from "react";
 import { referralSourcesData } from "@/lib/dummydata";
 import { motion } from "framer-motion";
 
-const ReferralSourcesChart = () => {
+const ReferralSourcesChart = ({ data }: { data: any[] }) => {
   const chartColors = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-chart-5"];
   const textChartColors = ["text-chart-1", "text-chart-2", "text-chart-3", "text-chart-4", "text-chart-5"];
   return (
@@ -21,7 +21,7 @@ const ReferralSourcesChart = () => {
         <p className="text-gray-500 dark:text-gray-400 text-sm">Top 5 Channels</p>
       </div>
       <div className="grid h-48 md:h-64 grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-3 py-3">
-        {referralSourcesData.map((source, index) => (
+        {data.map((source, index) => (
           <React.Fragment key={index}>
             <p className={`text-sm font-medium ${textChartColors[index]}`}>{source.name}</p>
             <div className="h-2.5 w-full rounded-full bg-muted">

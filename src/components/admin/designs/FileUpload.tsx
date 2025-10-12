@@ -1,98 +1,91 @@
+'use client';
 
-"use client";
-
-import { useState } from "react";
+import { useCallback, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { FiTrash } from 'react-icons/fi'; // Import FiTrash icon
 
 interface FileUploadProps {
-  designId: string;
+  onUploadSuccess: (files: { url: string; type: string; name: string }[]) => void;
+  initialFiles: { url: string; type: string; name: string }[];
+  fileTypeCategory: string;
 }
 
-const FileUpload = ({ designId }: FileUploadProps) => {
-  const [files, setFiles] = useState<File[]>([]);
+const FileUpload = ({ onUploadSuccess, initialFiles = [], fileTypeCategory }: FileUploadProps) => {
+  const [uploadedFiles, setUploadedFiles] = useState<{ url: string; type: string; name: string }[]>(initialFiles);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles(Array.from(e.target.files));
-    }
-  };
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const newFilesData = await Promise.all(
+      acceptedFiles.map(async (file) => {
+        const signedUrlResponse = await fetch('/api/designs/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileName: file.name, fileType: file.type, fileTypeCategory: fileTypeCategory }),
+        });
+        const { signedUrl } = await signedUrlResponse.json();
+        const publicUrl = signedUrl.split('?')[0];
 
-  const handleUpload = async () => {
-    for (const file of files) {
-      try {
-        const response = await fetch("/api/designs/upload", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ fileName: file.name, fileType: file.type }),
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', signedUrl, true);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.setRequestHeader('x-amz-acl', 'public-read');
+        await new Promise((resolve, reject) => {
+          xhr.onload = () => {
+            if (xhr.status === 200) {
+              resolve({ url: publicUrl, type: fileTypeCategory, name: file.name }); // Return object with url and type
+            } else {
+              reject(new Error('Upload failed'));
+            }
+          };
+          xhr.onerror = () => reject(new Error('Upload failed'));
+          xhr.send(file);
         });
 
-        const { signedUrl } = await response.json();
+        return { url: publicUrl, type: fileTypeCategory, name: file.name };
+      })
+    );
 
-        await fetch(signedUrl, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type,
-          },
-        });
+    const updatedFiles = [...uploadedFiles, ...newFilesData];
+    setUploadedFiles(updatedFiles);
+    onUploadSuccess(updatedFiles);
+  }, [uploadedFiles, onUploadSuccess, fileTypeCategory]);
 
-        const fileUrl = signedUrl.split("?")[0];
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-        await fetch(`/api/designs/${designId}/files`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ fileUrl }),
-        });
-
-        console.log(`File ${file.name} uploaded and associated with design ${designId}`);
-      } catch (error) {
-        console.error(`Error uploading file ${file.name}:`, error);
-      }
-    }
+  const handleRemove = (indexToRemove: number) => {
+    const updatedFiles = uploadedFiles.filter((_, index) => index !== indexToRemove);
+    setUploadedFiles(updatedFiles);
+    onUploadSuccess(updatedFiles); // Notify parent about the change
   };
 
   return (
-    <div className="mb-4 md:mb-8">
-      <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">File Upload</h2>
-      <div className="flex flex-col items-center justify-center w-full">
-        <label
-          htmlFor="dropzone-file"
-          className="flex flex-col items-center justify-center w-full h-32 md:h-48 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted"
-        >
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <span className="material-symbols-outlined text-4xl md:text-6xl text-muted-foreground">
-              cloud_upload
-            </span>
-            <p className="mb-2 text-base md:text-lg text-foreground font-bold">
-              <span className="font-semibold">Drag and drop files here</span>
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Or click to browse your files
-            </p>
-          </div>
-          <input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} multiple />
-        </label>
-        {files.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold">Selected Files:</h3>
-            <ul>
-              {files.map((file, index) => (
-                <li key={index}>{file.name}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        <button 
-          onClick={handleUpload}
-          className="flex items-center gap-2 mt-4 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-sm font-bold"
-          disabled={files.length === 0}
-        >
-          <span className="material-symbols-outlined">upload_file</span>
-          <span className="truncate">Upload Files</span>
-        </button>
+    <div>
+      <div
+        {...getRootProps()}
+        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+        }`}>
+        <input {...getInputProps()} />
+        {
+          isDragActive ?
+            <p>Drop the files here ...</p> :
+            <p>Drag 'n' drop some files here, or click to select files</p>
+        }
+      </div>
+      <div className="mt-4">
+        <p className="font-semibold">Uploaded Files:</p>
+        <ul>
+          {uploadedFiles.map((file, index) => {
+            const fileName = decodeURIComponent(file.url.split('/').pop() || '');
+            return (
+              <li key={index} className="flex items-center justify-between p-2 bg-background rounded-lg">
+                <span className="text-sm truncate" title={fileName}>{fileName}</span>
+                <button onClick={() => handleRemove(index)} className="text-red-500 hover:text-red-700">
+                  <FiTrash />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );

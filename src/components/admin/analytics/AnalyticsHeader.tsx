@@ -3,7 +3,7 @@
 
 import { motion } from "framer-motion";
 
-const AnalyticsHeader = () => {
+const AnalyticsHeader = ({ timePeriod, setTimePeriod }: { timePeriod: string, setTimePeriod: (period: string) => void }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -27,6 +27,8 @@ const AnalyticsHeader = () => {
             name="time_period"
             type="radio"
             value="Today"
+            checked={timePeriod === "Today"}
+            onChange={() => setTimePeriod("Today")}
           />
         </label>
         <label className="flex h-full cursor-pointer items-center justify-center rounded-md px-4 text-sm font-medium transition-colors has-[:checked]:bg-background has-[:checked]:text-primary has-[:checked]:shadow-sm text-muted-foreground hover:text-foreground">
@@ -36,16 +38,19 @@ const AnalyticsHeader = () => {
             name="time_period"
             type="radio"
             value="Last 7 Days"
+            checked={timePeriod === "Last 7 Days"}
+            onChange={() => setTimePeriod("Last 7 Days")}
           />
         </label>
         <label className="flex h-full cursor-pointer items-center justify-center rounded-md px-4 text-sm font-medium transition-colors has-[:checked]:bg-background has-[:checked]:text-primary has-[:checked]:shadow-sm text-muted-foreground hover:text-foreground">
           <span>Last 30 Days</span>
           <input
-            defaultChecked
             className="sr-only"
             name="time_period"
             type="radio"
             value="Last 30 Days"
+            checked={timePeriod === "Last 30 Days"}
+            onChange={() => setTimePeriod("Last 30 Days")}
           />
         </label>
         <label className="flex h-full cursor-pointer items-center justify-center rounded-md px-4 text-sm font-medium transition-colors has-[:checked]:bg-background has-[:checked]:text-primary has-[:checked]:shadow-sm text-muted-foreground hover:text-foreground">
@@ -55,6 +60,8 @@ const AnalyticsHeader = () => {
             name="time_period"
             type="radio"
             value="All Time"
+            checked={timePeriod === "All Time"}
+            onChange={() => setTimePeriod("All Time")}
           />
         </label>
       </div>

@@ -26,7 +26,7 @@ const NewPlans = () => {
             >
               <div className="relative h-64 w-full overflow-hidden">
                 <Image
-                  src={design.images[0].url}
+                  src={design.files && design.files.length > 0 ? design.files[0].url : '/images/default-avatar.png'}
                   alt={design.name}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
