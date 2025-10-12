@@ -40,6 +40,13 @@ export async function GET() {
         createdAt: 'desc',
       },
       take: 4,
+      include: {
+        files: {
+          where: {
+            type: 'IMAGE',
+          },
+        },
+      },
     });
 
     const testimonials = await prisma.testimonial.findMany({
