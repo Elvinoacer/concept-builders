@@ -1,5 +1,6 @@
-import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
+import { FiAlertTriangle } from 'react-icons/fi';
 
 interface CategoryPageProps {
   params: {
@@ -8,15 +9,41 @@ interface CategoryPageProps {
 }
 
 async function getCategory(id: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories/${id}`);
-  if (!res.ok) {
-    return notFound();
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories/${id}`);
+    if (!res.ok) {
+      return null;
+    }
+    return res.json();
+  } catch (error) {
+    console.error('Failed to fetch category:', error);
+    return null;
   }
-  return res.json();
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const category = await getCategory(params.id);
+
+  if (!category) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gray-100 dark:bg-gray-900 text-center px-4">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg max-w-md w-full">
+          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 rounded-full flex items-center justify-center">
+            <FiAlertTriangle size={40} className="text-red-500 dark:text-red-400" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-3">
+            Category Not Found
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-8">
+            The category you are looking for does not exist or may have been moved.
+          </p>
+          <Link href="/categories" className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-transform transform hover:scale-105 duration-300 ease-in-out shadow-md">
+            Explore Other Categories
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">

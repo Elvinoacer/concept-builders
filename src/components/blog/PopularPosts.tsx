@@ -1,48 +1,86 @@
+'use client';
+
 import { Post } from "@/generated/prisma";
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-async function getPopularPosts() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/blog`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch posts");
+const PopularPosts = () => {
+  const [popularPosts, setPopularPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/blog`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+        const posts = await res.json();
+        setPopularPosts(posts.sort((a: Post, b: Post) => (b.views || 0) - (a.views || 0)).slice(0, 3));
+      } catch (error) {
+        console.error("Failed to fetch popular posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  if (loading) {
+    return <PopularPostsSkeleton />;
   }
-  const posts = await res.json();
-  return posts.slice(0, 3);
-}
-
-const PopularPosts = async () => {
-  const popularPosts: Post[] = await getPopularPosts();
 
   return (
-    <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-      <h3 className="text-lg md:text-xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-400">
+    <div className="rounded-lg border bg-card p-4 shadow-sm md:p-6">
+      <h3 className="font-heading mb-4 text-lg font-bold tracking-tight text-foreground">
         Popular Posts
       </h3>
-      <div className="space-y-4">
-        {popularPosts.map((post, index) => (
-          <a
-            key={index}
-            className="flex items-center gap-4 group"
-            href={`/blog/${post.id}`}
-          >
-            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-md h-12 w-12 md:h-16 md:w-16 flex-shrink-0">
+      {popularPosts.length > 0 ? (
+        <div className="space-y-4">
+          {popularPosts.map((post) => (
+            <Link key={post.id} href={`/blog/${post.id}`} className="group flex items-start gap-4">
               <Image
-                src={post.image || ""}
+                src={post.image || ''}
                 alt={post.title}
                 width={64}
                 height={64}
-                className="rounded-md"
+                className="aspect-square rounded-md object-cover"
               />
+              <div className="flex-1">
+                <p className="font-semibold leading-tight text-foreground group-hover:text-primary line-clamp-2">
+                  {post.title}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">No popular posts found.</p>
+      )}
+    </div>
+  );
+};
+
+export const PopularPostsSkeleton = () => {
+  return (
+    <div className="rounded-lg border bg-card p-4 shadow-sm md:p-6">
+      <div className="mb-4 h-6 w-3/4 animate-pulse rounded-md bg-muted"></div>
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex items-start gap-4">
+            <div className="h-16 w-16 flex-shrink-0 animate-pulse rounded-md bg-muted"></div>
+            <div className="flex-1 space-y-2 py-1">
+              <div className="h-4 w-full animate-pulse rounded-md bg-muted"></div>
+              <div className="h-4 w-5/6 animate-pulse rounded-md bg-muted"></div>
+              <div className="mt-1 h-3 w-1/3 animate-pulse rounded-md bg-muted"></div>
             </div>
-            <div className="flex flex-col justify-center">
-              <h4 className="text-gray-800 text-sm md:text-base font-bold leading-snug line-clamp-2 group-hover:text-primary transition-colors dark:text-white">
-                {post.title}
-              </h4>
-              <p className="text-gray-500 text-sm font-normal leading-normal mt-1 dark:text-gray-400">
-                {new Date(post.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          </a>
+          </div>
         ))}
       </div>
     </div>
@@ -50,3 +88,4 @@ const PopularPosts = async () => {
 };
 
 export default PopularPosts;
+

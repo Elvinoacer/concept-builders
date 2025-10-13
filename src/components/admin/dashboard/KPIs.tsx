@@ -2,13 +2,36 @@
 import React from 'react';
 
 const kpis = [
-  { title: 'Total Revenue', key: 'totalSales', prefix: '$', change: '+12.5%', icon: 'monetization_on' },
+  { title: 'Total Revenue', key: 'totalSales', prefix: ', change: '+12.5%', icon: 'monetization_on' },
   { title: 'Total Visitors', key: 'totalVisitors', prefix: '', change: '+8.2%', icon: 'people' },
   { title: 'Conversion Rate', key: 'conversionRate', suffix: '%', change: '-1.8%', icon: 'touch_app' },
   { title: 'Total Orders', key: 'totalOrders', prefix: '', change: '+5.3%', icon: 'shopping_cart' },
 ];
 
+const KPISkeleton = () => {
+  return (
+    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            <div className="flex-1">
+              <div className="h-4 w-2/3 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+              <div className="h-8 w-1/2 mt-2 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+            </div>
+          </div>
+          <div className="h-4 w-3/4 mt-4 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+      ))}
+    </section>
+  )
+}
+
 const KPIs = ({ stats }) => {
+  if (!stats) {
+    return <KPISkeleton />;
+  }
+
   return (
     <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       {kpis.map((kpi) => {

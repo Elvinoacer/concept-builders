@@ -1,25 +1,39 @@
 
+'use client';
+
 import { categories } from "@/lib/dummydata";
 
 const Categories = () => {
   return (
-    <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-      <h3
-        className="text-lg md:text-xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-400"
-      >
+    <div className="rounded-lg border bg-card p-4 shadow-sm md:p-6">
+      <h3 className="font-heading mb-4 text-lg font-bold tracking-tight text-foreground">
         Categories
       </h3>
-      <ul className="space-y-3">
+      <ul className="space-y-2">
         {categories.map((category, index) => (
           <li key={index}>
             <a
-              className="text-gray-600 hover:text-primary hover:font-medium transition-all text-base dark:text-gray-400 dark:hover:text-primary"
+              className="text-muted-foreground transition-colors hover:text-primary"
               href="#"
             >
               {category.name}
             </a>
           </li>
         ))}
+      </ul>
+    </div>
+  );
+};
+
+export const CategoriesSkeleton = () => {
+  return (
+    <div className="rounded-lg border bg-card p-4 shadow-sm md:p-6">
+      <div className="mb-4 h-6 w-3/4 animate-pulse rounded-md bg-muted"></div>
+      <ul className="space-y-3">
+        <li className="h-5 w-1/2 animate-pulse rounded-md bg-muted"></li>
+        <li className="h-5 w-2/3 animate-pulse rounded-md bg-muted"></li>
+        <li className="h-5 w-1/2 animate-pulse rounded-md bg-muted"></li>
+        <li className="h-5 w-3/4 animate-pulse rounded-md bg-muted"></li>
       </ul>
     </div>
   );

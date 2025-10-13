@@ -6,43 +6,61 @@ import { Post } from "@/generated/prisma";
 
 const FeaturedPost = ({ post }: { post: Post }) => {
   if (!post) {
-    return null; // Or some fallback UI
+    return null; 
   }
 
-  // Create a short description from the content, stripping HTML tags.
-  const description = post.content.replace(/<[^>]*>?/gm, '').trim().substring(0, 120) + '...';
+  const description = post.content.replace(/<[^>]*>?/gm, '').trim().substring(0, 150) + '...';
 
   return (
-    <Link href={`/blog/${post.id}`}>
-      <div className="p-3 md:p-4 @container bg-white rounded-lg border border-gray-200 shadow-sm mb-8 dark:bg-gray-800 dark:border-gray-700 hover:shadow-md transition-shadow duration-200">
-        <div className="flex flex-col items-center justify-center rounded-lg @xl:flex-row @xl:items-center">
-          <div className="w-full md:w-1/2 bg-center bg-no-repeat aspect-video bg-cover rounded-md">
+    <div className="group mb-8 overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-lg dark:hover:shadow-white/10">
+      <Link href={`/blog/${post.id}`}>
+        <div className="md:flex">
+          <div className="md:w-1/2 lg:w-3/5">
             <Image
               src={post.image || ''}
               alt={post.title}
-              width={300}
-              height={180}
-              className="rounded-md w-full h-auto"
+              width={600}
+              height={360}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </div>
-          <div className="flex w-full md:w-1/2 min-w-72 grow flex-col items-center justify-center gap-2 py-4 @xl:pl-6 text-center">
-            <p
-              className="text-sm font-bold leading-normal bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-400"
-            >
-              Featured
+          <div className="flex flex-col justify-center p-6 md:w-1/2 lg:w-2/5 md:p-8">
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+              Featured Post
             </p>
-            <h3 className="text-lg md:text-xl font-bold leading-tight tracking-tight dark:text-white">
+            <h2 className="font-heading mt-2 text-2xl font-bold leading-tight tracking-tighter text-foreground md:text-3xl">
               {post.title}
-            </h3>
-            <p className="text-sm md:text-base font-normal leading-relaxed dark:text-gray-400">
+            </h2>
+            <p className="mt-4 text-base text-muted-foreground line-clamp-3">
               {description}
             </p>
-            <Button className="mt-2 max-w-fit">Read More</Button>
+            <div className="mt-6">
+                <Button variant="outline">Read More</Button>
+            </div>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 };
+
+export const FeaturedPostSkeleton = () => {
+    return (
+        <div className="mb-8 overflow-hidden rounded-lg border bg-card shadow-sm">
+            <div className="md:flex">
+                <div className="h-64 w-full animate-pulse bg-muted md:h-auto md:w-1/2 lg:w-3/5"></div>
+                <div className="p-6 md:w-1/2 lg:w-2/5 md:p-8">
+                    <div className="h-4 w-1/4 animate-pulse rounded-md bg-muted"></div>
+                    <div className="mt-4 h-8 w-full animate-pulse rounded-md bg-muted md:h-10"></div>
+                    <div className="mt-1 h-8 w-3/4 animate-pulse rounded-md bg-muted md:h-10"></div>
+                    <div className="mt-6 h-5 w-full animate-pulse rounded-md bg-muted"></div>
+                    <div className="mt-2 h-5 w-5/6 animate-pulse rounded-md bg-muted"></div>
+                    <div className="mt-2 h-5 w-full animate-pulse rounded-md bg-muted"></div>
+                    <div className="mt-8 h-12 w-32 animate-pulse rounded-md bg-muted"></div>
+                </div>
+            </div>
+        </div>
+    )
+}
 
 export default FeaturedPost;

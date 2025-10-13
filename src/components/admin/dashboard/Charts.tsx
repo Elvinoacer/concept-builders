@@ -1,7 +1,38 @@
 'use client';
 import React from 'react';
 
+const ChartsSkeleton = () => {
+  return (
+    <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-md p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <div className="h-5 w-32 mb-2 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-4 w-24 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+          </div>
+          <div className="h-8 w-28 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+        <div className="h-64 md:h-80 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+      </div>
+      <div className="bg-white dark:bg-gray-800 rounded-md p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex justify-between items-center mb-4">
+            <div>
+                <div className="h-5 w-32 mb-2 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+                <div className="h-4 w-24 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+            </div>
+            <div className="h-8 w-16 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+        <div className="h-64 md:h-80 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
+      </div>
+    </section>
+  )
+}
+
 const Charts = ({ stats, monthlySales, clientAcquisition }) => {
+  if (!stats || !monthlySales || !clientAcquisition) {
+    return <ChartsSkeleton />;
+  }
+
   const maxSales = Math.max(...monthlySales.map((s) => s.sales));
 
   const chartData = monthlySales.map((sale, index) => {
