@@ -2,7 +2,7 @@
 import React from 'react';
 
 const kpis = [
-  { title: 'Total Revenue', key: 'totalSales', prefix: ', change: '+12.5%', icon: 'monetization_on' },
+  { title: 'Total Revenue', key: 'totalSales', prefix: '$', change: '+12.5%', icon: 'monetization_on' },
   { title: 'Total Visitors', key: 'totalVisitors', prefix: '', change: '+8.2%', icon: 'people' },
   { title: 'Conversion Rate', key: 'conversionRate', suffix: '%', change: '-1.8%', icon: 'touch_app' },
   { title: 'Total Orders', key: 'totalOrders', prefix: '', change: '+5.3%', icon: 'shopping_cart' },

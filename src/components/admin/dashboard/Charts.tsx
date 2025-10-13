@@ -29,7 +29,7 @@ const ChartsSkeleton = () => {
 }
 
 const Charts = ({ stats, monthlySales, clientAcquisition }) => {
-  if (!stats || !monthlySales || !clientAcquisition) {
+  if (!stats || !monthlySales || monthlySales.length === 0 || !clientAcquisition) {
     return <ChartsSkeleton />;
   }
 
