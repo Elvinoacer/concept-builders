@@ -29,24 +29,28 @@ const ChartsSkeleton = () => {
 }
 
 const Charts = ({ stats, monthlySales, clientAcquisition }) => {
-  if (!stats || !monthlySales || monthlySales.length === 0 || !clientAcquisition) {
+  if (!stats || !monthlySales || !clientAcquisition) {
     return <ChartsSkeleton />;
   }
 
-  const maxSales = Math.max(...monthlySales.map((s) => s.sales));
+  const hasSalesData = monthlySales.length > 0;
+  const maxSales = hasSalesData ? Math.max(...monthlySales.map((s) => s.sales)) : 0;
+  const chartData = hasSalesData
+    ? monthlySales.map((sale, index) => {
+        const y = 280 - (sale.sales / maxSales) * 260;
+        const x = 60 + index * 70;
+        return { x, y };
+      })
+    : [];
 
-  const chartData = monthlySales.map((sale, index) => {
-    const y = 280 - (sale.sales / maxSales) * 260;
-    const x = 60 + index * 70;
-    return { x, y };
-  });
-
-  const pathData = chartData.reduce((acc, point, index) => {
-    if (index === 0) {
-      return `M ${point.x} ${point.y}`;
-    }
-    return `${acc} L ${point.x} ${point.y}`;
-  }, '');
+  const pathData = hasSalesData
+    ? chartData.reduce((acc, point, index) => {
+        if (index === 0) {
+          return `M ${point.x} ${point.y}`;
+        }
+        return `${acc} L ${point.x} ${point.y}`;
+      }, '')
+    : '';
 
   const totalClients = clientAcquisition.reduce((acc, curr) => acc + curr.count, 0);
 
@@ -61,29 +65,35 @@ const Charts = ({ stats, monthlySales, clientAcquisition }) => {
           <p className="text-xl sm:text-2xl md:text-3xl font-bold dark:text-white">${stats.totalSales.toLocaleString()}</p>
         </div>
         <div className="h-64 md:h-80 overflow-x-auto">
-          <svg fill="none" height="100%" preserveAspectRatio="none" viewBox="0 0 500 300" width="100%" xmlns="http://www.w3.org/2000/svg" style={{ minWidth: 500 }}>
-            <path d="M40 280 H460" className="stroke-gray-200 dark:stroke-gray-700" strokeWidth="2"></path>
-            <path d="M40 20 V280" className="stroke-gray-200 dark:stroke-gray-700" strokeWidth="2"></path>
-            <path d={pathData} fill="none" stroke="url(#salesGradient)" strokeLinecap="round" strokeWidth="3"></path>
-            <defs>
-              <linearGradient id="salesGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#0ea5e9" />
-                <stop offset="100%" stopColor="#22d3ee" />
-              </linearGradient>
-            </defs>
-            <g fill="rgba(17, 147, 212, 0.1)">
-              <path d={`${pathData} L ${chartData[chartData.length -1].x} 280 L ${chartData[0].x} 280 Z`} />
-            </g>
-            <g className="text-sm fill-gray-400 dark:fill-gray-500">
-              {monthlySales.map((d, i) => (
-                <text key={i} x={60 + i * 70} y="295">{d.month}</text>
-              ))}
-              <text x="5" y="280">0</text>
-              <text x="5" y="205">{maxSales / 2}</text>
-              <text x="5" y="130">{maxSales}</text>
-              <text x="5" y="55">{maxSales * 1.5}</text>
-            </g>
-          </svg>
+          {hasSalesData ? (
+            <svg fill="none" height="100%" preserveAspectRatio="none" viewBox="0 0 500 300" width="100%" xmlns="http://www.w3.org/2000/svg" style={{ minWidth: 500 }}>
+              <path d="M40 280 H460" className="stroke-gray-200 dark:stroke-gray-700" strokeWidth="2"></path>
+              <path d="M40 20 V280" className="stroke-gray-200 dark:stroke-gray-700" strokeWidth="2"></path>
+              <path d={pathData} fill="none" stroke="url(#salesGradient)" strokeLinecap="round" strokeWidth="3"></path>
+              <defs>
+                <linearGradient id="salesGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#0ea5e9" />
+                  <stop offset="100%" stopColor="#22d3ee" />
+                </linearGradient>
+              </defs>
+              <g fill="rgba(17, 147, 212, 0.1)">
+                <path d={`${pathData} L ${chartData[chartData.length - 1].x} 280 L ${chartData[0].x} 280 Z`} />
+              </g>
+              <g className="text-sm fill-gray-400 dark:fill-gray-500">
+                {monthlySales.map((d, i) => (
+                  <text key={i} x={60 + i * 70} y="295">{d.month}</text>
+                ))}
+                <text x="5" y="280">0</text>
+                <text x="5" y="205">{maxSales / 2}</text>
+                <text x="5" y="130">{maxSales}</text>
+                <text x="5" y="55">{maxSales * 1.5}</text>
+              </g>
+            </svg>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-500 dark:text-gray-400">No sales data available for this period.</p>
+            </div>
+          )}
         </div>
       </div>
       <div className="bg-white dark:bg-gray-800 rounded-md p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
