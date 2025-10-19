@@ -8,7 +8,7 @@ const CostEstimate: React.FC<CostEstimateProps> = ({ estimates, design }) => {
   const [openBreakdown, setOpenBreakdown] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const newEstimates = (estimates || []).filter(e => e.name === 'Basic' || e.name === 'Premium').map(e => e.name === 'Premium' ? {...e, name: 'Luxury'} : e);
+  const newEstimates = (estimates || []).filter(e => e.name.toLowerCase() === 'basic' || e.name.toLowerCase() === 'luxury');
 
   return (
     <>
@@ -38,7 +38,7 @@ const CostEstimate: React.FC<CostEstimateProps> = ({ estimates, design }) => {
                   <div className="mt-4 pl-10">
                       <h4 className="font-semibold text-md mb-2 dark:text-white">Cost Breakdown</h4>
                       <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                          {costBreakdown[estimate.name].map(item => (
+                          {estimate.costBreakdown.map(item => (
                               <li key={item.item} className="flex justify-between">
                                   <span>{item.item}</span>
                                   <span>{item.cost}</span>

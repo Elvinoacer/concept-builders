@@ -1,6 +1,6 @@
 "use client";
 
-import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
+import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 
 interface PayPalPaymentProps {
   amount: string; // The amount to charge
@@ -77,18 +77,6 @@ const PayPalPayment = ({ amount, onPaymentSuccess, onPaymentError }: PayPalPayme
   );
 }
 
-export default function PayPalPaymentWrapper(props: PayPalPaymentProps) {
-  const initialOptions = {
-    "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
-    currency: "USD",
-    intent: "capture",
-    components: "buttons",
-  };
+export default PayPalPayment;
 
-  return (
-    <PayPalScriptProvider options={initialOptions}>
-      <PayPalPayment {...props} />
-    </PayPalScriptProvider>
-  )
-}
 

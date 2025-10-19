@@ -7,10 +7,12 @@ import Image from "next/image";
 import { ModeToggle } from "./ui/mode-toggle";
 import SearchModal from './SearchModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCart } from '@/hooks/useCart';
 
 const Header = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { cartCount } = useCart();
 
   return (
     <>
@@ -45,7 +47,7 @@ const Header = () => {
           {/* Desktop-only icons */}
           <div className="hidden md:flex items-center gap-2 md:gap-4">
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Link href="/dashboard/wishlist" className="text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
+              <Link href="/dashboard/wishlist" className="flex items-center text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
                 <span className="material-symbols-outlined">favorite</span>
               </Link>
             </motion.div>
@@ -60,21 +62,28 @@ const Header = () => {
           >
             <span className="material-symbols-outlined">search</span>
           </motion.button>
-          <ModeToggle />
+          <div className="flex items-center">
+            <ModeToggle />
+          </div>
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-            <Link href="/cart" className="text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
+            <Link href="/cart" className="relative flex items-center text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
               <span className="material-symbols-outlined">shopping_cart</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center rounded-full text-xs text-white bg-gradient-to-r from-blue-600 to-cyan-400 p-1 leading-none">
+                  {cartCount}
+                </span>
+              )}
             </Link>
           </motion.div>
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-            <Link href="/dashboard" className="text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
+            <Link href="/dashboard" className="flex items-center text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
               <span className="material-symbols-outlined">person</span>
             </Link>
           </motion.div>
 
           {/* Hamburger menu for mobile */}
           <div className="md:hidden">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
+            <button onClick={() => setIsMobileMenuOpen(true)} className="flex items-center text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
               <span className="material-symbols-outlined">menu</span>
             </button>
           </div>
@@ -113,6 +122,15 @@ const Header = () => {
                 <Link href="/dashboard/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-slate-600 text-lg font-medium hover:text-[#1193d4] transition-colors dark:text-gray-300 dark:hover:text-primary">
                   <span className="material-symbols-outlined">favorite</span>
                   <span>Wishlist</span>
+                </Link>
+                <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)} className="relative flex items-center gap-3 text-slate-600 text-lg font-medium hover:text-[#1193d4] transition-colors dark:text-gray-300 dark:hover:text-primary">
+                  <span className="material-symbols-outlined">shopping_cart</span>
+                  <span>Cart</span>
+                  {cartCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center rounded-full text-xs text-white bg-gradient-to-r from-blue-600 to-cyan-400 p-1 leading-none">
+                      {cartCount}
+                    </span>
+                  )}
                 </Link>
               </div>
             </div>

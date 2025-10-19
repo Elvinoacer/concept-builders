@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import { useState } from 'react';
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 
 export default function PaymentForm({ designId }: { designId: string }) {
     const [error, setError] = useState(null);
@@ -36,20 +36,26 @@ export default function PaymentForm({ designId }: { designId: string }) {
         }
     };
 
-    const initialOptions = {
-        "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
-        currency: "USD",
-        intent: "capture",
-        components: "buttons",
-      };
+    const onError = (err) => {
+        setError(err.message);
+    };
+
+    const [{ isPending }] = usePayPalScriptReducer();
+
+    if (isPending) {
+        return (
+            <div className="flex justify-center items-center p-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <span className="ml-2">Loading PayPal...</span>
+            </div>
+        );
+    }
 
     return (
         <div>
             <h1>Pay $100 Securely</h1>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            <PayPalScriptProvider options={initialOptions}>
-                <PayPalButtons createOrder={createOrder} onApprove={onApprove} />
-            </PayPalScriptProvider>
+            <PayPalButtons createOrder={createOrder} onApprove={onApprove} onError={onError} />
         </div>
     );
 }

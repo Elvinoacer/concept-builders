@@ -5,7 +5,7 @@ import Image from 'next/image';
 const ItemsPurchased = ({ items }) => {
   return (
     <div>
-      <h3 className="text-gray-900 dark:text-white text-base md:text-lg font-bold leading-tight tracking-tight mb-2 md:mb-4">Items Purchased</h3>
+      <h3 className="text-gray-900 dark:text-white text-base md:text-lg font-bold leading-tight tracking-tight mb-2 md:mb-4">Purchased Designs</h3>
       {items.map((item) => (
         <div key={item.id} className="flex items-center gap-4 bg-white dark:bg-gray-700 p-3 md:p-4 rounded-lg border border-gray-200 dark:border-gray-600">
           <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-md size-12 md:size-16 shrink-0">

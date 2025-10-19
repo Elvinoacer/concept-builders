@@ -5,12 +5,14 @@ import "./globals.css";
 import Script from "next/script";
 
 import { ThemeProvider } from "@/components/theme-provider";
-import PayPalProviderWrapper from "@/components/PayPalProviderWrapper";
+
 import Providers from "./Providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  // TODO: Add a production URL here for metadata.
+  metadataBase: new URL("http://localhost:3000"),
   title: "Concept Builders",
   description: "Build Your Dream Home",
   icons: {
@@ -55,10 +57,8 @@ export const metadata: Metadata = {
           enableSystem
           disableTransitionOnChange
         >
-          <PayPalProviderWrapper>
-            <Providers>{children}</Providers>
-            <Toaster />
-          </PayPalProviderWrapper>
+          <Providers>{children}</Providers>
+                    <Toaster />
         </ThemeProvider>
       </body>
     </html>

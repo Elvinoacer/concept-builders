@@ -1,7 +1,8 @@
 
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 const API_URL = 'https://api.exchangerate-api.com/v4/latest/';
 
@@ -24,7 +25,9 @@ const currencyOptions: CurrencyOption[] = [
 ];
 
 const CurrencyConverter = () => {
-  const [amount, setAmount] = useState<number>(1);
+  const searchParams = useSearchParams();
+  const initialAmount = searchParams.get('amount');
+  const [amount, setAmount] = useState<number>(initialAmount ? parseFloat(initialAmount) : 1);
   const [fromCurrency, setFromCurrency] = useState<string>("USD");
   const [toCurrency, setToCurrency] = useState<string>("EUR");
   const [exchangeRates, setExchangeRates] = useState<any>(null);

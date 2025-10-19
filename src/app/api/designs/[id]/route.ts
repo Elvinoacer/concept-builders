@@ -11,6 +11,11 @@ export async function GET(
       where: { id: params.id },
       include: {
         files: true,
+        reviews: {
+          include: {
+            author: true,
+          },
+        },
       },
     });
 
@@ -47,6 +52,7 @@ export async function PUT(
       planDetails,
       buildingCostEstimates,
       calculatorOptions,
+      faq,
       files,
     } = body;
 
@@ -65,6 +71,7 @@ export async function PUT(
         planDetails,
         buildingCostEstimates,
         calculatorOptions,
+        faq,
         files: {
           deleteMany: {},
           create: files.map((file: { url: string; type: string; originalFileName: string }) => ({
@@ -72,6 +79,14 @@ export async function PUT(
             type: file.type,
             originalFileName: file.originalFileName,
           })),
+        },
+      },
+      include: {
+        files: true,
+        reviews: {
+          include: {
+            author: true,
+          },
         },
       },
     });
@@ -91,7 +106,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const designId = params.id;
+    const resolvedParams = await params;
+    const designId = resolvedParams.id;
 
     // 1. Fetch the design and its files
     const design = await prisma.design.findUnique({
@@ -105,15 +121,14 @@ export async function DELETE(
 
     // 2. Extract keys for DO Spaces deletion
     const fileKeys = design.files.map(file => {
-      const urlParts = file.url.split('/');
-      // Assuming the URL format is like https://your-bucket.sfo3.digitaloceanspaces.com/key
-      // The key should be the part after the domain, e.g., 'folder/filename.ext'
-      // This might need adjustment based on the exact URL structure
-      // For DigitalOcean Spaces, the key is usually everything after the bucket name in the path
-      // Example: https://<bucket-name>.<region>.digitaloceanspaces.com/<key>
-      // So, if urlParts[2] is the domain, urlParts[3] would be the start of the key
-      return urlParts.slice(3).join('/');
-    }).filter(key => key); // Filter out any empty keys
+      try {
+        const url = new URL(file.url);
+        return url.pathname.substring(1); // Remove leading '/'
+      } catch (error) {
+        console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
+        return null;
+      }
+    }).filter((key): key is string => key !== null);
 
     // 3. Delete files from DigitalOcean Spaces
     if (fileKeys.length > 0) {

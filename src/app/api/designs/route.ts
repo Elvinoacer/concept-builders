@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(request.nextUrl.searchParams.get("limit") || "10");
     const skip = (page - 1) * limit;
 
-    const where = search
+    const categoryId = request.nextUrl.searchParams.get("categoryId");
+
+    const where: any = search
       ? {
           name: {
             contains: search,
@@ -17,10 +19,17 @@ export async function GET(request: NextRequest) {
         }
       : {};
 
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
     const designs = await prisma.design.findMany({
       where,
       skip,
       take: limit,
+      include: {
+        files: true,
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -77,11 +86,13 @@ export async function POST(request: Request) {
       buildingCostEstimates,
       calculatorOptions,
       files: {
-        create: files.map((file: { url: string; type: string; originalFileName: string }) => ({
-          url: file.url,
-          type: file.type,
-          originalFileName: file.originalFileName,
-        })),
+        create: files.map(
+          (file: { url: string; type: string; originalFileName: string }) => ({
+            url: file.url,
+            type: file.type,
+            originalFileName: file.originalFileName,
+          })
+        ),
       },
     };
 

@@ -1,0 +1,452 @@
+Intasend Payment Code Example
+
+// app/payments/page.tsx
+import StkPushForm from "@/components/StkPushForm";
+import CheckoutForm from "@/components/CheckoutForm";
+
+
+export default function PaymentsPage() {
+ return (
+   <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+     <div className="w-full max-w-6xl mx-auto">
+       <h1 className="text-3xl font-bold text-center text-gray-800 mb-10">
+         Intasend Payment Options
+       </h1>
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+         <StkPushForm />
+         <CheckoutForm />
+       </div>
+     </div>
+   </div>
+ );
+}
+
+
+
+
+
+// components/StkPushForm.tsx
+"use client";
+
+
+import { useState } from "react";
+import { usePaymentStore } from "@/stores/intasend/paymentStore";
+
+
+export default function StkPushForm() {
+ const [formData, setFormData] = useState({
+   first_name: "",
+   last_name: "",
+   email: "",
+   amount: "",
+   phone_number: "",
+   api_ref: "test",
+ });
+
+
+ const { stkState, initiateStkPush } = usePaymentStore();
+ const { loading, error, paymentData } = stkState;
+
+
+ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   setFormData({ ...formData, [e.target.name]: e.target.value });
+ };
+
+
+ const handleSubmit = async (e: React.FormEvent) => {
+   e.preventDefault();
+   await initiateStkPush({ ...formData, amount: parseFloat(formData.amount) });
+ };
+
+
+ return (
+   <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+     <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+       Pay with M-Pesa STK Push
+     </h2>
+     <form onSubmit={handleSubmit} className="space-y-4">
+       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+         <input
+           name="first_name"
+           placeholder="First Name"
+           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 text-gray-900"
+           value={formData.first_name}
+           onChange={handleChange}
+           required
+         />
+         <input
+           name="last_name"
+           placeholder="Last Name"
+           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 text-gray-900"
+           value={formData.last_name}
+           onChange={handleChange}
+           required
+         />
+       </div>
+       <input
+         name="email"
+         type="email"
+         placeholder="Email"
+         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 text-gray-900"
+         value={formData.email}
+         onChange={handleChange}
+         required
+       />
+       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+         <input
+           name="amount"
+           type="number"
+           placeholder="Amount (KES)"
+           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 text-gray-900"
+           value={formData.amount}
+           onChange={handleChange}
+           required
+         />
+         <input
+           name="phone_number"
+           placeholder="Phone Number (e.g., 2547...)"
+           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 text-gray-900"
+           value={formData.phone_number}
+           onChange={handleChange}
+           required
+         />
+       </div>
+       <button
+         type="submit"
+         disabled={loading}
+         className="w-full bg-green-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+       >
+         {loading ? "Processing..." : "Pay with M-Pesa"}
+       </button>
+     </form>
+     {error && <p className="mt-4 text-red-600 bg-red-100 p-3 rounded-lg text-center">{error}</p>}
+     {paymentData && (
+       <div className="mt-4 bg-green-100 p-4 rounded-lg text-center">
+         <p className="font-semibold text-green-800">
+           STK Push initiated successfully!
+         </p>
+         <p className="text-green-700">
+           Please check your phone to complete the payment.
+         </p>
+       </div>
+     )}
+   </div>
+ );
+}
+
+
+
+// components/CheckoutForm.tsx
+"use client";
+
+
+import { useState } from "react";
+import { usePaymentStore } from "@/stores/intasend/paymentStore";
+
+
+export default function CheckoutForm() {
+ const [amount, setAmount] = useState("");
+
+
+ const { checkoutState, generateCheckoutLink } = usePaymentStore();
+ const { loading, error, checkoutUrl } = checkoutState;
+
+
+ const handleSubmit = async (e: React.FormEvent) => {
+   e.preventDefault();
+   await generateCheckoutLink({
+     amount: parseFloat(amount),
+     currency: "KES",
+     // The first_name, last_name, and email can be collected on the IntaSend-hosted page
+   });
+ };
+
+
+ return (
+   <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+     <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+       Generate Card/Bank Checkout Link
+     </h2>
+     <form onSubmit={handleSubmit} className="space-y-4">
+       <input
+         name="amount"
+         type="number"
+         placeholder="Amount (KES)"
+         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 text-gray-900"
+         value={amount}
+         onChange={(e) => setAmount(e.target.value)}
+         required
+       />
+       <button
+         type="submit"
+         disabled={loading || !amount}
+         className="w-full bg-blue-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+       >
+         {loading ? "Generating..." : "Generate Payment Link"}
+       </button>
+     </form>
+     {error && <p className="mt-4 text-red-600 bg-red-100 p-3 rounded-lg text-center">{error}</p>}
+     {checkoutUrl && (
+       <div className="mt-4 text-center">
+         <a
+           href={checkoutUrl}
+           target="_blank"
+           rel="noopener noreferrer"
+           className="inline-block bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition-colors"
+         >
+           Proceed to Checkout
+         </a>
+       </div>
+     )}
+   </div>
+ );
+}
+
+
+
+
+
+
+// src/stores/intasend/paymentStore.ts
+import { create } from "zustand";
+
+
+type ActionState = {
+ loading: boolean;
+ error: string | null;
+};
+
+
+interface PaymentState {
+ stkState: ActionState & { paymentData: any | null };
+ checkoutState: ActionState & { checkoutUrl: string | null };
+ initiateStkPush: (data: any) => Promise<void>;
+ generateCheckoutLink: (data: any) => Promise<void>;
+ reset: () => void;
+}
+
+
+export const usePaymentStore = create<PaymentState>((set) => ({
+ stkState: {
+   loading: false,
+   error: null,
+   paymentData: null,
+ },
+ checkoutState: {
+   loading: false,
+   error: null,
+   checkoutUrl: null,
+ },
+
+
+ async initiateStkPush(data) {
+   set((state) => ({
+     stkState: { ...state.stkState, loading: true, error: null },
+   }));
+   try {
+     const response = await fetch("/api/intasend/stk-push", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify(data),
+     });
+     const result = await response.json();
+     if (!response.ok) {
+       throw new Error(result.error || "Failed to initiate STK Push");
+     }
+     set((state) => ({
+       stkState: { ...state.stkState, paymentData: result },
+     }));
+   } catch (err) {
+     set((state) => ({
+       stkState: { ...state.stkState, error: (err as Error).message },
+     }));
+   } finally {
+     set((state) => ({ stkState: { ...state.stkState, loading: false } }));
+   }
+ },
+
+
+ async generateCheckoutLink(data) {
+   set((state) => ({
+     checkoutState: { ...state.checkoutState, loading: true, error: null },
+   }));
+   try {
+     const response = await fetch("/api/intasend/checkout", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify(data),
+     });
+     const result = await response.json();
+     if (!response.ok) {
+       throw new Error(result.error || "Failed to generate checkout link");
+     }
+     set((state) => ({
+       checkoutState: { ...state.checkoutState, checkoutUrl: result.url },
+     }));
+   } catch (err) {
+     set((state) => ({
+       checkoutState: {
+         ...state.checkoutState,
+         error: (err as Error).message,
+       },
+     }));
+   } finally {
+     set((state) => ({
+       checkoutState: { ...state.checkoutState, loading: false },
+     }));
+   }
+ },
+
+
+ reset: () =>
+   set({
+     stkState: { loading: false, error: null, paymentData: null },
+     checkoutState: { loading: false, error: null, checkoutUrl: null },
+   }),
+}));
+
+
+
+
+
+
+
+
+
+
+// app/api/intasend/checkout/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import IntaSend from "intasend-node";
+
+
+export async function POST(req: NextRequest) {
+ try {
+   const body = await req.json();
+   // We only expect amount and currency from the client for a generic checkout link
+   const { amount, currency = "KES" } = body;
+
+
+   if (!amount || amount <= 0) {
+     return NextResponse.json(
+       { error: "A valid amount is required" },
+       { status: 400 }
+     );
+   }
+
+
+   if (
+     !process.env.INTASEND_PUBLISHABLE_KEY ||
+     !process.env.INTASEND_SECRET_KEY
+   ) {
+     return NextResponse.json(
+       { error: "IntaSend keys not configured" },
+       { status: 500 }
+     );
+   }
+
+
+   const intasend = new IntaSend(
+     process.env.INTASEND_PUBLISHABLE_KEY,
+     process.env.INTASEND_SECRET_KEY,
+     process.env.NODE_ENV !== "production" // Test mode in non-prod
+   );
+
+
+   // The host and redirect_url should preferably be set in your environment variables
+   const host = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+
+   const collection = intasend.collection();
+   const resp = await collection.charge({
+     first_name: "Elvin", // Placeholder
+     last_name: "Omondi", // Placeholder
+     email: "omondielvin@gmail.com", // Placeholder
+     host: host,
+     amount: Number(amount),
+     currency,
+     redirect_url: `${host}/payment-success`, // Crucial parameter
+     api_ref: `checkout-${Date.now()}`, // Simple unique reference
+   });
+
+
+   return NextResponse.json(resp);
+ } catch (error) {
+   console.error("Checkout error:", error);
+   return NextResponse.json(
+     { error: "Failed to generate checkout link" },
+     { status: 500 }
+   );
+ }
+}
+
+
+
+
+
+// app/api/intasend/stk-push/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import IntaSend from "intasend-node";
+
+
+export async function POST(req: NextRequest) {
+ try {
+   const body = await req.json();
+   const { first_name, last_name, email, amount, phone_number, api_ref } =
+     body;
+
+
+   if (
+     !process.env.INTASEND_PUBLISHABLE_KEY ||
+     !process.env.INTASEND_SECRET_KEY
+   ) {
+     return NextResponse.json(
+       { error: "IntaSend keys not configured" },
+       { status: 500 }
+     );
+   }
+
+
+   const intasend = new IntaSend(
+     process.env.INTASEND_PUBLISHABLE_KEY,
+     process.env.INTASEND_SECRET_KEY,
+     // process.env.NODE_ENV !== "production" // Test mode in non-prod
+     false
+   );
+
+
+   // The host and callback_url should preferably be set in your environment variables
+   const host = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+
+   const collection = intasend.collection();
+   const resp = await collection.mpesaStkPush({
+     first_name,
+     email,
+     amount: Number(amount),
+     phone_number,
+     api_ref: `stk-${Date.now()}`,
+     callback_url: `${host}/api/intasend-webhook`,
+   });
+
+
+   return NextResponse.json(resp);
+ } catch (error: any) {
+   console.error(
+     "IntaSend STK Push Error:",
+     error.response?.data || error.message || error
+   );
+   return NextResponse.json(
+     {
+       error:
+         error.response?.data?.detail || "Failed to initiate M-Pesa STK Push",
+     },
+     { status: error.response?.status || 500 }
+   );
+ }
+}
+
+
+
+
+
+Important note: you must have a webhook for payments verifications and updating the database

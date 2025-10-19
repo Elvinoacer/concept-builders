@@ -65,7 +65,7 @@ export const authOptions: AuthOptions = {
           prompt: "consent",
           access_type: "offline",
           response_type: "code",
-          scope: "openid email profile https://www.googleapis.com/auth/documents.readonly",
+          scope: "openid email profile",
         },
       },
     }),
@@ -78,14 +78,14 @@ export const authOptions: AuthOptions = {
     strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
-  callbacks: {
-    async signIn({ user, account, profile, isNewUser }) {
+  events: {
+    async signIn({ user, isNewUser }) {
       const ipAddress = globalThis.tempSignInIp || 'Unknown';
       delete globalThis.tempSignInIp; // Clean up
 
       await prisma.loginHistory.create({
         data: {
-          userId: user.id,
+          userId: user.id!,
           ipAddress: ipAddress,
         },
       });
@@ -95,11 +95,15 @@ export const authOptions: AuthOptions = {
         const referral = cookieStore.get('referral')?.value;
         if (referral) {
           await prisma.user.update({
-            where: { id: user.id },
+            where: { id: user.id! },
             data: { referralSource: referral },
           });
         }
       }
+    },
+  },
+  callbacks: {
+    async signIn({ user, account, profile, isNewUser }) {
       return true;
     },
     async signOut({ token }) {

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -35,8 +35,9 @@ const AdminCategoriesPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
-
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
+    {}
+  );
 
   const fetchCategories = async () => {
     setIsLoading(true);
@@ -65,11 +66,12 @@ const AdminCategoriesPage = () => {
 
   const handleDeleteCategory = async (categoryId: string) => {
     toast.warning("Are you sure you want to delete this category?", {
-      description: "All designs and related data within this category will be permanently deleted.",
+      description:
+        "All designs and related data within this category will be permanently deleted.",
       action: {
         label: "Yes, Delete",
         onClick: async () => {
-          setLoadingStates(prev => ({ ...prev, [categoryId]: true }));
+          setLoadingStates((prev) => ({ ...prev, [categoryId]: true }));
           const response = await fetch(`/api/admin/categories/${categoryId}`, {
             method: "DELETE",
           });
@@ -81,7 +83,7 @@ const AdminCategoriesPage = () => {
             console.error("Error deleting category:", await response.text());
             toast.error("Error deleting category.");
           }
-          setLoadingStates(prev => ({ ...prev, [categoryId]: false }));
+          setLoadingStates((prev) => ({ ...prev, [categoryId]: false }));
         },
       },
       cancel: {
@@ -113,7 +115,9 @@ const AdminCategoriesPage = () => {
           <CgSpinner className="animate-spin text-primary" size={32} />
         </div>
       ) : categories.length === 0 ? (
-        <div className="text-center text-muted-foreground">No categories found.</div>
+        <div className="text-center text-muted-foreground">
+          No categories found.
+        </div>
       ) : (
         <Table>
           <TableHeader>
@@ -128,27 +132,47 @@ const AdminCategoriesPage = () => {
             {categories.map((category: any) => (
               <TableRow key={category.id}>
                 <TableCell>
-                    <Image
-                        src={category.designs?.[0]?.files?.[0]?.url || category.image || '/images/placeholder.png'}
-                        alt={category.name}
-                        width={50}
-                        height={50}
-                        className="rounded-md"
-                    />
+                  <Image
+                    src={
+                      category.designs?.[0]?.files?.[0]?.url ||
+                      category.image ||
+                      "/images/category-placeholder.png"
+                    }
+                    alt={category.name}
+                    width={50}
+                    height={50}
+                    className="rounded-md"
+                  />
                 </TableCell>
                 <TableCell>
                   <Link href={`/admin/categories/${category.id}`}>
-                    <span className="cursor-pointer hover:underline">{category.name}</span>
+                    <span className="cursor-pointer hover:underline">
+                      {category.name}
+                    </span>
                   </Link>
                 </TableCell>
                 <TableCell>{category._count.designs}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleEditCategory(category)} disabled={loadingStates[category.id]}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEditCategory(category)}
+                      disabled={loadingStates[category.id]}
+                    >
                       <FiEdit />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteCategory(category.id)} disabled={loadingStates[category.id]}>
-                      {loadingStates[category.id] ? <CgSpinner className="animate-spin" /> : <FiTrash />}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteCategory(category.id)}
+                      disabled={loadingStates[category.id]}
+                    >
+                      {loadingStates[category.id] ? (
+                        <CgSpinner className="animate-spin" />
+                      ) : (
+                        <FiTrash />
+                      )}
                     </Button>
                   </div>
                 </TableCell>
@@ -161,7 +185,9 @@ const AdminCategoriesPage = () => {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} />
+              <PaginationPrevious
+                onClick={() => handlePageChange(currentPage - 1)}
+              />
             </PaginationItem>
             {[...Array(totalPages)].map((_, i) => (
               <PaginationItem key={i}>
@@ -174,7 +200,9 @@ const AdminCategoriesPage = () => {
               </PaginationItem>
             ))}
             <PaginationItem>
-              <PaginationNext onClick={() => handlePageChange(currentPage + 1)} />
+              <PaginationNext
+                onClick={() => handlePageChange(currentPage + 1)}
+              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

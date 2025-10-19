@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { designTabs } from "@/lib/dummydata";
+import { designsPageData } from "@/lib/dummydata/designsPage";
 
 interface DesignsTabsProps {
   activeTab: string;
@@ -17,7 +17,7 @@ const DesignsTabs = ({ activeTab, setActiveTab }: DesignsTabsProps) => {
       className="border-b border-border mb-4 md:mb-6"
     >
       <nav className="flex gap-4 md:gap-8 overflow-x-auto whitespace-nowrap">
-        {designTabs.map((tab) => (
+        {designsPageData.designTabs.map((tab) => (
           <a
             key={tab.id}
             href="#"

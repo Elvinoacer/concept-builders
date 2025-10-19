@@ -6,11 +6,8 @@ export const designsPageData = {
   sortByNameOption: "Sort by Name",
   sortByPriceAscOption: "Sort by Price (Low to High)",
   sortByPriceDescOption: "Sort by Price (High to Low)",
-  designTabs: {
-    detailedSpecificationsTitle: "Detailed Specifications",
-    buildingCostEstimatesTitle: "Building Cost Estimates",
-    faqTitle: "Frequently Asked Questions",
-    customerReviewsTitle: "Customer Reviews",
-    outOfFiveText: "out of 5",
-  },
+  designTabs: [
+    { id: "all", label: "All Designs" },
+    { id: "folders", label: "Folders" },
+  ],
 };

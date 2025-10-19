@@ -170,7 +170,7 @@ export default function DesignFileUpload({ design, onUploadComplete }) {
     const theme = themes[fileType];
 
     // Filter existing files for this fileType and only show the latest version
-    const latestExistingFiles = design.files.filter(
+    const latestExistingFiles = (design?.files || []).filter(
       (file) => file.type === fileType && (file.isLatest === true || file.isLatest === null || file.isLatest === undefined) && file.fileIdentifier && file.originalFileName
     );
 

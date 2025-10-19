@@ -12,6 +12,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -35,6 +36,28 @@ model User {
   referralSource String?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  cart          Cart?
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String     @unique
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  cartId    String
+  design    Design   @relation(fields: [designId], references: [id])
+  designId  String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  @@unique([cartId, designId])
 }
 
 model LoginHistory {
@@ -117,14 +140,16 @@ model Design {
   folder      Folder?  @relation(fields: [folderId], references: [id])
   folderId    String?
 
-  buildingCostEstimates Json?
-  calculatorOptions     Json?
+  buildingCostEstimates Json[]
+  calculatorOptions     Json[]
+  faq                   Json[]
 
   wishlistedBy User[]
   category     Category? @relation(fields: [categoryId], references: [id])
   categoryId   String?
   reviews      Review[]
   orderItems   OrderItem[]
+  cartItems    CartItem[]
   views        Int      @default(0)
 }
 
@@ -132,7 +157,7 @@ model File {
   id               String   @id @default(cuid())
   url              String
   type             FileType
-  design           Design   @relation(fields: [designId], references: [id])
+  design           Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
   designId         String
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -188,6 +213,8 @@ model Order {
   items     OrderItem[]
   status    OrderStatus @default(PENDING)
   amount    Float
+  paymentGateway String?
+  paymentId      String? @unique
 }
 
 model OrderItem {

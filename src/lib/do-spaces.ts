@@ -1,8 +1,8 @@
 import { S3Client, DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 
 const s3Client = new S3Client({
-  endpoint: `https://fra1.digitaloceanspaces.com`,
-  region: "fra1",
+  endpoint: `https://sfo3.digitaloceanspaces.com`,
+  region: "sfo3",
   credentials: {
     accessKeyId: process.env.DO_SPACES_ACCESS_KEY!,
     secretAccessKey: process.env.DO_SPACES_SECRET_KEY!,

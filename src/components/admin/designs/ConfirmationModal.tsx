@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { CgSpinner } from "react-icons/cg";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -8,9 +9,10 @@ interface ConfirmationModalProps {
   onConfirm: () => void;
   title: string;
   message: string;
+  isLoading?: boolean;
 }
 
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }: ConfirmationModalProps) => {
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, isLoading = false }: ConfirmationModalProps) => {
   if (!isOpen) {
     return null;
   }
@@ -35,8 +37,11 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }: Confi
           <p className="mt-2 text-sm text-muted-foreground">{message}</p>
         </div>
         <div className="p-6 bg-muted flex justify-end gap-4 rounded-b-lg flex-shrink-0">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-muted-foreground rounded-md hover:bg-border">Cancel</button>
-          <button onClick={onConfirm} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">Confirm</button>
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-muted-foreground rounded-md hover:bg-border" disabled={isLoading}>Cancel</button>
+          <button onClick={onConfirm} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 flex items-center" disabled={isLoading}>
+            {isLoading && <CgSpinner className="animate-spin mr-2" />}
+            {isLoading ? "Deleting..." : "Confirm"}
+          </button>
         </div>
       </motion.div>
     </motion.div>

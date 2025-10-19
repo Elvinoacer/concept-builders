@@ -1,42 +1,72 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { designDetailPageData } from "@/lib/dummydata/designDetailPage";
+import { useEffect, useState } from 'react';
+import { Design } from '@/generated/prisma';
+import Link from 'next/link';
+import Image from 'next/image';
 
-const RelatedDesigns = ({ relatedDesigns }) => {
+const RelatedDesigns = ({ categoryId }: { categoryId: string | null }) => {
+  const [relatedDesigns, setRelatedDesigns] = useState<Design[]>([]);
+  const [currentImageIndexes, setCurrentImageIndexes] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchRelatedDesigns = async () => {
+      if (!categoryId) return;
+      try {
+        const response = await fetch(
+          `/api/designs?categoryId=${categoryId}&limit=4`
+        );
+        if (!response.ok) {
+          throw new Error('Failed to fetch related designs');
+        }
+        const data = await response.json();
+        setRelatedDesigns(data.designs);
+        setCurrentImageIndexes(new Array(data.designs.length).fill(0));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchRelatedDesigns();
+  }, [categoryId]);
+
   return (
-    <section className="mt-8 md:mt-16 isolate">
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center tracking-tight dark:text-white">{designDetailPageData.relatedDesigns.title}</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 [perspective:1000px]">
-        {relatedDesigns?.map((design, index) => (
-          <motion.div
-            key={index}
-            className="showcase-item group"
-            whileHover={{ rotateY: 10, rotateX: 5, scale: 1.05 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="relative">
-              {design.imageUrl && (
-                <div
-                  className="w-full bg-center bg-no-repeat aspect-video sm:aspect-[3/4] bg-cover rounded-lg shadow-2xl overflow-hidden showcase-image"
-                  style={{ backgroundImage: `url(${design.imageUrl})` }}
-                ></div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <motion.div
-                className="absolute bottom-0 left-0 p-6 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all duration-500"
-                initial={{ y: 20 }}
-                whileHover={{ y: 0 }}
-              >
-                <h3 className="text-xl font-bold text-white">{design.name}</h3>
-                <p className="text-sm text-gray-200 mt-1">{design.description}</p>
-                <p className="text-lg font-bold text-blue-400 mt-2">{design.price}</p>
-              </motion.div>
-            </div>
-          </motion.div>
-        ))}
+    <div className="mt-16">
+      <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text">Related Designs</h2>
+      <div className="flex flex-wrap justify-center gap-8">
+        {relatedDesigns.map((design) => {
+          const imageUrls = design.files?.filter(
+            (file) => file.type === 'IMAGE'
+          ).map(file => file.url);
+          return (
+            <Link href={`/designs/${design.id}`} key={design.id}>
+              <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white dark:bg-gray-800">
+                {imageUrls && imageUrls.length > 0 && (
+                  <Image
+                    src={imageUrls[0]}
+                    alt={design.name}
+                    width={400}
+                    height={300}
+                    className="w-full"
+                  />
+                )}
+                <div className="px-6 py-4 min-h-[10rem]">
+                  <div className="font-bold text-xl mb-2 dark:text-white">{design.name}</div>
+                  <p className="text-gray-700 text-base dark:text-gray-300 h-20 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:3] [-webkit-box-orient:vertical]">
+                    {design.description}
+                  </p>
+                </div>
+                <div className="px-6 pt-4 pb-2">
+                  <span className="inline-block rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 bg-gradient-to-r from-blue-600 to-cyan-400 text-white dark:text-white">
+                    ${design.basePrice}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
-    </section>
+    </div>
   );
 };
 

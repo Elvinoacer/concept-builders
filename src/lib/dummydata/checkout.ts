@@ -1,24 +1,6 @@
 export const checkoutForm = {
     title: "Checkout",
-    shippingInformation: {
-        title: "Shipping Information",
-        address: {
-            label: "Address",
-            placeholder: "123 Maple Street"
-        },
-        city: {
-            label: "City",
-            placeholder: "Anytown"
-        },
-        state: {
-            label: "State",
-            placeholder: "CA"
-        },
-        zip: {
-            label: "Zip Code",
-            placeholder: "90210"
-        }
-    },
+    
     paymentMethod: {
         title: "Payment Method",
         creditCard: "Credit Card",

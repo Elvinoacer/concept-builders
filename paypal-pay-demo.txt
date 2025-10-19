@@ -1,0 +1,346 @@
+"use client";
+
+
+import { useCartStore } from "@/stores/paypal/cartStore";
+import PayPalButton from "@/components/PayPalButton";
+
+
+export default function Checkout() {
+ const items = useCartStore((state) => state.items);
+ const total = useCartStore((state) => state.getTotal());
+ const paymentStatus = useCartStore((state) => state.paymentStatus);
+ const errorMessage = useCartStore((state) => state.errorMessage);
+
+
+ // For demo, add some items on mount or via buttons
+ // In real app, add via addItem
+
+
+ return (
+   <div className="container mx-auto p-4">
+     <h1 className="text-2xl font-bold mb-4">Checkout</h1>
+     <ul>
+       {items.map((item) => (
+         <li key={item.id}>
+           {item.name} - ${item.price} x {item.quantity}
+         </li>
+       ))}
+     </ul>
+     <p>Total: ${total.toFixed(2)}</p>
+     <PayPalButton />
+     {paymentStatus === "processing" && <p>Processing...</p>}
+     {paymentStatus === "success" && <p>Payment successful!</p>}
+     {paymentStatus === "error" && <p>Error: {errorMessage}</p>}
+   </div>
+ );
+}
+
+
+
+
+
+// src/components/PayPalButton.tsx
+"use client";
+
+
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { useCartStore } from "@/stores/paypal/cartStore";
+import { useEffect } from "react";
+
+
+export default function PayPalButton() {
+ const total = useCartStore((state) => state.getTotal());
+ const setPaymentStatus = useCartStore((state) => state.setPaymentStatus);
+ const setErrorMessage = useCartStore((state) => state.setErrorMessage);
+
+
+ useEffect(() => {
+   if (!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID) {
+     console.error("PayPal Client ID is missing in environment variables");
+     setErrorMessage("PayPal configuration error: Client ID not found");
+     setPaymentStatus("error");
+   } else {
+     console.log(
+       "PayPal Client ID:",
+       process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
+     );
+   }
+ }, []);
+
+
+ const createOrder = async () => {
+   try {
+     const response = await fetch("/api/paypal/create", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ amount: total }),
+     });
+     const data = await response.json();
+     if (!response.ok) {
+       throw new Error(data.error || "Failed to create order");
+     }
+     if (!data.orderID) {
+       throw new Error("No order ID returned from server");
+     }
+     return data.orderID;
+   } catch (error: any) {
+     console.error("Create Order Error:", error.message);
+     setErrorMessage(error.message || "Failed to create order");
+     setPaymentStatus("error");
+     return undefined; // Explicitly return undefined instead of null
+   }
+ };
+
+
+ const onApprove = async (data: { orderID: string }) => {
+   setPaymentStatus("processing");
+   try {
+     const response = await fetch("/api/paypal/capture", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ orderID: data.orderID }),
+     });
+     const result = await response.json();
+     if (!response.ok)
+       throw new Error(result.error || "Failed to capture order");
+     setPaymentStatus("success");
+   } catch (error: any) {
+     console.error("Capture Order Error:", error.message);
+     setPaymentStatus("error");
+     setErrorMessage(error.message || "Payment capture failed");
+   }
+ };
+
+
+ const onError = (err: any) => {
+   console.error("PayPal SDK Error:", err);
+   setPaymentStatus("error");
+   setErrorMessage("An error occurred with PayPal: " + err.message);
+ };
+
+
+ if (!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID) {
+   return <div>Error: PayPal Client ID is not configured.</div>;
+ }
+
+
+ return (
+   <PayPalScriptProvider
+     options={{
+       clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+       currency: "USD",
+       intent: "capture",
+     }}
+   >
+     <PayPalButtons
+       style={{ layout: "vertical" }}
+       createOrder={createOrder}
+       onApprove={onApprove}
+       onError={onError}
+       disabled={total <= 0} // Disable button if total is 0
+     />
+   </PayPalScriptProvider>
+ );
+}
+
+
+
+
+
+
+// src/stores/paypal/cartStore.ts
+import { create } from "zustand";
+
+
+interface CartItem {
+ id: string;
+ name: string;
+ price: number;
+ quantity: number;
+}
+
+
+interface CartState {
+ items: CartItem[];
+ addItem: (item: CartItem) => void;
+ removeItem: (id: string) => void;
+ getTotal: () => number;
+ paymentStatus: "idle" | "processing" | "success" | "error";
+ setPaymentStatus: (status: CartState["paymentStatus"]) => void;
+ errorMessage: string;
+ setErrorMessage: (message: string) => void;
+}
+
+
+export const useCartStore = create<CartState>((set, get) => ({
+ items: [
+   {
+     id: "1",
+     name: "cardigan",
+     price: 50,
+     quantity: 2,
+   },
+ ],
+ addItem: (item) => set((state) => ({ items: [...state.items, item] })),
+ removeItem: (id) =>
+   set((state) => ({ items: state.items.filter((item) => item.id !== id) })),
+ getTotal: () => {
+   const total = get().items.reduce(
+     (sum, item) => sum + item.price * item.quantity,
+     0
+   );
+   console.log("Cart Total:", total); // Debug log
+   return total;
+ },
+ paymentStatus: "idle",
+ setPaymentStatus: (status) => set({ paymentStatus: status }),
+ errorMessage: "",
+ setErrorMessage: (message) => set({ errorMessage: message }),
+}));
+
+
+
+
+// src/lib/paypal.ts
+import * as paypal from "@paypal/checkout-server-sdk";
+
+
+function environment() {
+ return new paypal.core.LiveEnvironment(
+   process.env.PAYPAL_CLIENT_ID!,
+   process.env.PAYPAL_CLIENT_SECRET!
+ );
+}
+
+
+export function client() {
+ return new paypal.core.PayPalHttpClient(environment());
+}
+
+
+
+
+
+// src/app/api/paypal/capture/route.ts
+import { client } from "@/lib/paypal";
+import paypal from "@paypal/checkout-server-sdk";
+import { NextResponse } from "next/server";
+
+
+export async function POST(request: Request) {
+ const body = await request.json();
+ const { orderID } = body;
+
+
+ if (!orderID) {
+   return NextResponse.json(
+     { error: "Order ID is required" },
+     { status: 400 }
+   );
+ }
+
+
+ try {
+   const PaypalClient = client();
+   const req = new paypal.orders.OrdersCaptureRequest(orderID);
+   req.requestBody({});
+
+
+   const response = await PaypalClient.execute(req);
+
+
+   // Check if the capture was successful
+   if (response.result.status !== "COMPLETED") {
+     return NextResponse.json(
+       { error: "Failed to capture payment." },
+       { status: 500 }
+     );
+   }
+
+
+   // Here you can add logic to update your database, etc.
+   // e.g., save the transaction details, update order status to 'paid'
+
+
+   return NextResponse.json({
+     success: true,
+     details: {
+       id: response.result.id,
+       status: response.result.status,
+       payer: response.result.payer,
+     },
+   });
+ } catch (error) {
+   console.error(error);
+   return NextResponse.json(
+     { error: "Internal server error" },
+     { status: 500 }
+   );
+ }
+}
+
+
+
+
+// src/app/api/paypal/create/route.ts
+import { client } from "@/lib/paypal";
+import paypal from "@paypal/checkout-server-sdk";
+import { NextResponse } from "next/server";
+
+
+export async function POST(request: Request) {
+ const body = await request.json();
+ const { amount } = body;
+
+
+ if (!amount || isNaN(amount) || amount <= 0) {
+   return NextResponse.json(
+     { error: "Valid amount is required" },
+     { status: 400 }
+   );
+ }
+
+
+ try {
+   const PaypalClient = client();
+   const req = new paypal.orders.OrdersCreateRequest();
+   req.headers["Prefer"] = "return=representation";
+   req.requestBody({
+     intent: "CAPTURE",
+     purchase_units: [
+       {
+         amount: {
+           currency_code: "USD",
+           value: amount.toFixed(2),
+         },
+       },
+     ],
+   });
+
+
+   const response = await PaypalClient.execute(req);
+   console.log("PayPal API Response:", response); // Debug log
+   if (response.statusCode !== 201) {
+     return NextResponse.json(
+       {
+         error: `Failed to create order: ${
+           response.result?.message || "Unknown error"
+         }`,
+       },
+       { status: 500 }
+     );
+   }
+
+
+   return NextResponse.json({ orderID: response.result.id });
+ } catch (error: any) {
+   console.error("PayPal API Error:", error.message, error); // Enhanced error logging
+   return NextResponse.json(
+     { error: `Internal server error: ${error.message}` },
+     { status: 500 }
+   );
+ }
+}
+
+
+

@@ -1,15 +1,15 @@
 "use client";
 import React from "react";
-import ConfirmationHeader from "@/components/order-confirmation/ConfirmationHeader";
-import OrderSummary from "@/components/order-confirmation/OrderSummary";
-import ItemsPurchased from "@/components/order-confirmation/ItemsPurchased";
-import DeliveryDetails from "@/components/order-confirmation/DeliveryDetails";
-import ActionButtons from "@/components/order-confirmation/ActionButtons";
+import ConfirmationHeader from "@/components/purchase-confirmation/ConfirmationHeader";
+import PurchaseSummary from "@/components/purchase-confirmation/PurchaseSummary";
+import ItemsPurchased from "@/components/purchase-confirmation/ItemsPurchased";
+import DeliveryDetails from "@/components/purchase-confirmation/DeliveryDetails";
+import ActionButtons from "@/components/purchase-confirmation/ActionButtons";
 
-const OrderConfirmationPage = () => {
-  const order = {
-    orderNumber: "123456789",
-    orderDate: "July 26, 2024",
+const PurchaseConfirmationPage = () => {
+  const purchase = {
+    purchaseNumber: "123456789",
+    purchaseDate: "July 26, 2024",
     total: 2499.0,
     items: [
       {
@@ -19,11 +19,6 @@ const OrderConfirmationPage = () => {
         image: "/images/banner-1.png",
       },
     ],
-    delivery: {
-      name: "Sophia Carter",
-      email: "sophia.carter@email.com",
-      address: "123 Oak Street, Anytown, CA 91234",
-    },
   };
 
   return (
@@ -34,19 +29,16 @@ const OrderConfirmationPage = () => {
       <div className="layout-container flex h-full grow flex-col">
         <main className="flex flex-1 justify-center py-8 md:py-12 px-4 bg-gray-50 dark:bg-gray-900">
           <div className="layout-content-container flex flex-col w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-            <ConfirmationHeader orderNumber={order.orderNumber} />
+            <ConfirmationHeader purchaseNumber={purchase.purchaseNumber} />
             <div className="px-8 md:px-12 py-6 border-t border-gray-200 dark:border-gray-700">
-              <OrderSummary
-                orderDate={order.orderDate}
-                total={order.total}
-                orderNumber={order.orderNumber}
+              <PurchaseSummary
+                purchaseDate={purchase.purchaseDate}
+                total={purchase.total}
+                purchaseNumber={purchase.purchaseNumber}
               />
             </div>
             <div className="px-8 md:px-12 py-6 border-t border-gray-200 dark:border-gray-700">
-              <ItemsPurchased items={order.items} />
-            </div>
-            <div className="px-8 md:px-12 py-6 border-t border-gray-200 dark:border-gray-700">
-              <DeliveryDetails delivery={order.delivery} />
+              <ItemsPurchased items={purchase.items} />
             </div>
             <div className="p-8 md:p-12 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 rounded-b-lg">
               <ActionButtons />
@@ -58,4 +50,4 @@ const OrderConfirmationPage = () => {
   );
 };
 
-export default OrderConfirmationPage;
+export default PurchaseConfirmationPage;

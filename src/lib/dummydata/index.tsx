@@ -116,19 +116,9 @@ export const costBreakdown = {
   ],
 };
 
-export const designDetailsTabs = [
-  { id: "description", label: "Description" },
-  { id: "plan-details", label: "Plan Details" },
-  { id: "construction-cost", label: "Construction Cost" },
-  { id: "faq-support", label: "FAQ & Support" },
-  { id: "drawing-sets", label: "Drawing Sets" },
-  { id: "reviews", label: "Reviews" },
-];
 
-export const designTabs = [
-  { id: "all", label: "All" },
-  { id: "folders", label: "Folders" },
-];
+
+
 
 export const designTabIcons = {
   Basic: "🏠",

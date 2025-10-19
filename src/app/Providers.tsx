@@ -3,10 +3,12 @@
 import { SessionProvider } from 'next-auth/react';
 import { Toaster } from 'sonner';
 import ImpersonationBanner from '@/components/admin/ImpersonationBanner';
+import { CartSync } from '@/components/cart/CartSync';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
+      <CartSync />
       <ImpersonationBanner />
       {children}
       <Toaster

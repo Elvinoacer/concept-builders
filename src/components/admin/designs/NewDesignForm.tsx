@@ -2,23 +2,24 @@
 
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FiX, FiUpload, FiPlus, FiSave } from "react-icons/fi";
+import { FiX, FiPlus, FiSave, FiEdit } from "react-icons/fi";
 import { CgSpinner } from "react-icons/cg";
+import { toast } from "sonner";
 import FileUpload from "./FileUpload";
 
 interface NewDesignFormProps {
   onClose: () => void;
   folderId?: string;
-  onDesignAdded?: () => void;
+  designToEdit?: any;
+  onSuccess?: () => void;
 }
 
-const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps) => {
+const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesignFormProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [basePrice, setBasePrice] = useState("");
@@ -38,6 +39,8 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
   });
   const [calculatorOptions, setCalculatorOptions] = useState([{ name: '', price: 0 }]);
 
+  const isEditMode = Boolean(designToEdit);
+
   useEffect(() => {
     const fetchCategories = async () => {
       const response = await fetch("/api/categories");
@@ -46,7 +49,38 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
     };
 
     fetchCategories();
-  }, []);
+
+    if (isEditMode) {
+      setName(designToEdit.name || "");
+      setDescription(designToEdit.description || "");
+      setBasePrice(designToEdit.basePrice?.toString() || "");
+      setPriceRange(designToEdit.priceRange || "");
+      setBedrooms(designToEdit.bedrooms?.toString() || "");
+      setBathrooms(designToEdit.bathrooms?.toString() || "");
+      setArea(designToEdit.area?.toString() || "");
+      setFloors(designToEdit.floors?.toString() || "");
+      setPlanDetails(Array.isArray(designToEdit.planDetails) ? designToEdit.planDetails.join('\n') : "");
+      setCategoryId(designToEdit.categoryId || "");
+      setFiles(designToEdit.files || []);
+
+      if (designToEdit.buildingCostEstimates) {
+        const estimates = {
+          basic: { description: '', costBreakdown: [] },
+          luxury: { description: '', costBreakdown: [] }
+        };
+        designToEdit.buildingCostEstimates.forEach(est => {
+          estimates[est.tier] = {
+            description: est.description,
+            costBreakdown: est.costBreakdown.map(item => ({ item: item.item, cost: item.cost.toString() }))
+          };
+        });
+        setBuildingCostEstimates(estimates);
+      }
+      if (designToEdit.calculatorOptions) {
+        setCalculatorOptions(designToEdit.calculatorOptions);
+      }
+    }
+  }, [designToEdit, isEditMode]);
 
   const handleUploadSuccess = (newFiles: { url: string; type: string; name: string }[], fileTypeCategory: string) => {
     const otherFiles = files.filter((f: any) => f.type !== fileTypeCategory);
@@ -55,18 +89,23 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
   };
 
   const handleFileRemove = async (fileUrl: string) => {
-    const key = fileUrl.split('/').pop();
-    if (!key) return;
+    try {
+      const key = new URL(fileUrl).pathname.substring(1);
 
-    await fetch('/api/designs/delete-file', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ key }),
-    });
+      await fetch('/api/designs/delete-uploaded-file', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key }),
+      });
 
-    setFiles(files.filter((file: any) => file.url !== fileUrl));
+      setFiles(files.filter((file: any) => file.url !== fileUrl));
+      toast.success("File deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      toast.error("Failed to delete file.");
+    }
   };
 
   const handleCostBreakdownChange = (tier: 'basic' | 'luxury', index: number, field: 'item' | 'cost', value: string) => {
@@ -107,45 +146,62 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
     e.preventDefault();
     setIsSubmitting(true);
 
+    const payload = {
+      name,
+      description,
+      basePrice: parseFloat(basePrice),
+      priceRange,
+      bedrooms: parseInt(bedrooms),
+      bathrooms: parseInt(bathrooms),
+      area: parseFloat(area),
+      floors: parseInt(floors),
+      planDetails: planDetails.split('\n'),
+      folderId: isEditMode ? designToEdit.folderId : folderId,
+      categoryId,
+      buildingCostEstimates: Object.entries(buildingCostEstimates).map(([tier, data]) => ({
+        tier,
+        description: data.description,
+        costBreakdown: data.costBreakdown.map(item => ({
+          ...item,
+          cost: parseFloat(item.cost) || 0
+        }))
+      })),
+      calculatorOptions: calculatorOptions.map(option => ({
+        ...option,
+        price: parseFloat(option.price) || 0
+      })),
+      files: files.map((file: any) => ({
+        url: file.url,
+        type: file.type,
+        originalFileName: file.originalFileName,
+      })),
+    };
+
     try {
-      const response = await fetch("/api/designs", {
-        method: "POST",
+      const url = isEditMode ? `/api/designs/${designToEdit.id}` : "/api/designs";
+      const method = isEditMode ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name,
-          description,
-          basePrice: parseFloat(basePrice),
-          priceRange,
-          bedrooms: parseInt(bedrooms),
-          bathrooms: parseInt(bathrooms),
-          area: parseInt(area),
-          floors: parseInt(floors),
-          planDetails: planDetails.split('\n'),
-          folderId,
-          categoryId,
-          buildingCostEstimates,
-          calculatorOptions,
-          files: files.map((file: any) => ({
-            url: file.url,
-            type: file.type,
-            originalFileName: file.originalFileName,
-          })),
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        if (onDesignAdded) {
-          onDesignAdded();
-        } else {
-          onClose();
+        toast.success(`Design ${isEditMode ? 'updated' : 'created'} successfully!`);
+        if (onSuccess) {
+          onSuccess();
         }
+        onClose();
       } else {
-        console.error("Error creating design:", await response.text());
+        const errorData = await response.json();
+        toast.error(`Error: ${errorData.error}`);
       }
     } catch (error) {
-      console.error("Error creating design:", error);
+      toast.error(`An unexpected error occurred.`);
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} design:`, error);
     } finally {
       setIsSubmitting(false);
     }
@@ -169,8 +225,8 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <div className="p-6 border-b border-border flex-shrink-0 flex justify-between items-center bg-gradient-to-r from-blue-600 to-cyan-400 text-white rounded-t-2xl">
             <div className="flex items-center gap-3">
-              <FiPlus className="text-primary" size={24} />
-              <h3 className="text-xl font-semibold text-foreground">Create New Design</h3>
+              {isEditMode ? <FiEdit size={24} /> : <FiPlus size={24} />}
+              <h3 className="text-xl font-semibold">{isEditMode ? 'Edit Design' : 'Create New Design'}</h3>
             </div>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <FiX size={20} />
@@ -200,8 +256,8 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
                 <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="A brief description of the design..." />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="planDetails">Plan Details (comma-separated)</Label>
-                <Textarea id="planDetails" name="planDetails" value={planDetails} onChange={(e) => setPlanDetails(e.target.value)} placeholder="e.g., 3 Bedrooms, 2 Bathrooms, Open-plan kitchen" />
+                <Label htmlFor="planDetails">Plan Details (one per line)</Label>
+                <Textarea id="planDetails" name="planDetails" value={planDetails} onChange={(e) => setPlanDetails(e.target.value)} placeholder="e.g., 3 Bedrooms\n2 Bathrooms\nOpen-plan kitchen" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -239,48 +295,47 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
                   <Label>PDF</Label>
                   <FileUpload
                     onUploadSuccess={(newFiles) => handleUploadSuccess(newFiles, 'PDF')}
+                    onFileRemove={handleFileRemove}
                     initialFiles={files.filter((f: any) => f.type === 'PDF')}
                     fileTypeCategory="PDF"
+                    multiple
+                    accept="application/pdf"
                   />
                 </div>
                 <div>
                   <Label>CAD</Label>
                   <FileUpload
                     onUploadSuccess={(newFiles) => handleUploadSuccess(newFiles, 'CAD')}
+                    onFileRemove={handleFileRemove}
                     initialFiles={files.filter((f: any) => f.type === 'CAD')}
                     fileTypeCategory="CAD"
+                    multiple
+                    accept=".dwg, .dxf"
                   />
                 </div>
                 <div>
                   <Label>Floor Plan</Label>
                   <FileUpload
                     onUploadSuccess={(newFiles) => handleUploadSuccess(newFiles, 'FLOOR_PLAN')}
+                    onFileRemove={handleFileRemove}
                     initialFiles={files.filter((f: any) => f.type === 'FLOOR_PLAN')}
                     fileTypeCategory="FLOOR_PLAN"
+                    multiple
+                    accept="image/*, application/pdf"
                   />
                 </div>
                 <div>
                   <Label>3D Renders (Images)</Label>
                   <FileUpload
                     onUploadSuccess={(newFiles) => handleUploadSuccess(newFiles, 'IMAGE')}
+                    onFileRemove={handleFileRemove}
                     initialFiles={files.filter((f: any) => f.type === 'IMAGE')}
                     fileTypeCategory="IMAGE"
                     multiple
+                    accept="image/*"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Uploaded Files</Label>
-                  {files.map((file: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                        {file.url.split('/').pop()}
-                      </a>
-                      <Button type="button" variant="destructive" size="sm" onClick={() => handleFileRemove(file.url)}>
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                
               </div>
 
               {/* Building Cost Estimates */}
@@ -293,7 +348,7 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
                       <Label htmlFor={`${tier}-description`}>Description</Label>
                       <Textarea
                         id={`${tier}-description`}
-                        value={buildingCostEstimates[tier].description}
+                        value={buildingCostEstimates[tier]?.description || ''}
                         onChange={(e) => {
                           const newEstimates = { ...buildingCostEstimates };
                           newEstimates[tier].description = e.target.value;
@@ -304,7 +359,7 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
                     </div>
                     <div className="mt-4">
                       <h5 className="text-sm font-medium">Cost Breakdown</h5>
-                      {buildingCostEstimates[tier].costBreakdown.map((item, index) => (
+                      {buildingCostEstimates[tier]?.costBreakdown.map((item, index) => (
                         <div key={index} className="mt-2 flex items-center space-x-2">
                           <Input
                             placeholder="Item"
@@ -366,7 +421,7 @@ const NewDesignForm = ({ onClose, folderId, onDesignAdded }: NewDesignFormProps)
               ) : (
                 <FiSave className="mr-2" />
               )}
-              {isSubmitting ? "Saving..." : "Save Design"}
+              {isSubmitting ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Design' : 'Save Design')}
             </Button>
           </div>
         </form>
