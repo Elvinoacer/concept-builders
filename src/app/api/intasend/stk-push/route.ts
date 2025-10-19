@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { first_name, last_name, email, amount, phone_number } = body;
+    const { first_name, email, amount, phone_number } = body;
 
     const userCart = await prisma.cart.findUnique({
       where: { userId },
@@ -46,7 +46,6 @@ export async function POST(req: NextRequest) {
     const collection = intasend.collection();
     const resp = await collection.mpesaStkPush({
       first_name,
-      last_name,
       email,
       amount: Number(amount),
       phone_number,
@@ -56,14 +55,22 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(resp);
   } catch (error: any) {
-    console.error(
-      "IntaSend STK Push Error:",
-      error.response?.data || error.message || error
-    );
+    let errorMessage = "Failed to initiate M-Pesa STK Push";
+    if (error.response?.data) {
+      try {
+        const errorData = JSON.parse(error.response.data.toString());
+        errorMessage = errorData.detail || errorMessage;
+        console.error("IntaSend STK Push Error:", errorData);
+      } catch (e) {
+        console.error("IntaSend STK Push Error (raw buffer):", error.response.data);
+      }
+    } else {
+      console.error("IntaSend STK Push Error:", error.message || error);
+    }
+
     return NextResponse.json(
       {
-        error:
-          error.response?.data?.detail || "Failed to initiate M-Pesa STK Push",
+        error: errorMessage,
       },
       { status: error.response?.status || 500 }
     );

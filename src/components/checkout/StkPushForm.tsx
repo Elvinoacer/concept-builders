@@ -30,7 +30,6 @@ export default function StkPushForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         first_name: session?.user?.name?.split(' ')[0],
-        last_name: session?.user?.name?.split(' ')[1] || 'User',
         email: session?.user?.email,
         amount: total,
         phone_number: phone,
