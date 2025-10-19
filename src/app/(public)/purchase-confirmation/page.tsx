@@ -6,6 +6,7 @@ import ItemsPurchased from "@/components/purchase-confirmation/ItemsPurchased";
 import DeliveryDetails from "@/components/purchase-confirmation/DeliveryDetails";
 import ActionButtons from "@/components/purchase-confirmation/ActionButtons";
 
+
 const PurchaseConfirmationPage = () => {
   const purchase = {
     purchaseNumber: "123456789",
