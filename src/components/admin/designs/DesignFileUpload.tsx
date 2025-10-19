@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Progress } from "@/components/ui/progress";
+import { ProgressBar } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { FiUploadCloud, FiFile, FiTrash2, FiLoader } from "react-icons/fi";
 
@@ -271,12 +271,12 @@ export default function DesignFileUpload({ design, onUploadComplete }) {
 
           {uploading && (
             <div className="mt-4">
-              <Progress value={progress} className="w-full h-3 rounded-full bg-gray-200 dark:bg-gray-700">
+              <ProgressBar value={progress} className="w-full h-3 rounded-full bg-gray-200 dark:bg-gray-700">
                 <div
                   className={`h-3 rounded-full ${theme.button} transition-all duration-300`}
                   style={{ width: `${progress}%` }}
                 ></div>
-              </Progress>
+              </ProgressBar>
               <p className="text-right text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">{Math.round(progress)}%</p>
             </div>
           )}
