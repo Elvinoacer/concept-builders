@@ -10,16 +10,28 @@ interface File {
 }
 
 interface Design {
-  id: string;
+  id: string | number;
   name: string;
   description: string;
-  basePrice: number;
-  bedrooms: number;
-  bathrooms: number;
-  area: number;
-  files: File[];
-  category: {
+  basePrice?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  area?: number;
+  files?: File[];
+  image?: string;
+  category?: {
     name: string;
+  } | string;
+  pricing?: {
+    pdf: number;
+    cad: number;
+    fullPackage: number;
+  };
+  details?: {
+    bedrooms: number;
+    bathrooms: number;
+    area: number;
+    floors: number;
   };
 }
 
@@ -50,6 +62,13 @@ const DesignCard = ({ design }: { design: Design }) => {
   // Calculate rotation based on mouse position
   const rotateX = isHovered ? mousePosition.y / 10 - 15 : 0;
   const rotateY = isHovered ? mousePosition.x / 10 - 20 : 0;
+
+  const categoryName = typeof design.category === 'string' ? design.category : design.category?.name;
+  const imageUrl = design.image || design.files?.[0]?.url || "/placeholder.jpg";
+  const price = design.basePrice || design.pricing?.pdf;
+  const bedrooms = design.bedrooms || design.details?.bedrooms;
+  const bathrooms = design.bathrooms || design.details?.bathrooms;
+  const area = design.area || design.details?.area;
 
   return (
     <div
@@ -96,7 +115,7 @@ const DesignCard = ({ design }: { design: Design }) => {
           }}
         >
           <Image
-            src={design.files[0]?.url || "/placeholder.jpg"}
+            src={imageUrl}
             alt={design.name}
             fill
             className="object-cover"
@@ -135,24 +154,24 @@ const DesignCard = ({ design }: { design: Design }) => {
           <h3 className="text-xl font-bold mb-1 group-hover:text-blue-300 transition-colors duration-300">
             {design.name}
           </h3>
-          <p className="text-sm text-gray-300">{design.category?.name}</p>
+          <p className="text-sm text-gray-300">{categoryName}</p>
         </div>
 
         {/* Stats */}
         <div className="flex justify-between items-center mb-4">
-          <p className="text-2xl font-bold text-blue-300">${design.basePrice}</p>
+          <p className="text-2xl font-bold text-blue-300">${price}</p>
           <div className="flex items-center gap-4 text-sm text-gray-300">
             <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
               <span className="material-symbols-outlined text-base">bed</span>
-              <span>{design.bedrooms}</span>
+              <span>{bedrooms}</span>
             </div>
             <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
               <span className="material-symbols-outlined text-base">bathtub</span>
-              <span>{design.bathrooms}</span>
+              <span>{bathrooms}</span>
             </div>
             <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
               <span className="material-symbols-outlined text-base">square_foot</span>
-              <span>{design.area} sqft</span>
+              <span>{area} sqft</span>
             </div>
           </div>
         </div>
