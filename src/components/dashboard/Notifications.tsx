@@ -1,9 +1,29 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
-import { notifications } from "@/lib/dummydata";
+import { formatDistanceToNow } from 'date-fns';
 
 const Notifications = () => {
+  const { data: session } = useSession();
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch("/api/notifications");
+        const data = await response.json();
+        setNotifications(data);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    if (session) {
+      fetchNotifications();
+    }
+  }, [session]);
+
   return (
     <section className="mt-4 md:mt-8">
       <h3 className="text-gray-800 text-lg md:text-xl font-bold leading-tight tracking-[-0.015em] mb-2 md:mb-4 dark:text-white">
@@ -24,7 +44,7 @@ const Notifications = () => {
               </p>
             </div>
             <span className="text-xs text-gray-400 dark:text-gray-500">
-              {notification.time}
+              {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
             </span>
           </div>
         ))}

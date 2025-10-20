@@ -1,21 +1,32 @@
 'use client';
-import React from 'react';
-import { purchasedDesigns } from '@/lib/dummydata';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useSearch } from '@/lib/SearchContext';
-
-// Augment data for demonstration purposes
-const augmentedDesigns = purchasedDesigns.map((design, index) => ({
-  ...design,
-  purchasedFileType: index === 0 ? 'PDF & CAD' : 'PDF',
-  purchasedAddOns: index === 0 ? ['Structural Plan', 'Bill of Quantities (BOQ)', 'Video', 'Architectural Plan'] : ['Video'],
-}));
+import { useSession } from 'next-auth/react';
 
 const PurchasedDesigns = ({ searchQuery }: { searchQuery: string }) => {
+  const { data: session } = useSession();
   const { resultsRef } = useSearch();
+  const [purchasedDesigns, setPurchasedDesigns] = useState([]);
 
-  const filteredDesigns = augmentedDesigns.filter(design =>
+  useEffect(() => {
+    const fetchPurchasedDesigns = async () => {
+      try {
+        const response = await fetch('/api/purchases');
+        const data = await response.json();
+        setPurchasedDesigns(data);
+      } catch (error) {
+        console.error('Error fetching purchased designs:', error);
+      }
+    };
+
+    if (session) {
+      fetchPurchasedDesigns();
+    }
+  }, [session]);
+
+  const filteredDesigns = purchasedDesigns.filter(design =>
     design.name.toLowerCase().includes((searchQuery || '').toLowerCase())
   );
 
@@ -25,7 +36,7 @@ const PurchasedDesigns = ({ searchQuery }: { searchQuery: string }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {filteredDesigns.map((design, index) => (
           <motion.div
-            key={index}
+            key={design.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
@@ -33,7 +44,7 @@ const PurchasedDesigns = ({ searchQuery }: { searchQuery: string }) => {
           >
             <div className="relative h-56">
               <Image
-                src={design.images[0].url}
+                src={design.files[0]?.url || '/images/category-placeholder.png'}
                 alt={design.name}
                 layout="fill"
                 objectFit="cover"
@@ -41,7 +52,7 @@ const PurchasedDesigns = ({ searchQuery }: { searchQuery: string }) => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
               <div className="absolute bottom-0 left-0 p-5">
                 <h4 className="text-2xl font-bold text-white shadow-black/50 shadow-text-lg">{design.name}</h4>
-                <p className="text-sm text-gray-200 shadow-black/50 shadow-text-sm">Purchased on: 22/10/2025</p>
+                <p className="text-sm text-gray-200 shadow-black/50 shadow-text-sm">Purchased on: {new Date(design.createdAt).toLocaleDateString()}</p>
               </div>
             </div>
             <div className="p-6">
@@ -50,21 +61,8 @@ const PurchasedDesigns = ({ searchQuery }: { searchQuery: string }) => {
                 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg flex items-center">
                   <span className="material-symbols-outlined text-3xl text-blue-600 dark:text-blue-400">description</span>
                   <div className="ml-4">
-                    <p className="font-bold text-lg text-gray-900 dark:text-white">{design.purchasedFileType}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">Digital Download</p>
+                    <p className="font-bold text-lg text-gray-900 dark:text-white">Digital Download</p>
                   </div>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">Included Add-ons</p>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                  {design.purchasedAddOns.map(addon => (
-                    <div key={addon} className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg text-green-500">check_circle</span>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{addon}</span>
-                    </div>
-                  ))}
                 </div>
               </div>
 

@@ -7,8 +7,6 @@ import FilterAside from "./FilterAside";
 
 import DesignCard from "./DesignCard";
 
-import { designs as allDesigns } from "@/lib/dummydata";
-import { designShowcaseData } from "@/lib/dummydata/designShowcase";
 import {
   Pagination,
   PaginationContent,
@@ -25,14 +23,9 @@ const ExploreDesigns = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const category = searchParams.get('category');
-  const searchQuery = searchParams.get('search');
-  const minPrice = searchParams.get('minPrice');
-  const maxPrice = searchParams.get('maxPrice');
-  const bedrooms = searchParams.get('bedrooms');
-  const styles = searchParams.get('styles');
-  const minSize = searchParams.get('minSize');
-  const sortBy = searchParams.get('sortBy');
+  const [designs, setDesigns] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -58,58 +51,35 @@ const ExploreDesigns = () => {
   };
 
   const handleClearFilters = () => {
-    updateSearchParams('minPrice', null);
-    updateSearchParams('maxPrice', null);
-    updateSearchParams('bedrooms', null);
-    updateSearchParams('styles', null);
-    updateSearchParams('minSize', null);
-    updateSearchParams('search', null); // Also clear search query
-    updateSearchParams('sortBy', null); // Also clear sort by
+    const params = new URLSearchParams();
+    router.push(`${pathname}?${params.toString()}`);
     setCurrentPage(1); // Reset to first page
   };
 
-  const initialDesigns = allDesigns; // Use allDesigns as the base
+  useEffect(() => {
+    const fetchDesigns = async () => {
+      setLoading(true);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('page', currentPage.toString());
+      params.set('limit', ITEMS_PER_PAGE.toString());
 
-  const filteredAndSortedDesigns = initialDesigns
-    .filter(design => {
-      const categoryMatch = category ? design.category === category : true;
-      const searchMatch = searchQuery
-        ? design.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          design.description.toLowerCase().includes(searchQuery.toLowerCase())
-        : true;
-      const minPriceMatch = minPrice ? design.price >= parseInt(minPrice) : true;
-      const maxPriceMatch = maxPrice ? design.price <= parseInt(maxPrice) : true;
-      const bedroomsMatch = bedrooms && bedrooms !== 'Any' ? (bedrooms === '4+' ? design.bedrooms >= 4 : design.bedrooms === parseInt(bedrooms)) : true;
-      const stylesMatch = styles ? styles.split(',').includes(design.style) : true;
-      const minSizeMatch = minSize ? design.area >= parseInt(minSize) : true;
-
-      return categoryMatch && searchMatch && minPriceMatch && maxPriceMatch && bedroomsMatch && stylesMatch && minSizeMatch;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case designShowcaseData.sortByOptions[0]: // Newest
-          return b.id - a.id; // Assuming higher ID means newer
-        case designShowcaseData.sortByOptions[1]: // Popular
-          return Math.random() - 0.5; // Placeholder for popularity
-        case designShowcaseData.sortByOptions[2]: // Price (Low to High)
-          return a.price - b.price;
-        case designShowcaseData.sortByOptions[3]: // Price (High to Low)
-          return b.price - a.price;
-        default:
-          return 0;
+      try {
+        const response = await fetch(`/api/designs?${params.toString()}`);
+        const data = await response.json();
+        setDesigns(data.designs);
+        setTotalPages(data.totalPages);
+      } catch (error) {
+        console.error('Error fetching designs:', error);
       }
-    });
+      setLoading(false);
+    };
 
-  const totalPages = Math.ceil(filteredAndSortedDesigns.length / ITEMS_PER_PAGE);
+    fetchDesigns();
+  }, [searchParams, currentPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
-  const paginatedDesigns = filteredAndSortedDesigns.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
 
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -122,15 +92,15 @@ const ExploreDesigns = () => {
   return (
     <section ref={sectionRef}>
       <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white shrink-0 self-start">{designShowcaseData.exploreDesignsTitle}</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white shrink-0 self-start">Explore Designs</h2>
         <div className="w-full flex flex-col md:flex-row items-center gap-4">
           <div className="relative w-full">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-2xl"> search </span>
             <input
               className="w-full rounded-full border-transparent bg-white dark:bg-gray-800 py-3 pl-12 pr-6 text-base text-slate-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary focus:ring-primary shadow-sm"
-              placeholder={designShowcaseData.searchPlaceholder}
+              placeholder="Search for designs..."
               type="search"
-              value={searchQuery || ''}
+              value={searchParams.get('search') || ''}
               onChange={handleSearchChange}
             />
           </div>
@@ -139,17 +109,18 @@ const ExploreDesigns = () => {
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex items-center justify-center gap-2 rounded-lg bg-gray-200 dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors shrink-0">
               <span className="material-symbols-outlined text-xl">filter_list</span>
-              <span>{designShowcaseData.filtersButtonText}</span>
+              <span>Filters</span>
             </button>
             <div className="relative flex-1">
               <select
                 className="appearance-none w-full rounded-lg border-transparent bg-gray-200 dark:bg-gray-800 py-2.5 pl-4 pr-10 text-sm text-slate-800 dark:text-gray-100 focus:border-primary focus:ring-primary shrink-0"
-                value={sortBy || designShowcaseData.sortByOptions[0]}
+                value={searchParams.get('sortBy') || 'Newest'}
                 onChange={handleSortChange}
               >
-                {designShowcaseData.sortByOptions.map((option) => (
-                  <option key={option}>{option}</option>
-                ))}
+                <option>Newest</option>
+                <option>Popular</option>
+                <option>Price (Low to High)</option>
+                <option>Price (High to Low)</option>
               </select>
               <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">expand_more</span>
             </div>
@@ -161,9 +132,13 @@ const ExploreDesigns = () => {
           <FilterAside key={searchParams.toString()} onClose={() => setIsFilterOpen(false)} searchParams={searchParams} updateSearchParams={updateSearchParams} handleClearFilters={handleClearFilters} />
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start">
-          {paginatedDesigns.map((design, index) => (
-            <DesignCard key={design.name} design={design} index={index} />
-          ))}
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            designs.map((design, index) => (
+              <DesignCard key={design.id} design={design} index={index} />
+            ))
+          )}
         </div>
       </div>
       <Pagination className="mt-8">

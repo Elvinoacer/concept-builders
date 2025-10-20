@@ -19,7 +19,7 @@ interface ProjectsState {
   fetchProjectById: (id: string) => void;
 }
 
-import { projectsData } from "@/lib/dummydata/projects";
+
 
 const useProjectsStore = create<ProjectsState>()(
   devtools(
@@ -28,19 +28,28 @@ const useProjectsStore = create<ProjectsState>()(
       project: null,
       loading: false,
       error: null,
-      fetchProjects: () => {
+      fetchProjects: async () => {
         set({ loading: true, error: null });
         try {
-          set({ projects: projectsData, loading: false });
+          const response = await fetch("/api/projects");
+          if (!response.ok) {
+            throw new Error("Failed to fetch projects");
+          }
+          const data: Project[] = await response.json();
+          set({ projects: data, loading: false });
         } catch (error: any) {
           set({ error: error.message, loading: false });
         }
       },
-      fetchProjectById: (id: string) => {
+      fetchProjectById: async (id: string) => {
         set({ loading: true, error: null });
         try {
-          const project = projectsData.find((p) => p.id === id) || null;
-          set({ project, loading: false });
+          const response = await fetch(`/api/projects/${id}`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch project");
+          }
+          const data: Project = await response.json();
+          set({ project: data, loading: false });
         } catch (error: any) {
           set({ error: error.message, loading: false });
         }

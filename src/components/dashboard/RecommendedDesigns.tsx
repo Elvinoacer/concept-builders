@@ -1,6 +1,5 @@
 'use client';
 import React, { useRef, useState, useEffect } from 'react';
-import { designs } from '@/lib/dummydata';
 import DesignCard from '@/components/DesignCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,6 +7,21 @@ const RecommendedDesigns = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [recommendedDesigns, setRecommendedDesigns] = useState([]);
+
+  useEffect(() => {
+    const fetchRecommendedDesigns = async () => {
+      try {
+        const response = await fetch('/api/designs?limit=5');
+        const data = await response.json();
+        setRecommendedDesigns(data.designs);
+      } catch (error) {
+        console.error('Error fetching recommended designs:', error);
+      }
+    };
+
+    fetchRecommendedDesigns();
+  }, []);
 
   const checkScrollability = () => {
     const el = scrollRef.current;
@@ -33,7 +47,7 @@ const RecommendedDesigns = () => {
       resizeObserver.observe(el);
       return () => resizeObserver.unobserve(el);
     }
-  }, []);
+  }, [recommendedDesigns]);
 
   return (
     <section className="mt-8">
@@ -44,7 +58,7 @@ const RecommendedDesigns = () => {
           onScroll={checkScrollability}
           className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide"
         >
-          {designs.map((design, index) => (
+          {recommendedDesigns.map((design, index) => (
             <motion.div
               key={design.id}
               initial={{ opacity: 0, x: 20 }}

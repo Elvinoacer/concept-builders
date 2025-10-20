@@ -45,16 +45,17 @@ export async function POST(req: NextRequest) {
     const intasend = new IntaSend(
       process.env.INTASEND_PUBLISHABLE_KEY,
       process.env.INTASEND_SECRET_KEY,
-      process.env.NODE_ENV !== "production"
+      // process.env.NODE_ENV !== "production"
+      false
     );
 
     const host = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const collection = intasend.collection();
     const resp = await collection.charge({
-      first_name: session.user.name?.split(' ')[0] || 'User',
-      last_name: session.user.name?.split(' ')[1] || '',
-      email: session.user.email || '',
+      first_name: session.user.name?.split(" ")[0] || "User",
+      last_name: session.user.name?.split(" ")[1] || "",
+      email: session.user.email || "",
       host: host,
       amount: Number(amount),
       currency,

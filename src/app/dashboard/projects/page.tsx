@@ -32,7 +32,7 @@ const ProjectsPage = () => {
             whileTap={{ scale: 0.95 }}
             className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors"
           >
-            New Project
+            Initialize New Project
           </motion.button>
         </Link>
       </header>

@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import { ReadonlyURLSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { designShowcaseData } from "@/lib/dummydata/designShowcase";
 
 interface FilterAsideProps {
   onClose?: () => void;
@@ -38,17 +37,17 @@ const FilterAside: React.FC<FilterAsideProps> = ({ onClose, searchParams, update
     >
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{designShowcaseData.filterAside.title}</h2>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Filters</h2>
           <button onClick={onClose} className="md:hidden">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">{designShowcaseData.filterAside.priceRangeTitle}</h3>
+          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Price Range</h3>
           <div className="flex items-center gap-2">
             <input
               className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4"
-              placeholder={designShowcaseData.filterAside.minPricePlaceholder}
+              placeholder="Min Price"
               type="number"
               value={currentMinPrice}
               onChange={(e) => updateSearchParams('minPrice', e.target.value)}
@@ -56,7 +55,7 @@ const FilterAside: React.FC<FilterAsideProps> = ({ onClose, searchParams, update
             <span className="text-gray-500">-</span>
             <input
               className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4"
-              placeholder={designShowcaseData.filterAside.maxPricePlaceholder}
+              placeholder="Max Price"
               type="number"
               value={currentMaxPrice}
               onChange={(e) => updateSearchParams('maxPrice', e.target.value)}
@@ -64,9 +63,9 @@ const FilterAside: React.FC<FilterAsideProps> = ({ onClose, searchParams, update
           </div>
         </div>
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">{designShowcaseData.filterAside.bedroomsTitle}</h3>
+          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Bedrooms</h3>
           <div className="flex flex-wrap gap-2">
-            {designShowcaseData.filterAside.bedroomOptions.map(option => (
+            {['Any', '1', '2', '3', '4+'].map(option => (
               <button
                 key={option}
                 onClick={() => updateSearchParams('bedrooms', option === 'Any' ? null : option)}
@@ -82,9 +81,9 @@ const FilterAside: React.FC<FilterAsideProps> = ({ onClose, searchParams, update
           </div>
         </div>
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">{designShowcaseData.filterAside.architecturalStyleTitle}</h3>
+          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Architectural Style</h3>
           <div className="space-y-2">
-            {designShowcaseData.filterAside.architecturalStyles.map(style => (
+            {['Modern', 'Traditional', 'Farmhouse', 'Minimalist'].map(style => (
               <label key={style} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <input
                   className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary"
@@ -98,7 +97,7 @@ const FilterAside: React.FC<FilterAsideProps> = ({ onClose, searchParams, update
           </div>
         </div>
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">{designShowcaseData.filterAside.sizeTitle}</h3>
+          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">Size (sq ft)</h3>
           <input
             className="w-full"
             max="5000"
@@ -110,14 +109,14 @@ const FilterAside: React.FC<FilterAsideProps> = ({ onClose, searchParams, update
           />
           <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
             <span>{currentMinSize}</span>
-            <span>{designShowcaseData.filterAside.maxSizeText}</span>
+            <span>5000+ sq ft</span>
           </div>
         </div>
         <button
           onClick={handleClearFilters}
           className="w-full rounded-lg bg-gray-200 dark:bg-gray-700 py-2.5 font-bold text-slate-800 dark:text-gray-200 transition hover:bg-gray-300 dark:hover:bg-gray-600"
         >
-          {designShowcaseData.filterAside.clearFiltersButtonText}
+          Clear Filters
         </button>
       </div>
     </motion.aside>

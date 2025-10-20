@@ -6,12 +6,14 @@ import { navLinks } from "@/lib/dummydata/index";
 import Image from "next/image";
 import { ModeToggle } from "./ui/mode-toggle";
 import SearchModal from './SearchModal';
+import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/hooks/useCart';
 
 const Header = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
   const { cartCount } = useCart();
 
   return (
@@ -44,14 +46,7 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
-          {/* Desktop-only icons */}
-          <div className="hidden md:flex items-center gap-2 md:gap-4">
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Link href="/dashboard/wishlist" className="flex items-center text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
-                <span className="material-symbols-outlined">favorite</span>
-              </Link>
-            </motion.div>
-          </div>
+          
 
           {/* Icons for all screen sizes */}
           <motion.button
@@ -77,7 +72,19 @@ const Header = () => {
           </motion.div>
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
             <Link href="/dashboard" className="flex items-center text-slate-600 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400">
-              <span className="material-symbols-outlined">person</span>
+              {session?.user?.image ? (
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name || 'User Avatar'}
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                />
+              ) : session?.user?.name ? (
+                <span className="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full text-sm font-bold text-gray-700">
+                  {session.user.name.charAt(0).toUpperCase()}
+                </span>
+              ) : null}
             </Link>
           </motion.div>
 
@@ -119,10 +126,7 @@ const Header = () => {
             </nav>
             <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
               <div className="flex flex-col gap-6">
-                <Link href="/dashboard/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-slate-600 text-lg font-medium hover:text-[#1193d4] transition-colors dark:text-gray-300 dark:hover:text-primary">
-                  <span className="material-symbols-outlined">favorite</span>
-                  <span>Wishlist</span>
-                </Link>
+                
                 <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)} className="relative flex items-center gap-3 text-slate-600 text-lg font-medium hover:text-[#1193d4] transition-colors dark:text-gray-300 dark:hover:text-primary">
                   <span className="material-symbols-outlined">shopping_cart</span>
                   <span>Cart</span>

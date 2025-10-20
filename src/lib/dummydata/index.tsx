@@ -81,13 +81,13 @@ export interface Purchase {
 }
 
 export * from "./customDesign";
-export * from "./designShowcase";
+
 export * from "./designsPage";
 export * from "./designDetailPage";
 export * from "./chat";
 export * from "./analytics";
 export * from "./content";
-export * from "./designs";
+
 export * from "./folders";
 export * from "./orders";
 export * from "./team";
@@ -176,81 +176,7 @@ export const adminStats = {
   ],
 };
 
-export const stats = [
-  { name: "Purchased Plans", value: "3", icon: "shopping_bag" },
-  { name: "Wishlisted Items", value: "8", icon: "favorite" },
-];
 
-export const notifications = [
-  {
-    icon: "update",
-    title: "Project Update",
-    description: 'Your project "Modern Retreat" has been updated.',
-    time: "2 hours ago",
-  },
-  {
-    icon: "new_releases",
-    title: "New Design",
-    description: 'New design "Coastal Breeze" is now available.',
-    time: "1 day ago",
-  },
-  {
-    icon: "redeem",
-    title: "Referral Bonus",
-    description: "Your referral bonus has been credited.",
-    time: "3 days ago",
-  },
-];
-
-export const purchasedDesigns: Design[] = [
-  {
-    id: 1,
-    name: "Modern Farmhouse",
-    basePrice: 500,
-    priceRange: "$500 - $700",
-    description:
-      "A contemporary take on the classic farmhouse style, featuring clean lines, natural materials, and an open floor plan. This design offers a perfect blend of rustic charm and modern convenience.",
-    images: [
-      {
-        url: "https://lh3.googleusercontent.com/aida-public/AB6AXuB6DIQv8NlnmwauEIdaoCDKYKtrdtei7ihU-feojNXa0L6UOTaRCQxgyYC-EjegRB016sR0FFBtEZzDTL5GaiAibKl6CvzIAvnd5GPR_dTXZD69kucJcqU8LHPDzlgcjS8g07rGECyA-KAZs4c7D2V_bwN6htTp17kD79J933EM0Jo3EcnSFOI7MhbFO88Swk5Cv3u7_4bYLOBFs78qQoQJnqRexLpTVvwD4HlXsDLVegBaueaewPYMv6gZoLhJBKHY6A8g99ZPEp0h",
-        type: "main",
-      },
-    ],
-    renderings: [],
-    floorPlanUrl: "",
-    planDetails: [],
-    faq: [],
-    buildingCostEstimates: [],
-    reviews: [],
-    relatedDesigns: [],
-    tags: [],
-    fileTypes: [],
-    drawingSetsOptions: [],
-  },
-  {
-    id: 2,
-    name: "Contemporary House",
-    basePrice: 600,
-    priceRange: "$600 - $800",
-    description: "A sleek, modern design.",
-    images: [
-      {
-        url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkSr_Xf0NHlSa-anpoxzVi4JTuOPx3mHvDJQ&s",
-        type: "main",
-      },
-    ],
-    renderings: [],
-    floorPlanUrl: "",
-    planDetails: [],
-    faq: [],
-    buildingCostEstimates: [],
-    reviews: [],
-    relatedDesigns: [],
-    tags: [],
-    fileTypes: [],
-    drawingSetsOptions: [],
-  },
-];
 
 export const contactHeader = {
   title: "Get in Touch",

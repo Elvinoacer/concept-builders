@@ -4,11 +4,29 @@ import PurchasedDesigns from "@/components/dashboard/PurchasedDesigns";
 import RecommendedDesigns from "@/components/dashboard/RecommendedDesigns";
 import { useSearch } from "@/lib/SearchContext";
 import { motion } from "framer-motion";
-
-import { stats } from "@/lib/dummydata";
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 const DashboardPage = () => {
+  const { data: session } = useSession();
   const { searchQuery } = useSearch();
+  const [stats, setStats] = useState([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("/api/dashboard/stats");
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    if (session) {
+      fetchStats();
+    }
+  }, [session]);
 
   return (
     <div className="dark:bg-gray-950 min-h-screen p-4 sm:p-6 md:p-8">
@@ -21,7 +39,7 @@ const DashboardPage = () => {
               transition={{ duration: 0.5 }}
               className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight dark:text-white"
             >
-              Welcome Back, Sophia!
+              Welcome Back, {session?.user?.name || "User"}!
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: -20 }}

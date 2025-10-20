@@ -37,6 +37,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   cart          Cart?
+  notifications Notification[]
+  conversations Conversation[] @relation("ConversationUsers")
+  sentMessages  Message[]
+  readMessages  Message[]      @relation("ReadMessages")
 }
 
 model Cart {
@@ -261,4 +265,48 @@ model ReferralVisit {
   id        String   @id @default(cuid())
   source    String
   createdAt DateTime @default(now())
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  icon        String
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CustomDesignRequest {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  designType  String
+  description String
+  budget      String?
+  attachments String[]
+  createdAt   DateTime @default(now())
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  users     User[]    @relation("ConversationUsers")
+  messages  Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  createdAt      DateTime     @default(now())
+  content        String
+  attachmentUrl  String?
+  attachmentType String?
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  sender         User         @relation(fields: [senderId], references: [id])
+  senderId       String
+  readBy         User[]       @relation("ReadMessages")
 }

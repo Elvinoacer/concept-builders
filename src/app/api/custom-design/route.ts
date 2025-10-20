@@ -1,0 +1,71 @@
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { v4 as uuidv4 } from "uuid";
+
+const s3Client = new S3Client({
+  endpoint: "https://sfo3.digitaloceanspaces.com", // Change to your region
+  region: "sfo3", // Change to your region
+  credentials: {
+    accessKeyId: process.env.DO_SPACES_ACCESS_KEY as string,
+    secretAccessKey: process.env.DO_SPACES_SECRET_KEY as string,
+  },
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const formData = await request.formData();
+
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string | null;
+    const designType = formData.get("designType") as string;
+    const description = formData.get("description") as string;
+    const budget = formData.get("budget") as string | null;
+    const files = formData.getAll("files") as File[];
+
+    if (!name || !email || !designType || !description) {
+      return new NextResponse("Missing required fields", { status: 400 });
+    }
+
+    const uploadedFileUrls: string[] = [];
+
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const fileExtension = file.name.split(".").pop();
+        const fileName = `${uuidv4()}.${fileExtension}`;
+
+        const command = new PutObjectCommand({
+          Bucket: process.env.DO_SPACES_BUCKET,
+          Key: fileName,
+          Body: buffer,
+          ContentType: file.type,
+          ACL: "public-read",
+        });
+
+        await s3Client.send(command);
+        const fileUrl = `https://sfo3.digitaloceanspaces.com/${process.env.DO_SPACES_BUCKET}/${fileName}`;
+        uploadedFileUrls.push(fileUrl);
+      }
+    }
+
+    const customDesignRequest = await prisma.customDesignRequest.create({
+      data: {
+        name,
+        email,
+        phone,
+        designType,
+        description,
+        budget,
+        attachments: uploadedFileUrls,
+      },
+    });
+
+    return NextResponse.json(customDesignRequest, { status: 201 });
+  } catch (error) {
+    console.error("Error submitting custom design request:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
