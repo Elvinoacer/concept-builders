@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Pagination from "@/components/ui/Pagination";
+import Pagination from "@/components/ui/CustomPagination";
 import { useState } from "react";
 
 const OrdersTable = ({ orders }: { orders: any[] }) => {

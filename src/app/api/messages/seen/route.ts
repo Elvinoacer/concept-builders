@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { pusher } from "@/app/api/pusher/auth/route";
+
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -47,8 +47,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Trigger a pusher event to notify other users
-    await pusher.trigger(conversationId, "message:seen", lastMessage);
+    
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-import { pusher } from "@/app/api/pusher/auth/route";
+
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    await pusher.trigger(conversation.id, 'messages:new', { ...newMessage, tempId });
+    
 
     return NextResponse.json(newMessage, { status: 201 });
   } catch (error) {

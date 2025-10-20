@@ -5,14 +5,9 @@ import React, { useState, useEffect } from 'react';
 import { Conversation } from '@/generated/prisma';
 import ChatWindow from '@/components/dashboard/messages/ChatWindow';
 import { useSession } from 'next-auth/react';
-
 import { Input } from '@/components/ui/input';
-
 import NewClientConversationModal from '@/components/admin/messages/NewClientConversationModal';
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-import Pusher from 'pusher-js';
 
 const AdminMessagesPage = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -20,7 +15,6 @@ const AdminMessagesPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const { data: session } = useSession();
 
   const fetchConversations = async () => {
@@ -42,35 +36,6 @@ const AdminMessagesPage = () => {
       fetchConversations();
     }
   }, [session, searchTerm, filter]);
-
-  useEffect(() => {
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-      authEndpoint: '/api/pusher/auth',
-    });
-
-    conversations.forEach(conversation => {
-      const channel = pusher.subscribe(`presence-${conversation.id}`);
-
-      channel.bind('pusher:subscription_succeeded', (members: any) => {
-        setOnlineUsers(Object.keys(members.members));
-      });
-
-      channel.bind('pusher:member_added', (member: any) => {
-        setOnlineUsers((prev) => [...prev, member.id]);
-      });
-
-      channel.bind('pusher:member_removed', (member: any) => {
-        setOnlineUsers((prev) => prev.filter(id => id !== member.id));
-      });
-    });
-
-    return () => {
-      conversations.forEach(conversation => {
-        pusher.unsubscribe(`presence-${conversation.id}`);
-      });
-    };
-  }, [conversations]);
 
   const handleConversationCreated = (newConversation: any) => {
     setConversations((prev) => [newConversation, ...prev]);
@@ -108,7 +73,6 @@ const AdminMessagesPage = () => {
             <div>
               {conversations.map((conversation) => {
                 const otherUser = conversation.users.find(user => user.email !== session?.user?.email);
-                const isOnline = otherUser ? onlineUsers.includes(otherUser.id) : false;
 
                 return (
                   <div
@@ -122,7 +86,6 @@ const AdminMessagesPage = () => {
                           <AvatarImage src={otherUser?.image || '/images/default-avatar.png'} />
                           <AvatarFallback>{otherUser?.name?.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <div className={`absolute bottom-0 right-4 w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`}></div>
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between">

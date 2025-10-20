@@ -13,7 +13,7 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import Pagination from "@/components/ui/Pagination";
+import Pagination from "@/components/ui/CustomPagination";
 
 const UsersTable = ({ users, refetch, loading, searchTerm }) => {
   const [selectedUser, setSelectedUser] = useState(null);

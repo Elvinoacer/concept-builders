@@ -6,11 +6,7 @@ import { Conversation, Message as MessageType } from '@/generated/prisma';
 import Message from './Message';
 import MessageInput from './MessageInput';
 import { motion } from 'framer-motion';
-
-import Pusher from 'pusher-js';
-
 import { toast } from 'sonner';
-
 import { useSession } from 'next-auth/react';
 
 interface ChatWindowProps {
@@ -20,7 +16,6 @@ interface ChatWindowProps {
 const ChatWindow: React.FC<ChatWindowProps> = ({ conversation }) => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
 
@@ -46,48 +41,45 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversation }) => {
     };
 
     fetchMessages();
+  }, [conversation.id]);
 
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-      authEndpoint: '/api/pusher/auth',
-    });
+  useEffect(() => {
+    let isPolling = true;
 
-    const channel = pusher.subscribe(`presence-${conversation.id}`);
-
-    channel.bind('pusher:subscription_succeeded', (members: any) => {
-      setOnlineUsers(Object.keys(members.members));
-    });
-
-    channel.bind('pusher:member_added', (member: any) => {
-      setOnlineUsers((prev) => [...prev, member.id]);
-    });
-
-    channel.bind('pusher:member_removed', (member: any) => {
-      setOnlineUsers((prev) => prev.filter(id => id !== member.id));
-    });
-
-    channel.bind('messages:new', (newMessage: MessageType & { tempId?: string }) => {
-      setMessages((prevMessages) => {
-        if (newMessage.tempId) {
-          return prevMessages.map(msg => msg.id === newMessage.tempId ? newMessage : msg);
-        } else {
-          return [...prevMessages, newMessage];
+    const poll = async () => {
+      while (isPolling) {
+        try {
+          const lastMessageTimestamp = messages.length > 0 ? messages[messages.length - 1].createdAt : new Date(0).toISOString();
+          const response = await fetch(`/api/poll?conversationId=${conversation.id}&lastMessageTimestamp=${lastMessageTimestamp}`);
+          
+          if (response.ok) {
+            const newMessages = await response.json();
+            if (newMessages.length > 0) {
+              setMessages(prevMessages => {
+                const existingIds = new Set(prevMessages.map(m => m.id));
+                const filteredNewMessages = newMessages.filter((m: any) => !existingIds.has(m.id));
+                return [...prevMessages, ...filteredNewMessages];
+              });
+            }
+          } else {
+            console.error("Polling failed with status:", response.status);
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+        } catch (error) {
+          console.error('Error during polling:', error);
+          await new Promise(resolve => setTimeout(resolve, 5000));
         }
-      });
-    });
+      }
+    };
 
-    channel.bind('message:seen', (seenMessage: MessageType) => {
-      setMessages((prevMessages) => 
-        prevMessages.map(msg => 
-          msg.id === seenMessage.id ? { ...msg, status: 'seen' } : msg
-        )
-      );
-    });
+    if (!loading) {
+        poll();
+    }
 
     return () => {
-      pusher.unsubscribe(`presence-${conversation.id}`);
+      isPolling = false;
     };
-  }, [conversation.id]);
+  }, [conversation.id, loading, messages]);
 
   useEffect(() => {
     const markAsSeen = async () => {
