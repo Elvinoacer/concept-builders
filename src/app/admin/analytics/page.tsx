@@ -17,14 +17,18 @@ const AnalyticsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`/api/admin/analytics?timePeriod=${timePeriod}`);
+        const res = await fetch(
+          `/api/admin/analytics?timePeriod=${timePeriod}`
+        );
         if (!res.ok) {
           throw new Error("Failed to fetch analytics data");
         }
         const data = await res.json();
         setAnalyticsData(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred"
+        );
       } finally {
         setLoading(false);
       }
@@ -44,7 +48,10 @@ const AnalyticsPage = () => {
   return (
     <div className="w-full max-w-7xl mx-auto bg-background text-foreground">
       <div className="flex flex-col gap-8 p-4 md:p-8">
-                <AnalyticsHeader timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
+        <AnalyticsHeader
+          timePeriod={timePeriod}
+          setTimePeriod={setTimePeriod}
+        />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {analyticsData?.statsData.map((stat: any, index: number) => (
             <StatCard

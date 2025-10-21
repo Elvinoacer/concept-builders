@@ -1,4 +1,4 @@
-import { Toaster } from 'sonner';
+import { Toaster } from "sonner";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -7,6 +7,7 @@ import Script from "next/script";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import Providers from "./Providers";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,8 +33,8 @@ export const metadata: Metadata = {
   },
 };
 
-
-  export default function RootLayout({  children,
+export default function RootLayout({
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
@@ -58,8 +59,9 @@ export const metadata: Metadata = {
           disableTransitionOnChange
         >
           <Providers>{children}</Providers>
-                    <Toaster />
+          <Toaster />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
