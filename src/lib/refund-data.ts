@@ -1,4 +1,3 @@
-
 export const refund = [
   {
     title: "1. Design Services",
@@ -53,10 +52,10 @@ export const refund = [
       <p>If you have any questions or concerns regarding our Refund Policy, please contact us at:</p>
       <address class="not-italic mt-4 space-y-1">
         <p><strong>Concept Builders</strong></p>
-        <p>123 Design Avenue</p>
-        <p>Cityville, State 12345</p>
+        <p>123 Kenyatta Avenue</p>
+        <p>P.O BOX 20100, Nakuru</p>
         <p>Email: <a class="text-primary hover:underline" href="mailto:support@conceptbuilders.com">support@conceptbuilders.com</a></p>
-        <p>Phone: <a class="text-primary hover:underline" href="tel:555-123-4567">(555) 123-4567</a></p>
+        <p>Phone: <a class="text-primary hover:underline" href="tel:254741360865">+254741360865</a></p>
       </address>
     `,
   },

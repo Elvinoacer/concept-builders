@@ -11,13 +11,14 @@ const PurchaseConfirmationPage = () => {
   const searchParams = useSearchParams();
   const purchaseId = searchParams.get("purchaseId");
   const [purchase, setPurchase] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (purchaseId) {
       const fetchPurchase = async () => {
         try {
+          setLoading(true);
           const response = await fetch(`/api/purchases/${purchaseId}`);
           if (!response.ok) {
             throw new Error("Failed to fetch purchase details");
