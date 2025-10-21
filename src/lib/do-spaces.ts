@@ -1,4 +1,5 @@
-import { S3Client, DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const s3Client = new S3Client({
   endpoint: `https://sfo3.digitaloceanspaces.com`,
@@ -8,6 +9,19 @@ const s3Client = new S3Client({
     secretAccessKey: process.env.DO_SPACES_SECRET_KEY!,
   },
 });
+
+export const getSignedUrlForFiles = async (keys: string[]) => {
+  const signedUrls = await Promise.all(
+    keys.map(async (key) => {
+      const command = new GetObjectCommand({
+        Bucket: process.env.DO_SPACES_BUCKET!,
+        Key: key,
+      });
+      return getSignedUrl(s3Client, command, { expiresIn: 3600 });
+    })
+  );
+  return signedUrls;
+};
 
 export const deleteFile = async (key: string) => {
   try {

@@ -28,6 +28,14 @@ export async function POST(req: NextRequest) {
       const cartId = data.api_ref;
       const paymentId = data.invoice_id;
 
+      const existingOrder = await prisma.order.findUnique({
+        where: { paymentId },
+      });
+
+      if (existingOrder) {
+        return NextResponse.json({ success: true });
+      }
+
       const userCart = await prisma.cart.findUnique({
         where: { id: cartId },
         include: { items: { include: { design: true } } },
@@ -61,8 +69,33 @@ export async function POST(req: NextRequest) {
           })),
         });
 
+        await tx.notification.create({
+          data: {
+            userId: userCart.userId,
+            title: "Order Created",
+            description: `Your order #${order.id} has been created successfully.`,
+            icon: "ShoppingCart",
+          },
+        });
+
         await tx.cart.delete({ where: { id: userCart.id } });
       });
+    } else {
+      console.log("Payment failed:", data);
+      const cartId = data.api_ref;
+      const userCart = await prisma.cart.findUnique({
+        where: { id: cartId },
+      });
+      if (userCart) {
+        await prisma.notification.create({
+          data: {
+            userId: userCart.userId,
+            title: "Payment Failed",
+            description: `Your payment for order in cart ${cartId} failed.`,
+            icon: "AlertTriangle",
+          },
+        });
+      }
     }
 
     return NextResponse.json({ success: true });

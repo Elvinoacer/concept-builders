@@ -32,13 +32,31 @@ export async function POST(request: Request) {
     const response = await PaypalClient.execute(req);
 
     if (response.result.status !== "COMPLETED") {
+      await prisma.notification.create({
+        data: {
+          userId: userId,
+          title: "Payment Failed",
+          description: `Your payment for order ${orderID} failed.`,
+          icon: "AlertTriangle",
+        },
+      });
       return NextResponse.json(
         { error: "Failed to capture payment." },
         { status: 500 }
       );
     }
 
-    // Payment was successful, now create the order in the database.
+    const existingOrder = await prisma.order.findUnique({
+      where: { paymentId: response.result.id },
+    });
+
+    if (existingOrder) {
+      return NextResponse.json({
+        success: true,
+        orderId: existingOrder.id,
+      });
+    }
+
     const userCart = await prisma.cart.findUnique({
       where: { userId },
       include: { items: { include: { design: true } } },
@@ -70,6 +88,15 @@ export async function POST(request: Request) {
           designId: item.designId,
           quantity: item.quantity,
         })),
+      });
+
+      await tx.notification.create({
+        data: {
+          userId: userId,
+          title: "Order Created",
+          description: `Your order #${order.id} has been created successfully.`,
+          icon: "ShoppingCart",
+        },
       });
 
       await tx.cart.delete({ where: { id: userCart.id } });

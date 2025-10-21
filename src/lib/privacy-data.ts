@@ -1,4 +1,3 @@
-
 export const privacy = [
   {
     title: "Introduction",
@@ -30,6 +29,6 @@ export const privacy = [
   },
   {
     title: "Contact Us",
-    content: `If you have any questions or concerns about this Privacy Policy, please contact us at:<br/><br/><address class="not-italic mt-2">Concept Builders<br/>123 Main Street<br/>Anytown, USA 12345<br/>Email: <a class="text-primary hover:underline" href="mailto:support@conceptbuilders.com">support@conceptbuilders.com</a></address>`,
+    content: `If you have any questions or concerns about this Privacy Policy, please contact us at:<address class="not-italic mt-2">Concept Builders<br/>P.O. Box 20100<br/>Nakuru, Kenya<br/>Email: <a class="text-primary hover:underline" href="mailto:support@conceptbuilders.com">support@conceptbuilders.com</a></address>`,
   },
 ];
