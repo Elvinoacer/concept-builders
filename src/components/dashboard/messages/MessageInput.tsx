@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Import useEffect and useRef
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Paperclip, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useSocket } from '@/app/Providers'; // Import the useSocket hook
+import { useSession } from 'next-auth/react'; // Import useSession
 
 interface MessageInputProps {
   conversationId: string;
@@ -16,6 +18,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
   const [content, setContent] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const socketContext = useSocket(); // Get the socket instance
+  const socket = socketContext?.socket;
+  const { data: session } = useSession(); // Get the session
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -23,22 +31,67 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
     }
   };
 
+  const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newContent = e.target.value;
+    setContent(newContent);
+
+    if (!socket || !session?.user?.id) return;
+
+    if (newContent.length > 0 && !isTyping) {
+      socket.emit('typing', { conversationId, userId: session.user.id });
+      setIsTyping(true);
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit('stopTyping', { conversationId, userId: session.user.id });
+      setIsTyping(false);
+    }, 3000); // Stop typing after 3 seconds of inactivity
+  };
+
+  useEffect(() => {
+    // Cleanup typing status when component unmounts or conversation changes
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      if (isTyping && socket && session?.user?.id) {
+        socket.emit('stopTyping', { conversationId, userId: session.user.id });
+      }
+    };
+  }, [conversationId, socket, session?.user?.id, isTyping]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content && !file) return;
 
     setLoading(true);
 
-    const tempId = `temp-${Date.now()}`;
+    // Clear any pending typing timeout and send stopTyping immediately
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+    if (isTyping && socket && session?.user?.id) {
+      socket.emit('stopTyping', { conversationId, userId: session.user.id });
+      setIsTyping(false);
+    }
+
+    const optimisticId = `optimistic-${Date.now()}`;
     onSendMessage({ 
-      id: tempId, 
+      id: optimisticId, 
+      optimisticId: optimisticId, 
       content, 
       attachmentUrl: file ? URL.createObjectURL(file) : undefined,
       attachmentType: file?.type,
       conversationId, 
-      sender: { id: 'temp-sender' }, // temporary sender
+      sender: session?.user, // Use actual session.user object
+      senderId: session?.user?.id, // Explicitly set senderId for optimistic message
       createdAt: new Date().toISOString(),
-      status: 'sending' 
+      status: 'pending' 
     });
 
     let attachmentUrl: string | undefined;
@@ -67,32 +120,24 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
       }
     }
 
-    try {
-      const response = await fetch('/api/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          content, 
-          attachmentUrl, 
-          attachmentType, 
-          conversationId,
-          tempId
-        }),
-      });
-
-      if (response.ok) {
-        setContent('');
-        setFile(null);
-      } else {
-        toast.error('Failed to send message.');
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Error sending message.');
+    if (!socket) {
+      toast.error('Socket not connected.');
+      setLoading(false);
+      return;
     }
 
+    const messageData = {
+      content,
+      attachmentUrl,
+      attachmentType,
+      conversationId,
+      tempId: optimisticId,
+      senderId: session?.user?.id, // Use actual sender ID
+    };
+
+    socket.emit('sendMessage', messageData);
+    setContent('');
+    setFile(null);
     setLoading(false);
   };
 
@@ -107,7 +152,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
           type="text"
           placeholder="Type a message..."
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={handleContentChange} // Use the new handler
           className="flex-1 bg-gray-100 dark:bg-gray-800 border-none focus:ring-0"
         />
         <Button type="submit" size="icon" className="ml-2" disabled={loading}>

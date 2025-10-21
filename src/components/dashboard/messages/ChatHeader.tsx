@@ -1,49 +1,31 @@
-"use client";
-import React from "react";
-import { usePathname } from "next/navigation";
+'use client';
 
-const ChatHeader = ({
-  project,
-}: {
-  project: { title: string; id: string };
-}) => {
-  const pathname = usePathname();
+import { Conversation } from '@/generated/prisma';
+import { useSession } from 'next-auth/react';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-  const navItems = [
-    { href: "#overview", label: "Overview", id: "overview" },
-    { href: "#design", label: "Design", id: "design" },
-    { href: "#construction", label: "Construction", id: "construction" },
-    { href: "#chat", label: "Chat", id: "chat" },
-  ];
+interface ChatHeaderProps {
+  conversation: Conversation;
+  onlineUsers: string[];
+}
 
-  const isActive = (id: string) => pathname?.includes(id);
+const ChatHeader: React.FC<ChatHeaderProps> = ({ conversation, onlineUsers }) => {
+  const { data: session } = useSession();
+  const otherUser = conversation.users.find(user => user.email !== session?.user?.email);
+  const isOnline = otherUser ? onlineUsers.includes(otherUser.id) : false;
 
   return (
-    <div className="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-      <div className="px-4 py-4 md:px-8 md:py-6">
-        <p className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">
-          Project: {project.title}
-        </p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Project ID: {project.id}
-        </p>
-      </div>
-      <div className="px-4 md:px-8">
-        <div className="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto whitespace-nowrap">
-          {navItems.map((item) => (
-            <a
-              key={item.id}
-              href={item.href}
-              className={`px-4 py-3 text-sm font-medium transition-colors ${
-                isActive(item.id)
-                  ? "text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400"
-                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-              }`}
-            >
-              {item.label}
-            </a>
-          ))}
-        </div>
+    <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center">
+      <Avatar className="w-12 h-12 mr-4">
+        <AvatarImage src={otherUser?.image || '/images/default-avatar.png'} />
+        <AvatarFallback>{otherUser?.name?.charAt(0)}</AvatarFallback>
+        {isOnline && (
+          <span className="absolute bottom-0 -right-2 block h-4 w-4 rounded-full bg-green-500 ring-2 ring-white z-10" />
+        )}
+      </Avatar>
+      <div>
+        <h2 className="text-xl font-semibold">{otherUser?.name}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{isOnline ? 'Online' : 'Offline'}</p>
       </div>
     </div>
   );

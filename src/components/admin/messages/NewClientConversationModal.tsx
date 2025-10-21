@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
+import { useSocket } from '@/app/Providers'; // Import the useSocket hook
+
 interface NewClientConversationModalProps {
   onConversationCreated: (conversation: any) => void;
 }
@@ -15,6 +17,7 @@ const NewClientConversationModal: React.FC<NewClientConversationModalProps> = ({
   const [clients, setClients] = useState<User[]>([]);
   const [selectedClient, setSelectedClient] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const socket = useSocket(); // Get the socket instance
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -32,36 +35,24 @@ const NewClientConversationModal: React.FC<NewClientConversationModalProps> = ({
     fetchClients();
   }, []);
 
-  const handleStartConversation = async () => {
-    if (!selectedClient) return;
+  const handleStartConversation = () => {
+    if (!selectedClient || !socket) return;
 
     setLoading(true);
 
-    try {
-      const response = await fetch('/api/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          recipientId: selectedClient.id,
-          content: 'Hi!', // Initial message
-        }),
-      });
+    socket.emit('createConversation', { recipientId: selectedClient.id, initialMessage: 'Hi!' });
 
-      if (response.ok) {
-        const newConversation = await response.json();
-        onConversationCreated(newConversation);
-        toast.success('Conversation started.');
-      } else {
-        toast.error('Failed to start conversation.');
-      }
-    } catch (error) {
-      console.error('Error starting conversation:', error);
-      toast.error('Error starting conversation.');
-    }
+    socket.on('conversationCreated', (newConversation: any) => {
+      onConversationCreated(newConversation);
+      toast.success('Conversation started.');
+      setLoading(false);
+      // Close modal or reset state
+    });
 
-    setLoading(false);
+    socket.on('conversationError', (error: string) => {
+      toast.error(error);
+      setLoading(false);
+    });
   };
 
   return (

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -8,38 +7,58 @@ import { toast } from 'sonner';
 import NewConversationModal from './NewConversationModal';
 import { useSession } from 'next-auth/react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useSocket } from '@/app/Providers'; // Import the useSocket hook
 
 interface ConversationListProps {
   onSelectConversation: (conversation: Conversation) => void;
+  onlineUsers: string[];
 }
 
-const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversation }) => {
+const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversation, onlineUsers }) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
-
-  const fetchConversations = async () => {
-    try {
-      const response = await fetch('/api/conversations');
-      if (response.ok) {
-        const data = await response.json();
-        setConversations(data);
-      } else {
-        toast.error('Failed to fetch conversations.');
-      }
-    } catch (error) {
-      console.error('Error fetching conversations:', error);
-      toast.error('Error fetching conversations.');
-    }
-    setLoading(false);
-  };
+  const socketContext = useSocket(); // Get the socket context
+  const socket = socketContext?.socket;
 
   useEffect(() => {
-    fetchConversations();
-    const interval = setInterval(fetchConversations, 30000); // Poll every 30 seconds
+    if (!socket || !session?.user?.id) return;
 
-    return () => clearInterval(interval);
-  }, []);
+    socket.emit('getConversations', session.user.id);
+
+    socket.on('conversations', (fetchedConversations: Conversation[]) => {
+      setConversations(fetchedConversations);
+      setLoading(false);
+    });
+
+    socket.on('newConversation', (newConversation: Conversation) => {
+      setConversations((prev) => [newConversation, ...prev]);
+    });
+
+    socket.on('messageReceived', (message: any) => {
+      // Find the conversation and update its last message
+      setConversations((prev) => {
+        const updatedConversations = prev.map((conv) => {
+          if (conv.id === message.conversationId) {
+            return { ...conv, messages: [message] }; // Update with the latest message
+          }
+          return conv;
+        });
+        // Bring the updated conversation to the top
+        const conversationToMove = updatedConversations.find(conv => conv.id === message.conversationId);
+        if (conversationToMove) {
+          return [conversationToMove, ...updatedConversations.filter(conv => conv.id !== message.conversationId)];
+        }
+        return updatedConversations;
+      });
+    });
+
+    return () => {
+      socket.off('conversations');
+      socket.off('newConversation');
+      socket.off('messageReceived');
+    };
+  }, [socket, session?.user?.id]);
 
   const handleConversationCreated = (newConversation: any) => {
     setConversations((prev) => [newConversation, ...prev]);
@@ -52,11 +71,11 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
         <h2 className="text-xl font-semibold">Messages</h2>
         <NewConversationModal onConversationCreated={handleConversationCreated} />
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1">
         {loading ? (
           <div className="p-4 text-center">Loading...</div>
         ) : (
-          <div>
+          <div className="overflow-y-auto h-full">
             {conversations.map((conversation, index) => {
               const otherUser = conversation.users.find(user => user.email !== session?.user?.email);
 
@@ -74,6 +93,11 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
                       <Avatar className="w-12 h-12 mr-4">
                         <AvatarImage src={otherUser?.image || '/images/default-avatar.png'} />
                         <AvatarFallback>{otherUser?.name?.charAt(0)}</AvatarFallback>
+                        {otherUser && onlineUsers.includes(otherUser.id) && (
+                          <span className="absolute inset-y-0 inset-x-0 flex items-end justify-end z-20">
+                            <span className="block h-4 w-4 rounded-full bg-green-500 ring-2 ring-white dark:ring-gray-800" />
+                          </span>
+                        )}
                       </Avatar>
                     </div>
                     <div className="flex-1">

@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { useSession } from "next-auth/react";
 
-import { Check, CheckCheck } from 'lucide-react';
+import { Check, CheckCheck, Clock } from 'lucide-react'; // Import Clock icon
 
 interface MessageProps {
   message: MessageType & { sender: { image?: string, name?: string }, status?: 'sending' | 'sent' | 'seen' };
@@ -21,8 +21,8 @@ const Message: React.FC<MessageProps> = ({ message }) => {
   const isSender = message.senderId === session?.user?.id;
 
   const getStatusIcon = () => {
-    if (message.status === 'sending') {
-      return <Check className="w-4 h-4 text-gray-400" />;
+    if (message.status === 'pending') {
+      return isSender ? <Clock className="w-4 h-4 text-gray-400" /> : null;
     } else if (message.status === 'sent') {
       return <Check className="w-4 h-4 text-gray-400" />;
     } else if (message.status === 'seen') {
@@ -58,7 +58,7 @@ const Message: React.FC<MessageProps> = ({ message }) => {
           <p className="text-xs text-gray-500 dark:text-gray-400">
             {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
           </p>
-          {isSender && getStatusIcon()}
+          {getStatusIcon()}
         </div>
       </div>
     </div>
