@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { FileText, Image as ImageIcon, Trash2, UploadCloud } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
 
 interface CustomDesignRequestDetailsProps {
   initialRequest: CustomDesignRequest;
