@@ -1,15 +1,67 @@
-
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const ContactForm = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    toast.loading("Sending message...");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success("Message sent successfully!");
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        toast.error(result.error || "Failed to send message.");
+      }
+    } catch (error) {
+      console.error("Contact form submission error:", error);
+      toast.error("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+      toast.dismiss(); // Dismiss loading toast
+    }
+  };
+
   return (
     <div className="rounded-2xl bg-white p-6 md:p-10 shadow-2xl dark:bg-gray-800/50 dark:backdrop-blur-sm">
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800 dark:text-white">
         Send Us a Message
       </h2>
-      <form action="#" className="space-y-6" method="POST">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label
@@ -24,6 +76,9 @@ const ContactForm = () => {
               name="name"
               placeholder="Enter your name"
               type="text"
+              value={formData.name}
+              onChange={handleChange}
+              required
             />
           </div>
           <div>
@@ -39,6 +94,9 @@ const ContactForm = () => {
               name="email"
               placeholder="Enter your email"
               type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
             />
           </div>
         </div>
@@ -56,6 +114,8 @@ const ContactForm = () => {
               name="phone"
               placeholder="Enter your mobile number"
               type="tel"
+              value={formData.phone}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -71,6 +131,9 @@ const ContactForm = () => {
               name="subject"
               placeholder="Enter the subject"
               type="text"
+              value={formData.subject}
+              onChange={handleChange}
+              required
             />
           </div>
         </div>
@@ -87,14 +150,18 @@ const ContactForm = () => {
             name="message"
             placeholder="Enter your message"
             rows={5}
+            value={formData.message}
+            onChange={handleChange}
+            required
           />
         </div>
         <div>
           <Button
             className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white py-3 text-lg font-semibold hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 transform hover:scale-105"
             type="submit"
+            disabled={loading}
           >
-            Send Message
+            {loading ? "Sending..." : "Send Message"}
           </Button>
         </div>
       </form>

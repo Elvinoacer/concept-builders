@@ -10,6 +10,8 @@ export async function GET(request: NextRequest) {
 
     const categoryId = request.nextUrl.searchParams.get("categoryId");
 
+    const isFeatured = request.nextUrl.searchParams.get("isFeatured");
+
     const where: any = search
       ? {
           name: {
@@ -23,12 +25,23 @@ export async function GET(request: NextRequest) {
       where.categoryId = categoryId;
     }
 
+    if (isFeatured) {
+      where.isFeatured = true;
+    }
+
     const designs = await prisma.design.findMany({
       where,
       skip,
       take: limit,
       include: {
         files: true,
+        reviews: true,
+        discounts: {
+          include: {
+            discount: true,
+          },
+        },
+        orderItems: true,
       },
       orderBy: {
         createdAt: "desc",

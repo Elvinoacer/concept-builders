@@ -4,19 +4,28 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { slides } from "@/lib/dummydata";
+import { slides as dummySlides } from "@/lib/dummydata";
+import { Banner } from "@/generated/prisma";
 
-const Hero = () => {
+interface HeroProps {
+  banners: Banner[];
+}
+
+const Hero = ({ banners }: HeroProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
+  const slidesToUse = banners.length > 0 ? banners : dummySlides;
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+      setCurrentSlide((prev) =>
+        prev === slidesToUse.length - 1 ? 0 : prev + 1
+      );
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [slidesToUse.length]);
 
   const goToSlide = (slideIndex: number) => {
     setCurrentSlide(slideIndex);
@@ -44,8 +53,8 @@ const Hero = () => {
                 className="absolute inset-0"
               >
                 <Image
-                  src={slides[currentSlide].image}
-                  alt={slides[currentSlide].title}
+                  src={slidesToUse[currentSlide].image}
+                  alt={slidesToUse[currentSlide].title}
                   fill
                   className="object-cover bg-center"
                   priority
@@ -62,10 +71,10 @@ const Hero = () => {
                 className="flex flex-col gap-3 md:gap-4 text-left max-w-2xl"
               >
                 <h1 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight [text-shadow:2px_2px_4px_rgba(0,0,0,0.5)]">
-                  {slides[currentSlide].title}
+                  {slidesToUse[currentSlide].title}
                 </h1>
                 <p className="text-gray-200 text-sm sm:text-base md:text-lg [text-shadow:2px_2px_4px_rgba(0,0,0,0.5)]">
-                  {slides[currentSlide].description}
+                  {slidesToUse[currentSlide].description}
                 </p>
               </motion.div>
               <motion.form
@@ -84,13 +93,16 @@ const Hero = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 flex h-10 md:h-11 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 px-3 md:px-4 text-xs md:text-sm font-bold text-white shadow-sm hover:from-blue-700 hover:to-cyan-500 transition-all">
+                <button
+                  type="submit"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 flex h-10 md:h-11 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 px-3 md:px-4 text-xs md:text-sm font-bold text-white shadow-sm hover:from-blue-700 hover:to-cyan-500 transition-all"
+                >
                   Search
                 </button>
               </motion.form>
             </div>
             <div className="absolute bottom-3 right-3 flex gap-2">
-              {slides.map((_, index) => (
+              {slidesToUse.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}

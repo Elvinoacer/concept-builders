@@ -18,7 +18,10 @@ export async function GET(
     });
 
     if (!category) {
-      return NextResponse.json({ error: "Category not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Category not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(category);
@@ -37,13 +40,10 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { name } = body;
 
     const updatedCategory = await prisma.category.update({
       where: { id: params.id },
-      data: {
-        name,
-      },
+      data: body,
     });
 
     return NextResponse.json(updatedCategory);

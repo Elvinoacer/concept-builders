@@ -4,10 +4,13 @@ import { Input } from "@/components/ui/input";
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationFirst,
+  PaginationLast,
 } from "@/components/ui/pagination";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,6 +50,32 @@ export default function CategoriesPage() {
       setCurrentPage(page);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  };
+
+  const getPaginationRange = () => {
+    const delta = 2;
+    const range = [];
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    if (currentPage - delta > 2) {
+      range.unshift("...");
+    }
+    if (currentPage + delta < totalPages - 1) {
+      range.push("...");
+    }
+
+    range.unshift(1);
+    if (totalPages > 1) {
+      range.push(totalPages);
+    }
+
+    return range;
   };
 
   return (
@@ -201,7 +230,7 @@ export default function CategoriesPage() {
                   `}
                   >
                     <Image
-                      src={category.image || "/images/placeholder.png"}
+                      src={category.designs[0]?.files[0]?.url || "/images/placeholder.png"}
                       alt={category.name}
                       layout="fill"
                       objectFit="cover"
@@ -213,29 +242,41 @@ export default function CategoriesPage() {
 
                   {/* Content */}
                   <div className={viewMode === "grid" ? "p-6" : "flex-1"}>
-                    <h2
-                      className={`
-                      font-semibold text-gray-800 dark:text-white transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400
-                      ${viewMode === "grid" ? "text-xl mb-2" : "text-lg"}
-                    `}
-                    >
-                      {category.name}
-                    </h2>
+                    <div className="flex items-center justify-between">
+                      <h2
+                        className={`
+                        font-semibold text-gray-800 dark:text-white transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400
+                        ${viewMode === "grid" ? "text-xl mb-2" : "text-lg"}
+                      `}
+                      >
+                        {category.name}
+                      </h2>
+                      {category.isFeatured && (
+                        <div className="text-xs font-semibold text-white bg-green-500 rounded-full px-2 py-1">
+                          Best Seller
+                        </div>
+                      )}
+                    </div>
                     {viewMode === "grid" && category.description && (
                       <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
                         {category.description}
                       </p>
                     )}
-                    <div
-                      className={`
-                      flex items-center text-blue-600 dark:text-blue-400 font-medium transition-all duration-200 group-hover:translate-x-1
-                      ${viewMode === "grid" ? "mt-4" : "mt-2"}
-                    `}
-                    >
-                      <span className="text-sm">Explore</span>
-                      <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">
-                        →
-                      </span>
+                    <div className="flex items-center justify-between mt-4">
+                      <div
+                        className={`
+                        flex items-center text-blue-600 dark:text-blue-400 font-medium transition-all duration-200 group-hover:translate-x-1
+                        ${viewMode === "grid" ? "mt-4" : "mt-2"}
+                      `}
+                      >
+                        <span className="text-sm">Explore</span>
+                        <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">
+                          →
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {category._count.designs} designs
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -247,83 +288,74 @@ export default function CategoriesPage() {
         {/* Pagination */}
         {categories.length > 0 && (
           <div className="mt-12 px-4 sm:px-0">
-            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-gray-200/40 dark:border-gray-700/40">
-              <Pagination>
-                <PaginationContent className="flex items-center gap-2">
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      className="cursor-pointer bg-white dark:bg-gray-700 border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-xl px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600"
-                    />
-                  </PaginationItem>
-
-                  {[...Array(totalPages)].map((_, i) => {
-                    const page = i + 1;
-                    const isCurrent = currentPage === page;
-                    const showPage =
-                      page === 1 ||
-                      page === totalPages ||
-                      (page >= currentPage - 1 && page <= currentPage + 1);
-
-                    if (!showPage) {
-                      if (
-                        page === currentPage - 2 ||
-                        page === currentPage + 2
-                      ) {
-                        return (
-                          <PaginationItem key={i}>
-                            <span className="px-3 py-2 text-gray-500 dark:text-gray-400">
-                              ...
-                            </span>
-                          </PaginationItem>
-                        );
-                      }
-                      return null;
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationFirst
+                    onClick={() => handlePageChange(1)}
+                    aria-disabled={currentPage === 1}
+                    className={
+                      currentPage === 1
+                        ? "pointer-events-none opacity-50"
+                        : undefined
                     }
-
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    aria-disabled={currentPage === 1}
+                    className={
+                      currentPage === 1
+                        ? "pointer-events-none opacity-50"
+                        : undefined
+                    }
+                  />
+                </PaginationItem>
+                {getPaginationRange().map((page, index) => {
+                  if (page === "...") {
                     return (
-                      <PaginationItem key={i}>
-                        <PaginationLink
-                          isActive={isCurrent}
-                          onClick={() => handlePageChange(page)}
-                          className={`
-                            cursor-pointer transition-all duration-200 rounded-xl px-4 py-2 border-0
-                            ${
-                              isCurrent
-                                ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/25"
-                                : "bg-white dark:bg-gray-700 shadow-sm hover:shadow-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
-                            }
-                          `}
-                        >
-                          {page}
-                        </PaginationLink>
+                      <PaginationItem key={index}>
+                        <PaginationEllipsis />
                       </PaginationItem>
                     );
-                  })}
+                  }
 
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      className="cursor-pointer bg-white dark:bg-gray-700 border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-xl px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600"
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-
-              {/* Page Info */}
-              <div className="text-center mt-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Page{" "}
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">
-                    {currentPage}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">
-                    {totalPages}
-                  </span>
-                </p>
-              </div>
-            </div>
+                  return (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(page as number)}
+                        isActive={currentPage === page}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    aria-disabled={totalPages === currentPage}
+                    className={
+                      totalPages === currentPage
+                        ? "pointer-events-none opacity-50"
+                        : undefined
+                    }
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLast
+                    onClick={() => handlePageChange(totalPages)}
+                    aria-disabled={totalPages === currentPage}
+                    className={
+                      totalPages === currentPage
+                        ? "pointer-events-none opacity-50"
+                        : undefined
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </main>

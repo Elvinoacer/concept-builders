@@ -1,8 +1,50 @@
+"use client";
+
 import Link from "next/link";
 import { footerLinks, socialLinks } from "@/lib/dummydata";
 import Image from "next/image";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!email) {
+      toast.error("Please enter your email address.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message);
+        setEmail(""); // Clear email on success
+      } else {
+        toast.error(data.message || "Failed to subscribe.");
+      }
+    } catch (error) {
+      console.error("Subscription error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <footer className="bg-[#F3F4F6] text-[#0B2545] dark:bg-gray-900 dark:text-gray-200">
       <div className="mx-auto max-w-7xl px-4 md:px-10 py-8 md:py-16">
@@ -27,17 +69,21 @@ const Footer = () => {
               <h4 className="text-lg font-semibold mb-4 dark:text-white">
                 Subscribe to our newsletter
               </h4>
-              <form className="flex flex-col gap-2">
+              <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
                 <input
                   type="email"
                   placeholder="Enter your email"
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
                 <button
                   type="submit"
                   className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-[#2563eb] to-[#26c6da] text-white font-semibold hover:from-blue-700 hover:to-cyan-500 transition-all"
+                  disabled={loading}
                 >
-                  Subscribe
+                  {loading ? "Subscribing..." : "Subscribe"}
                 </button>
               </form>
             </div>

@@ -1,22 +1,25 @@
-'use client';
-import { useEffect } from 'react';
-import useLandingPageStore from '@/lib/store/landing-page';
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { Design } from "@/generated/prisma";
 
-const NewPlans = () => {
-  const { newPlans, fetchLandingPageData } = useLandingPageStore();
+interface NewPlansProps {
+  newPlans: Design[] &
+    { files: { url: string }[]; category: { name: string } | null }[];
+}
 
-  useEffect(() => {
-    fetchLandingPageData();
-  }, [fetchLandingPageData]);
-
+const NewPlans = ({ newPlans }: NewPlansProps) => {
   return (
     <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Explore Our Newest Plans</h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">Fresh designs hot off the press, featuring the latest architectural trends and innovations.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+            Explore Our Newest Plans
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">
+            Fresh designs hot off the press, featuring the latest architectural
+            trends and innovations.
+          </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-4xl mx-auto">
           {newPlans.map((design) => (
@@ -26,7 +29,11 @@ const NewPlans = () => {
             >
               <div className="relative h-64 w-full overflow-hidden">
                 <Image
-                  src={design.files && design.files.length > 0 ? design.files[0].url : '/images/default-avatar.png'}
+                  src={
+                    design.files && design.files.length > 0
+                      ? design.files[0].url
+                      : "/images/default-avatar.png"
+                  }
                   alt={design.name}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -44,7 +51,10 @@ const NewPlans = () => {
                   {/* These details are not in the new schema, so I will remove them */}
                 </div>
                 <div className="mt-6 text-center">
-                  <Link href={`/designs/${design.id}`} className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold px-5 py-3 rounded-lg hover:from-blue-700 hover:to-cyan-500 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                  <Link
+                    href={`/designs/${design.id}`}
+                    className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold px-5 py-3 rounded-lg hover:from-blue-700 hover:to-cyan-500 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                  >
                     View Details
                   </Link>
                 </div>

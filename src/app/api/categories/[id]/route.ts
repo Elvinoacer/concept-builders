@@ -6,13 +6,49 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const search = request.nextUrl.searchParams.get("search") || "";
+    const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
+    const limit = parseInt(request.nextUrl.searchParams.get("limit") || "10");
+    const skip = (page - 1) * limit;
+
+    const designsWhere = search
+      ? {
+          OR: [
+            {
+              name: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              description: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          ],
+        }
+      : {};
+
     const category = await prisma.category.findUnique({
       where: { id: params.id },
       include: {
         designs: {
+          where: designsWhere,
+          skip,
+          take: limit,
           include: {
             files: true,
+            reviews: true,
+            discounts: {
+              include: {
+                discount: true,
+              },
+            },
           },
+        },
+        _count: {
+          select: { designs: { where: designsWhere } },
         },
       },
     });
@@ -36,14 +72,30 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = params;
     const body = await request.json();
-    const { name } = body;
+    console.log("Received PUT request body for category:", body); // Added logging
+    const { name, image, isFeatured } = body; // Added image and isFeatured
+
+    if (!name) {
+      return NextResponse.json({ message: "Name is required" }, { status: 400 });
+    }
+
+    // Construct data object for update, only include fields if they are provided
+    const updateData: { name: string; image?: string | null; isFeatured?: boolean } = { name };
+    if (image !== undefined) { // Allow image to be null
+      updateData.image = image;
+    }
+    if (isFeatured !== undefined) { // Allow isFeatured to be false
+      if (typeof isFeatured !== 'boolean') {
+        return NextResponse.json({ message: "isFeatured must be a boolean value" }, { status: 400 });
+      }
+      updateData.isFeatured = isFeatured;
+    }
 
     const updatedCategory = await prisma.category.update({
-      where: { id: params.id },
-      data: {
-        name,
-      },
+      where: { id },
+      data: updateData,
     });
 
     return NextResponse.json(updatedCategory);

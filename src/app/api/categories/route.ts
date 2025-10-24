@@ -10,15 +10,44 @@ export async function GET(request: NextRequest) {
 
     const where = search
       ? {
-          name: {
-            contains: search,
-            mode: "insensitive",
-          },
+          OR: [
+            {
+              name: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              description: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          ],
         }
       : {};
 
     const categories = await prisma.category.findMany({
       where,
+      include: {
+        _count: {
+          select: { designs: true },
+        },
+        designs: {
+          take: 1,
+          orderBy: {
+            createdAt: "asc",
+          },
+          include: {
+            files: {
+              where: {
+                type: "IMAGE",
+              },
+              take: 1,
+            },
+          },
+        },
+      },
       skip,
       take: limit,
       orderBy: {

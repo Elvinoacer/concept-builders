@@ -216,15 +216,23 @@ export const aboutHeader = {
 };
 
 export const mission = {
-  title: "Our Mission",
+  title: "Design. Structure. Legacy.",
   description:
-    "Our mission is to empower individuals and families to create their ideal living spaces by providing innovative, sustainable, and cost-effective architectural solutions. We strive to deliver exceptional quality and customer satisfaction, making the journey of building a home an enjoyable and rewarding experience.",
+    `"Where Vision Meets Precision."
+
+At Concept Builders KE, we don't just construct buildings — we bring concepts to life. Our name is more than a brand. It's a philosophy rooted in creative design, structural excellence, and client-focused delivery:
+
+· Modern residential homes & mansionettes
+· Apartment blocks tailored for today's urban lifestyle
+· High-end finishes balanced with structural durability
+· Smart, sustainable, future-ready construction`,
 };
 
 export const vision = {
-  title: "Our Vision",
+  title: "Concept Builders KE",
   description:
-    "We envision a future where everyone has access to high-quality architectural design and construction services, regardless of their budget or location. We aim to be the go-to platform for homeowners, builders, and architects, fostering collaboration and innovation in the industry.",
+    `Based in Nakuru | Proudly Kenyan | Built for Tomorrow.
+#Njengat'itiDesigns#ConceptBuildersK1`,
 };
 
 export const values = [
@@ -304,12 +312,12 @@ export const steps = [
 ];
 
 export const marqueeItems = [
-  "Architectural Excellence",
-  "Innovative Designs",
-  "Sustainable Building",
-  "Client-Centric Approach",
-  "Quality Craftsmanship",
-  "Modern Solutions",
+  { id: "1", content: "Architectural Excellence" },
+  { id: "2", content: "Innovative Designs" },
+  { id: "3", content: "Sustainable Building" },
+  { id: "4", content: "Client-Centric Approach" },
+  { id: "5", content: "Quality Craftsmanship" },
+  { id: "6", content: "Modern Solutions" },
 ];
 
 export interface Testimonial {
@@ -486,13 +494,13 @@ export const footerLinks = {
   ],
   contact: [
     { href: "/contact", label: "Contact Us", icon: "email" },
-    { href: "/support/chat", label: "Live Chat", icon: "chat_bubble" },
+    { href: "/dashboard/messages", label: "Live Chat", icon: "chat_bubble" },
   ],
 };
 
 export const socialLinks = [
   {
-    href: "#",
+    href: "https://facebook.com/conceptbuilders",
     icon: (props: SVGProps<SVGSVGElement>) => (
       <svg
         {...props}
@@ -511,27 +519,15 @@ export const socialLinks = [
     ),
   },
   {
-    href: "#",
+    href: "https://www.tiktok.com/@wilsonwarainy?is_from_webapp=1&sender_device=pc",
     icon: (props: SVGProps<SVGSVGElement>) => (
-      <svg
-        {...props}
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 2.8 3.2 2.8 5.5 0 3.9-3.1 7.1-7 7.1-3.9 0-7-3.2-7-7.1 0-2.3 1.2-4.1 2.8-5.5-1.3-1.3-2-3.4-2-3.4s-1.4 2.8-1.4 5.5c0 4.9 3.9 8.9 8.6 8.9s8.6-4 8.6-8.9c0-2.7-1.4-5.5-1.4-5.5z"></path>
-        <path d="M12 22v-7.5"></path>
+      <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z"/>
       </svg>
     ),
   },
   {
-    href: "#",
+    href: "https://www.instagram.com/conceptbuilderske?igsh=YzljYTk1ODg3Zg==",
     icon: (props: SVGProps<SVGSVGElement>) => (
       <svg
         {...props}
@@ -552,7 +548,7 @@ export const socialLinks = [
     ),
   },
   {
-    href: "#",
+    href: "https://linkedin.com/company/conceptbuilders",
     icon: (props: SVGProps<SVGSVGElement>) => (
       <svg
         {...props}

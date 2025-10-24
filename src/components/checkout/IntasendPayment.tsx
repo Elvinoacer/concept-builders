@@ -4,15 +4,45 @@ import { Button } from "@/components/ui/button";
 import StkPushForm from './StkPushForm';
 import CheckoutLink from './CheckoutLink';
 
-const IntasendPayment = () => {
+interface IntasendPaymentProps {
+  cart: any[]; // Add cart to props
+  finalTotal: number;
+  appliedDiscountAmount: number;
+  appliedDiscountId: string | null;
+  appliedDiscountCode: string | null;
+}
+
+const IntasendPayment: React.FC<IntasendPaymentProps> = ({
+  cart,
+  finalTotal,
+  appliedDiscountAmount,
+  appliedDiscountId,
+  appliedDiscountCode,
+}) => {
   const [view, setView] = useState('options'); // 'options', 'stk', 'checkout'
 
   const renderView = () => {
     switch (view) {
       case 'stk':
-        return <StkPushForm />;
+        return (
+          <StkPushForm
+            cart={cart} // Pass cart to StkPushForm
+            finalTotal={finalTotal}
+            appliedDiscountAmount={appliedDiscountAmount}
+            appliedDiscountId={appliedDiscountId}
+            appliedDiscountCode={appliedDiscountCode}
+          />
+        );
       case 'checkout':
-        return <CheckoutLink />;
+        return (
+          <CheckoutLink
+            cart={cart} // Pass cart to CheckoutLink
+            finalTotal={finalTotal}
+            appliedDiscountAmount={appliedDiscountAmount}
+            appliedDiscountId={appliedDiscountId}
+            appliedDiscountCode={appliedDiscountCode}
+          />
+        );
       default:
         return (
           <div className="flex flex-col space-y-4">

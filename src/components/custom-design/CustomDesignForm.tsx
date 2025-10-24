@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -16,9 +15,9 @@ import {
 } from "@/components/ui/select";
 import FileUploadPreview from "./FileUploadPreview";
 import { UploadCloud } from "lucide-react";
+import SuccessModal from "./SuccessModal";
 
 const CustomDesignForm = () => {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -28,6 +27,17 @@ const CustomDesignForm = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setPhone("");
+    setDesignType("");
+    setDescription("");
+    setBudget("");
+    setFiles([]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,21 +68,18 @@ const CustomDesignForm = () => {
       toast.success(
         "Custom design request submitted successfully! We will contact you soon."
       );
-      // Reset form
-      setName("");
-      setEmail("");
-      setPhone("");
-      setDesignType("");
-      setDescription("");
-      setBudget("");
-      setFiles([]);
-      router.push("/"); // Redirect to home or a thank you page
+      setIsModalOpen(true);
     } catch (error: any) {
       console.error("Error submitting custom design request:", error);
       toast.error(error.message || "Failed to submit custom design request.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    resetForm();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -238,6 +245,7 @@ const CustomDesignForm = () => {
           </Button>
         </div>
       </form>
+      <SuccessModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </motion.div>
   );
 };

@@ -10,17 +10,23 @@ import EmailVerificationForm from './EmailVerificationForm';
 
 const AuthForm = () => {
   const [authMode, setAuthMode] = useState('login');
+  const [signupEmail, setSignupEmail] = useState('');
+
+  const handleSignupSuccess = (email: string) => {
+    setSignupEmail(email);
+    setAuthMode('emailVerification');
+  };
 
   const renderForm = () => {
     switch (authMode) {
       case 'login':
         return <LoginForm setAuthMode={setAuthMode} />;
       case 'signup':
-        return <SignupForm setAuthMode={setAuthMode} />;
+        return <SignupForm setAuthMode={setAuthMode} onSignupSuccess={handleSignupSuccess} />;
       case 'forgotPassword':
         return <ForgotPasswordForm setAuthMode={setAuthMode} />;
       case 'emailVerification':
-        return <EmailVerificationForm setAuthMode={setAuthMode} />;
+        return <EmailVerificationForm setAuthMode={setAuthMode} email={signupEmail} />;
       default:
         return <LoginForm setAuthMode={setAuthMode} />;
     }
@@ -56,6 +62,9 @@ const AuthForm = () => {
               <button onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')} className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 ml-1">
                 {authMode === 'login' ? "Sign up" : "Login"}
               </button>
+            </p>
+            <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+              Having trouble? <a href="/contact" className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 ml-1">Contact Support</a>
             </p>
         </div>
       </div>

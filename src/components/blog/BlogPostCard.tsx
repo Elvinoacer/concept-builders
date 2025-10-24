@@ -38,12 +38,22 @@ export const BlogPostCard = ({ post }: { post: Post }) => {
 export const BlogPostCardSkeleton = () => {
   return (
     <div className="flex flex-col overflow-hidden rounded-lg border bg-card shadow-sm">
-      <div className="h-48 w-full animate-pulse bg-muted"></div>
+      <div className="h-48 w-full relative overflow-hidden bg-gray-200 dark:bg-gray-700">
+        <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+      </div>
       <div className="flex flex-1 flex-col p-4 md:p-6">
-        <div className="h-6 w-3/4 animate-pulse rounded bg-muted"></div>
-        <div className="mt-3 h-4 w-full animate-pulse rounded bg-muted"></div>
-        <div className="mt-1 h-4 w-5/6 animate-pulse rounded bg-muted"></div>
-        <div className="mt-5 h-3 w-1/3 animate-pulse rounded bg-muted"></div>
+        <div className="h-6 w-3/4 relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700 mb-3">
+          <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+        </div>
+        <div className="mt-3 h-4 w-full relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
+          <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+        </div>
+        <div className="mt-1 h-4 w-5/6 relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700 mb-5">
+          <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+        </div>
+        <div className="mt-5 h-3 w-1/3 relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
+          <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+        </div>
       </div>
     </div>
   );

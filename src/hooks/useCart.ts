@@ -1,80 +1,108 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
-import { Design } from '@/lib/dummydata';
+import { Design } from '@/generated/prisma'; // Use generated Prisma Design type
 
 interface CartItem extends Design {
   quantity: number;
+  selectedPackage?: string;
+  selectedExtras?: any[];
 }
 
 export const useCart = () => {
   const { data: session, status } = useSession();
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [appliedDiscountAmount, setAppliedDiscountAmount] = useState(0);
+  const [appliedDiscountId, setAppliedDiscountId] = useState<string | null>(null);
+  const [appliedDiscountCode, setAppliedDiscountCode] = useState<string | null>(null);
 
-  const loadCartFromServer = useCallback(async () => {
-    setIsLoading(true);
+  const fetchCart = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch('/api/cart/items');
       if (response.ok) {
-        const dbCart: CartItem[] = await response.json();
-        setCart(dbCart);
+        const fullCart = await response.json(); // Now returns full cart object
+        const frontendCartItems = fullCart.items.map((item: any) => ({
+          ...item.design,
+          quantity: item.quantity,
+          selectedPackage: item.selectedPackage,
+          selectedExtras: typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras,
+        }));
+        setCart(frontendCartItems);
+        setAppliedDiscountAmount(fullCart.discountAmount || 0);
+        setAppliedDiscountId(fullCart.discountId || null);
+        setAppliedDiscountCode(fullCart.discountCode || null);
       } else {
-        console.error('Failed to fetch DB cart:', await response.text());
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to fetch cart');
         setCart([]);
+        setAppliedDiscountAmount(0);
+        setAppliedDiscountId(null);
+        setAppliedDiscountCode(null);
       }
-    } catch (error) {
-      console.error('Error fetching cart from DB:', error);
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred while fetching cart.');
       setCart([]);
+    } finally {
+      setLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   const loadCartFromStorage = useCallback(() => {
-    setIsLoading(true);
-    const cartFromStorage = JSON.parse(localStorage.getItem('cart') || '[]');
-    setCart(cartFromStorage);
-    setIsLoading(false);
+    setLoading(true);
+    try {
+      const cartFromStorage = JSON.parse(localStorage.getItem('cart') || '[]');
+      setCart(cartFromStorage);
+    } catch (err) {
+      console.error('Error parsing cart from local storage:', err);
+      setCart([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   // Effect to load cart based on authentication status
   useEffect(() => {
     if (status === 'authenticated') {
-      loadCartFromServer();
+      fetchCart();
     } else if (status === 'unauthenticated') {
       loadCartFromStorage();
     }
     // While status is 'loading', do nothing.
-  }, [status, loadCartFromServer, loadCartFromStorage]);
+  }, [status, fetchCart, loadCartFromStorage]);
 
   // Effect to listen for the sync event and force a reload
   useEffect(() => {
     const handleSync = () => {
       // After a sync, we are authenticated and must reload from the server.
-      loadCartFromServer();
+      fetchCart();
     };
     window.addEventListener('cart-synced', handleSync);
     return () => {
       window.removeEventListener('cart-synced', handleSync);
     };
-  }, [loadCartFromServer]); // Depend on the memoized function
+  }, [fetchCart]);
 
-  const addToCart = async (design: Design) => {
+  const addToCart = async (design: Design, selectedPackage: string, selectedExtras: any[]) => {
     if (status === 'authenticated') {
       try {
         const response = await fetch('/api/cart/items', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ designId: design.id }),
+          body: JSON.stringify({ designId: design.id, selectedPackage, selectedExtras }),
         });
         if (response.ok) {
           const newCart: CartItem[] = await response.json();
           setCart(newCart);
           toast.success('Added to cart!');
         } else {
-          toast.error('This item is already in your cart.');
+          const errorData = await response.json();
+          toast.error(errorData.message || errorData.error || 'Failed to add to cart.');
         }
-      } catch (error) {
+      } catch (err) {
         toast.error('An error occurred while adding to cart.');
       }
     } else {
@@ -82,7 +110,7 @@ export const useCart = () => {
       if (existingItem) {
         toast.info('This design is already in your cart.');
       } else {
-        const newCart = [...cart, { ...design, quantity: 1 }];
+        const newCart = [...cart, { ...design, quantity: 1, selectedPackage, selectedExtras }];
         setCart(newCart);
         localStorage.setItem('cart', JSON.stringify(newCart));
         toast.success('Added to cart!');
@@ -90,7 +118,7 @@ export const useCart = () => {
     }
   };
 
-  const removeFromCart = async (designId: string) => {
+  const removeItem = async (designId: string) => {
     if (status === 'authenticated') {
         try {
             const response = await fetch(`/api/cart/items/${designId}`, {
@@ -101,9 +129,10 @@ export const useCart = () => {
                 setCart(newCart);
                 toast.success('Removed from cart.');
             } else {
-                toast.error('Failed to remove item from cart.');
+                const errorData = await response.json();
+                toast.error(errorData.error || 'Failed to remove item from cart.');
             }
-        } catch (error) {
+        } catch (err) {
             toast.error('An error occurred while removing from cart.');
         }
     } else {
@@ -114,5 +143,36 @@ export const useCart = () => {
     }
   };
 
-  return { cart, addToCart, removeFromCart, cartCount: cart.length, isLoading };
+  const cartTotal = useMemo(() => {
+    return cart.reduce((total, item) => {
+      let itemTotal = item.basePrice * item.quantity;
+      if (item.selectedExtras) {
+        item.selectedExtras.forEach(extra => {
+          itemTotal += extra.price;
+        });
+      }
+      return total + itemTotal;
+    }, 0);
+  }, [cart]);
+
+  const setAppliedDiscount = useCallback((amount: number, id: string | null, code: string | null) => {
+    setAppliedDiscountAmount(amount);
+    setAppliedDiscountId(id);
+    setAppliedDiscountCode(code);
+  }, []);
+
+  return {
+    cart,
+    addToCart,
+    removeItem,
+    cartCount: cart.length,
+    cartTotal,
+    loading,
+    error,
+    fetchCart,
+    appliedDiscountAmount,
+    appliedDiscountId,
+    appliedDiscountCode,
+    setAppliedDiscount, // New function returned
+  };
 };

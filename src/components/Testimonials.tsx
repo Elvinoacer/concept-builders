@@ -1,16 +1,15 @@
 'use client';
-import { useEffect, useState } from 'react';
-import useLandingPageStore from '@/lib/store/landing-page';
+import { useState } from 'react';
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { Testimonial } from "@prisma/client";
 
-const Testimonials = () => {
-  const { testimonials, fetchLandingPageData } = useLandingPageStore();
+interface TestimonialsProps {
+  testimonials: Testimonial[];
+}
+
+const Testimonials = ({ testimonials }: TestimonialsProps) => {
   const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    fetchLandingPageData();
-  }, [fetchLandingPageData]);
 
   const nextTestimonial = () => {
     setIndex((prev) => (prev + 1) % testimonials.length);

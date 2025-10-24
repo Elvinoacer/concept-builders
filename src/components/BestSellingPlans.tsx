@@ -1,16 +1,15 @@
-'use client';
-import { useEffect } from 'react';
-import useLandingPageStore from '@/lib/store/landing-page';
+"use client";
 import Image from "next/image";
+
 import Link from "next/link";
+import { Design } from "@/generated/prisma";
 
-const BestSellingPlans = () => {
-  const { bestSellingPlans, fetchLandingPageData } = useLandingPageStore();
+interface BestSellingPlansProps {
+  bestSellingPlans: Design[] &
+    { files: { url: string }[]; category: { name: string } | null }[];
+}
 
-  useEffect(() => {
-    fetchLandingPageData();
-  }, [fetchLandingPageData]);
-
+const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
   return (
     <section className="py-8 md:py-12 bg-white dark:bg-gray-950">
       <div className="container mx-auto px-4">
@@ -25,7 +24,11 @@ const BestSellingPlans = () => {
             >
               <div className="relative h-48 sm:h-56 md:h-64 w-full">
                 <Image
-                  src={design.files && design.files.length > 0 ? design.files[0].url : '/images/default-avatar.png'}
+                  src={
+                    design.files && design.files.length > 0
+                      ? design.files[0].url
+                      : "/images/default-avatar.png"
+                  }
                   alt={design.name}
                   fill
                   className="object-cover"

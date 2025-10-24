@@ -2,6 +2,7 @@
 import Notifications from "@/components/dashboard/Notifications";
 import PurchasedDesigns from "@/components/dashboard/PurchasedDesigns";
 import RecommendedDesigns from "@/components/dashboard/RecommendedDesigns";
+import MyRequests from "@/components/dashboard/MyRequests";
 import { useSearch } from "@/lib/SearchContext";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
@@ -80,8 +81,9 @@ const DashboardPage = () => {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-8">
           <PurchasedDesigns searchQuery={searchQuery} />
+          <MyRequests />
         </div>
         <div className="space-y-8">
           <RecommendedDesigns />

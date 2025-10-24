@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import KPIs from '@/components/admin/dashboard/KPIs';
 import Charts from '@/components/admin/dashboard/Charts';
+import CustomDesignRequests from '@/components/admin/dashboard/CustomDesignRequests';
 
 const AdminDashboardPage = () => {
   const [stats, setStats] = useState(null);
@@ -71,6 +72,9 @@ const AdminDashboardPage = () => {
     <>
       <KPIs stats={stats} />
       <Charts stats={stats} monthlySales={monthlySales} clientAcquisition={clientAcquisition} />
+      <div className="mt-8">
+        <CustomDesignRequests />
+      </div>
     </>
   );
 };

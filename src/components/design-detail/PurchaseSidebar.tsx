@@ -15,7 +15,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   const { addToCart } = useCart();
   const { data: session, status } = useSession(); // Get session data
   const router = useRouter(); // Initialize useRouter
-  const [selectedFileType, setSelectedFileType] = useState("PDF");
+  const [selectedFileType, setSelectedFileType] = useState("pdf");
   const [calculatorOptions, setCalculatorOptions] = useState<
     CalculatorOption[]
   >(
@@ -80,12 +80,15 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
     }
   }, [totalPrice, exchangeRate]);
 
-  const handleBuyNow = async () => {
-    // 1. Add the item to the cart. The useCart hook handles all logic for guests and logged-in users.
-    await addToCart(design);
+  const handleAddToCart = () => {
+    const selectedExtras = calculatorOptions.filter(option => option.checked);
+    addToCart(design, selectedFileType, selectedExtras);
+  };
 
-    // 2. Proceed to checkout or login.
-    // The CartSync component will handle merging the cart after a new login.
+  const handleBuyNow = async () => {
+    const selectedExtras = calculatorOptions.filter(option => option.checked);
+    await addToCart(design, selectedFileType, selectedExtras);
+
     if (status === "authenticated") {
       router.push("/checkout");
     } else {
@@ -128,7 +131,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
                   className="sr-only"
                 />
                 <span className="font-semibold text-gray-800 dark:text-gray-200">
-                  {fileType}
+                  {fileType === 'pdf' ? 'PDF' : fileType === 'cad' ? 'CAD' : 'PDF & CAD'}
                 </span>
                 <span className="font-bold text-blue-600 dark:text-blue-400">
                   +${designDetailPageData.purchaseSidebar.fileTypePrices[fileType]}
@@ -206,7 +209,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => addToCart(design)}
+            onClick={handleAddToCart}
             className="w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-gray-200 text-gray-800 text-lg font-bold tracking-wide hover:bg-gray-300 transition-all dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 whitespace-nowrap"
           >
             <i className="material-symbols-outlined"> shopping_cart </i>

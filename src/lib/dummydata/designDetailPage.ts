@@ -22,9 +22,9 @@ export const designDetailPageData = {
     convertingText: "Converting...",
     viewMoreConversionsText: "View more conversions",
     fileTypePrices: {
-      PDF: 0,
-      CAD: 100,
-      "PDF & CAD": 150,
+      pdf: 0,
+      cad: 100,
+      "pdf-and-cad": 150,
     },
   },
   relatedDesigns: {

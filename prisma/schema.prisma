@@ -10,46 +10,54 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
+  id                  String         @id @default(cuid())
+  name                String?
+  email               String?        @unique
+  emailVerified       DateTime?
+  image               String?
   hashedPassword      String?
-  accounts      Account[]
-  sessions      Session[]
-  orders        Order[]
-  projects      Project[]
-  role          Role      @default(CLIENT)
-  reviews       Review[]
-  wishlist      Design[]
-  folders       Folder[]
-  status        UserStatus @default(ACTIVE)
-  loginHistory  LoginHistory[]
+  accounts            Account[]
+  sessions            Session[]
+  orders              Order[]
+  projects            Project[]
+  role                Role           @default(CLIENT)
+  reviews             Review[]
+  wishlist            Design[]
+  folders             Folder[]
+  status              UserStatus     @default(ACTIVE)
+  loginHistory        LoginHistory[]
   impersonatingUserId String?
-  referralSource String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  cart          Cart?
-  notifications Notification[]
-  conversations Conversation[] @relation("ConversationUsers")
-  sentMessages  Message[]
-  readMessages  Message[]      @relation("ReadMessages")
+  referralSource      String?
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @default(now()) @updatedAt
+  cart                Cart?
+  notifications       Notification[]
+  conversations       Conversation[] @relation("ConversationUsers")
+  sentMessages        Message[]
+  readMessages        Message[]      @relation("ReadMessages")
 }
 
 model Cart {
-  id        String     @id @default(cuid())
-  user      User       @relation(fields: [userId], references: [id])
-  userId    String     @unique
-  items     CartItem[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id               String     @id @default(cuid())
+  user             User       @relation(fields: [userId], references: [id])
+  userId           String     @unique
+  items            CartItem[]
+  discountCode     String?
+  discountAmount   Float?
+  discountId       String?
+  discount         Discount?  @relation(fields: [discountId], references: [id])
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 }
 
 model CartItem {
@@ -60,6 +68,8 @@ model CartItem {
   designId  String
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
+  selectedPackage String? 
+  selectedExtras Json?
 
   @@unique([cartId, designId])
 }
@@ -73,19 +83,19 @@ model LoginHistory {
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.Text
+  access_token             String? @db.Text
+  expires_at               Int?
   refresh_token_expires_in Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.Text
+  session_state            String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -98,7 +108,7 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  createdAt    DateTime @default(now())
 }
 
 model VerificationToken {
@@ -114,6 +124,7 @@ model Category {
   name    String   @unique
   image   String?
   designs Design[]
+  isFeatured Boolean @default(false)
 }
 
 model Folder {
@@ -125,7 +136,6 @@ model Folder {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
 }
-
 
 model Design {
   id          String   @id @default(cuid())
@@ -149,12 +159,14 @@ model Design {
   faq                   Json[]
 
   wishlistedBy User[]
-  category     Category? @relation(fields: [categoryId], references: [id])
+  category     Category?   @relation(fields: [categoryId], references: [id])
   categoryId   String?
   reviews      Review[]
   orderItems   OrderItem[]
   cartItems    CartItem[]
   views        Int      @default(0)
+  isFeatured   Boolean  @default(false)
+  discounts    DesignDiscount[]
 }
 
 model File {
@@ -177,7 +189,6 @@ enum FileType {
   IMAGE
   FLOOR_PLAN
 }
-
 
 model Review {
   id        String   @id @default(cuid())
@@ -210,15 +221,20 @@ model Post {
 }
 
 model Order {
-  id        String      @id @default(cuid())
-  userId    String
-  user      User        @relation(fields: [userId], references: [id])
-  createdAt DateTime    @default(now())
-  items     OrderItem[]
-  status    OrderStatus @default(PENDING)
-  amount    Float
+  id             String      @id @default(cuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id])
+  cartId         String?     @unique // New field to link to cart
+  createdAt      DateTime    @default(now())
+  items          OrderItem[]
+  status         OrderStatus @default(PENDING)
+  amount         Float
   paymentGateway String?
-  paymentId      String? @unique
+  paymentId      String?     @unique
+  discountCode   String?
+  discountAmount Float?
+  discountId     String?
+  discount       Discount?   @relation(fields: [discountId], references: [id])
 }
 
 model OrderItem {
@@ -288,6 +304,16 @@ model CustomDesignRequest {
   budget      String?
   attachments String[]
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+  status      CustomDesignRequestStatus @default(PENDING)
+}
+
+enum CustomDesignRequestStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  COMPLETED
 }
 
 model Conversation {
@@ -309,4 +335,57 @@ model Message {
   sender         User         @relation(fields: [senderId], references: [id])
   senderId       String
   readBy         User[]       @relation("ReadMessages")
+}
+
+model MarqueeItem {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Banner {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Discount {
+  id                String      @id @default(cuid())
+  code              String      @unique
+  type              DiscountType
+  value             Float
+  minPurchaseAmount Float?
+  maxUses           Int?
+  uses              Int         @default(0)
+  expiresAt         DateTime?
+  isActive          Boolean     @default(true)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  orders            Order[]
+  carts             Cart[] // New inverse relation
+  designs           DesignDiscount[]
+}
+
+model DesignDiscount {
+  design     Design   @relation(fields: [designId], references: [id])
+  designId   String
+  discount   Discount @relation(fields: [discountId], references: [id])
+  discountId String
+
+  @@id([designId, discountId])
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+model NewsletterSubscription {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }

@@ -15,14 +15,26 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { first_name, last_name, email, amount, phone_number } = body;
+    const { first_name, last_name, email, amount, phone_number, discountCode, discountAmount, discountId } = body;
 
-    const userCart = await prisma.cart.findUnique({
+    let userCart = await prisma.cart.findUnique({
       where: { userId },
     });
 
     if (!userCart) {
       return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+    }
+
+    // Update cart with discount details if provided
+    if (discountId || discountCode || discountAmount) {
+      userCart = await prisma.cart.update({
+        where: { id: userCart.id },
+        data: {
+          discountCode: discountCode || null,
+          discountAmount: discountAmount || null,
+          discountId: discountId || null,
+        },
+      });
     }
 
     if (
@@ -44,14 +56,28 @@ export async function POST(req: NextRequest) {
 
     // const host = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+    // Fetch USD to KES exchange rate
+    const exchangeRateRes = await fetch(`${req.nextUrl.origin}/api/exchange-rate`);
+    if (!exchangeRateRes.ok) {
+      throw new Error('Failed to fetch exchange rate for IntaSend payment');
+    }
+    const exchangeRateData = await exchangeRateRes.json();
+    const usdToKesRate = exchangeRateData.usdToKesRate;
+
+    if (!usdToKesRate) {
+      throw new Error('USD to KES exchange rate not available.');
+    }
+
+    const amountKES = (Number(amount) * usdToKesRate).toFixed(2); // Round to 2 decimal places
+
     const collection = intasend.collection();
     const resp = await collection.mpesaStkPush({
       first_name,
       last_name,
       email,
-      amount: Number(amount),
-      phone_number,
-      api_ref: userCart.id, // Pass cart ID as api_ref
+      amount: Number(amountKES),
+      phone_number: phone_number.startsWith('0') ? `254${phone_number.substring(1)}` : phone_number, // Ensure correct format
+      reference: userCart.id, // Use 'reference' instead of 'api_ref'
       // callback_url: `${host}/api/intasend/webhook`,
     });
 

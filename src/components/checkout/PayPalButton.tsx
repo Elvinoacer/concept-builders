@@ -6,20 +6,33 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export default function PayPalButton() {
-  const { cart } = useCart();
+interface PayPalButtonProps {
+  cart: any[];
+  finalTotal: number;
+  appliedDiscountAmount: number;
+  appliedDiscountId: string | null;
+  appliedDiscountCode: string | null;
+}
+
+export default function PayPalButton({
+  cart,
+  finalTotal,
+  appliedDiscountAmount,
+  appliedDiscountId,
+  appliedDiscountCode,
+}: PayPalButtonProps) {
   const router = useRouter();
-  const [total, setTotal] = useState(0);
   const [paymentStatus, setPaymentStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  useEffect(() => {
-    const newTotal = cart.reduce(
-      (sum, item) => sum + item.basePrice * item.quantity,
-      0
-    );
-    setTotal(newTotal);
-  }, [cart]);
+  // Remove the useEffect that calculates total from cart, as we now receive finalTotal as a prop
+  // useEffect(() => {
+  //   const newTotal = cart.reduce(
+  //     (sum, item) => sum + item.basePrice * item.quantity,
+  //     0
+  //   );
+  //   setTotal(newTotal);
+  // }, [cart]);
 
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID) {
@@ -34,7 +47,7 @@ export default function PayPalButton() {
       const response = await fetch("/api/paypal/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: total }),
+        body: JSON.stringify({ amount: finalTotal, cart: cart }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -60,13 +73,19 @@ export default function PayPalButton() {
       const response = await fetch("/api/paypal/capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderID: data.orderID }),
+        body: JSON.stringify({
+          orderID: data.orderID,
+          discountCode: appliedDiscountCode,
+          discountAmount: appliedDiscountAmount,
+          discountId: appliedDiscountId,
+          cart: cart, // Pass cart to capture endpoint
+        }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Failed to capture order");
       setPaymentStatus("success");
       toast.success("Payment successful!");
-      router.push(`/purchase-confirmation?purchaseId=${result.orderId}`);
+      router.push(result.redirect_url); // Use the redirect_url from the API response
     } catch (error: any) {
       console.error("Capture Order Error:", error.message);
       setPaymentStatus("error");
@@ -99,7 +118,7 @@ export default function PayPalButton() {
         createOrder={createOrder}
         onApprove={onApprove}
         onError={onError}
-        disabled={total <= 0}
+        disabled={finalTotal <= 0}
       />
     </PayPalScriptProvider>
   );

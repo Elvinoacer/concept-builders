@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
+import { sendCustomDesignRequestEmail } from "@/lib/emails";
+import { Role } from "@/generated/prisma";
 
 const s3Client = new S3Client({
   endpoint: "https://sfo3.digitaloceanspaces.com", // Change to your region
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
         const fileName = `${uuidv4()}.${fileExtension}`;
 
         const command = new PutObjectCommand({
-          Bucket: process.env.DO_SPACES_BUCKET,
+          Bucket: process.env.DO_SPACES_BUCKET as string,
           Key: fileName,
           Body: buffer,
           ContentType: file.type,
@@ -62,6 +64,25 @@ export async function POST(request: NextRequest) {
         attachments: uploadedFileUrls,
       },
     });
+
+    // Send email to admin
+    await sendCustomDesignRequestEmail(customDesignRequest);
+
+    // Create notification for admin
+    const admin = await prisma.user.findFirst({
+      where: { role: Role.ADMIN },
+    });
+
+    if (admin) {
+      await prisma.notification.create({
+        data: {
+          userId: admin.id,
+          title: "New Custom Design Request",
+          description: `A new custom design request has been submitted by ${name}`,
+          icon: "Paperclip",
+        },
+      });
+    }
 
     return NextResponse.json(customDesignRequest, { status: 201 });
   } catch (error) {

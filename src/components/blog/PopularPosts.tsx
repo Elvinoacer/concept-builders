@@ -13,12 +13,12 @@ const PopularPosts = () => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/blog`);
+        const res = await fetch(`/api/blog/popular`);
         if (!res.ok) {
-          throw new Error("Failed to fetch posts");
+          throw new Error("Failed to fetch popular posts");
         }
-        const posts = await res.json();
-        setPopularPosts(posts.sort((a: Post, b: Post) => (b.views || 0) - (a.views || 0)).slice(0, 3));
+        const result = await res.json();
+        setPopularPosts(result.data);
       } catch (error) {
         console.error("Failed to fetch popular posts:", error);
       } finally {
@@ -70,15 +70,25 @@ const PopularPosts = () => {
 export const PopularPostsSkeleton = () => {
   return (
     <div className="rounded-lg border bg-card p-4 shadow-sm md:p-6">
-      <div className="mb-4 h-6 w-3/4 animate-pulse rounded-md bg-muted"></div>
+      <div className="mb-4 h-6 w-3/4 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
+        <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+      </div>
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="flex items-start gap-4">
-            <div className="h-16 w-16 flex-shrink-0 animate-pulse rounded-md bg-muted"></div>
+            <div className="h-16 w-16 flex-shrink-0 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
+              <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+            </div>
             <div className="flex-1 space-y-2 py-1">
-              <div className="h-4 w-full animate-pulse rounded-md bg-muted"></div>
-              <div className="h-4 w-5/6 animate-pulse rounded-md bg-muted"></div>
-              <div className="mt-1 h-3 w-1/3 animate-pulse rounded-md bg-muted"></div>
+              <div className="h-4 w-full relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mb-1">
+                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+              </div>
+              <div className="h-4 w-5/6 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mb-1">
+                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+              </div>
+              <div className="mt-1 h-3 w-1/3 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
+                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+              </div>
             </div>
           </div>
         ))}

@@ -1,0 +1,1 @@
+ALTER TABLE "Design" ADD COLUMN "featuredOrder" INTEGER UNIQUE;

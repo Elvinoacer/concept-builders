@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   const userId = session.user.id;
 
   const body = await request.json();
-  const { orderID } = body;
+  const { orderID, discountCode, discountAmount, discountId } = body;
 
   if (!orderID) {
     return NextResponse.json(
@@ -79,6 +79,9 @@ export async function POST(request: Request) {
           status: "PAID",
           paymentGateway: "PAYPAL",
           paymentId: response.result.id,
+          discountCode: discountCode || null,
+          discountAmount: discountAmount || null,
+          discountId: discountId || null,
         },
       });
 
@@ -89,6 +92,17 @@ export async function POST(request: Request) {
           quantity: item.quantity,
         })),
       });
+
+      if (discountId) {
+        await tx.discount.update({
+          where: { id: discountId },
+          data: {
+            uses: {
+              increment: 1,
+            },
+          },
+        });
+      }
 
       await tx.notification.create({
         data: {
@@ -107,6 +121,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       orderId: newOrder.id,
+      redirect_url: `/purchase-confirmation?purchaseId=${newOrder.id}`,
     });
 
   } catch (error) {

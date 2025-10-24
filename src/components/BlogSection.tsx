@@ -1,16 +1,14 @@
 'use client';
-import { useEffect } from 'react';
-import useLandingPageStore from '@/lib/store/landing-page';
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Post } from "@prisma/client";
 
-const BlogSection = () => {
-  const { recentPosts, fetchLandingPageData } = useLandingPageStore();
+interface BlogSectionProps {
+  recentPosts: Post[];
+}
 
-  useEffect(() => {
-    fetchLandingPageData();
-  }, [fetchLandingPageData]);
+const BlogSection = ({ recentPosts }: BlogSectionProps) => {
 
   if (!recentPosts.length) {
     return null;
@@ -100,6 +98,14 @@ const BlogSection = () => {
               </motion.div>
             ))}
           </div>
+        </div>
+        <div className="text-center mt-12">
+          <Link
+            href="/blog"
+            className="inline-block bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 text-lg rounded-lg hover:from-blue-700 hover:to-cyan-500 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1"
+          >
+            Continue to Our Blog
+          </Link>
         </div>
       </div>
     </section>

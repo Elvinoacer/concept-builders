@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
       const userCart = await prisma.cart.findUnique({
         where: { id: cartId },
-        include: { items: { include: { design: true } } },
+        include: { items: { include: { design: true } }, discount: true }, // Include discount details
       });
 
       if (!userCart) {
@@ -58,6 +58,10 @@ export async function POST(req: NextRequest) {
             status: "PAID",
             paymentGateway: "INTASEND",
             paymentId: paymentId,
+            cartId: userCart.id, // Store cartId in the order
+            discountCode: userCart.discountCode || null,
+            discountAmount: userCart.discountAmount || null,
+            discountId: userCart.discountId || null,
           },
         });
 
@@ -69,12 +73,33 @@ export async function POST(req: NextRequest) {
           })),
         });
 
+        if (userCart.discountId) {
+          await tx.discount.update({
+            where: { id: userCart.discountId },
+            data: {
+              uses: {
+                increment: 1,
+              },
+            },
+          });
+        }
+
         await tx.notification.create({
           data: {
             userId: userCart.userId,
             title: "Order Created",
             description: `Your order #${order.id} has been created successfully.`,
             icon: "ShoppingCart",
+          },
+        });
+
+        // Clear discount fields from the cart after successful order
+        await tx.cart.update({
+          where: { id: userCart.id },
+          data: {
+            discountCode: null,
+            discountAmount: null,
+            discountId: null,
           },
         });
 

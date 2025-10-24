@@ -4,21 +4,55 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/useCart";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation"; // Added useRouter
 
-export default function StkPushForm() {
-  const { cart } = useCart();
+interface StkPushFormProps {
+  cart: any[]; // Add cart to props
+  finalTotal: number;
+  appliedDiscountAmount: number;
+  appliedDiscountId: string | null;
+  appliedDiscountCode: string | null;
+}
+
+export default function StkPushForm({
+  cart,
+  finalTotal,
+  appliedDiscountAmount,
+  appliedDiscountId,
+  appliedDiscountCode,
+}: StkPushFormProps) {
   const { data: session } = useSession();
-  const [total, setTotal] = useState(0);
+  const router = useRouter();
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [usdToKesRate, setUsdToKesRate] = useState<number | null>(null);
+  const [isFetchingRate, setIsFetchingRate] = useState(true);
+  const [rateError, setRateError] = useState<string | null>(null);
+
   useEffect(() => {
-    const newTotal = cart.reduce(
-      (sum, item) => sum + item.basePrice * item.quantity,
-      0
-    );
-    setTotal(newTotal);
-  }, [cart]);
+    const fetchExchangeRate = async () => {
+      setIsFetchingRate(true);
+      setRateError(null);
+      try {
+        const res = await fetch('/api/exchange-rate');
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || 'Failed to fetch exchange rate');
+        }
+        const data = await res.json();
+        setUsdToKesRate(data.usdToKesRate);
+      } catch (err: any) {
+        setRateError(err.message);
+        toast.error(`Exchange rate error: ${err.message}`);
+      } finally {
+        setIsFetchingRate(false);
+      }
+    };
+    fetchExchangeRate();
+  }, []);
+
+  const amountKES = usdToKesRate ? (finalTotal * usdToKesRate).toFixed(2) : 'N/A';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +66,12 @@ export default function StkPushForm() {
         first_name: session?.user?.name?.split(' ')[0],
         last_name: session?.user?.name?.split(' ')[1] || 'User',
         email: session?.user?.email,
-        amount: total,
+        amount: finalTotal, // Use finalTotal
         phone_number: phone,
+        discountCode: appliedDiscountCode,
+        discountAmount: appliedDiscountAmount,
+        discountId: appliedDiscountId,
+        cart: cart, // Pass cart to Intasend API
       }),
     });
 
@@ -41,6 +79,28 @@ export default function StkPushForm() {
 
     if (response.ok) {
       toast.success("STK Push initiated successfully! Check your phone.");
+      // Start polling for order status
+      const pollInterval = setInterval(async () => {
+        const statusRes = await fetch(`/api/orders/status?cartId=${cart.id}`); // Assuming cart.id is available and unique
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'PAID' && statusData.orderId) {
+          clearInterval(pollInterval);
+          toast.success("Payment confirmed! Redirecting...");
+          router.push(`/purchase-confirmation?purchaseId=${statusData.orderId}`);
+        } else if (statusData.status === 'FAILED') { // Assuming webhook can set a FAILED status
+          clearInterval(pollInterval);
+          toast.error("Payment failed. Please try again.");
+        }
+        // Add a timeout to stop polling after a certain period
+      }, 5000); // Poll every 5 seconds
+
+      // Set a timeout to stop polling after a certain period (e.g., 5 minutes)
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        // Optionally, show a message to the user if payment is still pending
+        toast.info("Payment is still pending. Please check your phone or contact support.");
+      }, 5 * 60 * 1000); // 5 minutes
     } else {
       toast.error(result.error || "Failed to initiate STK Push");
     }
@@ -63,10 +123,10 @@ export default function StkPushForm() {
         />
         <button
           type="submit"
-          disabled={loading || total <= 0 || !phone}
+          disabled={loading || finalTotal <= 0 || !phone || isFetchingRate || rateError}
           className="w-full bg-green-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? "Processing..." : `Pay KES ${total}`}
+          {loading ? "Processing..." : isFetchingRate ? "Fetching rate..." : rateError ? "Error" : `Pay KES ${amountKES}`}
         </button>
       </form>
     </div>

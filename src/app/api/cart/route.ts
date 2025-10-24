@@ -75,16 +75,15 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingItem) {
-      await prisma.cartItem.update({
-        where: { id: existingItem.id },
-        data: { quantity: existingItem.quantity + quantity },
-      });
+      // If item already exists, do nothing as quantity should always be 1
+      // Or, you could return a specific message indicating it's already in cart
+      return NextResponse.json({ message: "Item already in cart" }, { status: 200 });
     } else {
       await prisma.cartItem.create({
         data: {
           cartId: cart.id,
           designId: designId,
-          quantity: quantity,
+          quantity: 1, // Always add with quantity 1
         },
       });
     }

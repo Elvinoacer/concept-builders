@@ -23,20 +23,28 @@ export async function GET(req: Request) {
             createdAt: "asc",
           },
         },
+        discount: true, // Include discount details
       },
     });
 
     if (!userCart) {
-      return NextResponse.json([], { status: 200 });
+      // Return an empty cart object with null discount details if no cart exists
+      return NextResponse.json(
+        {
+          id: null, // Or a default ID if needed by frontend
+          userId: session.user.id,
+          items: [],
+          discountCode: null,
+          discountAmount: null,
+          discountId: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        { status: 200 }
+      );
     }
 
-    // Transform the data to match the structure the frontend expects (Design with quantity)
-    const frontendCartItems = userCart.items.map((item) => ({
-      ...item.design,
-      quantity: item.quantity,
-    }));
-
-    return NextResponse.json(frontendCartItems);
+    return NextResponse.json(userCart);
   } catch (error) {
     console.error("Failed to fetch cart items:", error);
     return NextResponse.json(
@@ -54,9 +62,13 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { designId } = await req.json();
+    const { designId, selectedPackage, selectedExtras } = await req.json();
+    const selectedExtrasString = JSON.stringify(selectedExtras);
     if (!designId) {
-      return NextResponse.json({ error: "Design ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Design ID is required" },
+        { status: 400 }
+      );
     }
 
     const userId = session.user.id;
@@ -69,20 +81,48 @@ export async function POST(req: Request) {
     });
 
     // Add the new item to the cart, or do nothing if it exists
-    await prisma.cartItem.upsert({
+    console.log("Upserting cart item with data:", {
       where: {
         cartId_designId: {
           cartId: userCart.id,
           designId: designId,
         },
       },
-      update: {},
+      update: { selectedPackage, selectedExtras },
       create: {
         cartId: userCart.id,
         designId: designId,
         quantity: 1,
+        selectedPackage,
+        selectedExtras,
       },
     });
+
+    const existingCartItem = await prisma.cartItem.findFirst({
+      where: {
+        cartId: userCart.id,
+        designId: designId,
+        selectedPackage: selectedPackage,
+        selectedExtras: selectedExtrasString,
+      },
+    });
+
+    if (existingCartItem) {
+      await prisma.cartItem.update({
+        where: { id: existingCartItem.id },
+        data: { quantity: existingCartItem.quantity + 1 },
+      });
+    } else {
+      await prisma.cartItem.create({
+        data: {
+          cartId: userCart.id,
+          designId: designId,
+          quantity: 1,
+          selectedPackage,
+          selectedExtras: selectedExtrasString,
+        },
+      });
+    }
 
     // Fetch the updated cart to return to the client
     const updatedCart = await prisma.cart.findUnique({
@@ -96,16 +136,11 @@ export async function POST(req: Request) {
             createdAt: "asc",
           },
         },
+        discount: true, // Include discount details
       },
     });
 
-    const frontendCartItems = updatedCart?.items.map((item) => ({
-      ...item.design,
-      quantity: item.quantity,
-    })) || [];
-
-    return NextResponse.json(frontendCartItems);
-
+    return NextResponse.json(updatedCart);
   } catch (error) {
     console.error("Failed to add item to cart:", error);
     return NextResponse.json(

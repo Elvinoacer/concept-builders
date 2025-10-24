@@ -1,14 +1,21 @@
-'use client';
-import { useEffect } from 'react';
-import useLandingPageStore from '@/lib/store/landing-page';
+"use client";
 import Link from "next/link";
+import { Category, Design, File } from "@/generated/prisma"; // Import Design and File
 
-const FeaturedCategories = () => {
-  const { featuredCategories, fetchLandingPageData } = useLandingPageStore();
+interface CategoryWithDesignsAndFiles extends Category {
+  designs: (Design & { files: File[] })[];
+}
 
-  useEffect(() => {
-    fetchLandingPageData();
-  }, [fetchLandingPageData]);
+interface FeaturedCategoriesProps {
+  featuredCategories: CategoryWithDesignsAndFiles[];
+}
+
+const FeaturedCategories = ({
+  featuredCategories,
+}: FeaturedCategoriesProps) => {
+  if (!featuredCategories || featuredCategories.length === 0) {
+    return null; // Or display a message like "No featured categories available"
+  }
 
   return (
     <section className="py-8 md:py-12 lg:py-16">
@@ -17,12 +24,17 @@ const FeaturedCategories = () => {
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
         {featuredCategories.map((category, index) => (
-          <Link key={index} href={`/design-showcase?category=${category.name}`}>
+          <Link
+            key={category.id || index}
+            href={`/design-showcase?category=${category.name}`}
+          >
             <div className="group flex flex-col gap-3 md:gap-4">
               <div className="overflow-hidden rounded-lg">
                 <div
                   className="w-full bg-center bg-no-repeat aspect-[4/3] bg-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                  style={{ backgroundImage: `url("${category.image || '/images/default-avatar.png'}")` }}
+                  style={{
+                    backgroundImage: `url("${category.designs?.[0]?.files?.[0]?.url || category.image || "/images/category-placeholder.png"}")`,
+                  }}
                 ></div>
               </div>
               <div>
