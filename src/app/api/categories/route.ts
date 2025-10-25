@@ -3,6 +3,17 @@ import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
+    const forFilters = request.nextUrl.searchParams.get("forFilters");
+
+    if (forFilters) {
+      const categories = await prisma.category.findMany({
+        orderBy: {
+          isFeatured: "desc",
+        },
+      });
+      return NextResponse.json(categories);
+    }
+
     const search = request.nextUrl.searchParams.get("search") || "";
     const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
     const limit = parseInt(request.nextUrl.searchParams.get("limit") || "10");
@@ -35,9 +46,6 @@ export async function GET(request: NextRequest) {
         },
         designs: {
           take: 1,
-          orderBy: {
-            createdAt: "asc",
-          },
           include: {
             files: {
               where: {

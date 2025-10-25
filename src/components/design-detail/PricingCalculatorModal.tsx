@@ -32,61 +32,39 @@ const PricingCalculatorModal: React.FC<PricingCalculatorModalProps> = ({
     setIsMounted(true);
   }, []);
 
-  const parseDetail = (detailKey: string): number => {
-    if (!design || !design.planDetails) return 0;
-    const detailString = design.planDetails.find((d) =>
-      d.startsWith(detailKey)
-    );
-    if (!detailString) return 0;
-    const match = detailString.match(/[\d,.]+/);
-    return match ? parseFloat(match[0].replace(/,/g, "")) : 0;
-  };
-
-  const [area, setArea] = useState(parseDetail("Total Living Area"));
-  const [bedrooms, setBedrooms] = useState(parseDetail("Bedrooms"));
-  const [bathrooms, setBathrooms] = useState(parseDetail("Bathrooms"));
-  const [storeys, setStoreys] = useState(parseDetail("Stories"));
   const [location, setLocation] = useState(1);
   const [finishQuality, setFinishQuality] = useState(1);
-  const [selectedOptions, setSelectedOptions] = useState<
-    {
-      name: string;
-      price: number;
-    }[]
-  >([]);
+  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [estimatedCost, setEstimatedCost] = useState(0);
 
   useEffect(() => {
-    if (design) {
-      setArea(parseDetail("Total Living Area"));
-      setBedrooms(parseDetail("Bedrooms"));
-      setBathrooms(parseDetail("Bathrooms"));
-      setStoreys(parseDetail("Stories"));
+    if (design.buildingCostFactors?.options) {
+      const initialQuantities: { [key: string]: number } = {};
+      design.buildingCostFactors.options.forEach((option: any) => {
+        initialQuantities[option.name] = 0; // Initialize with 0
+      });
+      setQuantities(initialQuantities);
     }
-  }, [design]);
+  }, [design.buildingCostFactors]);
 
   useEffect(() => {
-    const baseCostPerSqFt = 250;
-    const areaCost = area * baseCostPerSqFt;
-    const bedroomsCost = bedrooms * 5000;
-    const bathroomsCost = bathrooms * 7000;
-    const storeysCost = storeys > 1 ? areaCost * (storeys - 1) * 0.5 : 0;
-    const totalBaseCost = areaCost + bedroomsCost + bathroomsCost + storeysCost;
-    const selectedOptionsCost = selectedOptions.reduce(
-      (sum, option) => sum + option.price,
-      0
-    );
+    let factorCosts = 0;
+    if (design.buildingCostFactors?.options) {
+      design.buildingCostFactors.options.forEach((option: any) => {
+        const quantity = quantities[option.name] || 0;
+        factorCosts += quantity * (option.price || 0);
+      });
+    }
+
+    const totalBaseCost = factorCosts;
     const finalCost =
-      totalBaseCost * location * finishQuality + selectedOptionsCost;
+      totalBaseCost * location * finishQuality;
     setEstimatedCost(finalCost);
   }, [
-    area,
-    bedrooms,
-    bathrooms,
-    storeys,
+    quantities,
     location,
     finishQuality,
-    selectedOptions,
+    design.buildingCostFactors,
   ]);
 
   const modalContent = (
@@ -136,59 +114,34 @@ const PricingCalculatorModal: React.FC<PricingCalculatorModalProps> = ({
               {/* Left Panel - Inputs */}
               <div className="flex-1 overflow-y-auto p-6 border-r border-gray-100 dark:border-gray-800 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
                 <div className="space-y-6">
-                  {/* Basic Specifications */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                      <Home className="w-5 h-5 text-blue-600" />
-                      Basic Specifications
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Area (sq. ft.)
-                        </label>
-                        <Input
-                          type="number"
-                          value={area}
-                          onChange={(e) => setArea(Number(e.target.value))}
-                          className="h-12 text-lg"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Stories
-                        </label>
-                        <Input
-                          type="number"
-                          value={storeys}
-                          onChange={(e) => setStoreys(Number(e.target.value))}
-                          className="h-12 text-lg"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Bedrooms
-                        </label>
-                        <Input
-                          type="number"
-                          value={bedrooms}
-                          onChange={(e) => setBedrooms(Number(e.target.value))}
-                          className="h-12 text-lg"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Bathrooms
-                        </label>
-                        <Input
-                          type="number"
-                          value={bathrooms}
-                          onChange={(e) => setBathrooms(Number(e.target.value))}
-                          className="h-12 text-lg"
-                        />
+                  {/* Building Cost Factors */}
+                  {design.buildingCostFactors?.options && design.buildingCostFactors.options.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <Home className="w-5 h-5 text-blue-600" />
+                        Your Custom Specifications
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {design.buildingCostFactors.options.map((factor: any) => (
+                          <div key={factor.name} className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {factor.name} ({factor.unit})
+                            </label>
+                            <Input
+                              type="number"
+                              value={quantities[factor.name] || ''}
+                              onChange={(e) => setQuantities(prev => ({
+                                ...prev,
+                                [factor.name]: Number(e.target.value)
+                              }))}
+                              className="h-12 text-lg"
+                              placeholder="0"
+                            />
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Location & Quality */}
                   <div className="space-y-4">
@@ -244,62 +197,7 @@ const PricingCalculatorModal: React.FC<PricingCalculatorModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Additional Options */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                      <Layers className="w-5 h-5 text-purple-600" />
-                      Additional Options
-                    </h3>
-                    <div className="space-y-3">
-                      {design.calculatorOptions?.map((option) => (
-                        <div
-                          key={option.name}
-                          className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                            selectedOptions.some(
-                              (selected) => selected.name === option.name
-                            )
-                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                              : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                          }`}
-                          onClick={() => {
-                            setSelectedOptions((prev) =>
-                              selectedOptions.some(
-                                (selected) => selected.name === option.name
-                              )
-                                ? prev.filter(
-                                    (selected) => selected.name !== option.name
-                                  )
-                                : [...prev, option]
-                            );
-                          }}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div
-                              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                selectedOptions.some(
-                                  (selected) => selected.name === option.name
-                                )
-                                  ? "bg-blue-500 border-blue-500"
-                                  : "border-gray-400"
-                              }`}
-                            >
-                              {selectedOptions.some(
-                                (selected) => selected.name === option.name
-                              ) && (
-                                <div className="w-2 h-2 bg-white rounded-full" />
-                              )}
-                            </div>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">
-                              {option.name}
-                            </span>
-                          </div>
-                          <span className="font-bold text-blue-600 dark:text-blue-400">
-                            +${option.price.toLocaleString()}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  
                 </div>
               </div>
 
@@ -334,14 +232,23 @@ const PricingCalculatorModal: React.FC<PricingCalculatorModalProps> = ({
                     Cost Breakdown
                   </h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">
-                        Base Construction
-                      </span>
-                      <span className="font-medium">
-                        ${(area * 250).toLocaleString()}
-                      </span>
-                    </div>
+                    {design.buildingCostFactors?.options?.map((factor: any) => {
+                      const quantity = quantities[factor.name] || 0;
+                      const cost = quantity * (factor.price || 0);
+                      if (cost > 0) {
+                        return (
+                          <div key={factor.name} className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">
+                              {factor.name} ({quantity} {factor.unit})
+                            </span>
+                            <span className="font-medium">
+                              ${cost.toLocaleString()}
+                            </span>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
                         Location Factor
@@ -354,17 +261,7 @@ const PricingCalculatorModal: React.FC<PricingCalculatorModalProps> = ({
                       </span>
                       <span className="font-medium">{finishQuality}x</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">
-                        Additional Options
-                      </span>
-                      <span className="font-medium">
-                        +$
-                        {selectedOptions
-                          .reduce((sum, opt) => sum + opt.price, 0)
-                          .toLocaleString()}
-                      </span>
-                    </div>
+                    
                   </div>
                 </div>
 

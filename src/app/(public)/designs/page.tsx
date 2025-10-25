@@ -1,33 +1,91 @@
-"use client";
 import DesignCard from "@/components/DesignCard";
-import { designs, categories } from "@/lib/dummydata";
 import { designsPageData } from "@/lib/dummydata/designsPage";
-import { useEffect, useState } from "react";
+import prisma from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma";
+import { FilterControls } from "@/components/design-showcase/FilterControls";
+import { PaginationControls } from "@/components/design-showcase/PaginationControls";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+interface AllDesignsPageProps {
+  searchParams: {
+    category?: string;
+    sort?: string;
+    search?: string;
+    page?: string;
+    pageSize?: string;
+  };
+}
+const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
+  const session = await getServerSession(authOptions);
+  const { category, sort, search } = searchParams;
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+  const currentPage = Number(searchParams.page) || 1;
+  const pageSize = Number(searchParams.pageSize) || 9; // Default page size
+  const skip = (currentPage - 1) * pageSize;
 
-const AllDesignsPage = () => {
-  const [filteredDesigns, setFilteredDesigns] = useState(designs);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [sortOrder, setSortOrder] = useState("name");
+  const categories = await prisma.category.findMany();
 
-  useEffect(() => {
-    let newFilteredDesigns = [...designs];
+  const where: Prisma.DesignWhereInput = {};
+  if (category && category !== "All") {
+    where.category = {
+      name: category,
+    };
+  }
 
-    if (selectedCategory !== "All") {
-      newFilteredDesigns = newFilteredDesigns.filter((design) => design.category === selectedCategory);
-    }
+  if (search) {
+    where.OR = [
+      {
+        name: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+      {
+        description: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+    ];
+  }
 
-    if (sortOrder === "price-asc") {
-      newFilteredDesigns.sort((a, b) => a.pricing.pdf - b.pricing.pdf);
-    } else if (sortOrder === "price-desc") {
-      newFilteredDesigns.sort((a, b) => b.pricing.pdf - a.pricing.pdf);
-    } else {
-      newFilteredDesigns.sort((a, b) => a.name.localeCompare(b.name));
-    }
+  const orderBy: Prisma.DesignOrderByWithRelationInput = {};
+  if (sort === "price-asc") {
+    orderBy.basePrice = "asc";
+  } else if (sort === "price-desc") {
+    orderBy.basePrice = "desc";
+  } else {
+    orderBy.name = "asc";
+  }
 
-    setFilteredDesigns(newFilteredDesigns);
-  }, [selectedCategory, sortOrder]);
+  const [designs, totalDesigns, user] = await Promise.all([
+    prisma.design.findMany({
+      where,
+      orderBy,
+      skip,
+      take: pageSize,
+      include: {
+        files: {
+          where: {
+            type: "IMAGE",
+          },
+        },
+        category: true,
+      },
+    }),
+    prisma.design.count({
+      where,
+    }),
+    session?.user?.id
+      ? prisma.user.findUnique({
+          where: { id: session.user.id },
+          include: { wishlist: true },
+        })
+      : Promise.resolve(null),
+  ]);
+
+  const totalPages = Math.ceil(totalDesigns / pageSize);
+  const wishlist = user?.wishlist || [];
 
   return (
     <div
@@ -40,38 +98,29 @@ const AllDesignsPage = () => {
         <main className="flex-1 px-4 py-8 md:px-16 lg:px-24 xl:px-40 md:py-12 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight dark:text-white">{designsPageData.pageTitle}</h1>
-              <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-                <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
-                  <SelectTrigger className="w-full md:w-[180px]">
-                    <SelectValue placeholder={designsPageData.categorySelectPlaceholder} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="All">{designsPageData.allCategoriesOption}</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.name} value={category.name}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select onValueChange={setSortOrder} defaultValue={sortOrder}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder={designsPageData.sortBySelectPlaceholder} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="name">{designsPageData.sortByNameOption}</SelectItem>
-                    <SelectItem value="price-asc">{designsPageData.sortByPriceAscOption}</SelectItem>
-                    <SelectItem value="price-desc">{designsPageData.sortByPriceDescOption}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight dark:text-white">
+                {designsPageData.pageTitle}
+              </h1>
+              <FilterControls
+                categories={categories}
+                category={category}
+                sort={sort}
+                search={search}
+              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredDesigns.map((design) => (
-                <DesignCard key={design.id} design={design} />
+              {designs.map((design) => (
+                <DesignCard
+                  key={design.id}
+                  design={design}
+                  isFavorited={wishlist.some((item) => item.id === design.id)}
+                />
               ))}
             </div>
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
           </div>
         </main>
       </div>

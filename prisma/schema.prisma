@@ -155,8 +155,14 @@ model Design {
   folderId    String?
 
   buildingCostEstimates Json[]
-  calculatorOptions     Json[]
+  minBuildingCost       Float?
+  maxBuildingCost       Float?
   faq                   Json[]
+  pdfPrice              Float? @default(0)
+  cadPrice              Float? @default(0)
+  pdfAndCadPrice        Float? @default(0)
+  packageOptions        Json?
+  buildingCostFactors   Json?
 
   wishlistedBy User[]
   category     Category?   @relation(fields: [categoryId], references: [id])

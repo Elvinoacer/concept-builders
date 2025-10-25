@@ -4,18 +4,24 @@ import { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DesignCard from './DesignCard';
 
+import DesignCardSkeleton from './DesignCardSkeleton';
+
 const FeaturedDesigns = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [featuredDesigns, setFeaturedDesigns] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDesigns = async () => {
+      setLoading(true);
       try {
         const response = await fetch('/api/designs?limit=5&isFeatured=true');
         const data = await response.json();
         setFeaturedDesigns(data.designs);
       } catch (error) {
         console.error('Error fetching featured designs:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -36,14 +42,25 @@ const FeaturedDesigns = () => {
           ref={scrollContainerRef}
           className="flex snap-x snap-mandatory overflow-x-auto pb-6 -mx-4 px-4 gap-6 scrollbar-hide touch-pan-x"
         >
-          {featuredDesigns.map((design: any, index) => (
-            <div
-              key={design.id}
-              className="w-[80%] sm:w-[45%] md:w-[30%] lg:w-[23%] flex-shrink-0 snap-start"
-            >
-              <DesignCard design={design} index={index} showDetails={false} />
-            </div>
-          ))}
+          {loading ? (
+            [...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                className="w-[80%] sm:w-[45%] md:w-[30%] lg:w-[23%] flex-shrink-0 snap-start"
+              >
+                <DesignCardSkeleton index={index} />
+              </div>
+            ))
+          ) : (
+            featuredDesigns.map((design: any, index) => (
+              <div
+                key={design.id}
+                className="w-[80%] sm:w-[45%] md:w-[30%] lg:w-[23%] flex-shrink-0 snap-start"
+              >
+                <DesignCard design={design} index={index} showDetails={false} />
+              </div>
+            ))
+          )}
         </div>
         <div className="hidden md:block absolute top-1/2 -translate-y-1/2 left-0">
           <button

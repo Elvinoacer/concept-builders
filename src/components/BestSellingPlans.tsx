@@ -25,9 +25,7 @@ const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
               <div className="relative h-48 sm:h-56 md:h-64 w-full">
                 <Image
                   src={
-                    design.files && design.files.length > 0
-                      ? design.files[0].url
-                      : "/images/default-avatar.png"
+                    design.files?.find(f => f.type === 'IMAGE')?.url || "/images/category-placeholder.png"
                   }
                   alt={design.name}
                   fill

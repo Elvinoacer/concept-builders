@@ -30,9 +30,7 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
               <div className="relative h-64 w-full overflow-hidden">
                 <Image
                   src={
-                    design.files && design.files.length > 0
-                      ? design.files[0].url
-                      : "/images/default-avatar.png"
+                    design.files?.find(f => f.type === 'IMAGE')?.url || "/images/category-placeholder.png"
                   }
                   alt={design.name}
                   fill

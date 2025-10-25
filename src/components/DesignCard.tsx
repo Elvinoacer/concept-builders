@@ -1,45 +1,50 @@
+"use client";
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-interface File {
-  id: string;
-  url: string;
-  type: string;
-  originalFileName: string;
+import { Design, File, Category } from "@/generated/prisma";
+
+interface DesignWithRelations extends Design {
+  files: File[];
+  category: Category;
 }
 
-interface Design {
-  id: string | number;
-  name: string;
-  description: string;
-  basePrice?: number;
-  bedrooms?: number;
-  bathrooms?: number;
-  area?: number;
-  files?: File[];
-  image?: string;
-  category?: {
-    name: string;
-  } | string;
-  pricing?: {
-    pdf: number;
-    cad: number;
-    fullPackage: number;
-  };
-  details?: {
-    bedrooms: number;
-    bathrooms: number;
-    area: number;
-    floors: number;
-  };
-}
+import { useSession, signIn } from "next-auth/react";
+import { toast } from "sonner";
 
-const DesignCard = ({ design }: { design: Design }) => {
+const DesignCard = ({ design, isFavorited }: { design: DesignWithRelations, isFavorited: boolean }) => {
+  const { data: session } = useSession();
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
+  const [favorited, setFavorited] = useState(isFavorited);
+
+  const handleFavorite = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!session) {
+      signIn("google");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/designs/${design.id}/favorite`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        setFavorited(!favorited);
+        toast.success(favorited ? "Removed from favorites" : "Added to favorites");
+      } else {
+        toast.error("Failed to update favorites");
+      }
+    } catch (error) {
+      toast.error("An error occurred");
+    }
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -63,12 +68,13 @@ const DesignCard = ({ design }: { design: Design }) => {
   const rotateX = isHovered ? mousePosition.y / 10 - 15 : 0;
   const rotateY = isHovered ? mousePosition.x / 10 - 20 : 0;
 
-  const categoryName = typeof design.category === 'string' ? design.category : design.category?.name;
-  const imageUrl = design.image || design.files?.[0]?.url || "/placeholder.jpg";
-  const price = design.basePrice || design.pricing?.pdf;
-  const bedrooms = design.bedrooms || design.details?.bedrooms;
-  const bathrooms = design.bathrooms || design.details?.bathrooms;
-  const area = design.area || design.details?.area;
+  const categoryName = design.category.name;
+  const imageFile = design.files?.find(file => file.type === 'IMAGE');
+  const imageUrl = imageFile?.url || "/images/category-placeholder.png";
+  const price = design.basePrice;
+  const bedrooms = design.bedrooms;
+  const bathrooms = design.bathrooms;
+  const area = design.area;
 
   return (
     <div
@@ -82,7 +88,8 @@ const DesignCard = ({ design }: { design: Design }) => {
         transform: isHovered
           ? `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`
           : "perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)",
-        transition: "transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease",
+        transition:
+          "transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease",
         boxShadow: isHovered
           ? "0 45px 100px rgba(0, 0, 0, 0.4), 0 16px 40px rgba(0, 0, 0, 0.4)"
           : "0 15px 35px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.19)",
@@ -137,14 +144,10 @@ const DesignCard = ({ design }: { design: Design }) => {
 
         {/* Favorite button */}
         <button
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-red-500/90 transition-colors duration-300 shadow-lg"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // Handle favorite logic here
-          }}
+          className={`absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-black/40 backdrop-blur-md rounded-full text-white ${favorited ? 'hover:bg-gray-500/90' : 'hover:bg-red-500/90'} transition-colors duration-300 shadow-lg`}
+          onClick={handleFavorite}
         >
-          <span className="material-symbols-outlined text-base">favorite</span>
+          <span className="material-symbols-outlined text-base" style={{ color: favorited ? 'red' : 'white' }}>favorite</span>
         </button>
       </div>
 
@@ -166,11 +169,15 @@ const DesignCard = ({ design }: { design: Design }) => {
               <span>{bedrooms}</span>
             </div>
             <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
-              <span className="material-symbols-outlined text-base">bathtub</span>
+              <span className="material-symbols-outlined text-base">
+                bathtub
+              </span>
               <span>{bathrooms}</span>
             </div>
             <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
-              <span className="material-symbols-outlined text-base">square_foot</span>
+              <span className="material-symbols-outlined text-base">
+                square_foot
+              </span>
               <span>{area} sqft</span>
             </div>
           </div>
@@ -180,11 +187,15 @@ const DesignCard = ({ design }: { design: Design }) => {
         <div className="overflow-hidden">
           <div
             className="transform transition-transform duration-500 ease-out"
-            style={{ transform: isHovered ? "translateY(0)" : "translateY(100%)" }}
+            style={{
+              transform: isHovered ? "translateY(0)" : "translateY(100%)",
+            }}
           >
             <button className="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-300 flex items-center justify-center gap-2">
               <span>View Details</span>
-              <span className="material-symbols-outlined text-base">arrow_forward</span>
+              <span className="material-symbols-outlined text-base">
+                arrow_forward
+              </span>
             </button>
           </div>
         </div>

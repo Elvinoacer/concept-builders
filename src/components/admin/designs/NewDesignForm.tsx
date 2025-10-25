@@ -33,11 +33,17 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState([]);
+  const [minBuildingCost, setMinBuildingCost] = useState('');
+  const [maxBuildingCost, setMaxBuildingCost] = useState('');
   const [buildingCostEstimates, setBuildingCostEstimates] = useState({
     basic: { description: '', costBreakdown: [{ item: '', cost: '' }] },
     luxury: { description: '', costBreakdown: [{ item: '', cost: '' }] },
   });
-  const [calculatorOptions, setCalculatorOptions] = useState([{ name: '', price: 0 }]);
+  const [pdfPrice, setPdfPrice] = useState("");
+  const [cadPrice, setCadPrice] = useState("");
+  const [pdfAndCadPrice, setPdfAndCadPrice] = useState("");
+  const [packageOptions, setPackageOptions] = useState<{ name: string; price: string }[]>([]);
+  const [buildingCostFactors, setBuildingCostFactors] = useState<{ name: string; unit: string; price: string }[]>([]);
 
   const isEditMode = Boolean(designToEdit);
 
@@ -62,6 +68,8 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
       setPlanDetails(Array.isArray(designToEdit.planDetails) ? designToEdit.planDetails.join('\n') : "");
       setCategoryId(designToEdit.categoryId || "");
       setFiles(designToEdit.files || []);
+      setMinBuildingCost(designToEdit.minBuildingCost?.toString() || '');
+      setMaxBuildingCost(designToEdit.maxBuildingCost?.toString() || '');
 
       if (designToEdit.buildingCostEstimates) {
         const estimates = {
@@ -76,9 +84,12 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
         });
         setBuildingCostEstimates(estimates);
       }
-      if (designToEdit.calculatorOptions) {
-        setCalculatorOptions(designToEdit.calculatorOptions);
-      }
+      
+      setPdfPrice(designToEdit.pdfPrice?.toString() || "");
+      setCadPrice(designToEdit.cadPrice?.toString() || "");
+      setPdfAndCadPrice(designToEdit.pdfAndCadPrice?.toString() || "");
+      setPackageOptions(designToEdit.packageOptions?.options || []);
+      setBuildingCostFactors(designToEdit.buildingCostFactors?.options || []);
     }
   }, [designToEdit, isEditMode]);
 
@@ -126,21 +137,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
     setBuildingCostEstimates(newEstimates);
   };
 
-  const handleCalculatorOptionChange = (index: number, field: 'name' | 'price', value: string | number) => {
-    const newOptions = [...calculatorOptions];
-    newOptions[index][field] = value;
-    setCalculatorOptions(newOptions);
-  };
-
-  const addCalculatorOption = () => {
-    setCalculatorOptions([...calculatorOptions, { name: '', price: 0 }]);
-  };
-
-  const removeCalculatorOption = (index: number) => {
-    const newOptions = [...calculatorOptions];
-    newOptions.splice(index, 1);
-    setCalculatorOptions(newOptions);
-  };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,6 +155,24 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
       planDetails: planDetails.split('\n'),
       folderId: isEditMode ? designToEdit.folderId : folderId,
       categoryId,
+      minBuildingCost: parseFloat(minBuildingCost) || null,
+      maxBuildingCost: parseFloat(maxBuildingCost) || null,
+      pdfPrice: parseFloat(pdfPrice) || null,
+      cadPrice: parseFloat(cadPrice) || null,
+      pdfAndCadPrice: parseFloat(pdfAndCadPrice) || null,
+      packageOptions: {
+        options: packageOptions.map(option => ({
+          name: option.name,
+          price: parseFloat(option.price) || 0
+        }))
+      },
+      buildingCostFactors: {
+        options: buildingCostFactors.map(option => ({
+          name: option.name,
+          unit: option.unit,
+          price: parseFloat(option.price) || 0
+        }))
+      },
       buildingCostEstimates: Object.entries(buildingCostEstimates).map(([tier, data]) => ({
         tier,
         description: data.description,
@@ -165,10 +180,6 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
           ...item,
           cost: parseFloat(item.cost) || 0
         }))
-      })),
-      calculatorOptions: calculatorOptions.map(option => ({
-        ...option,
-        price: parseFloat(option.price) || 0
       })),
       files: files.map((file: any) => ({
         url: file.url,
@@ -288,6 +299,111 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
                 </div>
               </div>
 
+              {/* Building Cost Factors */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium leading-6">Building Cost Factors</h3>
+                {buildingCostFactors.map((factor, index) => (
+                  <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center">
+                    <Input
+                      placeholder="Factor Name"
+                      value={factor.name}
+                      onChange={(e) => {
+                        const newFactors = [...buildingCostFactors];
+                        newFactors[index].name = e.target.value;
+                        setBuildingCostFactors(newFactors);
+                      }}
+                      className="md:col-span-2"
+                    />
+                    <Input
+                      placeholder="Unit (e.g., per sqft)"
+                      value={factor.unit}
+                      onChange={(e) => {
+                        const newFactors = [...buildingCostFactors];
+                        newFactors[index].unit = e.target.value;
+                        setBuildingCostFactors(newFactors);
+                      }}
+                    />
+                    <Input
+                      placeholder="Price per Unit"
+                      type="number"
+                      value={factor.price}
+                      onChange={(e) => {
+                        const newFactors = [...buildingCostFactors];
+                        newFactors[index].price = e.target.value;
+                        setBuildingCostFactors(newFactors);
+                      }}
+                    />
+                    <Button type="button" variant="destructive" size="sm" onClick={() => {
+                      const newFactors = [...buildingCostFactors];
+                      newFactors.splice(index, 1);
+                      setBuildingCostFactors(newFactors);
+                    }}>
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" size="sm" onClick={() => setBuildingCostFactors([...buildingCostFactors, { name: '', unit: '', price: '' }])}>
+                  Add Building Cost Factor
+                </Button>
+              </div>
+
+              {/* File Type Pricing */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium leading-6">File Type Pricing</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="pdfPrice">PDF Price</Label>
+                    <Input id="pdfPrice" name="pdfPrice" type="number" value={pdfPrice} onChange={(e) => setPdfPrice(e.target.value)} placeholder="e.g., 0" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cadPrice">CAD Price</Label>
+                    <Input id="cadPrice" name="cadPrice" type="number" value={cadPrice} onChange={(e) => setCadPrice(e.target.value)} placeholder="e.g., 100" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="pdfAndCadPrice">PDF & CAD Price</Label>
+                    <Input id="pdfAndCadPrice" name="pdfAndCadPrice" type="number" value={pdfAndCadPrice} onChange={(e) => setPdfAndCadPrice(e.target.value)} placeholder="e.g., 150" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Package Options */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium leading-6">Package Options (Fixed Price Add-ons)</h3>
+                {packageOptions.map((option, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Input
+                      placeholder="Option Name"
+                      value={option.name}
+                      onChange={(e) => {
+                        const newOptions = [...packageOptions];
+                        newOptions[index].name = e.target.value;
+                        setPackageOptions(newOptions);
+                      }}
+                    />
+                    <Input
+                      placeholder="Price"
+                      type="number"
+                      value={option.price}
+                      onChange={(e) => {
+                        const newOptions = [...packageOptions];
+                        newOptions[index].price = e.target.value;
+                        setPackageOptions(newOptions);
+                      }}
+                    />
+                    <Button type="button" variant="destructive" size="sm" onClick={() => {
+                      const newOptions = [...packageOptions];
+                      newOptions.splice(index, 1);
+                      setPackageOptions(newOptions);
+                    }}>
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" size="sm" onClick={() => setPackageOptions([...packageOptions, { name: '', price: '' }])}>
+                  Add Package Option
+                </Button>
+              </div>
+
               {/* File Uploads */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium leading-6">Design Files</h3>
@@ -341,6 +457,16 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
               {/* Building Cost Estimates */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium leading-6">Building Cost Estimates</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="minBuildingCost">Min Building Cost</Label>
+                    <Input id="minBuildingCost" name="minBuildingCost" type="number" value={minBuildingCost} onChange={(e) => setMinBuildingCost(e.target.value)} placeholder="e.g., 100000" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="maxBuildingCost">Max Building Cost</Label>
+                    <Input id="maxBuildingCost" name="maxBuildingCost" type="number" value={maxBuildingCost} onChange={(e) => setMaxBuildingCost(e.target.value)} placeholder="e.g., 150000" />
+                  </div>
+                </div>
                 {['basic', 'luxury'].map((tier) => (
                   <div key={tier} className="rounded-md border p-4">
                     <h4 className="text-md font-medium capitalize">{tier}</h4>
@@ -384,31 +510,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
                 ))}
               </div>
 
-              {/* Building Calculator Options */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium leading-6">Building Calculator Options</h3>
-                {calculatorOptions.map((option, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <Input
-                      placeholder="Option Name"
-                      value={option.name}
-                      onChange={(e) => handleCalculatorOptionChange(index, 'name', e.target.value)}
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Price"
-                      value={option.price}
-                      onChange={(e) => handleCalculatorOptionChange(index, 'price', Number(e.target.value))}
-                    />
-                    <Button type="button" variant="destructive" size="sm" onClick={() => removeCalculatorOption(index)}>
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" size="sm" onClick={addCalculatorOption} className="mt-2">
-                  Add Option
-                </Button>
-              </div>
+              
             </div>
           </ScrollArea>
           <div className="p-6 bg-muted/50 flex justify-end gap-4 rounded-b-2xl flex-shrink-0 border-t border-border">

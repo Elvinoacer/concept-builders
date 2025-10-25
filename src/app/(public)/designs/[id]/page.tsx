@@ -10,6 +10,8 @@ import RelatedDesigns from "@/components/design-detail/RelatedDesigns";
 import Renderings from "@/components/design-detail/Renderings";
 import { ThemeProvider } from "@/components/theme-provider";
 import Loading from './loading';
+import ErrorState from "@/components/design-detail/ErrorState";
+import NotFoundState from "@/components/design-detail/NotFoundState";
 
 const DesignDetailPage = ({ params }: { params: { id: string } }) => {
   const { id } = use(params);
@@ -17,22 +19,29 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchDesign = async () => {
-      try {
-        const response = await fetch(`/api/designs/${id}`);
-        if (!response.ok) {
+  const fetchDesign = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/designs/${id}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          setDesign(null);
+        } else {
           throw new Error("Failed to fetch design");
         }
+      } else {
         const data = await response.json();
         setDesign(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (id) {
       fetchDesign();
     }
@@ -43,11 +52,11 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <ErrorState message={error} onRetry={fetchDesign} />;
   }
 
   if (!design) {
-    return <div>Design not found</div>;
+    return <NotFoundState />;
   }
 
   const images = design.files?.filter(file => file.type === 'IMAGE') || [];
@@ -76,14 +85,14 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
               <DesignGallery images={images} />
               <Renderings renderings={renderings} />
               {floorPlan && <FloorPlan floorPlanUrl={floorPlan.url} />}
-              {design && design.buildingCostEstimates && <DesignTabs design={design} />}
+              {design && <DesignTabs design={design} />}
             </div>
 
             <div className="lg:col-span-1">
               <PurchaseSidebar design={design} />
             </div>
           </div>
-          <RelatedDesigns categoryId={design.categoryId} />
+          <RelatedDesigns categoryId={design.categoryId} currentDesignId={design.id} />
         </div>
       </main>
     </ThemeProvider>

@@ -5,7 +5,7 @@ import { Design } from '@/generated/prisma';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const RelatedDesigns = ({ categoryId }: { categoryId: string | null }) => {
+const RelatedDesigns = ({ categoryId, currentDesignId }: { categoryId: string | null, currentDesignId: string }) => {
   const [relatedDesigns, setRelatedDesigns] = useState<Design[]>([]);
   const [currentImageIndexes, setCurrentImageIndexes] = useState<number[]>([]);
 
@@ -14,7 +14,7 @@ const RelatedDesigns = ({ categoryId }: { categoryId: string | null }) => {
       if (!categoryId) return;
       try {
         const response = await fetch(
-          `/api/designs?categoryId=${categoryId}&limit=4`
+          `/api/designs?categoryId=${categoryId}&limit=5&exclude=${currentDesignId}`
         );
         if (!response.ok) {
           throw new Error('Failed to fetch related designs');

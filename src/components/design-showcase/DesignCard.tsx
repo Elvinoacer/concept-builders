@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 interface File {
   url: string;
+  type: string;
 }
 
 interface Discount {
@@ -30,24 +31,24 @@ interface Design {
   discounts?: Discount[];
   orderItems?: OrderItem[];
   basePrice: number;
+  minBuildingCost?: number;
+  maxBuildingCost?: number;
 }
 
 interface DesignCardProps {
   design: Design;
   index: number;
   showDetails?: boolean;
+  priceType?: string;
 }
 
-const DesignCard: React.FC<DesignCardProps> = ({ design, index, showDetails = true }) => {
+const DesignCard: React.FC<DesignCardProps> = ({ design, index, showDetails = true, priceType }) => {
   const router = useRouter();
-  const truncateDescription = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) {
-      return text;
-    }
-    return text.substring(0, maxLength) + "...";
-  };
+  
 
   const isBestSeller = design.orderItems && design.orderItems.length > 10;
+
+  const imageUrl = design.files?.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.png";
 
   return (
     <motion.div
@@ -61,7 +62,7 @@ const DesignCard: React.FC<DesignCardProps> = ({ design, index, showDetails = tr
         <Image
           alt={design.name}
           className="w-full h-32 sm:h-40 object-cover"
-          src={design.files[0]?.url || "/images/category-placeholder.png"}
+          src={imageUrl}
           width={300}
           height={160}
         />
@@ -87,16 +88,24 @@ const DesignCard: React.FC<DesignCardProps> = ({ design, index, showDetails = tr
       </div>
 
       <div className="p-4">
-        <h3 className="font-semibold text-slate-800 dark:text-white">
+        <h3 className="font-semibold text-slate-800 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis">
           {design.name}
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {truncateDescription(design.description, 100)}
+        <p className="text-sm text-gray-600 dark:text-gray-400 h-20 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:3] [-webkit-box-orient:vertical]">
+          {design.description}
         </p>
         {showDetails && (
-          <p className="text-lg font-semibold text-slate-800 dark:text-white mt-2">
-            {formatCurrency(design.basePrice)}
-          </p>
+          <div className="mt-2">
+            {priceType === 'building' && design.minBuildingCost && design.maxBuildingCost ? (
+              <p className="text-sm font-semibold text-slate-800 dark:text-white">
+                Est. Build: {formatCurrency(design.minBuildingCost)} - {formatCurrency(design.maxBuildingCost)}
+              </p>
+            ) : (
+              <p className="text-lg font-semibold text-slate-800 dark:text-white">
+                {formatCurrency(design.basePrice)}
+              </p>
+            )}
+          </div>
         )}
       </div>
     </motion.div>

@@ -3,30 +3,104 @@ import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
-    const search = request.nextUrl.searchParams.get("search") || "";
-    const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
-    const limit = parseInt(request.nextUrl.searchParams.get("limit") || "10");
+    const searchParams = request.nextUrl.searchParams;
+    const search = searchParams.get("search") || "";
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
     const skip = (page - 1) * limit;
 
-    const categoryId = request.nextUrl.searchParams.get("categoryId");
+    const priceType = searchParams.get("priceType");
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+    const bedrooms = searchParams.get("bedrooms");
+    const styles = searchParams.get("styles")?.split(",");
+    const minSize = searchParams.get("minSize");
+    const maxSize = searchParams.get("maxSize");
+    const sortBy = searchParams.get("sortBy");
+    const categoryId = searchParams.get("categoryId");
+    const exclude = searchParams.get("exclude");
+    const isFeatured = searchParams.get("isFeatured");
 
-    const isFeatured = request.nextUrl.searchParams.get("isFeatured");
-
-    const where: any = search
-      ? {
+    const where: any = {
+      OR: [
+        {
           name: {
             contains: search,
             mode: "insensitive",
           },
-        }
-      : {};
+        },
+        {
+          description: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ],
+    };
+
+    if (priceType === "design" && (minPrice || maxPrice)) {
+      where.basePrice = {};
+      if (minPrice) where.basePrice.gte = parseFloat(minPrice);
+      if (maxPrice) where.basePrice.lte = parseFloat(maxPrice);
+    } else if (priceType === "building" && (minPrice || maxPrice)) {
+      where.minBuildingCost = {};
+      if (minPrice) where.minBuildingCost.gte = parseFloat(minPrice);
+      if (maxPrice) where.maxBuildingCost = { lte: parseFloat(maxPrice) };
+    }
+
+    if (bedrooms) {
+      if (bedrooms === "4+") {
+        where.bedrooms = { gte: 4 };
+      } else {
+        where.bedrooms = parseInt(bedrooms);
+      }
+    }
+
+    if (styles && styles.length > 0) {
+      const categories = await prisma.category.findMany({
+        where: {
+          name: {
+            in: styles,
+          },
+        },
+      });
+      const categoryIds = categories.map((c) => c.id);
+      where.categoryId = { in: categoryIds };
+    }
+
+    if (minSize || maxSize) {
+      where.area = {};
+      if (minSize) where.area.gte = parseFloat(minSize);
+      if (maxSize) where.area.lte = parseFloat(maxSize);
+    }
 
     if (categoryId) {
       where.categoryId = categoryId;
     }
 
+    if (exclude) {
+      where.id = { not: exclude };
+    }
+
     if (isFeatured) {
       where.isFeatured = true;
+    }
+
+    let orderBy: any = { createdAt: "desc" };
+    if (sortBy) {
+      switch (sortBy) {
+        case "Popular":
+          orderBy = { views: "desc" };
+          break;
+        case "Price (Low to High)":
+          orderBy = { basePrice: "asc" };
+          break;
+        case "Price (High to Low)":
+          orderBy = { basePrice: "desc" };
+          break;
+        default:
+          orderBy = { createdAt: "desc" };
+      }
     }
 
     const designs = await prisma.design.findMany({
@@ -43,9 +117,7 @@ export async function GET(request: NextRequest) {
         },
         orderItems: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy,
     });
 
     const totalDesigns = await prisma.design.count({ where });
@@ -76,15 +148,21 @@ export async function POST(request: Request) {
       planDetails,
       folderId,
       buildingCostEstimates,
-      calculatorOptions,
+      buildingCostFactors,
+      packageOptions,
       files,
+      minBuildingCost,
+      maxBuildingCost,
+      pdfPrice,
+      cadPrice,
+      pdfAndCadPrice,
     } = body;
 
     if (!name || !description || !basePrice || !categoryId) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    const designData = {
+    const designData: any = {
       name,
       description,
       basePrice,
@@ -97,7 +175,13 @@ export async function POST(request: Request) {
       planDetails: planDetails || [],
       folderId,
       buildingCostEstimates,
-      calculatorOptions,
+      buildingCostFactors,
+      packageOptions,
+      minBuildingCost,
+      maxBuildingCost,
+      pdfPrice,
+      cadPrice,
+      pdfAndCadPrice,
       files: {
         create: files.map(
           (file: { url: string; type: string; originalFileName: string }) => ({
