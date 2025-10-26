@@ -180,7 +180,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ items, isLoading, onDiscoun
                   <p className="font-semibold text-gray-800 dark:text-white">{item.name}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Quantity: {item.quantity}</p>
                 </div>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">${(item.basePrice * item.quantity).toFixed(2)}</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">${(item.basePrice * item.quantity + (item.selectedFileType === 'pdf' ? item.pdfPrice || 0 : item.selectedFileType === 'cad' ? item.cadPrice || 0 : item.selectedFileType === 'pdf-and-cad' ? item.pdfAndCadPrice || 0 : 0) + (item.selectedExtras?.reduce((sum, extra) => sum + extra.price, 0) || 0)).toFixed(2)}</p>
               </div>
               <IncludedItems selectedPackage={item.selectedPackage} selectedExtras={item.selectedExtras} />
             </div>

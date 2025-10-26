@@ -72,11 +72,6 @@ export default function CheckoutLink({
     if (response.ok) {
       setCheckoutUrl(result.url);
       toast.success("Payment link generated successfully!");
-      // The Intasend API response for collection.charge should contain a redirect_url
-      // We will use this URL to redirect the user.
-      if (result.redirect_url) {
-        window.location.href = result.redirect_url;
-      }
     } else {
       toast.error(result.error || "Failed to generate checkout link");
     }

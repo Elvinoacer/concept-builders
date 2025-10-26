@@ -4,12 +4,17 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
-import { designDetailPageData } from "@/lib/dummydata/designDetailPage";
+
 
 const CartItem = ({ item, onRemove }) => {
-  const fileTypePrice = item.selectedPackage
-    ? designDetailPageData.purchaseSidebar.fileTypePrices[item.selectedPackage] || 0
-    : 0;
+  let fileTypePrice = 0;
+  if (item.selectedFileType === 'pdf') {
+    fileTypePrice = item.pdfPrice || 0;
+  } else if (item.selectedFileType === 'cad') {
+    fileTypePrice = item.cadPrice || 0;
+  } else if (item.selectedFileType === 'pdf-and-cad') {
+    fileTypePrice = item.pdfAndCadPrice || 0;
+  }
 
   const itemTotalPrice = item.basePrice +
     fileTypePrice +
@@ -36,9 +41,9 @@ const CartItem = ({ item, onRemove }) => {
       <div className="flex-1 flex flex-col sm:flex-row justify-between items-start sm:items-center w-full">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{item.name}</h3>
-          {item.selectedPackage && (
+          {item.selectedFileType && (
             <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">
-              File Type: {item.selectedPackage.toUpperCase()} (+${fileTypePrice.toFixed(2)})
+              File Type: {item.selectedFileType.toUpperCase()} (+${fileTypePrice.toFixed(2)})
             </p>
           )}
           {item.selectedExtras && item.selectedExtras.length > 0 && (

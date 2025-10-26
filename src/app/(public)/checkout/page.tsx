@@ -89,7 +89,8 @@ const CheckoutPage = () => {
             Proceed to Payment
           </Button>
           <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-            Upon successful purchase, you will be redirected to your dashboard to download all your files.
+            Upon successful purchase, you will be redirected to your dashboard
+            to download all your files.
           </p>
         </div>
       </div>
@@ -112,7 +113,9 @@ const CheckoutPage = () => {
                 Cart
               </a>
               <span className="text-gray-400 dark:text-gray-600">/</span>
-              <span className="text-gray-900 dark:text-white font-semibold">Checkout</span>
+              <span className="text-gray-900 dark:text-white font-semibold">
+                Checkout
+              </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8 md:mb-10">
               Secure Checkout

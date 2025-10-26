@@ -45,10 +45,23 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Cart not found" }, { status: 404 });
       }
 
-      const totalAmount = userCart.items.reduce(
-        (acc, item) => acc + item.design.basePrice * item.quantity,
-        0
-      );
+      const totalAmount = userCart.items.reduce((acc, item) => {
+        let itemTotal = item.design.basePrice * item.quantity;
+        if (item.selectedFileType === 'pdf') {
+          itemTotal += item.design.pdfPrice || 0;
+        } else if (item.selectedFileType === 'cad') {
+          itemTotal += item.design.cadPrice || 0;
+        } else if (item.selectedFileType === 'pdf-and-cad') {
+          itemTotal += item.design.pdfAndCadPrice || 0;
+        }
+        if (item.selectedExtras) {
+          const extras = JSON.parse(item.selectedExtras as string);
+          extras.forEach((extra: any) => {
+            itemTotal += extra.price;
+          });
+        }
+        return acc + itemTotal;
+      }, 0);
 
       await prisma.$transaction(async (tx) => {
         const order = await tx.order.create({
@@ -70,6 +83,9 @@ export async function POST(req: NextRequest) {
             orderId: order.id,
             designId: item.designId,
             quantity: item.quantity,
+            selectedFileType: item.selectedFileType,
+            selectedPackage: item.selectedPackage,
+            selectedExtras: item.selectedExtras,
           })),
         });
 

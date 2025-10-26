@@ -74,7 +74,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { designId, selectedPackage, selectedExtras } = await req.json();
+    const { designId, selectedFileType, selectedPackage, selectedExtras } = await req.json();
     if (!designId) {
       return NextResponse.json(
         { error: "Design ID is required" },
@@ -95,6 +95,7 @@ export async function POST(req: Request) {
       where: {
         cartId: userCart.id,
         designId: designId,
+        selectedFileType: selectedFileType, // Add this line
         selectedPackage: selectedPackage,
         selectedExtras: {
           equals: selectedExtras,
@@ -107,6 +108,7 @@ export async function POST(req: Request) {
         where: { id: existingCartItem.id },
         data: {
           quantity: existingCartItem.quantity + 1,
+          selectedFileType: selectedFileType, // Add this line
           selectedPackage: selectedPackage,
           selectedExtras: selectedExtras,
         },
@@ -117,6 +119,7 @@ export async function POST(req: Request) {
           cartId: userCart.id,
           designId: designId,
           quantity: 1,
+          selectedFileType: selectedFileType, // Add this line
           selectedPackage,
           selectedExtras: selectedExtras,
         },

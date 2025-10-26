@@ -1,4 +1,5 @@
 "use client";
+import { Design } from "@/generated/prisma";
 import { useEffect, useState, use } from "react";
 import Breadcrumbs from "@/components/design-detail/Breadcrumbs";
 import DesignGallery from "@/components/design-detail/DesignGallery";

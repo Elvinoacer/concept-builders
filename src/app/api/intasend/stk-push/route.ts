@@ -15,7 +15,16 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { first_name, last_name, email, amount, phone_number, discountCode, discountAmount, discountId } = body;
+    const {
+      first_name,
+      last_name,
+      email,
+      amount,
+      phone_number,
+      discountCode,
+      discountAmount,
+      discountId,
+    } = body;
 
     let userCart = await prisma.cart.findUnique({
       where: { userId },
@@ -54,18 +63,19 @@ export async function POST(req: NextRequest) {
       false
     );
 
-    // const host = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
+    const host = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     // Fetch USD to KES exchange rate
-    const exchangeRateRes = await fetch(`${req.nextUrl.origin}/api/exchange-rate`);
+    const exchangeRateRes = await fetch(
+      `${req.nextUrl.origin}/api/exchange-rate`
+    );
     if (!exchangeRateRes.ok) {
-      throw new Error('Failed to fetch exchange rate for IntaSend payment');
+      throw new Error("Failed to fetch exchange rate for IntaSend payment");
     }
     const exchangeRateData = await exchangeRateRes.json();
     const usdToKesRate = exchangeRateData.usdToKesRate;
 
     if (!usdToKesRate) {
-      throw new Error('USD to KES exchange rate not available.');
+      throw new Error("USD to KES exchange rate not available.");
     }
 
     const amountKES = (Number(amount) * usdToKesRate).toFixed(2); // Round to 2 decimal places
@@ -75,10 +85,13 @@ export async function POST(req: NextRequest) {
       first_name,
       last_name,
       email,
+      host: host,
       amount: Number(amountKES),
-      phone_number: phone_number.startsWith('0') ? `254${phone_number.substring(1)}` : phone_number, // Ensure correct format
-      reference: userCart.id, // Use 'reference' instead of 'api_ref'
-      // callback_url: `${host}/api/intasend/webhook`,
+      phone_number: phone_number.startsWith("0")
+        ? `254${phone_number.substring(1)}`
+        : phone_number, // Ensure correct format
+      api_ref: userCart.id, // Use 'api_ref' for consistency
+      callback_url: `${host}/api/intasend/webhook`,
     });
 
     return NextResponse.json(resp);

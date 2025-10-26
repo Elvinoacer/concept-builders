@@ -1,12 +1,14 @@
-
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { Design } from "@/lib/dummydata";
+import { Design } from "@/generated/prisma";
 
-interface CartItemWithQuantity extends Design {
+interface CartItem extends Design {
   quantity: number;
+  selectedFileType: string;
+  selectedPackage?: string;
+  selectedExtras?: any[];
 }
 
 export async function POST(req: NextRequest) {
@@ -17,47 +19,67 @@ export async function POST(req: NextRequest) {
   }
 
   const userId = session.user.id;
-  const localCartItems: CartItemWithQuantity[] = await req.json();
+  const localCartItems: CartItem[] = await req.json();
 
   if (!localCartItems || localCartItems.length === 0) {
     return NextResponse.json({ message: "No items to sync." }, { status: 200 });
   }
 
   try {
-    // Find or create a cart for the user
-    let userCart = await prisma.cart.findUnique({
+    const userCart = await prisma.cart.upsert({
       where: { userId },
+      update: {},
+      create: { userId },
     });
 
-    if (!userCart) {
-      userCart = await prisma.cart.create({
-        data: { userId },
-      });
-    }
-
-    // Use a transaction to upsert all items
-    const upsertOperations = localCartItems.map((item) =>
-      prisma.cartItem.upsert({
-        where: {
-          cartId_designId: {
-            cartId: userCart!.id,
+    await prisma.$transaction(async (tx) => {
+      for (const item of localCartItems) {
+        const existingItem = await tx.cartItem.findFirst({
+          where: {
+            cartId: userCart.id,
             designId: item.id,
+            selectedFileType: item.selectedFileType,
+            selectedPackage: item.selectedPackage,
+            selectedExtras: {
+              equals: item.selectedExtras,
+            },
+          },
+        });
+
+        if (existingItem) {
+          await tx.cartItem.update({
+            where: { id: existingItem.id },
+            data: {
+              quantity: existingItem.quantity + item.quantity,
+            },
+          });
+        } else {
+          await tx.cartItem.create({
+            data: {
+              cartId: userCart.id,
+              designId: item.id,
+              quantity: item.quantity,
+              selectedFileType: item.selectedFileType,
+              selectedPackage: item.selectedPackage,
+              selectedExtras: item.selectedExtras,
+            },
+          });
+        }
+      }
+    });
+
+    const updatedCart = await prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            design: true,
           },
         },
-        update: {
-          // If the item already exists, do nothing. The quantity is always 1.
-        },
-        create: {
-          cartId: userCart!.id,
-          designId: item.id,
-          quantity: item.quantity,
-        },
-      })
-    );
+      },
+    });
 
-    await prisma.$transaction(upsertOperations);
-
-    return NextResponse.json({ message: "Cart synced successfully." }, { status: 200 });
+    return NextResponse.json(updatedCart, { status: 200 });
   } catch (error) {
     console.error("Error syncing cart:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

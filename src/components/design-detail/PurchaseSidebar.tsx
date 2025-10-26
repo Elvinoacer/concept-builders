@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-import { Design } from "@/lib/dummydata";
+import { Design } from "@/generated/prisma";
 import { useCart } from "@/hooks/useCart";
 import { useSession, signIn } from "next-auth/react"; // Import useSession and signIn
 import { useRouter } from "next/navigation"; // Import useRouter
@@ -27,7 +27,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   // For now, keeping it empty as per previous logic for additional options
 
   const totalPrice = useMemo(() => {
-    const basePrice = design.basePrice;
+    const basePrice = design.basePrice || 0;
     let fileTypePrice = 0;
     if (selectedFileType === "pdf") {
       fileTypePrice = design.pdfPrice || 0;
@@ -38,7 +38,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
     }
 
     const selectedAdditionalOptionsCost = selectedOptions.reduce(
-      (sum, option) => sum + option.price,
+      (sum, option) => sum + (option.price || 0),
       0
     );
 
@@ -87,11 +87,11 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   };
 
   const handleAddToCart = () => {
-    addToCart(design, selectedFileType, selectedOptions);
+    addToCart(design, selectedFileType, selectedFileType, selectedOptions);
   };
 
   const handleBuyNow = async () => {
-    await addToCart(design, selectedFileType, selectedOptions);
+    await addToCart(design, selectedFileType, selectedFileType, selectedOptions);
 
     if (status === "authenticated") {
       router.push("/checkout");

@@ -5,6 +5,7 @@ import { Design } from '@/generated/prisma'; // Use generated Prisma Design type
 
 interface CartItem extends Design {
   quantity: number;
+  selectedFileType: string;
   selectedPackage?: string;
   selectedExtras?: any[];
 }
@@ -28,13 +29,11 @@ export const useCart = () => {
         const frontendCartItems = fullCart.items.map((item: any) => ({
           ...item.design,
           quantity: item.quantity,
+          selectedFileType: item.selectedFileType,
           selectedPackage: item.selectedPackage,
           selectedExtras: typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras,
         }));
         setCart(frontendCartItems);
-        setAppliedDiscountAmount(fullCart.discountAmount || 0);
-        setAppliedDiscountId(fullCart.discountId || null);
-        setAppliedDiscountCode(fullCart.discountCode || null);
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'Failed to fetch cart');
@@ -70,48 +69,33 @@ export const useCart = () => {
     }
   }, []);
 
-  // Effect to load cart based on authentication status
   useEffect(() => {
     if (status === 'authenticated') {
-      fetchCart();
+      syncCart().then(() => fetchCart());
     } else if (status === 'unauthenticated') {
       loadCartFromStorage();
     }
     // While status is 'loading', do nothing.
   }, [status, fetchCart, loadCartFromStorage]);
 
-  // Effect to listen for the sync event and force a reload
-  useEffect(() => {
-    const handleSync = () => {
-      // After a sync, we are authenticated and must reload from the server.
-      fetchCart();
-    };
-    window.addEventListener('cart-synced', handleSync);
-    return () => {
-      window.removeEventListener('cart-synced', handleSync);
-    };
-  }, [fetchCart]);
-
-  const addToCart = async (design: Design, selectedPackage: string, selectedExtras: any[]) => {
+  const addToCart = async (design: Design, selectedFileType: string, selectedPackage: string, selectedExtras: any[]) => {
     if (status === 'authenticated') {
       try {
         const response = await fetch('/api/cart/items', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ designId: design.id, selectedPackage, selectedExtras }),
+          body: JSON.stringify({ designId: design.id, selectedFileType, selectedPackage, selectedExtras }),
         });
         if (response.ok) {
           const fullCart = await response.json();
           const frontendCartItems = fullCart.items.map((item: any) => ({
             ...item.design,
             quantity: item.quantity,
+            selectedFileType: item.selectedFileType,
             selectedPackage: item.selectedPackage,
             selectedExtras: typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras,
           }));
           setCart(frontendCartItems);
-          setAppliedDiscountAmount(fullCart.discountAmount || 0);
-          setAppliedDiscountId(fullCart.discountId || null);
-          setAppliedDiscountCode(fullCart.discountCode || null);
           toast.success('Added to cart!');
         } else {
           const errorData = await response.json();
@@ -121,11 +105,11 @@ export const useCart = () => {
         toast.error('An error occurred while adding to cart.');
       }
     } else {
-      const existingItem = cart.find(item => item.id === design.id);
+      const existingItem = cart.find(item => item.id === design.id && item.selectedFileType === selectedFileType && item.selectedPackage === selectedPackage && JSON.stringify(item.selectedExtras) === JSON.stringify(selectedExtras));
       if (existingItem) {
         toast.info('This design is already in your cart.');
       } else {
-        const newCart = [...cart, { ...design, quantity: 1, selectedPackage, selectedExtras }];
+        const newCart = [...cart, { ...design, quantity: 1, selectedFileType, selectedPackage, selectedExtras }];
         setCart(newCart);
         localStorage.setItem('cart', JSON.stringify(newCart));
         toast.success('Added to cart!');
@@ -161,6 +145,15 @@ export const useCart = () => {
   const cartTotal = useMemo(() => {
     return cart.reduce((total, item) => {
       let itemTotal = item.basePrice * item.quantity;
+
+      if (item.selectedFileType === 'pdf') {
+        itemTotal += item.pdfPrice || 0;
+      } else if (item.selectedFileType === 'cad') {
+        itemTotal += item.cadPrice || 0;
+      } else if (item.selectedFileType === 'pdf-and-cad') {
+        itemTotal += item.pdfAndCadPrice || 0;
+      }
+
       if (item.selectedExtras) {
         const extrasArray = Array.isArray(item.selectedExtras)
           ? item.selectedExtras
@@ -183,6 +176,37 @@ export const useCart = () => {
     setAppliedDiscountId(id);
     setAppliedDiscountCode(code);
   }, []);
+
+  const syncCart = async () => {
+    const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    if (localCart.length > 0) {
+      try {
+        const response = await fetch('/api/cart/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(localCart),
+        });
+        if (response.ok) {
+          const updatedCart = await response.json();
+          setCart(updatedCart.items.map((item: any) => ({
+            ...item.design,
+            quantity: item.quantity,
+            selectedFileType: item.selectedFileType,
+            selectedPackage: item.selectedPackage,
+            selectedExtras: typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras,
+          })));
+          localStorage.removeItem('cart');
+          toast.success('Cart synced successfully!');
+        } else {
+          toast.error('Failed to sync cart.');
+        }
+      } catch (error) {
+        toast.error('An error occurred while syncing cart.');
+      }
+    }
+  };
+
+  
 
   return {
     cart,
