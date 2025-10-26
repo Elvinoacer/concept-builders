@@ -24,7 +24,7 @@ export const useCart = () => {
     try {
       const response = await fetch('/api/cart/items');
       if (response.ok) {
-        const fullCart = await response.json(); // Now returns full cart object
+        const fullCart = await response.json();
         const frontendCartItems = fullCart.items.map((item: any) => ({
           ...item.design,
           quantity: item.quantity,
@@ -55,7 +55,13 @@ export const useCart = () => {
     setLoading(true);
     try {
       const cartFromStorage = JSON.parse(localStorage.getItem('cart') || '[]');
-      setCart(cartFromStorage);
+      // Ensure cartFromStorage is an array
+      if (Array.isArray(cartFromStorage)) {
+        setCart(cartFromStorage);
+      } else {
+        console.error('Cart from local storage is not an array:', cartFromStorage);
+        setCart([]); // Fallback to empty array
+      }
     } catch (err) {
       console.error('Error parsing cart from local storage:', err);
       setCart([]);
@@ -95,8 +101,17 @@ export const useCart = () => {
           body: JSON.stringify({ designId: design.id, selectedPackage, selectedExtras }),
         });
         if (response.ok) {
-          const newCart: CartItem[] = await response.json();
-          setCart(newCart);
+          const fullCart = await response.json();
+          const frontendCartItems = fullCart.items.map((item: any) => ({
+            ...item.design,
+            quantity: item.quantity,
+            selectedPackage: item.selectedPackage,
+            selectedExtras: typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras,
+          }));
+          setCart(frontendCartItems);
+          setAppliedDiscountAmount(fullCart.discountAmount || 0);
+          setAppliedDiscountId(fullCart.discountId || null);
+          setAppliedDiscountCode(fullCart.discountCode || null);
           toast.success('Added to cart!');
         } else {
           const errorData = await response.json();
@@ -147,9 +162,17 @@ export const useCart = () => {
     return cart.reduce((total, item) => {
       let itemTotal = item.basePrice * item.quantity;
       if (item.selectedExtras) {
-        item.selectedExtras.forEach(extra => {
-          itemTotal += extra.price;
-        });
+        const extrasArray = Array.isArray(item.selectedExtras)
+          ? item.selectedExtras
+          : item.selectedExtras.selectedOptions;
+
+        if (Array.isArray(extrasArray)) {
+          extrasArray.forEach(extra => {
+            if (extra && typeof extra.price === 'number') {
+              itemTotal += extra.price;
+            }
+          });
+        }
       }
       return total + itemTotal;
     }, 0);

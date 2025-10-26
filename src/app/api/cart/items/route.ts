@@ -7,8 +7,20 @@ export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
-    // No session means no database cart. Return an empty array.
-    return NextResponse.json([], { status: 200 });
+    // No session means no database cart. Return an empty cart object.
+    return NextResponse.json(
+      {
+        id: null,
+        userId: null,
+        items: [],
+        discountCode: null,
+        discountAmount: null,
+        discountId: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      { status: 200 }
+    );
   }
 
   try {
@@ -63,7 +75,6 @@ export async function POST(req: Request) {
 
   try {
     const { designId, selectedPackage, selectedExtras } = await req.json();
-    const selectedExtrasString = JSON.stringify(selectedExtras);
     if (!designId) {
       return NextResponse.json(
         { error: "Design ID is required" },
@@ -80,37 +91,25 @@ export async function POST(req: Request) {
       create: { userId },
     });
 
-    // Add the new item to the cart, or do nothing if it exists
-    console.log("Upserting cart item with data:", {
-      where: {
-        cartId_designId: {
-          cartId: userCart.id,
-          designId: designId,
-        },
-      },
-      update: { selectedPackage, selectedExtras },
-      create: {
-        cartId: userCart.id,
-        designId: designId,
-        quantity: 1,
-        selectedPackage,
-        selectedExtras,
-      },
-    });
-
     const existingCartItem = await prisma.cartItem.findFirst({
       where: {
         cartId: userCart.id,
         designId: designId,
         selectedPackage: selectedPackage,
-        selectedExtras: selectedExtrasString,
+        selectedExtras: {
+          equals: selectedExtras,
+        },
       },
     });
 
     if (existingCartItem) {
       await prisma.cartItem.update({
         where: { id: existingCartItem.id },
-        data: { quantity: existingCartItem.quantity + 1 },
+        data: {
+          quantity: existingCartItem.quantity + 1,
+          selectedPackage: selectedPackage,
+          selectedExtras: selectedExtras,
+        },
       });
     } else {
       await prisma.cartItem.create({
@@ -119,7 +118,7 @@ export async function POST(req: Request) {
           designId: designId,
           quantity: 1,
           selectedPackage,
-          selectedExtras: selectedExtrasString,
+          selectedExtras: selectedExtras,
         },
       });
     }

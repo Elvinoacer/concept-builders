@@ -13,11 +13,12 @@ interface AllDesignsPageProps {
     search?: string;
     page?: string;
     pageSize?: string;
+    isFeatured?: string;
   };
 }
 const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
   const session = await getServerSession(authOptions);
-  const { category, sort, search } = searchParams;
+  const { category, sort, search, isFeatured } = searchParams;
 
   const currentPage = Number(searchParams.page) || 1;
   const pageSize = Number(searchParams.pageSize) || 9; // Default page size
@@ -47,6 +48,10 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
         },
       },
     ];
+  }
+
+  if (isFeatured === 'true') {
+    where.isFeatured = true;
   }
 
   const orderBy: Prisma.DesignOrderByWithRelationInput = {};

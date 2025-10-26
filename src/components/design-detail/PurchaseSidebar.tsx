@@ -87,17 +87,11 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   };
 
   const handleAddToCart = () => {
-    const selectedExtras = {
-      selectedOptions,
-    };
-    addToCart(design, selectedFileType, selectedExtras);
+    addToCart(design, selectedFileType, selectedOptions);
   };
 
   const handleBuyNow = async () => {
-    const selectedExtras = {
-      selectedOptions,
-    };
-    await addToCart(design, selectedFileType, selectedExtras);
+    await addToCart(design, selectedFileType, selectedOptions);
 
     if (status === "authenticated") {
       router.push("/checkout");

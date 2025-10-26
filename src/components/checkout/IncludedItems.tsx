@@ -32,7 +32,7 @@ const IncludedItems: React.FC<IncludedItemsProps> = ({ selectedPackage, selected
           </div>
         )}
         {selectedExtras?.map((extra: any) => (
-          <div key={extra.id} className="flex items-center justify-between text-sm">
+          <div key={extra.name} className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-lg text-gray-500">add_circle</span>
               <span>{extra.name}</span>
