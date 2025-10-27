@@ -1,22 +1,36 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Testimonial } from "@prisma/client";
+import { Feedback } from "@/generated/prisma";
 
-interface TestimonialsProps {
-  testimonials: Testimonial[];
-}
-
-const Testimonials = ({ testimonials }: TestimonialsProps) => {
+const Testimonials = () => {
   const [index, setIndex] = useState(0);
+  const [featuredFeedback, setFeaturedFeedback] = useState<Feedback[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeaturedFeedback = async () => {
+      try {
+        const response = await fetch('/api/featured-feedback');
+        const data = await response.json();
+        setFeaturedFeedback(data);
+      } catch (error) {
+        console.error('Error fetching featured feedback:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedFeedback();
+  }, []);
 
   const nextTestimonial = () => {
-    setIndex((prev) => (prev + 1) % testimonials.length);
+    setIndex((prev) => (prev + 1) % featuredFeedback.length);
   };
 
   const prevTestimonial = () => {
-    setIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    setIndex((prev) => (prev - 1 + featuredFeedback.length) % featuredFeedback.length);
   };
 
   const slideVariants = {
@@ -38,9 +52,15 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
 
   const [direction, setDirection] = useState(0);
 
-  if (!testimonials.length) {
+  if (loading) {
+    return null; // Or a loading spinner
+  }
+
+  if (!featuredFeedback.length) {
     return null;
   }
+
+  const currentFeedback = featuredFeedback[index];
 
   return (
     <section className="py-16 md:py-24 bg-white dark:bg-gray-950">
@@ -75,13 +95,13 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
                   format_quote
                 </span>
                 <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg italic mb-6 text-center">
-                  {testimonials[index].quote}
+                  {currentFeedback.feedback}
                 </p>
                 <div className="flex items-center justify-center">
                   <div className="relative w-14 h-14 mr-4">
                     <Image
-                      src={testimonials[index].image}
-                      alt={testimonials[index].author}
+                      src={currentFeedback.user?.image || "/images/default-avatar.png"}
+                      alt={currentFeedback.user?.name || "Anonymous"}
                       fill
                       className="rounded-full object-cover"
                       sizes="56px"
@@ -89,10 +109,10 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
                   </div>
                   <div>
                     <p className="font-bold text-lg text-gray-900 dark:text-white">
-                      {testimonials[index].author}
+                      {currentFeedback.user?.name || "Anonymous"}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {/* The title is not in the new schema, so I will remove it */}
+                      {currentFeedback.category}
                     </p>
                   </div>
                 </div>
@@ -115,7 +135,7 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
         </div>
 
         <div className="flex justify-center mt-8">
-          {testimonials.map((_, i) => (
+          {featuredFeedback.map((_, i) => (
             <button
               key={i}
               onClick={() => setIndex(i)}

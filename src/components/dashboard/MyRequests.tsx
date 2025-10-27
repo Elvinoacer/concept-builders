@@ -44,33 +44,34 @@ const MyRequests = () => {
   }
 
   return (
-    <Card>
+    <Card className="shadow-lg rounded-2xl border border-gray-200 dark:border-gray-700">
       <CardHeader>
-        <CardTitle>My Custom Design Requests</CardTitle>
+        <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">My Custom Design Requests</CardTitle>
       </CardHeader>
       <CardContent>
         {requests.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">You haven't made any custom design requests yet.</p>
-            <a href="/custom-design" className="text-blue-600 hover:underline mt-2 inline-block">Make a request</a>
+          <div className="text-center py-12">
+            <span className="material-symbols-outlined text-6xl text-gray-400 dark:text-gray-500">edit_document</span>
+            <p className="text-gray-500 dark:text-gray-400 mt-4 text-lg">You haven't made any custom design requests yet.</p>
+            <a href="/custom-design" className="text-white bg-gradient-to-r from-blue-600 to-cyan-400 hover:shadow-lg transition-shadow mt-6 inline-block px-8 py-3 rounded-full font-bold text-lg">Make a request</a>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Design Type</TableHead>
-                <TableHead>Budget</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-md font-bold">Date</TableHead>
+                <TableHead className="text-md font-bold">Design Type</TableHead>
+                <TableHead className="text-md font-bold">Budget</TableHead>
+                <TableHead className="text-md font-bold">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {requests.map((request) => (
-                <TableRow key={request.id} onClick={() => router.push(`/custom-design/${request.id}`)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell>{request.designType}</TableCell>
-                  <TableCell>{request.budget}</TableCell>
-                  <TableCell><Badge>{request.status}</Badge></TableCell>
+                <TableRow key={request.id} onClick={() => router.push(`/custom-design/${request.id}`)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300">
+                  <TableCell className="py-4 text-lg">{new Date(request.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell className="py-4 text-lg">{request.designType}</TableCell>
+                  <TableCell className="py-4 text-lg">{request.budget}</TableCell>
+                  <TableCell className="py-4"><Badge className="text-lg px-4 py-1">{request.status}</Badge></TableCell>
                 </TableRow>
             ))}
             </TableBody>

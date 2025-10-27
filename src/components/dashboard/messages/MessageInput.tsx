@@ -16,7 +16,8 @@ interface MessageInputProps {
 
 const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessage }) => {
   const [content, setContent] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [filePreviews, setFilePreviews] = useState<Array<{ file: File; previewUrl: string; type: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -27,7 +28,20 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFile(e.target.files[0]);
+      const newFiles = Array.from(e.target.files);
+      setAttachedFiles((prev) => [...prev, ...newFiles]);
+
+      const newPreviews = newFiles.map((file) => {
+        if (file.type.startsWith('image/')) {
+          return { file, previewUrl: URL.createObjectURL(file), type: 'image' };
+        } else if (file.type === 'application/pdf') {
+          return { file, previewUrl: '/icons/pdf-icon.svg', type: 'pdf' }; // Placeholder icon
+        } else if (file.type.includes('document') || file.type.includes('text')) {
+          return { file, previewUrl: '/icons/doc-icon.svg', type: 'document' }; // Placeholder icon
+        }
+        return { file, previewUrl: '/icons/file-icon.svg', type: 'other' }; // Generic icon
+      });
+      setFilePreviews((prev) => [...prev, ...newPreviews]);
     }
   };
 
@@ -52,6 +66,18 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
     }, 3000); // Stop typing after 3 seconds of inactivity
   };
 
+  const handleRemoveFile = (fileToRemove: File) => {
+    setAttachedFiles((prev) => prev.filter((file) => file !== fileToRemove));
+    setFilePreviews((prev) =>
+      prev.filter((preview) => {
+        if (preview.file === fileToRemove && preview.type === 'image') {
+          URL.revokeObjectURL(preview.previewUrl); // Clean up object URL
+        }
+        return preview.file !== fileToRemove;
+      })
+    );
+  };
+
   useEffect(() => {
     // Cleanup typing status when component unmounts or conversation changes
     return () => {
@@ -61,12 +87,18 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
       if (isTyping && socket && session?.user?.id) {
         socket.emit('stopTyping', { conversationId, userId: session.user.id });
       }
+      // Revoke all object URLs when component unmounts
+      filePreviews.forEach(preview => {
+        if (preview.type === 'image') {
+          URL.revokeObjectURL(preview.previewUrl);
+        }
+      });
     };
-  }, [conversationId, socket, session?.user?.id, isTyping]);
+  }, [conversationId, socket, session?.user?.id, isTyping, filePreviews]); // Add filePreviews to dependency array
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content && !file) return;
+    if (!content && attachedFiles.length === 0) return;
 
     setLoading(true);
 
@@ -81,42 +113,51 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
     }
 
     const optimisticId = `optimistic-${Date.now()}`;
-    onSendMessage({ 
-      id: optimisticId, 
-      optimisticId: optimisticId, 
-      content, 
-      attachmentUrl: file ? URL.createObjectURL(file) : undefined,
-      attachmentType: file?.type,
-      conversationId, 
-      sender: session?.user, // Use actual session.user object
-      senderId: session?.user?.id, // Explicitly set senderId for optimistic message
+    const optimisticAttachments = filePreviews.map(p => ({
+      url: p.previewUrl, // Use previewUrl for optimistic display
+      type: p.file.type,
+      name: p.file.name,
+    }));
+
+    onSendMessage({
+      id: optimisticId,
+      optimisticId: optimisticId,
+      content,
+      attachments: optimisticAttachments, // Pass array of attachments
+      conversationId,
+      sender: session?.user,
+      senderId: session?.user?.id,
       createdAt: new Date().toISOString(),
-      status: 'pending' 
+      status: 'pending',
     });
 
-    let attachmentUrl: string | undefined;
-    let attachmentType: string | undefined;
+    const uploadedAttachments: Array<{ url: string; type: string; name: string }> = [];
 
-    if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
+    if (attachedFiles.length > 0) {
+      for (const file of attachedFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      try {
-        const response = await fetch('/api/files/upload', {
-          method: 'POST',
-          body: formData,
-        });
+        try {
+          const response = await fetch('/api/files/upload', {
+            method: 'POST',
+            body: formData,
+          });
 
-        if (response.ok) {
-          const data = await response.json();
-          attachmentUrl = data.url;
-          attachmentType = file.type;
-        } else {
-          toast.error('Failed to upload file.');
+          if (response.ok) {
+            const data = await response.json();
+            uploadedAttachments.push({
+              url: data.url,
+              type: file.type,
+              name: file.name,
+            });
+          } else {
+            toast.error(`Failed to upload file: ${file.name}`);
+          }
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          toast.error(`Error uploading file: ${file.name}`);
         }
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        toast.error('Error uploading file.');
       }
     }
 
@@ -128,16 +169,16 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
 
     const messageData = {
       content,
-      attachmentUrl,
-      attachmentType,
+      attachments: uploadedAttachments.length > 0 ? uploadedAttachments : undefined, // Send uploaded attachments
       conversationId,
       tempId: optimisticId,
-      senderId: session?.user?.id, // Use actual sender ID
+      senderId: session?.user?.id,
     };
 
     socket.emit('sendMessage', messageData);
     setContent('');
-    setFile(null);
+    setAttachedFiles([]); // Clear attached files
+    setFilePreviews([]); // Clear file previews
     setLoading(false);
   };
 
@@ -146,7 +187,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
       <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700 flex items-center">
         <label htmlFor="file-upload" className="mr-2 cursor-pointer">
           <Paperclip className="w-6 h-6 text-gray-500 dark:text-gray-400 hover:text-primary" />
-          <input id="file-upload" type="file" className="sr-only" onChange={handleFileChange} />
+          <input id="file-upload" type="file" multiple className="sr-only" onChange={handleFileChange} />
         </label>
         <Input
           type="text"
@@ -159,8 +200,32 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, onSendMessa
           {loading ? <div className="loader"></div> : <Send className="w-6 h-6" />}
         </Button>
       </form>
-      {file && (
-        <div className="p-2 text-sm text-gray-500 dark:text-gray-400">Selected file: {file.name}</div>
+      {filePreviews.length > 0 && (
+        <div className="p-2 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2">
+          {filePreviews.map((preview, index) => (
+            <motion.div
+              key={preview.file.name + index} // Use name + index for a unique key
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="relative flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-2 pr-8 text-sm text-gray-700 dark:text-gray-300"
+            >
+              {preview.type === 'image' ? (
+                <img src={preview.previewUrl} alt={preview.file.name} className="h-10 w-10 object-cover rounded mr-2" />
+              ) : (
+                <img src={preview.previewUrl} alt={preview.type} className="h-10 w-10 object-contain rounded mr-2" />
+              )}
+              <span className="truncate max-w-[100px]">{preview.file.name}</span>
+              <button
+                type="button"
+                onClick={() => handleRemoveFile(preview.file)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+              >
+                &times;
+              </button>
+            </motion.div>
+          ))}
+        </div>
       )}
     </motion.div>
   );

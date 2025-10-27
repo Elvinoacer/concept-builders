@@ -12,8 +12,14 @@ import { useSession } from "next-auth/react";
 
 import { Check, CheckCheck, Clock } from 'lucide-react'; // Import Clock icon
 
+interface MessageWithAttachments extends MessageType {
+  sender: { image?: string, name?: string };
+  status?: 'pending' | 'sent' | 'seen';
+  attachments?: Array<{ url: string; type: string; name: string }>;
+}
+
 interface MessageProps {
-  message: MessageType & { sender: { image?: string, name?: string }, status?: 'sending' | 'sent' | 'seen' };
+  message: MessageWithAttachments;
 }
 
 const Message: React.FC<MessageProps> = ({ message }) => {
@@ -41,16 +47,25 @@ const Message: React.FC<MessageProps> = ({ message }) => {
         <div className={`relative max-w-lg px-4 py-2 rounded-lg ${isSender ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'}`}>
           <p className="text-sm font-semibold mb-1">{message.sender.name}</p>
           <p className="text-sm">{message.content}</p>
-          {message.attachmentUrl && (
-            <a 
-              href={message.attachmentUrl} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex items-center mt-2 text-sm bg-gray-100 dark:bg-gray-600 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500"
-            >
-              <Paperclip className="w-4 h-4 mr-2" />
-              <span>{message.attachmentType}</span>
-            </a>
+          {message.attachments && message.attachments.length > 0 && (
+            <div className="mt-2 space-y-2">
+              {message.attachments.map((attachment, attIndex) => (
+                <a
+                  key={attIndex}
+                  href={attachment.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-sm bg-gray-100 dark:bg-gray-600 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500"
+                >
+                  {attachment.type.startsWith('image/') ? (
+                    <img src={attachment.url} alt={attachment.name} className="w-10 h-10 object-cover rounded mr-2" />
+                  ) : (
+                    <Paperclip className="w-4 h-4 mr-2" />
+                  )}
+                  <span className="truncate">{attachment.name}</span>
+                </a>
+              ))}
+            </div>
           )}
           <div className={`absolute bottom-0 ${isSender ? 'right-[-8px]' : 'left-[-8px]'} w-0 h-0 border-t-[8px] border-t-transparent ${isSender ? 'border-l-[8px] border-l-blue-500' : 'border-r-[8px] border-r-gray-200 dark:border-r-gray-700'} border-b-[8px] border-b-transparent`}></div>
         </div>

@@ -13,6 +13,7 @@ import { useSocket } from '@/app/Providers'; // Import the useSocket hook
 interface LocalMessageType extends MessageType {
   optimisticId?: string; // A stable ID for optimistic updates
   status?: 'pending' | 'sent' | 'seen';
+  attachments?: Array<{ url: string; type: string; name: string }>; // Add attachments array
 }
 
 import ChatHeader from './ChatHeader';
@@ -155,7 +156,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversation, onlineUsers }) =>
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = (message: MessageType) => {
+  const handleSendMessage = (message: LocalMessageType) => { // Use LocalMessageType
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 

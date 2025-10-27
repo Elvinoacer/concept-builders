@@ -9,6 +9,7 @@ const FeedbackPage = () => {
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [userFeedback, setUserFeedback] = useState([]);
 
   const categories = [
     { id: 'general', label: 'General Feedback', icon: 'chat' },
@@ -22,13 +23,27 @@ const FeedbackPage = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ rating, category: selectedCategory, feedback }),
+      });
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setFeedback('');
-    setRating(0);
+      if (!response.ok) {
+        throw new Error("Failed to submit feedback");
+      }
+
+      setIsSubmitted(true);
+      setFeedback("");
+      setRating(0);
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -215,6 +230,41 @@ const FeedbackPage = () => {
             </div>
           </div>
         </motion.div>
+
+        {userFeedback.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-8 bg-white rounded-xl shadow-sm p-6 dark:bg-gray-800 dark:border dark:border-gray-700"
+          >
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-6 dark:text-white">
+              Your Submitted Feedback
+            </h2>
+            <div className="space-y-4">
+              {userFeedback.map((fb) => (
+                <div key={fb.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 relative">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-bold text-gray-900 dark:text-white">{fb.category}</p>
+                      <div className="flex items-center text-yellow-500 text-lg">
+                        {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteFeedback(fb.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <span className="material-symbols-outlined">delete</span>
+                    </button>
+                  </div>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm mb-2">{fb.feedback}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">Submitted on: {new Date(fb.createdAt).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

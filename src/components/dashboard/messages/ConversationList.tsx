@@ -1,20 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Conversation } from '@/generated/prisma';
-import { motion } from 'framer-motion';
-import { toast } from 'sonner';
-import NewConversationModal from './NewConversationModal';
-import { useSession } from 'next-auth/react';
+import { useSocket } from "@/app/Providers"; // Import the useSocket hook
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useSocket } from '@/app/Providers'; // Import the useSocket hook
+import { Conversation } from "@/generated/prisma";
+import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+import React, { useEffect, useState } from "react";
+import NewConversationModal from "./NewConversationModal";
 
 interface ConversationListProps {
   onSelectConversation: (conversation: Conversation) => void;
   onlineUsers: string[];
 }
 
-const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversation, onlineUsers }) => {
+const ConversationList: React.FC<ConversationListProps> = ({
+  onSelectConversation,
+  onlineUsers,
+}) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
@@ -24,18 +26,18 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
   useEffect(() => {
     if (!socket || !session?.user?.id) return;
 
-    socket.emit('getConversations', session.user.id);
+    socket.emit("getConversations", session.user.id);
 
-    socket.on('conversations', (fetchedConversations: Conversation[]) => {
+    socket.on("conversations", (fetchedConversations: Conversation[]) => {
       setConversations(fetchedConversations);
       setLoading(false);
     });
 
-    socket.on('newConversation', (newConversation: Conversation) => {
+    socket.on("newConversation", (newConversation: Conversation) => {
       setConversations((prev) => [newConversation, ...prev]);
     });
 
-    socket.on('messageReceived', (message: any) => {
+    socket.on("messageReceived", (message: any) => {
       // Find the conversation and update its last message
       setConversations((prev) => {
         const updatedConversations = prev.map((conv) => {
@@ -45,18 +47,25 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
           return conv;
         });
         // Bring the updated conversation to the top
-        const conversationToMove = updatedConversations.find(conv => conv.id === message.conversationId);
+        const conversationToMove = updatedConversations.find(
+          (conv) => conv.id === message.conversationId
+        );
         if (conversationToMove) {
-          return [conversationToMove, ...updatedConversations.filter(conv => conv.id !== message.conversationId)];
+          return [
+            conversationToMove,
+            ...updatedConversations.filter(
+              (conv) => conv.id !== message.conversationId
+            ),
+          ];
         }
         return updatedConversations;
       });
     });
 
     return () => {
-      socket.off('conversations');
-      socket.off('newConversation');
-      socket.off('messageReceived');
+      socket.off("conversations");
+      socket.off("newConversation");
+      socket.off("messageReceived");
     };
   }, [socket, session?.user?.id]);
 
@@ -69,7 +78,9 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
     <div className="h-full flex flex-col">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
         <h2 className="text-xl font-semibold">Messages</h2>
-        <NewConversationModal onConversationCreated={handleConversationCreated} />
+        <NewConversationModal
+          onConversationCreated={handleConversationCreated}
+        />
       </div>
       <div className="flex-1">
         {loading ? (
@@ -77,7 +88,9 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
         ) : (
           <div className="overflow-y-auto h-full">
             {conversations.map((conversation, index) => {
-              const otherUser = conversation.users.find(user => user.email !== session?.user?.email);
+              const otherUser = conversation.users.find(
+                (user) => user.email !== session?.user?.email
+              );
 
               return (
                 <motion.div
@@ -91,8 +104,12 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
                   <div className="flex items-center">
                     <div className="relative">
                       <Avatar className="w-12 h-12 mr-4">
-                        <AvatarImage src={otherUser?.image || '/images/default-avatar.png'} />
-                        <AvatarFallback>{otherUser?.name?.charAt(0)}</AvatarFallback>
+                        <AvatarImage
+                          src={otherUser?.image || "/images/default-avatar.png"}
+                        />
+                        <AvatarFallback>
+                          {otherUser?.name?.charAt(0)}
+                        </AvatarFallback>
                         {otherUser && onlineUsers.includes(otherUser.id) && (
                           <span className="absolute inset-y-0 inset-x-0 flex items-end justify-end z-20">
                             <span className="block h-4 w-4 rounded-full bg-green-500 ring-2 ring-white dark:ring-gray-800" />
@@ -103,13 +120,19 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
                     <div className="flex-1">
                       <div className="flex justify-between">
                         <h3 className="font-semibold">{otherUser?.name}</h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{new Date(conversation.messages[0]?.createdAt).toLocaleTimeString()}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Date(
+                            conversation.messages[0]?.createdAt
+                          ).toLocaleTimeString()}
+                        </p>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{conversation.messages[0]?.content}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                        {conversation.messages[0]?.content}
+                      </p>
                     </div>
                   </div>
                 </motion.div>
-              )
+              );
             })}
           </div>
         )}

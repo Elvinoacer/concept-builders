@@ -45,6 +45,7 @@ model User {
   conversations       Conversation[] @relation("ConversationUsers")
   sentMessages        Message[]
   readMessages        Message[]      @relation("ReadMessages")
+  feedback            Feedback[]
 }
 
 model Cart {
@@ -395,4 +396,15 @@ model NewsletterSubscription {
   id        String   @id @default(cuid())
   email     String   @unique
   createdAt DateTime @default(now())
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  rating    Int
+  category  String
+  feedback  String
+  createdAt DateTime @default(now())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  isFeatured Boolean @default(false)
 }

@@ -1,7 +1,8 @@
-'use client';
-import React, { useRef, useState, useEffect } from 'react';
-import DesignCard from '@/components/DesignCard';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client";
+import React, { useRef, useState, useEffect } from "react";
+import DesignCard from "@/components/DesignCard";
+import { motion, AnimatePresence } from "framer-motion";
+import ShowMoreCard from "./ShowMoreCard";
 
 const RecommendedDesigns = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -12,11 +13,11 @@ const RecommendedDesigns = () => {
   useEffect(() => {
     const fetchRecommendedDesigns = async () => {
       try {
-        const response = await fetch('/api/designs?limit=5');
+        const response = await fetch("/api/dashboard/recommendations");
         const data = await response.json();
-        setRecommendedDesigns(data.designs);
+        setRecommendedDesigns(data);
       } catch (error) {
-        console.error('Error fetching recommended designs:', error);
+        console.error("Error fetching recommended designs:", error);
       }
     };
 
@@ -31,11 +32,11 @@ const RecommendedDesigns = () => {
     }
   };
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scroll = (direction: "left" | "right") => {
     const el = scrollRef.current;
     if (el) {
-      const scrollAmount = direction === 'left' ? -320 : 320;
-      el.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      const scrollAmount = direction === "left" ? -320 : 320;
+      el.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
 
@@ -51,12 +52,14 @@ const RecommendedDesigns = () => {
 
   return (
     <section className="mt-8">
-      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Recommended for You</h3>
+      <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+        Recommended for You
+      </h3>
       <div className="relative">
-        <div 
-          ref={scrollRef} 
+        <div
+          ref={scrollRef}
           onScroll={checkScrollability}
-          className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide"
+          className="flex overflow-x-auto space-x-8 pb-6 scrollbar-hide"
         >
           {recommendedDesigns.map((design, index) => (
             <motion.div
@@ -64,36 +67,41 @@ const RecommendedDesigns = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="min-w-[300px]"
+              className="min-w-[320px]"
             >
               <DesignCard design={design} />
             </motion.div>
           ))}
+          <ShowMoreCard />
         </div>
 
         <AnimatePresence>
           {canScrollLeft && (
-            <motion.button 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }} 
-              onClick={() => scroll('left')} 
-              className="absolute top-1/2 -translate-y-1/2 left-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-2 rounded-full shadow-lg z-10 hover:bg-white dark:hover:bg-gray-900 transition-colors"
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={() => scroll("left")}
+              className="absolute top-1/2 -translate-y-1/2 left-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-3 rounded-full shadow-xl z-10 hover:bg-white dark:hover:bg-gray-900 transition-all duration-300"
             >
-              <span className="material-symbols-outlined">chevron_left</span>
+              <span className="material-symbols-outlined text-3xl">
+                chevron_left
+              </span>
             </motion.button>
           )}
         </AnimatePresence>
         <AnimatePresence>
           {canScrollRight && (
-            <motion.button 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }} 
-              onClick={() => scroll('right')} 
-              className="absolute top-1/2 -translate-y-1/2 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-2 rounded-full shadow-lg z-10 hover:bg-white dark:hover:bg-gray-900 transition-colors"
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={() => scroll("right")}
+              className="absolute top-1/2 -translate-y-1/2 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-3 rounded-full shadow-xl z-10 hover:bg-white dark:hover:bg-gray-900 transition-all duration-300"
             >
-              <span className="material-symbols-outlined">chevron_right</span>
+              <span className="material-symbols-outlined text-3xl">
+                chevron_right
+              </span>
             </motion.button>
           )}
         </AnimatePresence>

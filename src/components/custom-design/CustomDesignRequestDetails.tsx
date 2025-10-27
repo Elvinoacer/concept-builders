@@ -214,158 +214,113 @@ const CustomDesignRequestDetails: React.FC<CustomDesignRequestDetailsProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="max-w-4xl mx-auto py-8"
+      className="max-w-6xl mx-auto py-12 px-4"
     >
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Custom Design Request #{request.id.substring(0, 8)}</CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Status: <Badge className="ml-1">{currentStatus}</Badge></p>
+      <Card className="bg-white dark:bg-gray-800 shadow-2xl rounded-3xl border-gray-200 dark:border-gray-700">
+        <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between p-8 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-br from-blue-500 to-cyan-400 p-3 rounded-full">
+              <span className="material-symbols-outlined text-white text-4xl">edit_document</span>
+            </div>
+            <div>
+              <CardTitle className="text-4xl font-extrabold text-gray-900 dark:text-white">Custom Design Request</CardTitle>
+              <p className="text-lg text-gray-500 dark:text-gray-400">#{request.id.substring(0, 8)}</p>
+            </div>
           </div>
-          {isAdmin ? (
-            <Select value={currentStatus} onValueChange={handleStatusChange} disabled={loading}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Update Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(CustomDesignRequestStatus).map((statusOption) => (
-                  <SelectItem key={statusOption} value={statusOption}>
-                    {statusOption.replace(/_/g, ' ')}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            !isAdmin && (
-              <Button onClick={() => setIsEditing(!isEditing)} variant="outline">
+          <div className="flex items-center gap-4 mt-4 md:mt-0">
+            <Badge className={`text-lg px-4 py-2 ${currentStatus === 'COMPLETED' ? 'bg-green-500' : 'bg-yellow-500'}`}>{currentStatus.replace(/_/g, ' ')}</Badge>
+            {isAdmin ? (
+              <Select value={currentStatus} onValueChange={handleStatusChange} disabled={loading}>
+                <SelectTrigger className="w-[200px] h-12 text-lg">
+                  <SelectValue placeholder="Update Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(CustomDesignRequestStatus).map((statusOption) => (
+                    <SelectItem key={statusOption} value={statusOption} className="text-lg">
+                      {statusOption.replace(/_/g, ' ')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Button onClick={() => setIsEditing(!isEditing)} variant="outline" className="h-12 px-6 text-lg">
                 {isEditing ? "Cancel" : "Edit Request"}
               </Button>
-            )
-          )}
+            )}
+          </div>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                value={request.name}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                value={request.email}
-                readOnly
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                value={request.phone || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-              />
-            </div>
-            <div>
-              <Label htmlFor="designType">Type of Design</Label>
-              {isEditing ? (
-                <Select value={request.designType} onValueChange={handleSelectChange} required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select design type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Residential">Residential</SelectItem>
-                    <SelectItem value="Commercial">Commercial</SelectItem>
-                    <SelectItem value="Renovation">Renovation</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input id="designType" value={request.designType} readOnly />
-              )}
-            </div>
-            <div>
-              <Label htmlFor="description">Project Description</Label>
-              <Textarea
-                id="description"
-                value={request.description}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-                rows={5}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="budget">Estimated Budget</Label>
-              <Input
-                id="budget"
-                value={request.budget || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-              />
+        <CardContent className="p-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-lg font-semibold">Full Name</Label>
+                <Input id="name" value={request.name} onChange={handleInputChange} readOnly={!isEditing} required className="h-12 text-lg" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-lg font-semibold">Email</Label>
+                <Input id="email" value={request.email} readOnly required className="h-12 text-lg" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-lg font-semibold">Phone Number</Label>
+                <Input id="phone" value={request.phone || ''} onChange={handleInputChange} readOnly={!isEditing} className="h-12 text-lg" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="designType" className="text-lg font-semibold">Type of Design</Label>
+                {isEditing ? (
+                  <Select value={request.designType} onValueChange={handleSelectChange} required>
+                    <SelectTrigger className="h-12 text-lg">
+                      <SelectValue placeholder="Select design type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Residential" className="text-lg">Residential</SelectItem>
+                      <SelectItem value="Commercial" className="text-lg">Commercial</SelectItem>
+                      <SelectItem value="Renovation" className="text-lg">Renovation</SelectItem>
+                      <SelectItem value="Other" className="text-lg">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input id="designType" value={request.designType} readOnly className="h-12 text-lg" />
+                )}
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="description" className="text-lg font-semibold">Project Description</Label>
+                <Textarea id="description" value={request.description} onChange={handleInputChange} readOnly={!isEditing} rows={6} required className="text-lg" />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="budget" className="text-lg font-semibold">Estimated Budget</Label>
+                <Input id="budget" value={request.budget || ''} onChange={handleInputChange} readOnly={!isEditing} className="h-12 text-lg" />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Attachments</Label>
+            <div className="space-y-4">
+              <Label className="text-lg font-semibold">Attachments</Label>
               {request.attachments.length === 0 && newFiles.length === 0 && (
-                <p className="text-gray-500 dark:text-gray-400 text-sm">No attachments provided.</p>
+                <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl">
+                  <span className="material-symbols-outlined text-6xl text-gray-400 dark:text-gray-500">cloud_off</span>
+                  <p className="text-gray-500 dark:text-gray-400 mt-4 text-lg">No attachments provided.</p>
+                </div>
               )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {request.attachments.map((url, index) => (
-                  <div
-                    key={index}
-                    className="relative flex items-center space-x-2 p-3 border rounded-md bg-gray-50 dark:bg-gray-700"
-                  >
-                    {url.match(/\.(jpeg|jpg|png|gif|webp)$/i) ? (
-                      <Image src={url} alt="Attachment" width={40} height={40} className="rounded-md object-cover" />
-                    ) : (
-                      <div className="flex-shrink-0">{getFileIcon(url)}</div>
-                    )}
-                    <a
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 text-sm text-blue-600 hover:underline truncate"
-                    >
+                  <div key={index} className="relative group flex items-center space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-shadow">
+                    <div className="flex-shrink-0">{getFileIcon(url)}</div>
+                    <a href={url} target="_blank" rel="noopener noreferrer" className="flex-1 text-lg text-blue-600 hover:underline truncate">
                       {getFileNameFromUrl(url)}
                     </a>
                     {!isAdmin && isEditing && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleExistingFileRemove(url)}
-                        className="text-red-500 hover:text-red-700"
-                        disabled={loading}
-                      >
-                        <Trash2 className="h-4 w-4" />
+                      <Button type="button" variant="ghost" size="icon" onClick={() => handleExistingFileRemove(url)} className="absolute top-2 right-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity" disabled={loading}>
+                        <Trash2 className="h-5 w-5" />
                       </Button>
                     )}
                   </div>
                 ))}
                 {newFiles.map((file, index) => (
-                  <div
-                    key={file.name + index}
-                    className="relative flex items-center space-x-2 p-3 border rounded-md bg-gray-50 dark:bg-gray-700"
-                  >
+                  <div key={file.name + index} className="relative group flex items-center space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-700/50">
                     <div className="flex-shrink-0">{getFileIcon(file.name)}</div>
-                    <span className="flex-1 text-sm truncate">{file.name}</span>
+                    <span className="flex-1 text-lg truncate">{file.name}</span>
                     {!isAdmin && isEditing && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleNewFileRemove(file)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
+                      <Button type="button" variant="ghost" size="icon" onClick={() => handleNewFileRemove(file)} className="absolute top-2 right-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 className="h-5 w-5" />
                       </Button>
                     )}
                   </div>
@@ -374,49 +329,36 @@ const CustomDesignRequestDetails: React.FC<CustomDesignRequestDetailsProps> = ({
 
               {!isAdmin && isEditing && (
                 <div
-                  className={`mt-4 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md transition-colors ${
+                  className={`mt-6 flex justify-center px-6 py-10 border-4 border-dashed rounded-2xl transition-colors ${
                     isDragOver
-                      ? "border-primary bg-primary/10"
+                      ? "border-blue-500 bg-blue-500/10"
                       : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
                   }`}
                   onDragOver={onDragOver}
                   onDragLeave={onDragLeave}
                   onDrop={onDrop}
                 >
-                  <div className="space-y-1 text-center">
-                    <UploadCloud
-                      className={`mx-auto h-8 w-8 md:h-12 md:w-12 ${
-                        isDragOver ? "text-primary" : "text-gray-400"
-                      }`}
-                    />
-                    <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                      <label
-                        htmlFor="file-upload"
-                        className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
-                      >
+                  <div className="space-y-2 text-center">
+                    <UploadCloud className={`mx-auto h-16 w-16 ${isDragOver ? "text-blue-500" : "text-gray-400"}`} />
+                    <div className="flex text-lg text-gray-600 dark:text-gray-400">
+                      <label htmlFor="file-upload" className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                         <span>Upload more files</span>
-                        <Input
-                          id="file-upload"
-                          type="file"
-                          className="sr-only"
-                          onChange={handleFileChange}
-                          multiple
-                        />
+                        <Input id="file-upload" type="file" className="sr-only" onChange={handleFileChange} multiple />
                       </label>
                       <p className="pl-1">or drag and drop</p>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      PNG, JPG, GIF, PDF, DOCX up to 10MB
-                    </p>
+                    <p className="text-md text-gray-500 dark:text-gray-400">PNG, JPG, GIF, PDF, DOCX up to 10MB</p>
                   </div>
                 </div>
               )}
             </div>
 
             {!isAdmin && isEditing && (
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Saving..." : "Save Changes"}
-              </Button>
+              <div className="flex justify-end">
+                <Button type="submit" className="h-14 px-8 text-lg" disabled={loading}>
+                  {loading ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
             )}
           </form>
         </CardContent>

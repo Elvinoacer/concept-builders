@@ -110,6 +110,7 @@ export async function GET(request: NextRequest) {
       include: {
         files: true,
         reviews: true,
+        category: true,
         discounts: {
           include: {
             discount: true,

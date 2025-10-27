@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import Link from 'next/link';
 
 const HelpPage = () => {
   const [activeCategory, setActiveCategory] = useState("getting-started");
@@ -17,12 +18,14 @@ const HelpPage = () => {
         {
           id: 1,
           title: "Creating Your First Project",
-          content: "Learn how to create your first project from scratch...",
+          content: "Learn how to create your first project from scratch.",
+          path: "/dashboard/help/articles/creating-first-project",
         },
         {
           id: 2,
           title: "Account Setup Guide",
-          content: "Complete guide to setting up your account...",
+          content: "Complete guide to setting up your account.",
+          path: "/dashboard/help/articles/account-setup-guide",
         },
       ],
     },
@@ -34,29 +37,8 @@ const HelpPage = () => {
         {
           id: 3,
           title: "Payment Methods",
-          content: "How to add and manage payment methods...",
-        },
-        {
-          id: 4,
-          title: "Subscription Plans",
-          content: "Understanding different subscription tiers...",
-        },
-      ],
-    },
-    {
-      id: "design",
-      title: "Design Tools",
-      icon: "palette",
-      articles: [
-        {
-          id: 5,
-          title: "Using the Design Editor",
-          content: "Master the design editor tools and features...",
-        },
-        {
-          id: 6,
-          title: "Templates Library",
-          content: "How to use and customize templates...",
+          content: "How to add and manage payment methods.",
+          path: "/dashboard/help/articles/payment-methods",
         },
       ],
     },
@@ -68,12 +50,14 @@ const HelpPage = () => {
         {
           id: 7,
           title: "System Requirements",
-          content: "Minimum system requirements for optimal performance...",
+          content: "Minimum system requirements for optimal performance.",
+          path: "/dashboard/help/articles/system-requirements",
         },
         {
           id: 8,
           title: "Troubleshooting",
-          content: "Common issues and their solutions...",
+          content: "Common issues and their solutions.",
+          path: "/dashboard/help/articles/troubleshooting",
         },
       ],
     },
@@ -147,6 +131,13 @@ const HelpPage = () => {
     setActiveFAQ(activeFAQ === id ? null : id);
   };
 
+  const activeCategoryData = categories.find((cat) => cat.id === activeCategory);
+
+  const filteredArticles = activeCategoryData?.articles.filter(article =>
+    article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    article.content.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+
   return (
     <div className="dark:bg-gray-900 min-h-screen py-3 sm:py-6 md:py-8">
       <header className="mb-6 px-4 sm:px-6 md:px-8">
@@ -208,9 +199,32 @@ const HelpPage = () => {
               <p className="text-blue-600 text-xs sm:text-sm font-medium dark:text-blue-400">
                 {method.contact}
               </p>
-              <button className="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition-colors dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800">
-                Contact Now
-              </button>
+              {method.title === "Email Support" ? (
+                <a
+                  href={`mailto:${method.contact}`}
+                  className="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition-colors dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 text-center flex items-center justify-center"
+                >
+                  Contact Now
+                </a>
+              ) : method.title === "Live Chat" ? (
+                <a
+                  href="/dashboard/messages"
+                  className="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition-colors dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 text-center flex items-center justify-center"
+                >
+                  Contact Now
+                </a>
+              ) : method.title === "Video Tutorials" ? (
+                <button
+                  className="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors dark:bg-blue-900 dark:text-blue-300 opacity-50 cursor-not-allowed"
+                  disabled
+                >
+                  Coming Soon
+                </button>
+              ) : (
+                <button className="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition-colors dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800">
+                  Contact Now
+                </button>
+              )}
             </motion.div>
           ))}
         </motion.div>
@@ -253,9 +267,7 @@ const HelpPage = () => {
 
           {/* Articles Grid */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-            {categories
-              .find((cat) => cat.id === activeCategory)
-              ?.articles.map((article) => (
+            {filteredArticles.map((article) => (
                 <motion.div
                   key={article.id}
                   whileHover={{ y: -2 }}
@@ -267,9 +279,15 @@ const HelpPage = () => {
                   <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 dark:text-gray-400 leading-relaxed">
                     {article.content}
                   </p>
-                  <button className="text-blue-600 text-xs sm:text-sm font-medium hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-                    Read Article →
-                  </button>
+                  {article.path ? (
+                    <Link href={article.path} className="text-blue-600 text-xs sm:text-sm font-medium hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                      Read Article →
+                    </Link>
+                  ) : (
+                    <button className="text-blue-600 text-xs sm:text-sm font-medium hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                      Read Article →
+                    </button>
+                  )}
                 </motion.div>
               ))}
           </div>
@@ -333,12 +351,20 @@ const HelpPage = () => {
             Our support team is here to assist you
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <button className="bg-white text-blue-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors text-sm sm:text-base">
+            <a
+              href="https://wa.me/254741360865"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white text-blue-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors text-sm sm:text-base flex items-center justify-center"
+            >
               Contact Support
-            </button>
-            <button className="border border-white text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-white hover:text-blue-600 transition-colors text-sm sm:text-base">
-              Schedule a Call
-            </button>
+            </a>
+            <a
+              href="tel:254741360865"
+              className="border border-white text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-white hover:text-blue-600 transition-colors text-sm sm:text-base flex items-center justify-center"
+            >
+              Call Now
+            </a>
           </div>
         </motion.div>
       </div>

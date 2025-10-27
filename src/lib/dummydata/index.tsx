@@ -84,7 +84,6 @@ export * from "./customDesign";
 
 export * from "./designsPage";
 export * from "./designDetailPage";
-export * from "./chat";
 export * from "./analytics";
 export * from "./content";
 
