@@ -19,6 +19,13 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         id: projectId,
         userId: userId, // Ensure the user owns the project
       },
+      include: {
+        milestones: true,
+        requirements: true,
+        costs: true,
+        invoices: { include: { invoiceItems: true } },
+        feedback: { include: { client: true, admin: true } },
+      },
     });
 
     if (!project) {

@@ -16,62 +16,64 @@ datasource db {
 }
 
 model User {
-  id                  String         @id @default(cuid())
-  name                String?
-  email               String?        @unique
-  emailVerified       DateTime?
-  image               String?
-  hashedPassword      String?
-  accounts            Account[]
-  sessions            Session[]
-  orders              Order[]
-  projects            Project[]
-  role                Role           @default(CLIENT)
-  reviews             Review[]
-  wishlist            Design[]
-  folders             Folder[]
-  status              UserStatus     @default(ACTIVE)
-  loginHistory        LoginHistory[]
-  impersonatingUserId String?
-  referralSource      String?
-  emailVerificationToken String?
+  id                       String            @id @default(cuid())
+  name                     String?
+  email                    String?           @unique
+  emailVerified            DateTime?
+  image                    String?
+  hashedPassword           String?
+  accounts                 Account[]
+  sessions                 Session[]
+  orders                   Order[]
+  projects                 Project[]
+  role                     Role              @default(CLIENT)
+  reviews                  Review[]
+  wishlist                 Design[]
+  folders                  Folder[]
+  status                   UserStatus        @default(ACTIVE)
+  loginHistory             LoginHistory[]
+  impersonatingUserId      String?
+  referralSource           String?
+  emailVerificationToken   String?
   emailVerificationExpires DateTime?
-  passwordResetToken String?
-  passwordResetExpires DateTime?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @default(now()) @updatedAt
-  cart                Cart?
-  notifications       Notification[]
-  conversations       Conversation[] @relation("ConversationUsers")
-  sentMessages        Message[]
-  readMessages        Message[]      @relation("ReadMessages")
-  feedback            Feedback[]
+  passwordResetToken       String?
+  passwordResetExpires     DateTime?
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @default(now()) @updatedAt
+  cart                     Cart?
+  notifications            Notification[]
+  conversations            Conversation[]    @relation("ConversationUsers")
+  sentMessages             Message[]
+  readMessages             Message[]         @relation("ReadMessages")
+  feedback                 Feedback[]
+  clientFeedback           ProjectFeedback[] @relation("ClientFeedback")
+  adminFeedback            ProjectFeedback[] @relation("AdminFeedback")
 }
 
 model Cart {
-  id               String     @id @default(cuid())
-  user             User       @relation(fields: [userId], references: [id])
-  userId           String     @unique
-  items            CartItem[]
-  discountCode     String?
-  discountAmount   Float?
-  discountId       String?
-  discount         Discount?  @relation(fields: [discountId], references: [id])
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  id             String     @id @default(cuid())
+  user           User       @relation(fields: [userId], references: [id])
+  userId         String     @unique
+  items          CartItem[]
+  discountCode   String?
+  discountAmount Float?
+  discountId     String?
+  discount       Discount?  @relation(fields: [discountId], references: [id])
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 }
 
 model CartItem {
-  id        String   @id @default(cuid())
-  cart      Cart     @relation(fields: [cartId], references: [id])
-  cartId    String
-  design    Design   @relation(fields: [designId], references: [id])
-  designId  String
-  quantity  Int      @default(1)
-  createdAt DateTime @default(now())
+  id               String   @id @default(cuid())
+  cart             Cart     @relation(fields: [cartId], references: [id])
+  cartId           String
+  design           Design   @relation(fields: [designId], references: [id])
+  designId         String
+  quantity         Int      @default(1)
+  createdAt        DateTime @default(now())
   selectedFileType String?
-  selectedPackage String?
-  selectedExtras Json?
+  selectedPackage  String?
+  selectedExtras   Json?
 
   @@unique([cartId, designId, selectedFileType, selectedPackage, selectedExtras])
 }
@@ -122,11 +124,11 @@ model VerificationToken {
 }
 
 model Category {
-  id      String   @id @default(cuid())
-  name    String   @unique
-  image   String?
-  designs Design[]
-  isFeatured Boolean @default(false)
+  id         String   @id @default(cuid())
+  name       String   @unique
+  image      String?
+  designs    Design[]
+  isFeatured Boolean  @default(false)
 }
 
 model Folder {
@@ -167,13 +169,13 @@ model Design {
   buildingCostFactors   Json?
 
   wishlistedBy User[]
-  category     Category?   @relation(fields: [categoryId], references: [id])
+  category     Category?        @relation(fields: [categoryId], references: [id])
   categoryId   String?
   reviews      Review[]
   orderItems   OrderItem[]
   cartItems    CartItem[]
-  views        Int      @default(0)
-  isFeatured   Boolean  @default(false)
+  views        Int              @default(0)
+  isFeatured   Boolean          @default(false)
   discounts    DesignDiscount[]
 }
 
@@ -255,16 +257,24 @@ model OrderItem {
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  imageUrl    String?
-  progress    Int      @default(0)
-  status      String   @default("Planning")
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String               @id @default(cuid())
+  name              String
+  description       String?
+  imageUrl          String?
+  progress          Int                  @default(0)
+  status            ProjectStatus        @default(PLANNING)
+  userId            String
+  user              User                 @relation(fields: [userId], references: [id])
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  completionRemarks String?
+  declaration       Boolean              @default(false)
+  totalCost         Float                @default(0)
+  milestones        ProjectMilestone[]
+  requirements      ProjectRequirement[]
+  feedback          ProjectFeedback[]
+  costs             ProjectCost[]
+  invoices          Invoice[]
 }
 
 enum Role {
@@ -303,7 +313,7 @@ model Notification {
 }
 
 model CustomDesignRequest {
-  id          String   @id @default(cuid())
+  id          String                    @id @default(cuid())
   name        String
   email       String
   phone       String?
@@ -311,8 +321,8 @@ model CustomDesignRequest {
   description String
   budget      String?
   attachments String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt @default(now())
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @default(now()) @updatedAt
   status      CustomDesignRequestStatus @default(PENDING)
 }
 
@@ -347,8 +357,8 @@ model Message {
 model Attachment {
   id        String   @id @default(cuid())
   url       String
-  type      String   // e.g., "image/jpeg", "application/pdf"
-  name      String   // Original file name
+  type      String // e.g., "image/jpeg", "application/pdf"
+  name      String // Original file name
   message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
   messageId String
   createdAt DateTime @default(now())
@@ -371,17 +381,17 @@ model Banner {
 }
 
 model Discount {
-  id                String      @id @default(cuid())
-  code              String      @unique
+  id                String           @id @default(cuid())
+  code              String           @unique
   type              DiscountType
   value             Float
   minPurchaseAmount Float?
   maxUses           Int?
-  uses              Int         @default(0)
+  uses              Int              @default(0)
   expiresAt         DateTime?
-  isActive          Boolean     @default(true)
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  isActive          Boolean          @default(true)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
   orders            Order[]
   carts             Cart[] // New inverse relation
   designs           DesignDiscount[]
@@ -408,12 +418,123 @@ model NewsletterSubscription {
 }
 
 model Feedback {
+  id         String   @id @default(cuid())
+  rating     Int
+  category   String
+  feedback   String
+  createdAt  DateTime @default(now())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  isFeatured Boolean  @default(false)
+}
+
+// New Enums
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+  CANCELLED
+}
+
+enum MilestoneStatus {
+  PENDING
+  COMPLETED
+  OVERDUE
+}
+
+enum RequirementStatus {
+  PENDING
+  MET
+  NOT_MET
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum InvoiceType {
+  INITIAL
+  MILESTONE
+  FINAL
+  CUSTOM
+}
+
+// New Models
+model ProjectMilestone {
+  id            String          @id @default(cuid())
+  projectId     String
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  dueDate       DateTime
+  completedDate DateTime?
+  status        MilestoneStatus @default(PENDING)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model ProjectRequirement {
+  id          String            @id @default(cuid())
+  projectId   String
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  description String
+  status      RequirementStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model ProjectFeedback {
   id        String   @id @default(cuid())
-  rating    Int
-  category  String
-  feedback  String
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientId  String
+  client    User     @relation(name: "ClientFeedback", fields: [clientId], references: [id])
+  adminId   String? // Optional, if feedback can be from client to admin or vice-versa
+  admin     User?    @relation(name: "AdminFeedback", fields: [adminId], references: [id])
+  message   String
+  rating    Int? // Optional rating
   createdAt DateTime @default(now())
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
-  isFeatured Boolean @default(false)
+}
+
+model ProjectCost {
+  id           String   @id @default(cuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  description  String
+  amount       Float
+  dateIncurred DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  projectId     String
+  project       Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  invoiceNumber String        @unique
+  issueDate     DateTime      @default(now())
+  dueDate       DateTime
+  totalAmount   Float
+  status        InvoiceStatus @default(PENDING)
+  type          InvoiceType   @default(CUSTOM)
+  documentUrl   String? // URL to the generated PDF invoice
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  invoiceItems  InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Int
+  unitPrice   Float
+  total       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

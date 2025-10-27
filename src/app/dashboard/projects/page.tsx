@@ -12,7 +12,34 @@ const ProjectsPage = () => {
   }, [fetchProjects]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center">
+        <p className="text-gray-500 dark:text-gray-400">Loading projects...</p>
+      </div>
+    );
+  }
+
+  if (projects.length === 0) {
+    return (
+      <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center text-center">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          No projects yet!
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md">
+          It looks like you haven't started any projects. Explore our designs and
+          kickstart your dream home today!
+        </p>
+        <Link href="/design-showcase">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors"
+          >
+            Explore Designs
+          </motion.button>
+        </Link>
+      </div>
+    );
   }
 
   return (

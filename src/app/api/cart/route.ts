@@ -1,110 +1,77 @@
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import prisma from "@/lib/prisma";
 
-export async function GET(req: NextRequest) {
+export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
   }
+
+  const userId = session.user.id;
 
   try {
-    let cart = await prisma.cart.findUnique({
-      where: { userId: session.user.id },
-      include: {
-        items: {
-          include: {
-            design: true,
-          },
-        },
-      },
-    });
-
-    if (!cart) {
-      cart = await prisma.cart.create({
-        data: {
-          userId: session.user.id,
-        },
-        include: {
-          items: true,
-        },
-      });
-    }
-
-    return NextResponse.json(cart);
-  } catch (error) {
-    console.error("Error fetching cart:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const { designId, quantity = 1 } = await req.json();
+    const body = await request.json();
+    const { designId, quantity = 1, selectedFileType, selectedPackage, selectedExtras } = body;
 
     if (!designId) {
-      return NextResponse.json({ error: "Design ID is required" }, { status: 400 });
+      return new NextResponse("Missing designId", { status: 400 });
     }
 
-    let cart = await prisma.cart.findUnique({
-      where: { userId: session.user.id },
-    });
-
-    if (!cart) {
-      cart = await prisma.cart.create({
-        data: { userId: session.user.id },
-      });
-    }
-
-    const existingItem = await prisma.cartItem.findFirst({
+    let userCart = await prisma.cart.findUnique({
       where: {
-        cartId: cart.id,
-        designId: designId,
+        userId: userId,
       },
     });
 
-    if (existingItem) {
-      // If item already exists, do nothing as quantity should always be 1
-      // Or, you could return a specific message indicating it's already in cart
-      return NextResponse.json({ message: "Item already in cart" }, { status: 200 });
-    } else {
-      await prisma.cartItem.create({
+    if (!userCart) {
+      userCart = await prisma.cart.create({
         data: {
-          cartId: cart.id,
-          designId: designId,
-          quantity: 1, // Always add with quantity 1
+          userId: userId,
         },
       });
     }
 
-    const updatedCart = await prisma.cart.findUnique({
-        where: { userId: session.user.id },
-        include: {
-          items: {
-            include: {
-              design: true,
-            },
-          },
+    // Check if the item already exists in the cart with the same options
+    const existingCartItem = await prisma.cartItem.findFirst({
+      where: {
+        cartId: userCart.id,
+        designId: designId,
+        selectedFileType: selectedFileType,
+        selectedPackage: selectedPackage,
+        selectedExtras: selectedExtras,
+      },
+    });
+
+    if (existingCartItem) {
+      // If it exists, update the quantity
+      const updatedCartItem = await prisma.cartItem.update({
+        where: {
+          id: existingCartItem.id,
+        },
+        data: {
+          quantity: existingCartItem.quantity + quantity,
         },
       });
-
-    return NextResponse.json(updatedCart);
+      return NextResponse.json(updatedCartItem);
+    } else {
+      // Otherwise, create a new cart item
+      const newCartItem = await prisma.cartItem.create({
+        data: {
+          cartId: userCart.id,
+          designId: designId,
+          quantity: quantity,
+          selectedFileType: selectedFileType,
+          selectedPackage: selectedPackage,
+          selectedExtras: selectedExtras,
+        },
+      });
+      return NextResponse.json(newCartItem);
+    }
   } catch (error) {
-    console.error("Error adding to cart:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    console.error("Error adding item to cart:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

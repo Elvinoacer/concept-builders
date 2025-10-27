@@ -1,4 +1,4 @@
-import { Order, User, OrderItem, Design } from "@/generated/prisma";
+import { Order, User, OrderItem, Design, Invoice, InvoiceItem, Project } from "@/generated/prisma";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -6,6 +6,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 interface OrderWithDetails extends Order {
   user: User;
   items: (OrderItem & { design: Design })[];
+}
+
+interface InvoiceWithDetails extends Invoice {
+  project: Project & { user: User };
+  invoiceItems: InvoiceItem[];
 }
 
 export async function sendPasswordResetEmail(
@@ -179,6 +184,35 @@ export async function sendCustomDesignRequestStatusUpdateEmail(requestData: any,
     console.log("Custom design request status update email sent successfully:", data);
   } catch (error) {
     console.error("Error in sendCustomDesignRequestStatusUpdateEmail function:", error);
+    throw error;
+  }
+}
+
+export async function sendInvoiceEmail(invoice: InvoiceWithDetails) {
+  try {
+    console.log(`Attempting to send invoice email to ${invoice.project.user.email}`);
+    const { data, error } = await resend.emails.send({
+      from: "Concept Builders <onboarding@resend.dev>",
+      to: invoice.project.user.email!,
+      subject: `Your Invoice #${invoice.invoiceNumber} from Concept Builders`,
+      html: `<h1>Hello ${invoice.project.user.name},</h1>
+        <p>Here is your invoice for Project: <strong>${invoice.project.name}</strong>.</p>
+        <p><strong>Invoice Number:</strong> ${invoice.invoiceNumber}</p>
+        <p><strong>Issue Date:</strong> ${invoice.issueDate.toDateString()}</p>
+        <p><strong>Due Date:</strong> ${invoice.dueDate.toDateString()}</p>
+        <p><strong>Total Amount:</strong> ${invoice.totalAmount.toFixed(2)}</p>
+        <p><strong>Status:</strong> ${invoice.status}</p>
+        ${invoice.documentUrl ? `<p>You can download your invoice here: <a href="${invoice.documentUrl}">Download Invoice</a></p>` : ''}
+        <p>You can view full details by logging into your dashboard.</p>
+        <p>Thank you for your business!</p>`,
+    });
+    if (error) {
+      console.error("Error sending invoice email:", error);
+      throw error;
+    }
+    console.log("Invoice email sent successfully:", data);
+  } catch (error) {
+    console.error("Error in sendInvoiceEmail function:", error);
     throw error;
   }
 }

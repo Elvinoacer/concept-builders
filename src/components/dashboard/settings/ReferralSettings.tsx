@@ -1,9 +1,29 @@
-// components/dashboard/settings/ReferralSettings.jsx
-"use client";
-import React from "react";
-import { referralInfo } from "@/lib/dummydata/settings-data";
+'use client';
+import React, { useState, useEffect } from 'react';
 
 const ReferralSettings = () => {
+  const [referralInfo, setReferralInfo] = useState({
+    referralCode: '',
+    totalReferrals: 0,
+    earnedBonus: 0,
+    pendingBonus: 0,
+  });
+
+  useEffect(() => {
+    const fetchReferralInfo = async () => {
+      const response = await fetch('/api/settings/referrals');
+      if (response.ok) {
+        const data = await response.json();
+        setReferralInfo(data);
+      }
+    };
+    fetchReferralInfo();
+  }, []);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(referralInfo.referralCode);
+  };
+
   return (
     <div>
       <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">
@@ -24,19 +44,22 @@ const ReferralSettings = () => {
               value={referralInfo.referralCode}
               className="flex-1 block w-full rounded-none rounded-l-md border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-600 sm:text-base h-12 px-5"
             />
-            <button className="inline-flex items-center px-4 rounded-r-md border border-l-0 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
+            <button
+              onClick={handleCopy}
+              className="inline-flex items-center px-4 rounded-r-md border border-l-0 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+            >
               Copy
             </button>
           </div>
         </div>
         {[
-          { label: "Total Referrals", value: referralInfo.totalReferrals },
+          { label: 'Total Referrals', value: referralInfo.totalReferrals },
           {
-            label: "Earned Bonus",
+            label: 'Earned Bonus',
             value: `${referralInfo.earnedBonus.toFixed(2)}`,
           },
           {
-            label: "Pending Bonus",
+            label: 'Pending Bonus',
             value: `${referralInfo.pendingBonus.toFixed(2)}`,
           },
         ].map(({ label, value }) => (
@@ -55,3 +78,4 @@ const ReferralSettings = () => {
 };
 
 export default ReferralSettings;
+
