@@ -17,7 +17,7 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({ onConversat
   const [admins, setAdmins] = useState<User[]>([]);
   const [selectedAdmin, setSelectedAdmin] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
-  const socket = useSocket(); // Get the socket instance
+  const { socket } = useSocket(); // Get the socket instance
 
   useEffect(() => {
     const fetchAdmins = async () => {
