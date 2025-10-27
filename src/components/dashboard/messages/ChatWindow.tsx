@@ -40,6 +40,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversation, onlineUsers }) =>
   useEffect(() => {
     if (!socket || !session?.user?.id) return;
 
+    // Reset messages and set loading to true when conversation changes
+    setMessages([]);
+    setLoading(true);
+
     // Join the conversation room
     socket.emit('joinConversation', conversation.id);
 
