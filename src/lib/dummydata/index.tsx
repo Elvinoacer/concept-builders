@@ -92,7 +92,7 @@ export * from "./orders";
 export * from "./team";
 export * from "./users";
 export * from "./messages";
-export * from "./notifications";
+
 export * from "./projects";
 export * from "./projectDetails";
 export const costEstimateIcons = {
