@@ -2,16 +2,21 @@
 
 import { useSocket } from "@/app/Providers"; // Import the useSocket hook
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Conversation } from "@/generated/prisma";
+import { Conversation, Message, User } from "@/generated/prisma";
+
+interface ConversationWithMessagesAndUsers extends Conversation {
+  messages: Message[];
+  users: User[];
+}
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import NewConversationModal from "./NewConversationModal";
 
 interface ConversationListProps {
-  onSelectConversation: (conversation: Conversation) => void;
+  onSelectConversation: (conversation: ConversationWithMessagesAndUsers) => void;
   onlineUsers: string[];
-  selectedConversation?: Conversation | null; // New prop
+  selectedConversation?: ConversationWithMessagesAndUsers | null; // New prop
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({
@@ -19,7 +24,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
   onlineUsers,
   selectedConversation, // Destructure the new prop
 }) => {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversations, setConversations] = useState<ConversationWithMessagesAndUsers[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
   const socketContext = useSocket(); // Get the socket context
@@ -30,16 +35,16 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
     socket.emit("getConversations", session.user.id);
 
-    socket.on("conversations", (fetchedConversations: Conversation[]) => {
+    socket.on("conversations", (fetchedConversations: ConversationWithMessagesAndUsers[]) => {
       setConversations(fetchedConversations);
       setLoading(false);
     });
 
-    socket.on("newConversation", (newConversation: Conversation) => {
+    socket.on("newConversation", (newConversation: ConversationWithMessagesAndUsers) => {
       setConversations((prev) => [newConversation, ...prev]);
     });
 
-    socket.on("messageReceived", (message: any) => {
+    socket.on("messageReceived", (message: Message) => {
       setConversations((prev) => {
         let conversationFound = false;
         const updatedConversations = prev.map((conv) => {
@@ -85,7 +90,24 @@ const ConversationList: React.FC<ConversationListProps> = ({
     };
   }, [socket, session?.user?.id]);
 
-  const handleConversationCreated = (newConversation: any) => {
+  useEffect(() => {
+    if (selectedConversation) {
+      setConversations((prev) => {
+        const existingIndex = prev.findIndex(
+          (conv) => conv.id === selectedConversation.id
+        );
+
+        if (existingIndex !== -1) {
+          const updated = [...prev];
+          const [movedConversation] = updated.splice(existingIndex, 1);
+          return [movedConversation, ...updated];
+        }
+        return prev;
+      });
+    }
+  }, [selectedConversation]);
+
+  const handleConversationCreated = (newConversation: ConversationWithMessagesAndUsers) => {
     setConversations((prev) => [newConversation, ...prev]);
     onSelectConversation(newConversation);
   };

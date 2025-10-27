@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import ConversationList from '@/components/dashboard/messages/ConversationList';
 import ChatWindow from '@/components/dashboard/messages/ChatWindow';
-import { Conversation } from '@/generated/prisma';
+import { ConversationWithMessagesAndUsers } from '@/components/dashboard/messages/ConversationList';
 
 import { useSocket } from '@/app/Providers';
 
 const MessagesPage = () => {
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [selectedConversation, setSelectedConversation] = useState<ConversationWithMessagesAndUsers | null>(null);
   const socketContext = useSocket();
   const onlineUsers = socketContext?.onlineUsers || [];
 

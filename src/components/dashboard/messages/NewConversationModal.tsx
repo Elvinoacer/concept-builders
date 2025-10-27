@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { User } from '@/generated/prisma';
+import { ConversationWithMessagesAndUsers } from './ConversationList';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -10,7 +11,7 @@ import { toast } from 'sonner';
 import { useSocket } from '@/app/Providers'; // Import the useSocket hook
 
 interface NewConversationModalProps {
-  onConversationCreated: (conversation: any) => void;
+  onConversationCreated: (conversation: ConversationWithMessagesAndUsers) => void;
 }
 
 const NewConversationModal: React.FC<NewConversationModalProps> = ({ onConversationCreated }) => {
@@ -42,7 +43,7 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({ onConversat
 
     socket.emit('createConversation', { recipientId: selectedAdmin.id, initialMessage: 'Hi!' });
 
-    socket.on('conversationCreated', (newConversation: any) => {
+    socket.on('conversationCreated', (newConversation: ConversationWithMessagesAndUsers) => {
       onConversationCreated(newConversation);
       toast.success('Conversation started.');
       setLoading(false);

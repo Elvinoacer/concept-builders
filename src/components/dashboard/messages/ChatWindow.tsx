@@ -2,7 +2,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Conversation, Message as MessageType } from '@/generated/prisma';
+import { Conversation, Message as MessageType, Attachment } from '@/generated/prisma';
+import { ConversationWithMessagesAndUsers } from './ConversationList';
 import Message from './Message';
 import MessageInput from './MessageInput';
 import { motion } from 'framer-motion';
@@ -13,13 +14,13 @@ import { useSocket } from '@/app/Providers'; // Import the useSocket hook
 interface LocalMessageType extends MessageType {
   optimisticId?: string; // A stable ID for optimistic updates
   status?: 'pending' | 'sent' | 'seen';
-  attachments?: Array<{ url: string; type: string; name: string }>; // Add attachments array
+  attachments?: Attachment[]; // Add attachments array
 }
 
 import ChatHeader from './ChatHeader';
 
 interface ChatWindowProps {
-  conversation: Conversation;
+  conversation: ConversationWithMessagesAndUsers;
   onlineUsers: string[];
 }
 
