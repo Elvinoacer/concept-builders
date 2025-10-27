@@ -15,7 +15,7 @@ const MessagesPage = () => {
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       <div className="w-1/3 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-        <ConversationList onSelectConversation={setSelectedConversation} onlineUsers={onlineUsers} />
+        <ConversationList onSelectConversation={setSelectedConversation} onlineUsers={onlineUsers} selectedConversation={selectedConversation} />
       </div>
       <div className="w-2/3 flex flex-col">
         {selectedConversation ? (

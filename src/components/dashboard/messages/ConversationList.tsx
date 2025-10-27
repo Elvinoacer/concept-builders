@@ -11,6 +11,7 @@ import NewConversationModal from "./NewConversationModal";
 interface ConversationListProps {
   onSelectConversation: (conversation: Conversation) => void;
   onlineUsers: string[];
+  selectedConversation?: Conversation | null; // New prop
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({
@@ -38,14 +39,28 @@ const ConversationList: React.FC<ConversationListProps> = ({
     });
 
     socket.on("messageReceived", (message: any) => {
-      // Find the conversation and update its last message
       setConversations((prev) => {
+        let conversationFound = false;
         const updatedConversations = prev.map((conv) => {
           if (conv.id === message.conversationId) {
-            return { ...conv, messages: [message] }; // Update with the latest message
+            conversationFound = true;
+            // Append the new message to the existing messages array
+            // Ensure messages is an array, even if it was previously just [latestMessage]
+            const currentMessages = Array.isArray(conv.messages) ? conv.messages : [];
+            return { ...conv, messages: [...currentMessages, message] };
           }
           return conv;
         });
+
+        // If the conversation was not found (e.g., new conversation for this user)
+        // This case should ideally be handled by "newConversation" event, but as a fallback
+        if (!conversationFound) {
+          // You might want to fetch the full conversation here or handle it differently
+          // For now, we'll just add a placeholder or ignore if not found
+          console.warn("Received message for unknown conversation:", message.conversationId);
+          return updatedConversations;
+        }
+
         // Bring the updated conversation to the top
         const conversationToMove = updatedConversations.find(
           (conv) => conv.id === message.conversationId
@@ -99,7 +114,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   onClick={() => onSelectConversation(conversation)}
-                  className="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                  className={`p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer ${selectedConversation?.id === conversation.id ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
                 >
                   <div className="flex items-center">
                     <div className="relative">
