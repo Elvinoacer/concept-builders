@@ -17,6 +17,7 @@ interface ConversationListProps {
 const ConversationList: React.FC<ConversationListProps> = ({
   onSelectConversation,
   onlineUsers,
+  selectedConversation, // Destructure the new prop
 }) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
