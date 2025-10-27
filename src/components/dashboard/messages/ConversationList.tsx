@@ -149,9 +149,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                           {otherUser?.name?.charAt(0)}
                         </AvatarFallback>
                         {otherUser && onlineUsers.includes(otherUser.id) && (
-                          <span className="absolute inset-y-0 inset-x-0 flex items-end justify-end z-20">
-                            <span className="block h-4 w-4 rounded-full bg-green-500 ring-2 ring-white dark:ring-gray-800" />
-                          </span>
+                          <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400 border-2 border-white dark:border-gray-800"></span>
                         )}
                       </Avatar>
                     </div>
