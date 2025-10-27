@@ -1,5 +1,7 @@
 'use client';
 import React, { useState } from 'react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react'; // Import Lucide icons
+import { toast } from 'sonner'; // Import toast from sonner
 
 const PasswordSettings = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -10,8 +12,7 @@ const PasswordSettings = () => {
     newPassword: '',
     confirmPassword: '',
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const passwordFields = [
     {
@@ -37,7 +38,7 @@ const PasswordSettings = () => {
     },
   ];
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPasswords((prevPasswords) => ({
       ...prevPasswords,
@@ -45,37 +46,51 @@ const PasswordSettings = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setLoading(true); // Set loading to true on submission
+    toast.dismiss(); // Clear any existing toasts
 
     if (passwords.newPassword !== passwords.confirmPassword) {
-      setError('New passwords do not match');
+      toast.error('New passwords do not match');
+      setLoading(false);
       return;
     }
 
-    const response = await fetch('/api/settings/password', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        currentPassword: passwords.currentPassword,
-        newPassword: passwords.newPassword,
-      }),
-    });
+    if (passwords.newPassword.length < 8) {
+      toast.error('New password must be at least 8 characters long');
+      setLoading(false);
+      return;
+    }
 
-    if (response.ok) {
-      setSuccess('Password updated successfully');
-      setPasswords({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+    try {
+      const response = await fetch('/api/settings/password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: passwords.currentPassword,
+          newPassword: passwords.newPassword,
+        }),
       });
-    } else {
-      const data = await response.json();
-      setError(data.error || 'Failed to update password');
+
+      if (response.ok) {
+        toast.success('Password updated successfully');
+        setPasswords({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+      } else {
+        const data = await response.json();
+        toast.error(data.message || data.error || 'Failed to update password');
+      }
+    } catch (error: any) {
+      console.error('Error updating password:', error);
+      toast.error(`An unexpected error occurred: ${error.message}`);
+    } finally {
+      setLoading(false); // Set loading to false after submission
     }
   };
 
@@ -101,28 +116,31 @@ const PasswordSettings = () => {
               id={id}
               name={name}
               type={state ? 'text' : 'password'}
-              value={passwords[name]}
+              value={passwords[name as keyof typeof passwords]}
               onChange={handleChange}
+              disabled={loading} // Disable input when loading
             />
             <button
               type="button"
               onClick={() => setter(!state)}
               className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 top-4 md:top-6"
+              disabled={loading} // Disable button when loading
             >
-              <span className="material-symbols-outlined">
-                {state ? 'visibility_off' : 'visibility'}
-              </span>
+              {state ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
         ))}
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        {success && <p className="text-green-500 text-sm">{success}</p>}
         <div className="pt-4">
           <button
-            className="flex items-center justify-center rounded-md h-10 px-6 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-semibold shadow-sm hover:from-blue-700 hover:to-cyan-500"
+            className="flex items-center justify-center rounded-md h-10 px-6 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-semibold shadow-sm hover:from-blue-700 hover:to-cyan-500 transition-colors"
             type="submit"
+            disabled={loading} // Disable button when loading
           >
-            Update Password
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              'Update Password'
+            )}
           </button>
         </div>
       </form>

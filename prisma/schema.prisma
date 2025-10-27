@@ -48,6 +48,15 @@ model User {
   feedback                 Feedback[]
   clientFeedback           ProjectFeedback[] @relation("ClientFeedback")
   adminFeedback            ProjectFeedback[] @relation("AdminFeedback")
+  // Referral System Fields
+  referralCode             String            @unique @default(cuid()) // Now required
+  referredByCode           String?
+  referralBonus            Float             @default(0)
+  referralBonusConverted   Float             @default(0)
+
+  // New self-referencing relation for referred users
+  referredUsers            User[]            @relation("ReferredBy") // Users referred by this user
+  referrer                 User?             @relation("ReferredBy", fields: [referredByCode], references: [referralCode]) // The user who referred this user
 }
 
 model Cart {
