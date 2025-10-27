@@ -67,6 +67,7 @@ export async function GET(request: NextRequest) {
       include: {
         sender: true,
         readBy: true,
+        attachments: true, // Include attachments in the response
       },
       orderBy: {
         createdAt: "asc",
@@ -83,10 +84,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   let authenticatedUserId: string | null = null;
   let authenticatedUserEmail: string | null = null;
-  let requestBody: any = {}; // Declare requestBody here
+  let requestBody: any = {};
 
   try {
-    requestBody = await request.json(); // Read body once
+    requestBody = await request.json();
   } catch (error) {
     console.error("Error parsing request body:", error);
     return new NextResponse("Bad Request: Invalid JSON body", { status: 400 });
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
   // 1. Check for internal API key first (from Socket.IO backend)
   const apiKey = request.headers.get('X-API-Key');
   if (apiKey && apiKey === process.env.NEXT_API_SECRET_KEY) {
-    authenticatedUserId = requestBody.senderId; // Socket.IO server passes senderId in body
+    authenticatedUserId = requestBody.senderId;
 
     if (!authenticatedUserId) {
       return new NextResponse("Unauthorized: Missing senderId from internal service", { status: 401 });
@@ -127,10 +128,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { content, attachmentUrl, attachmentType, conversationId, recipientId } = requestBody; // Use the pre-parsed body
+    const { content, conversationId, recipientId, attachments } = requestBody; // Get attachments array
 
-    if (!content && !attachmentUrl) {
-      return new NextResponse("Missing content or attachmentUrl", { status: 400 });
+    if (!content && (!attachments || attachments.length === 0)) {
+      return new NextResponse("Missing content or attachments", { status: 400 });
     }
 
     let conversation;
@@ -151,8 +152,6 @@ export async function POST(request: NextRequest) {
       }
 
     } else if (recipientId) {
-      // Ensure the authenticated user is the one creating the conversation
-      // The senderId from the requestBody should match the authenticatedUserId
       if (authenticatedUserId !== requestBody.senderId) {
         return new NextResponse("Unauthorized: Sender ID mismatch", { status: 403 });
       }
@@ -188,13 +187,19 @@ export async function POST(request: NextRequest) {
     const newMessage = await prisma.message.create({
       data: {
         content,
-        attachmentUrl,
-        attachmentType,
         conversationId: conversation.id,
         senderId: authenticatedUserId,
+        attachments: {
+          create: attachments ? attachments.map((att: any) => ({
+            url: att.url,
+            type: att.type,
+            name: att.name,
+          })) : [],
+        },
       },
       include: {
         sender: true,
+        attachments: true, // Include attachments in the response
       },
     });
 

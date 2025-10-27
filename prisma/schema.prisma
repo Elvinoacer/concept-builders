@@ -336,13 +336,22 @@ model Message {
   id             String       @id @default(cuid())
   createdAt      DateTime     @default(now())
   content        String
-  attachmentUrl  String?
-  attachmentType String?
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   conversationId String
   sender         User         @relation(fields: [senderId], references: [id])
   senderId       String
   readBy         User[]       @relation("ReadMessages")
+  attachments    Attachment[] // New relation for multiple attachments
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  url       String
+  type      String   // e.g., "image/jpeg", "application/pdf"
+  name      String   // Original file name
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  messageId String
+  createdAt DateTime @default(now())
 }
 
 model MarqueeItem {

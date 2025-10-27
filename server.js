@@ -86,29 +86,65 @@ io.on("connection", (socket) => {
   });
 
   socket.on("getMessages", async (conversationId) => {
-    try {
-      const response = await axios.get(
-        `${NEXT_APP_URL}/api/messages?conversationId=${conversationId}&userId=${userId}`,
-        { headers: { "X-API-Key": SOCKET_TO_NEXT_API_KEY } }
-      );
-      socket.emit("messages", response.data);
-    } catch (error) {
-      console.error("Error fetching messages:", error.message);
-      socket.emit("messagesError", "Failed to fetch messages.");
-    }
-  });
+      const userId = socket.userId;
+      if (!userId) {
+        socket.emit("messageError", "Unauthorized: User not joined.");
+        return;
+      }
+
+      // Verify user is part of the conversation
+      const conversation = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+        include: { users: true },
+      });
+
+      if (!conversation || !conversation.users.some(user => user.id === userId)) {
+        socket.emit("messageError", "Unauthorized: Not a participant in this conversation.");
+        return;
+      }
+
+      const messages = await prisma.message.findMany({
+        where: {
+          conversationId: conversationId,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      });
+      socket.emit("messages", messages);
+    });
 
   socket.on("sendMessage", async (messageData) => {
     try {
-      // Add the authenticated userId to the messageData for the Next.js API to verify
-      const messageWithSender = { ...messageData, senderId: userId };
+      const currentUserId = socket.userId; // Get the authenticated user ID from the socket
+
+      if (!currentUserId) {
+        socket.emit("sendMessageError", "Unauthorized: User not authenticated.");
+        return;
+      }
+
+      // messageData now contains content, conversationId, tempId, and attachments (array)
+      const messageWithSenderAndAttachments = {
+        ...messageData,
+        senderId: currentUserId, // Use the authenticated userId from the socket
+      };
+
       const response = await axios.post(
         `${NEXT_APP_URL}/api/messages`,
-        messageWithSender,
+        messageWithSenderAndAttachments,
         { headers: { "X-API-Key": SOCKET_TO_NEXT_API_KEY } }
       );
       const savedMessage = { ...response.data, tempId: messageData.tempId }; // Include tempId for reconciliation
-            io.to(messageData.conversationId).emit("receiveMessage", response.data);
+      io.to(messageData.conversationId).emit("receiveMessage", response.data);
       socket.emit("messageSent", savedMessage);
     } catch (error) {
       console.error("Error sending message:", error.message);
