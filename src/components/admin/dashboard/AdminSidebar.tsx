@@ -159,7 +159,7 @@ const AdminSidebar = ({
           </span>
         </button>
       </div>
-      <nav className="flex-1 px-4 py-2 space-y-4 overflow-y-auto">
+      <nav className="relative z-50 flex-1 px-4 py-2 space-y-4 overflow-y-auto">
         {categorizedNavLinks.map((category) => (
           <div key={category.title}>
             <button
