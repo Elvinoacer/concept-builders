@@ -3,26 +3,103 @@ import prisma from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const totalSales = await prisma.order.aggregate({
-      _sum: {
-        amount: true,
-      },
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+    const sixtyDaysAgo = new Date(now.setDate(now.getDate() - 30)); // This will be 60 days ago from original 'now'
+
+    // Reset 'now' for accurate calculations
+    const currentEndDate = new Date();
+    const currentStartDate = new Date(currentEndDate);
+    currentStartDate.setDate(currentEndDate.getDate() - 30);
+
+    const previousEndDate = new Date(currentStartDate);
+    const previousStartDate = new Date(previousEndDate);
+    previousStartDate.setDate(previousEndDate.getDate() - 30);
+
+    // --- Current Period Metrics (Last 30 days) ---
+    const currentPeriodSalesAggregate = await prisma.order.aggregate({
+      _sum: { amount: true },
       where: {
         status: 'PAID',
+        createdAt: {
+          gte: currentStartDate,
+          lt: currentEndDate,
+        },
+      },
+    });
+    const currentPeriodSales = currentPeriodSalesAggregate._sum.amount || 0;
+
+    const currentPeriodVisitors = await prisma.referralVisit.count({
+      where: {
+        createdAt: {
+          gte: currentStartDate,
+          lt: currentEndDate,
+        },
       },
     });
 
-    const totalVisitors = await prisma.referralVisit.count();
+    const currentPeriodOrders = await prisma.order.count({
+      where: {
+        status: 'PAID',
+        createdAt: {
+          gte: currentStartDate,
+          lt: currentEndDate,
+        },
+      },
+    });
 
-    const totalOrders = await prisma.order.count();
+    // --- Previous Period Metrics (30-60 days ago) ---
+    const previousPeriodSalesAggregate = await prisma.order.aggregate({
+      _sum: { amount: true },
+      where: {
+        status: 'PAID',
+        createdAt: {
+          gte: previousStartDate,
+          lt: previousEndDate,
+        },
+      },
+    });
+    const previousPeriodSales = previousPeriodSalesAggregate._sum.amount || 0;
 
-    const conversionRate = totalVisitors > 0 ? (totalOrders / totalVisitors) * 100 : 0;
+    const previousPeriodVisitors = await prisma.referralVisit.count({
+      where: {
+        createdAt: {
+          gte: previousStartDate,
+          lt: previousEndDate,
+        },
+      },
+    });
+
+    const previousPeriodOrders = await prisma.order.count({
+      where: {
+        status: 'PAID',
+        createdAt: {
+          gte: previousStartDate,
+          lt: previousEndDate,
+        },
+      },
+    });
+
+    // --- Calculate Percentage Changes ---
+    const calculatePercentageChange = (current: number, previous: number) => {
+      if (previous === 0) {
+        return current > 0 ? 100 : 0; // If previous was 0 and current is > 0, it's 100% growth. If both are 0, 0% change.
+      }
+      return ((current - previous) / previous) * 100;
+    };
+
+    const salesChange = calculatePercentageChange(currentPeriodSales, previousPeriodSales);
+    const visitorsChange = calculatePercentageChange(currentPeriodVisitors, previousPeriodVisitors);
+    const ordersChange = calculatePercentageChange(currentPeriodOrders, previousPeriodOrders);
 
     const stats = {
-      totalSales: totalSales._sum.amount || 0,
-      totalVisitors,
-      totalOrders,
-      conversionRate,
+      totalSales: currentPeriodSales,
+      salesChange,
+      totalVisitors: currentPeriodVisitors,
+      visitorsChange,
+      totalOrders: currentPeriodOrders,
+      ordersChange,
+      conversionRate: currentPeriodVisitors > 0 ? (currentPeriodOrders / currentPeriodVisitors) * 100 : 0,
     };
 
     return NextResponse.json(stats);

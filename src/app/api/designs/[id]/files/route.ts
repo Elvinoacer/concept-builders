@@ -1,34 +1,37 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { v4 as uuidv4 } from 'uuid'; // Import uuid
 
-export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { fileUrl, fileType, originalFileName } = await request.json();
-    const designId = params.id;
+    const { id: designId } = params;
+    const { searchParams } = request.nextUrl;
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const skip = (page - 1) * limit;
 
-    if (!fileUrl || !fileType || !originalFileName) {
-      return new NextResponse("Missing fileUrl, fileType, or originalFileName", { status: 400 });
-    }
-
-    const newFile = await prisma.file.create({
-      data: {
-        url: fileUrl,
-        type: fileType,
+    const files = await prisma.file.findMany({
+      where: {
         designId: designId,
-        version: 1,
-        isLatest: true,
-        originalFileName: originalFileName,
-        fileIdentifier: uuidv4(), // Generate a new fileIdentifier for the first version
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take: limit,
+    });
+
+    const totalFiles = await prisma.file.count({
+      where: {
+        designId: designId,
       },
     });
 
-    return NextResponse.json(newFile, { status: 200 });
+    return NextResponse.json({
+      files,
+      totalPages: Math.ceil(totalFiles / limit),
+    });
   } catch (error) {
-    console.error("Error updating design with file:", error);
+    console.error("Error fetching design files:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

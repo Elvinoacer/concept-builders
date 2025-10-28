@@ -3,7 +3,13 @@
 import { motion } from "framer-motion";
 import { ordersTabsData } from "@/lib/dummydata/orders";
 
-const OrdersTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: string) => void }) => {
+const PurchasesTabs = ({
+  activeTab,
+  setActiveTab,
+}: {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -22,7 +28,9 @@ const OrdersTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveT
                 : "border-b-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
             } pb-3 pt-2`}
           >
-            <p className={`text-sm ${activeTab === tab.name ? "font-semibold" : "font-medium"}`}>
+            <p
+              className={`text-sm ${activeTab === tab.name ? "font-semibold" : "font-medium"}`}
+            >
               {tab.name}
             </p>
           </button>
@@ -32,4 +40,4 @@ const OrdersTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveT
   );
 };
 
-export default OrdersTabs;
+export default PurchasesTabs;

@@ -45,6 +45,18 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     if (id) {
       fetchDesign();
+
+      // Track design view
+      const trackView = async () => {
+        try {
+          await fetch(`/api/designs/${id}/view`, {
+            method: 'POST',
+          });
+        } catch (error) {
+          console.error('Error tracking design view:', error);
+        }
+      };
+      trackView();
     }
   }, [id]);
 

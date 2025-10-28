@@ -1,8 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { ModeToggle } from "../../ui/mode-toggle";
 import { useSession } from "next-auth/react";
+import Link from "next/link"; // Import Link for navigation
 
 const AdminHeader = (props: {
   sidebarOpen: boolean;
@@ -11,6 +12,29 @@ const AdminHeader = (props: {
   setIsDesktopSidebarOpen: (arg: boolean) => void;
 }) => {
   const { data: session, status } = useSession();
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (session?.user?.role === "ADMIN") {
+        try {
+          const response = await fetch("/api/admin/notifications/unread-count");
+          if (response.ok) {
+            const data = await response.json();
+            setUnreadNotificationCount(data.unreadCount);
+          }
+        } catch (error) {
+          console.error("Failed to fetch unread notification count:", error);
+        }
+      }
+    };
+
+    fetchUnreadCount();
+
+    // Poll for new notifications every 30 seconds (adjust as needed)
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, [session]);
 
   return (
     <header className="sticky top-0 z-30 flex w-full bg-gradient-to-r from-blue-50 to-cyan-50 drop-shadow-1 dark:from-gray-800 dark:to-gray-900 dark:drop-shadow-none border-b border-blue-200 dark:border-gray-700">
@@ -97,12 +121,14 @@ const AdminHeader = (props: {
 
         <div className="flex items-center gap-4">
           {/* Notifications button */}
-          <button className="relative p-2.5 rounded-xl bg-white border border-blue-100 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-blue-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 group">
+          <Link href="/admin/notifications" className="relative p-2.5 rounded-xl bg-white border border-blue-100 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-blue-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 group">
             <span className="material-symbols-outlined text-blue-500 dark:text-blue-400 group-hover:scale-110 transition-transform">
               notifications
             </span>
-            <span className="absolute top-1.5 right-1.5 block h-2.5 w-2.5 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400 ring-2 ring-white dark:ring-gray-800"></span>
-          </button>
+            {unreadNotificationCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 block h-2.5 w-2.5 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400 ring-2 ring-white dark:ring-gray-800"></span>
+            )}
+          </Link>
 
           <ModeToggle />
 

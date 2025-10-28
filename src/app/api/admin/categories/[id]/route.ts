@@ -6,12 +6,34 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { searchParams } = request.nextUrl;
+    const designPage = parseInt(searchParams.get("designPage") || "1");
+    const designLimit = parseInt(searchParams.get("designLimit") || "10");
+    const designSearch = searchParams.get("designSearch") || "";
+
+    const designSkip = (designPage - 1) * designLimit;
+
+    const designWhere = designSearch
+      ? {
+          name: {
+            contains: designSearch,
+            mode: "insensitive",
+          },
+        }
+      : {};
+
     const category = await prisma.category.findUnique({
       where: { id: params.id },
       include: {
         designs: {
+          where: designWhere,
           include: {
             files: true,
+          },
+          skip: designSkip,
+          take: designLimit,
+          orderBy: {
+            createdAt: "desc",
           },
         },
       },
@@ -24,7 +46,17 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(category);
+    const totalDesignsInCategory = await prisma.design.count({
+      where: {
+        categoryId: params.id,
+        ...designWhere,
+      },
+    });
+
+    return NextResponse.json({
+      ...category,
+      designsTotalPages: Math.ceil(totalDesignsInCategory / designLimit),
+    });
   } catch (error) {
     console.error("Error fetching category:", error);
     return NextResponse.json(

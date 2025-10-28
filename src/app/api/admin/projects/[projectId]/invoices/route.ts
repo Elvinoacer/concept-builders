@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { sendInvoiceEmail } from "@/lib/emails";
-import { ProjectStatus } from "@/generated/prisma"; // Import ProjectStatus for notification icon
+import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,

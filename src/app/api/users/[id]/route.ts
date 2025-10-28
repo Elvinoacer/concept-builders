@@ -6,14 +6,26 @@ export async function GET(request: Request, { params }: { params: { id: string }
   try {
     const user = await prisma.user.findUnique({
       where: { id: params.id },
-      include: {
-        accounts: true,
-        orders: true,
-        projects: true,
-        reviews: true,
-        wishlist: true,
-        folders: true,
-        loginHistory: true,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        bio: true,
+        adminRole: true,
+        referralCode: true,
+        referredByCode: true,
+        accounts: { select: { provider: true } },
+        orders: { select: { id: true, amount: true, createdAt: true } },
+        projects: { select: { id: true, name: true, status: true } },
+        reviews: { select: { id: true, rating: true, comment: true } },
+        wishlist: { select: { id: true, name: true } },
+        folders: { select: { id: true, name: true } },
+        loginHistory: { select: { createdAt: true, ipAddress: true }, orderBy: { createdAt: "desc" }, take: 5 }, // Latest 5 logins
       },
     });
     if (!user) {

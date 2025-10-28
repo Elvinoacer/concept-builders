@@ -2,59 +2,90 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 
 const PurchaseHistoryPage = () => {
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
   const params = useParams();
-  const { id } = params;
+  const { id: userId } = params;
+
+  const fetchPurchases = async () => {
+    try {
+      const response = await fetch(`/api/users/${userId}/purchases`);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setPurchases(data);
+        } else {
+          console.error("API did not return an array for purchases:", data);
+          toast.error("Failed to load purchases: Invalid data format.");
+          setPurchases([]);
+        }
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to fetch purchases:", response.statusText, errorText);
+        toast.error(`Failed to fetch purchases: ${response.statusText}`);
+        setPurchases([]);
+      }
+    } catch (error: any) {
+      console.error("Error fetching purchases:", error);
+      toast.error(`Error fetching purchases: ${error.message}`);
+      setPurchases([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (id) {
-      const fetchPurchases = async () => {
-        try {
-          const response = await fetch(`/api/users/${id}/purchases`);
-          if (response.ok) {
-            const data = await response.json();
-            if (Array.isArray(data)) {
-              setPurchases(data);
-            } else {
-              console.error("API did not return an array for purchases:", data);
-              setPurchases([]);
-            }
-          } else {
-            console.error("Failed to fetch purchases:", response.statusText);
-            setPurchases([]);
-          }
-        } catch (error) {
-          console.error("Error fetching purchases:", error);
-          setPurchases([]);
-        } finally {
-          setLoading(false);
-        }
-      };
+    if (userId) {
       fetchPurchases();
     }
-  }, [id]);
+  }, [userId]);
 
   const handleIssueRefund = async (purchaseId: string) => {
-    await fetch(`/api/users/${id}/refund`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ purchaseId }),
-    });
+    try {
+      const response = await fetch(`/api/users/${userId}/refund`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ purchaseId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to issue refund");
+      }
+
+      toast.success("Refund issued successfully!");
+      fetchPurchases(); // Re-fetch to update status
+    } catch (error: any) {
+      console.error("Error issuing refund:", error);
+      toast.error(`Failed to issue refund: ${error.message}`);
+    }
   };
 
   const handleResendReceipt = async (purchaseId: string) => {
-    await fetch(`/api/users/${id}/resend-receipt`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ purchaseId }),
-    });
+    try {
+      const response = await fetch(`/api/users/${userId}/resend-receipt`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ purchaseId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to resend receipt");
+      }
+
+      toast.success("Receipt resent successfully!");
+    } catch (error: any) {
+      console.error("Error resending receipt:", error);
+      toast.error(`Failed to resend receipt: ${error.message}`);
+    }
   };
 
   if (loading) {
@@ -93,12 +124,18 @@ const PurchaseHistoryPage = () => {
                 >
                   Status
                 </th>
+                <th
+                  scope="col"
+                  className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                >
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white dark:bg-gray-800 dark:divide-gray-700">
               {purchases.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                     No purchases found.
                   </td>
                 </tr>

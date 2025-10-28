@@ -1,36 +1,44 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
-import NewDesignForm from "@/components/admin/designs/NewDesignForm";
-import ConfirmationModal from "@/components/admin/designs/ConfirmationModal";
-import DesignFileUpload from "@/components/admin/designs/DesignFileUpload";
-import DesignFilePreview from "@/components/admin/designs/DesignFilePreview";
 import BuildingCostEstimatesModal from "@/components/admin/designs/BuildingCostEstimatesModal";
+import ConfirmationModal from "@/components/admin/designs/ConfirmationModal";
+import DesignFilePreview from "@/components/admin/designs/DesignFilePreview";
+import DesignFileUpload from "@/components/admin/designs/DesignFileUpload";
+import NewDesignForm from "@/components/admin/designs/NewDesignForm";
 import VersionControl from "@/components/admin/designs/VersionControl";
+import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
+import { FaBath, FaBed } from "react-icons/fa";
 import {
-  FiEdit,
-  FiTrash,
-  FiLayers,
-  FiDollarSign,
-  FiMaximize,
   FiChevronDown,
-  FiChevronUp,
+  FiDollarSign,
+  FiEdit,
+  FiLayers,
+  FiMaximize,
   FiStar,
+  FiTrash,
+  FiFolder,
 } from "react-icons/fi";
-import { FaBed, FaBath } from "react-icons/fa";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+interface Folder {
+  id: string;
+  name: string;
+}
 
 const DesignPage = () => {
-  const [design, setDesign] = useState(null);
+  const [design, setDesign] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setFormOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEstimatesModalOpen, setIsEstimatesModalOpen] = useState(false);
   const [filePreviewKey, setFilePreviewKey] = useState(0);
-  const [openAccordion, setOpenAccordion] = useState(null);
+  const [openAccordion, setOpenAccordion] = useState<number | null>(null);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const params = useParams();
   const router = useRouter();
   const { id } = params;
@@ -50,8 +58,23 @@ const DesignPage = () => {
     }
   };
 
+  const fetchFolders = async () => {
+    try {
+      const response = await fetch("/api/admin/folders");
+      if (response.ok) {
+        const data = await response.json();
+        setFolders(data);
+      } else {
+        console.error("Failed to fetch folders");
+      }
+    } catch (error) {
+      console.error("Error fetching folders:", error);
+    }
+  };
+
   useEffect(() => {
     fetchDesign();
+    fetchFolders();
   }, [id]);
 
   const handleDelete = async () => {
@@ -61,6 +84,7 @@ const DesignPage = () => {
       router.push("/admin/designs");
     } catch (error) {
       console.error("Error deleting design:", error);
+      toast.error("Failed to delete design.");
     } finally {
       setIsDeleting(false);
     }
@@ -71,20 +95,71 @@ const DesignPage = () => {
     fetchDesign();
   };
 
+  const handleLinkToFolder = async (newFolderId: string | null) => {
+    const originalFolderId = design.folderId;
+    const originalFolderName = design.folder?.name;
+
+    // Optimistic update
+    setDesign((prevDesign: any) => ({
+      ...prevDesign,
+      folderId: newFolderId,
+      folder: newFolderId
+        ? folders.find((f) => f.id === newFolderId)
+        : null,
+    }));
+    toast.info(
+      newFolderId
+        ? `Linking design to folder ${folders.find((f) => f.id === newFolderId)?.name}...`
+        : "Unlinking design from folder..."
+    );
+
+    try {
+      const response = await fetch(`/api/designs/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ folderId: newFolderId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update folder link");
+      }
+
+      toast.success(
+        newFolderId
+          ? `Design successfully linked to folder ${folders.find((f) => f.id === newFolderId)?.name}.`
+          : "Design successfully unlinked from folder."
+      );
+      fetchDesign(); // Re-fetch to ensure data consistency
+    } catch (error: any) {
+      console.error("Error linking design to folder:", error);
+      toast.error(`Failed to update folder link: ${error.message}`);
+      // Revert optimistic update
+      setDesign((prevDesign: any) => ({
+        ...prevDesign,
+        folderId: originalFolderId,
+        folder: originalFolderId
+          ? folders.find((f) => f.id === originalFolderId)
+          : null,
+      }));
+    }
+  };
+
   const formatPrice = (price: number | string) => {
-    const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
-    if (typeof numericPrice !== 'number' || isNaN(numericPrice)) return 'N/A';
+    const numericPrice = typeof price === "string" ? parseFloat(price) : price;
+    if (typeof numericPrice !== "number" || isNaN(numericPrice)) return "N/A";
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
     }).format(numericPrice);
   };
 
-  const toggleAccordion = (accordion) => {
+  const toggleAccordion = (accordion: number | null) => {
     setOpenAccordion(openAccordion === accordion ? null : accordion);
   };
 
-  const renderStars = (rating) => {
+  const renderStars = (rating: number) => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
       stars.push(
@@ -147,6 +222,32 @@ const DesignPage = () => {
             <p className="text-gray-600 dark:text-gray-300 text-lg">
               {design.description}
             </p>
+
+            {/* Folder Link Section */}
+            <div className="mt-6 flex items-center gap-4">
+              <FiFolder className="w-6 h-6 text-blue-500" />
+              <span className="text-gray-600 dark:text-gray-300 font-medium">
+                Folder:
+              </span>
+              <Select
+                onValueChange={(value) =>
+                  handleLinkToFolder(value === "none" ? null : value)
+                }
+                value={design.folderId || "none"}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select Folder" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Folder</SelectItem>
+                  {folders.map((folder) => (
+                    <SelectItem key={folder.id} value={folder.id}>
+                      {folder.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div className="flex flex-col items-center justify-center p-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg">
@@ -218,7 +319,7 @@ const DesignPage = () => {
                   Plan Details
                 </h4>
                 <ul className="space-y-2 text-gray-600 dark:text-gray-300">
-                  {design.planDetails.map((detail, index) => (
+                  {design.planDetails.map((detail: string, index: number) => (
                     <li key={index} className="flex items-center">
                       <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
                       {detail}
@@ -236,7 +337,7 @@ const DesignPage = () => {
                   Building Cost Estimates
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {design.buildingCostEstimates.map((estimate, index) => (
+                  {design.buildingCostEstimates.map((estimate: any, index: number) => (
                     <div
                       key={index}
                       className="p-6 bg-gray-50 dark:bg-gray-700/50 rounded-xl border dark:border-gray-600"
@@ -248,7 +349,7 @@ const DesignPage = () => {
                         {estimate.description}
                       </p>
                       <div className="space-y-3">
-                        {estimate.costBreakdown.slice(0, 3).map((item, i) => (
+                        {estimate.costBreakdown.slice(0, 3).map((item: any, i: number) => (
                           <div
                             key={i}
                             className="flex justify-between items-center text-sm border-t border-gray-200 dark:border-gray-600 pt-3"
@@ -262,16 +363,22 @@ const DesignPage = () => {
                           </div>
                         ))}
                         {estimate.costBreakdown.length > 3 && (
-                            <div className="text-center text-sm text-gray-500 dark:text-gray-400 pt-2">...and {estimate.costBreakdown.length - 3} more items</div>
+                          <div className="text-center text-sm text-gray-500 dark:text-gray-400 pt-2">
+                            ...and {estimate.costBreakdown.length - 3} more
+                            items
+                          </div>
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
                 <div className="mt-6 text-center">
-                    <button onClick={() => setIsEstimatesModalOpen(true)} className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-                        View Full Estimates
-                    </button>
+                  <button
+                    onClick={() => setIsEstimatesModalOpen(true)}
+                    className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                  >
+                    View Full Estimates
+                  </button>
                 </div>
               </div>
             )}
@@ -283,7 +390,7 @@ const DesignPage = () => {
                 Optional Add-ons
               </h3>
               <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-                {design.calculatorOptions.map((option, index) => (
+                {design.calculatorOptions.map((option: any, index: number) => (
                   <li
                     key={index}
                     className="flex justify-between items-center py-3"
@@ -307,7 +414,7 @@ const DesignPage = () => {
                 Frequently Asked Questions
               </h3>
               <div className="space-y-3">
-                {design.faq.map((item, index) => (
+                {design.faq.map((item: any, index: number) => (
                   <div
                     key={index}
                     className="border-b border-gray-200 dark:border-gray-700 last:border-b-0 pb-3"
@@ -343,7 +450,7 @@ const DesignPage = () => {
                 Customer Reviews
               </h3>
               <div className="space-y-6">
-                {design.reviews.map((review, index) => (
+                {design.reviews.map((review: any, index: number) => (
                   <div key={index} className="flex items-start space-x-4">
                     <Image
                       src={review.author.image || "/images/default-avatar.png"}
@@ -373,7 +480,7 @@ const DesignPage = () => {
           <DesignFileUpload design={design} onUploadComplete={fetchDesign} />
 
           {/* Version Control Component */}
-          <VersionControl files={design.files} />
+          <VersionControl designId={id} />
         </div>
 
         {/* Right Column */}

@@ -1,13 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Pagination from "@/components/ui/CustomPagination";
-import { useState } from "react";
 
-const OrdersTable = ({ orders }: { orders: any[] }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-
+const PurchasesTable = ({ purchases }: { purchases: any[] }) => {
   const getStatusChip = (status: string) => {
     switch (status) {
       case "PAID":
@@ -39,10 +34,6 @@ const OrdersTable = ({ orders }: { orders: any[] }) => {
     }
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = orders.slice(indexOfFirstItem, indexOfLastItem);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -54,10 +45,16 @@ const OrdersTable = ({ orders }: { orders: any[] }) => {
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
             <tr>
               <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
-                Order ID
+                Purchase ID
               </th>
               <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
                 Client
+              </th>
+              <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
+                Design Name
+              </th>
+              <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
+                Quantity
               </th>
               <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
                 Date
@@ -68,13 +65,16 @@ const OrdersTable = ({ orders }: { orders: any[] }) => {
               <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium">
                 Status
               </th>
-              <th scope="col" className="px-3 py-2 md:px-6 md:py-3 font-medium text-right">
+              <th
+                scope="col"
+                className="px-3 py-2 md:px-6 md:py-3 font-medium text-right"
+              >
                 Actions
               </th>
             </tr>
           </thead>
           <tbody>
-            {currentItems.map((order, index) => (
+            {purchases.map((purchase, index) => (
               <motion.tr
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -83,12 +83,34 @@ const OrdersTable = ({ orders }: { orders: any[] }) => {
                 className="bg-white border-b hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 <td className="px-3 py-2 md:px-6 md:py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  {order.id}
+                  {purchase.id}
                 </td>
-                <td className="px-3 py-2 md:px-6 md:py-4">{order.user ? order.user.name : 'N/A'}</td>
-                <td className="px-3 py-2 md:px-6 md:py-4">{new Date(order.createdAt).toLocaleDateString()}</td>
-                <td className="px-3 py-2 md:px-6 md:py-4">${order.amount.toFixed(2)}</td>
-                <td className="px-3 py-2 md:px-6 md:py-4">{getStatusChip(order.status)}</td>
+                <td className="px-3 py-2 md:px-6 md:py-4">
+                  {purchase.user ? purchase.user.name : "N/A"}
+                </td>
+                <td className="px-3 py-2 md:px-6 md:py-4">
+                  {purchase.items && purchase.items.length > 0
+                    ? purchase.items
+                        .map((item: any) => item.design?.name || "N/A")
+                        .join(", ")
+                    : "N/A"}
+                </td>
+                <td className="px-3 py-2 md:px-6 md:py-4">
+                  {purchase.items && purchase.items.length > 0
+                    ? purchase.items
+                        .map((item: any) => item.quantity)
+                        .join(", ")
+                    : "N/A"}
+                </td>
+                <td className="px-3 py-2 md:px-6 md:py-4">
+                  {new Date(purchase.createdAt).toLocaleDateString()}
+                </td>
+                <td className="px-3 py-2 md:px-6 md:py-4">
+                  ${purchase.amount.toFixed(2)}
+                </td>
+                <td className="px-3 py-2 md:px-6 md:py-4">
+                  {getStatusChip(purchase.status)}
+                </td>
                 <td className="px-3 py-2 md:px-6 md:py-4 text-right">
                   <a
                     href="#"
@@ -102,14 +124,8 @@ const OrdersTable = ({ orders }: { orders: any[] }) => {
           </tbody>
         </table>
       </div>
-      <Pagination
-        totalItems={orders.length}
-        itemsPerPage={itemsPerPage}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-      />
     </motion.div>
   );
 };
 
-export default OrdersTable;
+export default PurchasesTable;

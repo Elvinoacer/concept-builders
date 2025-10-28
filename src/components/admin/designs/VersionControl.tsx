@@ -1,5 +1,15 @@
 import { motion } from "framer-motion";
 import { FiDownload, FiEye } from "react-icons/fi"; // Import icons
+import { useState, useEffect, useCallback } from "react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { CgSpinner } from "react-icons/cg";
 
 interface File {
   id: string;
@@ -13,18 +23,39 @@ interface File {
 }
 
 interface VersionControlProps {
-  files: File[];
+  designId: string;
 }
 
-const VersionControl = ({ files }: VersionControlProps) => {
-  // Group files by fileIdentifier and then sort versions
-  const groupedFiles: Record<string, File[]> = (files || []).reduce((acc, file) => {
-    if (!acc[file.fileIdentifier]) {
-      acc[file.fileIdentifier] = [];
+const VersionControl = ({ designId }: VersionControlProps) => {
+  const [paginatedFiles, setPaginatedFiles] = useState<File[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const filesPerPage = 10; // Define how many files per page
+
+  const fetchFiles = useCallback(async () => {
+    if (!designId) return;
+    setIsLoadingFiles(true);
+    try {
+      const response = await fetch(
+        `/api/designs/${designId}/files?page=${currentPage}&limit=${filesPerPage}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch design files");
+      }
+      const data = await response.json();
+      setPaginatedFiles(data.files);
+      setTotalPages(data.totalPages);
+    } catch (error) {
+      console.error("Error fetching design files:", error);
+    } finally {
+      setIsLoadingFiles(false);
     }
-    acc[file.fileIdentifier].push(file);
-    return acc;
-  }, {});
+  }, [designId, currentPage, filesPerPage]);
+
+  useEffect(() => {
+    fetchFiles();
+  }, [fetchFiles]);
 
   const truncateFileName = (name: string, length = 30) => {
     if (name.length <= length) return name;
@@ -53,36 +84,49 @@ const VersionControl = ({ files }: VersionControlProps) => {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <div className="mt-8">
       <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2 md:mb-4">
         File Versions
       </h2>
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
-        <table className="w-full min-w-full text-sm text-left text-gray-500">
-          <thead className="text-xs text-muted-foreground uppercase bg-muted">
-            <tr>
-              <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
-                File Name
-              </th>
-              <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
-                Version
-              </th>
-              <th scope="col" className="hidden md:table-cell px-2 py-2 md:px-4 md:py-3 sm:px-6">
-                Uploaded Date
-              </th>
-              <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
-                Status
-              </th>
-              <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
-                <span className="sr-only">Actions</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(groupedFiles).map(([fileIdentifier, versions]) => (
-              // Sort versions from newest to oldest
-              versions.sort((a, b) => b.version - a.version).map((file, index) => (
+        {isLoadingFiles ? (
+          <div className="flex items-center justify-center h-24">
+            <CgSpinner className="animate-spin text-primary" size={32} />
+          </div>
+        ) : paginatedFiles.length === 0 ? (
+          <div className="text-center text-muted-foreground p-4">
+            No files found for this design.
+          </div>
+        ) : (
+          <table className="w-full min-w-full text-sm text-left text-gray-500">
+            <thead className="text-xs text-muted-foreground uppercase bg-muted">
+              <tr>
+                <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
+                  File Name
+                </th>
+                <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
+                  Version
+                </th>
+                <th scope="col" className="hidden md:table-cell px-2 py-2 md:px-4 md:py-3 sm:px-6">
+                  Uploaded Date
+                </th>
+                <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
+                  Status
+                </th>
+                <th scope="col" className="px-2 py-2 md:px-4 md:py-3 sm:px-6">
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedFiles.map((file, index) => (
                 <motion.tr
                   key={file.id} // Use file.id as key
                   initial={{ opacity: 0, y: 20 }}
@@ -94,8 +138,8 @@ const VersionControl = ({ files }: VersionControlProps) => {
                     scope="row"
                     className="px-2 py-2 md:px-4 md:py-4 sm:px-6 font-medium text-foreground whitespace-nowrap"
                   >
-                    <span title={decodeURIComponent(file.url.split('/').pop() || '')}>
-                      {truncateFileName(decodeURIComponent(file.url.split('/').pop() || ''))}
+                    <span title={decodeURIComponent(file.originalFileName || file.url.split('/').pop() || '')}>
+                      {truncateFileName(decodeURIComponent(file.originalFileName || file.url.split('/').pop() || ''))}
                     </span>
                   </th>
                   <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
@@ -117,18 +161,57 @@ const VersionControl = ({ files }: VersionControlProps) => {
                       <FiEye className="inline-block w-4 h-4 mr-1" /> View
                     </a>
                     <button
-                      onClick={() => handleDownload(file.url, decodeURIComponent(file.url.split('/').pop() || ''))}
+                      onClick={() => handleDownload(file.url, decodeURIComponent(file.originalFileName || file.url.split('/').pop() || ''))}
                       className="font-medium text-green-500 hover:underline whitespace-nowrap"
                     >
                       <FiDownload className="inline-block w-4 h-4 mr-1" /> Download
                     </button>
                   </td>
                 </motion.tr>
-              ))
-            ))}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
+      {totalPages > 1 && (
+        <div className="p-4">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className={
+                    currentPage === 1
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    isActive={currentPage === i + 1}
+                    onClick={() => handlePageChange(i + 1)}
+                    className="cursor-pointer"
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className={
+                    currentPage === totalPages
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 };
