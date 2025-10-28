@@ -94,11 +94,22 @@ const AdminSidebar = ({
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const activeCategory = categorizedNavLinks.find(category =>
-      category.links.some(link => pathname.startsWith(link.href))
-    );
-    if (activeCategory) {
-      setOpenCategories(prev => ({ ...prev, [activeCategory.title]: true }));
+    let bestMatch: string | null = null;
+    let activeCategoryTitle: string | null = null;
+
+    for (const category of categorizedNavLinks) {
+      for (const link of category.links) {
+        if (pathname.startsWith(link.href)) {
+          if (bestMatch === null || link.href.length > bestMatch.length) {
+            bestMatch = link.href;
+            activeCategoryTitle = category.title;
+          }
+        }
+      }
+    }
+
+    if (activeCategoryTitle) {
+      setOpenCategories(prev => ({ ...prev, [activeCategoryTitle]: true }));
     }
   }, [pathname]);
 

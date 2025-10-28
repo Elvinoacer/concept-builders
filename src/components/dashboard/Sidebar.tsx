@@ -49,11 +49,22 @@ const Sidebar = ({
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const activeCategory = navSections.find(section =>
-      section.links.some(link => pathname.startsWith(link.href))
-    );
-    if (activeCategory) {
-      setOpenCategories(prev => ({ ...prev, [activeCategory.title]: true }));
+    let bestMatch: string | null = null;
+    let activeCategoryTitle: string | null = null;
+
+    for (const section of navSections) {
+      for (const link of section.links) {
+        if (pathname.startsWith(link.href)) {
+          if (bestMatch === null || link.href.length > bestMatch.length) {
+            bestMatch = link.href;
+            activeCategoryTitle = section.title;
+          }
+        }
+      }
+    }
+
+    if (activeCategoryTitle) {
+      setOpenCategories(prev => ({ ...prev, [activeCategoryTitle]: true }));
     }
   }, [pathname]);
 
