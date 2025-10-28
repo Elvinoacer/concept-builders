@@ -13,8 +13,8 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { itemId: designId } = params;
-  if (!designId) {
+  const { itemId } = params;
+  if (!itemId) {
     return NextResponse.json({ error: "Item ID is required" }, { status: 400 });
   }
 
@@ -27,10 +27,9 @@ export async function DELETE(
 
     if (userCart) {
       // Delete the item from the cart
-      await prisma.cartItem.deleteMany({
+      await prisma.cartItem.delete({
         where: {
-          cartId: userCart.id,
-          designId: designId,
+          id: itemId,
         },
       });
     }
@@ -52,7 +51,11 @@ export async function DELETE(
 
     const frontendCartItems = updatedCart?.items.map((item) => ({
       ...item.design,
+      cartItemId: item.id,
       quantity: item.quantity,
+      selectedFileType: item.selectedFileType,
+      selectedPackage: item.selectedPackage,
+      selectedExtras: item.selectedExtras,
     })) || [];
 
     return NextResponse.json(frontendCartItems);
@@ -134,6 +137,7 @@ export async function PUT(
 
     const frontendCartItems = updatedCart?.items.map((item) => ({
       ...item.design,
+      cartItemId: item.id,
       quantity: item.quantity,
       selectedFileType: item.selectedFileType,
       selectedPackage: item.selectedPackage,

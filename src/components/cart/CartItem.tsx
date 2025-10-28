@@ -18,7 +18,7 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
   const debouncedExtras = useDebounce(selectedExtras, 500);
 
   useEffect(() => {
-    onUpdate(item.id, {
+    onUpdate(item.cartItemId, {
       quantity: debouncedQuantity,
       selectedFileType: debouncedFileType,
       selectedPackage: debouncedPackage,
@@ -104,11 +104,11 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
             </div>
           )}
 
-          {item.extraOptions && item.extraOptions.length > 0 && (
+          {item.packageOptions && item.packageOptions.options && item.packageOptions.options.length > 0 && (
             <div className="mt-2">
               <p className="text-sm text-slate-500 dark:text-gray-400">Extras:</p>
               <div className="flex flex-col gap-1 mt-1">
-                {item.extraOptions.map(extra => (
+                {item.packageOptions.options.map(extra => (
                   <label key={extra.name} className="flex items-center gap-2 text-sm">
                     <input 
                       type="checkbox"
@@ -144,7 +144,7 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
           <button
             className="text-slate-500 hover:text-red-500 transition-colors"
             type="button"
-            onClick={() => onRemove(item.id)}
+            onClick={() => onRemove(item.cartItemId)}
           >
             <Trash2 size={20} />
             <span className="sr-only">Remove</span>

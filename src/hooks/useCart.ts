@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Design } from '@/generated/prisma'; // Use generated Prisma Design type
 
 interface CartItem extends Design {
+  cartItemId: string;
   quantity: number;
   selectedFileType: string;
   selectedPackage?: string;
@@ -28,6 +29,7 @@ export const useCart = () => {
         const fullCart = await response.json();
         const frontendCartItems = fullCart.items.map((item: any) => ({
           ...item.design,
+          cartItemId: item.id, // Add this line
           quantity: item.quantity,
           selectedFileType: item.selectedFileType,
           selectedPackage: item.selectedPackage,
@@ -90,6 +92,7 @@ export const useCart = () => {
           const fullCart = await response.json();
           const frontendCartItems = fullCart.items.map((item: any) => ({
             ...item.design,
+            cartItemId: item.id, // Add this line
             quantity: item.quantity,
             selectedFileType: item.selectedFileType,
             selectedPackage: item.selectedPackage,
@@ -117,10 +120,10 @@ export const useCart = () => {
     }
   };
 
-  const removeItem = async (designId: string) => {
+  const removeItem = async (cartItemId: string) => {
     if (status === 'authenticated') {
         try {
-            const response = await fetch(`/api/cart/items/${designId}`, {
+            const response = await fetch(`/api/cart/items/${cartItemId}`, {
                 method: 'DELETE',
             });
             if (response.ok) {
@@ -222,6 +225,7 @@ export const useCart = () => {
           const updatedCart = await response.json();
           setCart(updatedCart.items.map((item: any) => ({
             ...item.design,
+            cartItemId: item.id, // Add this line
             quantity: item.quantity,
             selectedFileType: item.selectedFileType,
             selectedPackage: item.selectedPackage,
