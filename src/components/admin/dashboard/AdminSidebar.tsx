@@ -64,7 +64,7 @@ const categorizedNavLinks = [
       {
         href: "/admin/settings/discounts",
         label: "Discounts",
-        icon: "discount",
+        icon: "local_offer",
       },
       {
         href: "/admin/notifications",
