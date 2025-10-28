@@ -19,14 +19,7 @@ export async function GET(request: NextRequest) {
       },
       include: {
         wishlist: {
-          include: {
-            files: true, // Include files to get image URLs
-            // Include basePrice of the Design
-            // Assuming Design model has a basePrice field
-            // If Design is directly the WishlistItem, then basePrice is directly on it.
-            // If Wishlist is a join table, then it would be wishlist: { include: { design: { select: { basePrice: true } } } }
-            // Based on schema.prisma, User has wishlist: Design[], so Design is directly the item.
-          },
+          
           select: {
             id: true,
             name: true,
