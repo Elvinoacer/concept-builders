@@ -23,6 +23,7 @@ import {
   InvoiceType,
 } from "@/generated/prisma";
 import { format, formatDistanceToNow } from "date-fns";
+import Link from "next/link";
 
 interface User {
   id: string;
