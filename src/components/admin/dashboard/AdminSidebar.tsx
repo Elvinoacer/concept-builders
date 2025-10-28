@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -96,6 +96,20 @@ const AdminSidebar = ({
 }) => {
   const pathname = usePathname();
   const sidebar = useRef<any>(null);
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const activeCategory = categorizedNavLinks.find(category =>
+      category.links.some(link => pathname.startsWith(link.href))
+    );
+    if (activeCategory) {
+      setOpenCategories(prev => ({ ...prev, [activeCategory.title]: true }));
+    }
+  }, [pathname]);
+
+  const toggleCategory = (title: string) => {
+    setOpenCategories(prev => ({ ...prev, [title]: !prev[title] }));
+  };
 
   // close on click outside
   useEffect(() => {
@@ -139,39 +153,45 @@ const AdminSidebar = ({
           </span>
         </button>
       </div>
-      <nav className="flex-1 px-4 py-2 space-y-4">
+      <nav className="flex-1 px-4 py-2 space-y-4 overflow-y-auto">
         {categorizedNavLinks.map((category) => (
           <div key={category.title}>
-            <h3
-              className={`text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2 ${!isDesktopSidebarOpen && "hidden"}`}
+            <button
+              onClick={() => toggleCategory(category.title)}
+              className={`w-full flex justify-between items-center text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2 ${!isDesktopSidebarOpen && 'hidden'}`}
             >
               {category.title}
-            </h3>
-            <ul className="space-y-1">
-              {category.links.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium ${
-                        isActive
-                          ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white"
-                          : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                      } ${!isDesktopSidebarOpen && "justify-center"}`}
-                    >
-                      <span className="material-symbols-outlined">
-                        {link.icon}
-                      </span>
-                      <p className={`${!isDesktopSidebarOpen && "hidden"}`}>
-                        {link.label}
-                      </p>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+              <span className="material-symbols-outlined">
+                {openCategories[category.title] ? 'expand_less' : 'expand_more'}
+              </span>
+            </button>
+            {openCategories[category.title] && (
+              <ul className="space-y-1">
+                {category.links.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        onClick={() => setSidebarOpen(false)}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium ${
+                          isActive
+                            ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white"
+                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                        } ${!isDesktopSidebarOpen && "justify-center"}`}
+                      >
+                        <span className="material-symbols-outlined">
+                          {link.icon}
+                        </span>
+                        <p className={`${!isDesktopSidebarOpen && "hidden"}`}>
+                          {link.label}
+                        </p>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         ))}
       </nav>

@@ -490,10 +490,11 @@ export const footerLinks = {
     { href: "/terms", label: "Terms & Conditions" },
     { href: "/privacy", label: "Privacy Policy" },
     { href: "/refund", label: "Refund Policy" },
+    { href: "/faq", label: "FAQ" },
   ],
   contact: [
     { href: "/contact", label: "Contact Us", icon: "email" },
-    { href: "/dashboard/messages", label: "Live Chat", icon: "chat_bubble" },
+    { href: "/contact", label: "Live Chat", icon: "chat_bubble" },
   ],
 };
 

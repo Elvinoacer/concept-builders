@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -46,6 +46,20 @@ const Sidebar = ({
   setIsSidebarOpen: (isOpen: boolean) => void;
 }) => {
   const pathname = usePathname();
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const activeCategory = navSections.find(section =>
+      section.links.some(link => pathname.startsWith(link.href))
+    );
+    if (activeCategory) {
+      setOpenCategories(prev => ({ ...prev, [activeCategory.title]: true }));
+    }
+  }, [pathname]);
+
+  const toggleCategory = (title: string) => {
+    setOpenCategories(prev => ({ ...prev, [title]: !prev[title] }));
+  };
 
   const handleLinkClick = () => {
     if (window.innerWidth < 768) {
@@ -73,29 +87,37 @@ const Sidebar = ({
       <nav className="flex flex-col gap-4 flex-1 pt-4 overflow-y-auto">
         {navSections.map((section) => (
           <div key={section.title}>
-            <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
-              {section.title}
-            </h3>
-            <div className="flex flex-col gap-1 mt-2">
-              {section.links.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={handleLinkClick}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                      isActive
-                        ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md"
-                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    <span className="material-symbols-outlined">{link.icon}</span>
-                    <p>{link.label}</p>
-                  </Link>
-                );
-              })}
-            </div>
+            <button
+              onClick={() => toggleCategory(section.title)}
+              className="w-full flex justify-between items-center px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400"
+            >
+              <span>{section.title}</span>
+              <span className="material-symbols-outlined">
+                {openCategories[section.title] ? 'expand_less' : 'expand_more'}
+              </span>
+            </button>
+            {openCategories[section.title] && (
+              <div className="flex flex-col gap-1 mt-2">
+                {section.links.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={handleLinkClick}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                        isActive
+                          ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md"
+                          : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined">{link.icon}</span>
+                      <p>{link.label}</p>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
         ))}
       </nav>
