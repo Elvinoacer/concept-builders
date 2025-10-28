@@ -1,15 +1,14 @@
-'use client';
+"use client";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Post } from "@prisma/client";
+import { Post } from "@/generated/prisma";
 
 interface BlogSectionProps {
   recentPosts: Post[];
 }
 
 const BlogSection = ({ recentPosts }: BlogSectionProps) => {
-
   if (!recentPosts.length) {
     return null;
   }
@@ -30,8 +29,12 @@ const BlogSection = ({ recentPosts }: BlogSectionProps) => {
     <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-950">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">From Our Blog</h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">Insights, trends, and inspiration for your home-building journey.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+            From Our Blog
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">
+            Insights, trends, and inspiration for your home-building journey.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
@@ -57,10 +60,21 @@ const BlogSection = ({ recentPosts }: BlogSectionProps) => {
                 {/* The date is not in the new schema, so I will remove it */}
               </div>
               <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 leading-tight">
-                <Link href={`/blog/${featuredPost.id}`} className="hover:text-blue-600 transition-colors duration-300">{featuredPost.title}</Link>
+                <Link
+                  href={`/blog/${featuredPost.id}`}
+                  className="hover:text-blue-600 transition-colors duration-300"
+                >
+                  {featuredPost.title}
+                </Link>
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">By {/* The author is not in the new schema, so I will remove it */}</p>
-              <Link href={`/blog/${featuredPost.id}`} className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                By{" "}
+                {/* The author is not in the new schema, so I will remove it */}
+              </p>
+              <Link
+                href={`/blog/${featuredPost.id}`}
+                className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+              >
                 Read More
               </Link>
             </div>
@@ -91,9 +105,17 @@ const BlogSection = ({ recentPosts }: BlogSectionProps) => {
                     {/* The date is not in the new schema, so I will remove it */}
                   </div>
                   <h4 className="font-bold text-lg leading-tight text-gray-900 dark:text-white mb-2">
-                    <Link href={`/blog/${post.id}`} className="hover:text-blue-600 transition-colors duration-300">{post.title}</Link>
+                    <Link
+                      href={`/blog/${post.id}`}
+                      className="hover:text-blue-600 transition-colors duration-300"
+                    >
+                      {post.title}
+                    </Link>
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">By {/* The author is not in the new schema, so I will remove it */}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    By{" "}
+                    {/* The author is not in the new schema, so I will remove it */}
+                  </p>
                 </div>
               </motion.div>
             ))}

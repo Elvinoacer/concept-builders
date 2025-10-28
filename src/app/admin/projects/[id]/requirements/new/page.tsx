@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { RequirementStatus } from "@prisma/client";
+import { RequirementStatus } from "@/generated/prisma";
 import { PlusCircle } from "lucide-react";
 
 const CreateRequirementPage = () => {
@@ -11,7 +11,9 @@ const CreateRequirementPage = () => {
   const projectId = params.id as string;
 
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<RequirementStatus>(RequirementStatus.PENDING);
+  const [status, setStatus] = useState<RequirementStatus>(
+    RequirementStatus.PENDING
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,20 +23,25 @@ const CreateRequirementPage = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/admin/projects/${projectId}/requirements`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          description,
-          status,
-        }),
-      });
+      const response = await fetch(
+        `/api/admin/projects/${projectId}/requirements`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            description,
+            status,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
 
       router.push(`/admin/projects/${projectId}`);
@@ -57,9 +64,17 @@ const CreateRequirementPage = () => {
         </p>
       </header>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto"
+      >
         <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Description
+          </label>
           <textarea
             id="description"
             rows={3}
@@ -71,7 +86,12 @@ const CreateRequirementPage = () => {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+          <label
+            htmlFor="status"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Status
+          </label>
           <select
             id="status"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -94,10 +114,19 @@ const CreateRequirementPage = () => {
           className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors flex items-center justify-center space-x-2"
           disabled={loading}
         >
-          {loading ? "Creating..." : <><PlusCircle className="w-5 h-5" /><span>Create Requirement</span></>}
+          {loading ? (
+            "Creating..."
+          ) : (
+            <>
+              <PlusCircle className="w-5 h-5" />
+              <span>Create Requirement</span>
+            </>
+          )}
         </motion.button>
 
-        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
+        )}
       </form>
     </div>
   );

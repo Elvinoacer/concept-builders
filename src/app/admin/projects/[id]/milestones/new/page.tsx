@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { MilestoneStatus } from "@prisma/client";
+import { MilestoneStatus } from "@/generated/prisma";
 import { PlusCircle } from "lucide-react";
 
 const CreateMilestonePage = () => {
@@ -13,7 +13,9 @@ const CreateMilestonePage = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [status, setStatus] = useState<MilestoneStatus>(MilestoneStatus.PENDING);
+  const [status, setStatus] = useState<MilestoneStatus>(
+    MilestoneStatus.PENDING
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,22 +25,27 @@ const CreateMilestonePage = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/admin/projects/${projectId}/milestones`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          description,
-          dueDate,
-          status,
-        }),
-      });
+      const response = await fetch(
+        `/api/admin/projects/${projectId}/milestones`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            description,
+            dueDate,
+            status,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
 
       router.push(`/admin/projects/${projectId}`);
@@ -61,9 +68,17 @@ const CreateMilestonePage = () => {
         </p>
       </header>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto"
+      >
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Milestone Name</label>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Milestone Name
+          </label>
           <input
             type="text"
             id="name"
@@ -75,7 +90,12 @@ const CreateMilestonePage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Description
+          </label>
           <textarea
             id="description"
             rows={3}
@@ -86,7 +106,12 @@ const CreateMilestonePage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Due Date</label>
+          <label
+            htmlFor="dueDate"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Due Date
+          </label>
           <input
             type="date"
             id="dueDate"
@@ -98,7 +123,12 @@ const CreateMilestonePage = () => {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+          <label
+            htmlFor="status"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Status
+          </label>
           <select
             id="status"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -121,10 +151,19 @@ const CreateMilestonePage = () => {
           className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors flex items-center justify-center space-x-2"
           disabled={loading}
         >
-          {loading ? "Creating..." : <><PlusCircle className="w-5 h-5" /><span>Create Milestone</span></>}
+          {loading ? (
+            "Creating..."
+          ) : (
+            <>
+              <PlusCircle className="w-5 h-5" />
+              <span>Create Milestone</span>
+            </>
+          )}
         </motion.button>
 
-        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
+        )}
       </form>
     </div>
   );

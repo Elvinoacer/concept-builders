@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { InvoiceStatus, InvoiceType } from "@prisma/client";
+import { InvoiceStatus, InvoiceType } from "@/generated/prisma";
 import { PlusCircle, XCircle } from "lucide-react";
 import { format } from "date-fns";
 
@@ -27,7 +27,13 @@ const CreateInvoicePage = () => {
   const [type, setType] = useState<InvoiceType>(InvoiceType.CUSTOM);
   const [documentUrl, setDocumentUrl] = useState("");
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItemState[]>([
-    { id: Date.now().toString(), description: "", quantity: 1, unitPrice: 0, total: 0 },
+    {
+      id: Date.now().toString(),
+      description: "",
+      quantity: 1,
+      unitPrice: 0,
+      total: 0,
+    },
   ]);
 
   const [loading, setLoading] = useState(false);
@@ -49,7 +55,13 @@ const CreateInvoicePage = () => {
   const handleAddItem = () => {
     setInvoiceItems((prevItems) => [
       ...prevItems,
-      { id: Date.now().toString(), description: "", quantity: 1, unitPrice: 0, total: 0 },
+      {
+        id: Date.now().toString(),
+        description: "",
+        quantity: 1,
+        unitPrice: 0,
+        total: 0,
+      },
     ]);
   };
 
@@ -58,7 +70,10 @@ const CreateInvoicePage = () => {
   };
 
   useEffect(() => {
-    const calculatedTotal = invoiceItems.reduce((sum, item) => sum + item.total, 0);
+    const calculatedTotal = invoiceItems.reduce(
+      (sum, item) => sum + item.total,
+      0
+    );
     setTotalAmount(calculatedTotal);
   }, [invoiceItems]);
 
@@ -68,26 +83,31 @@ const CreateInvoicePage = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/admin/projects/${projectId}/invoices`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          invoiceNumber,
-          issueDate,
-          dueDate,
-          totalAmount,
-          status,
-          type,
-          documentUrl,
-          invoiceItems: invoiceItems.map(({ id, ...rest }) => rest), // Remove temporary id
-        }),
-      });
+      const response = await fetch(
+        `/api/admin/projects/${projectId}/invoices`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            invoiceNumber,
+            issueDate,
+            dueDate,
+            totalAmount,
+            status,
+            type,
+            documentUrl,
+            invoiceItems: invoiceItems.map(({ id, ...rest }) => rest), // Remove temporary id
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
 
       router.push(`/admin/projects/${projectId}`);
@@ -110,10 +130,18 @@ const CreateInvoicePage = () => {
         </p>
       </header>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-4xl mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-4xl mx-auto"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label htmlFor="invoiceNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Invoice Number</label>
+            <label
+              htmlFor="invoiceNumber"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Invoice Number
+            </label>
             <input
               type="text"
               id="invoiceNumber"
@@ -124,7 +152,12 @@ const CreateInvoicePage = () => {
             />
           </div>
           <div>
-            <label htmlFor="issueDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Issue Date</label>
+            <label
+              htmlFor="issueDate"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Issue Date
+            </label>
             <input
               type="date"
               id="issueDate"
@@ -135,7 +168,12 @@ const CreateInvoicePage = () => {
             />
           </div>
           <div>
-            <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Due Date</label>
+            <label
+              htmlFor="dueDate"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Due Date
+            </label>
             <input
               type="date"
               id="dueDate"
@@ -146,7 +184,12 @@ const CreateInvoicePage = () => {
             />
           </div>
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+            <label
+              htmlFor="status"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Status
+            </label>
             <select
               id="status"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -162,7 +205,12 @@ const CreateInvoicePage = () => {
             </select>
           </div>
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
+            <label
+              htmlFor="type"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Type
+            </label>
             <select
               id="type"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -178,7 +226,12 @@ const CreateInvoicePage = () => {
             </select>
           </div>
           <div>
-            <label htmlFor="documentUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Document URL (Optional)</label>
+            <label
+              htmlFor="documentUrl"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Document URL (Optional)
+            </label>
             <input
               type="text"
               id="documentUrl"
@@ -189,47 +242,83 @@ const CreateInvoicePage = () => {
           </div>
         </div>
 
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Invoice Items</h3>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+          Invoice Items
+        </h3>
         <div className="space-y-4 mb-4">
           {invoiceItems.map((item, index) => (
-            <div key={item.id} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
+            <div
+              key={item.id}
+              className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end bg-gray-50 dark:bg-gray-700 p-3 rounded-md"
+            >
               <div className="md:col-span-2">
-                <label htmlFor={`description-${item.id}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                <label
+                  htmlFor={`description-${item.id}`}
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Description
+                </label>
                 <input
                   type="text"
                   id={`description-${item.id}`}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                   value={item.description}
-                  onChange={(e) => handleItemChange(item.id, "description", e.target.value)}
+                  onChange={(e) =>
+                    handleItemChange(item.id, "description", e.target.value)
+                  }
                   required
                 />
               </div>
               <div>
-                <label htmlFor={`quantity-${item.id}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">Qty</label>
+                <label
+                  htmlFor={`quantity-${item.id}`}
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Qty
+                </label>
                 <input
                   type="number"
                   id={`quantity-${item.id}`}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                   value={item.quantity}
-                  onChange={(e) => handleItemChange(item.id, "quantity", parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    handleItemChange(
+                      item.id,
+                      "quantity",
+                      parseInt(e.target.value) || 0
+                    )
+                  }
                   min={1}
                   required
                 />
               </div>
               <div>
-                <label htmlFor={`unitPrice-${item.id}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">Unit Price</label>
+                <label
+                  htmlFor={`unitPrice-${item.id}`}
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Unit Price
+                </label>
                 <input
                   type="number"
                   id={`unitPrice-${item.id}`}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                   value={item.unitPrice}
-                  onChange={(e) => handleItemChange(item.id, "unitPrice", parseFloat(e.target.value) || 0)}
+                  onChange={(e) =>
+                    handleItemChange(
+                      item.id,
+                      "unitPrice",
+                      parseFloat(e.target.value) || 0
+                    )
+                  }
                   step="0.01"
                   required
                 />
               </div>
               <div className="flex items-center space-x-2">
-                <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">Total: ${item.total.toFixed(2)}</span>
+                <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Total: ${item.total.toFixed(2)}
+                </span>
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1.1 }}
@@ -257,7 +346,9 @@ const CreateInvoicePage = () => {
         </motion.button>
 
         <div className="mb-6 text-right">
-          <span className="text-lg font-bold text-gray-900 dark:text-white">Grand Total: ${totalAmount.toFixed(2)}</span>
+          <span className="text-lg font-bold text-gray-900 dark:text-white">
+            Grand Total: ${totalAmount.toFixed(2)}
+          </span>
         </div>
 
         <motion.button
@@ -267,10 +358,19 @@ const CreateInvoicePage = () => {
           className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors flex items-center justify-center space-x-2"
           disabled={loading}
         >
-          {loading ? "Generating..." : <><PlusCircle className="w-5 h-5" /><span>Generate Invoice</span></>}
+          {loading ? (
+            "Generating..."
+          ) : (
+            <>
+              <PlusCircle className="w-5 h-5" />
+              <span>Generate Invoice</span>
+            </>
+          )}
         </motion.button>
 
-        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
+        )}
       </form>
     </div>
   );

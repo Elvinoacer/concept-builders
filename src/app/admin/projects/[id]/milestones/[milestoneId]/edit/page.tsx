@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { MilestoneStatus } from "@prisma/client";
+import { MilestoneStatus } from "@/generated/prisma";
 import { Edit } from "lucide-react";
 import { format } from "date-fns";
 
@@ -25,7 +25,9 @@ const EditMilestonePage = () => {
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [completedDate, setCompletedDate] = useState<string | null>(null);
-  const [status, setStatus] = useState<MilestoneStatus>(MilestoneStatus.PENDING);
+  const [status, setStatus] = useState<MilestoneStatus>(
+    MilestoneStatus.PENDING
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [milestoneLoading, setMilestoneLoading] = useState(true);
@@ -35,7 +37,9 @@ const EditMilestonePage = () => {
 
     const fetchMilestone = async () => {
       try {
-        const response = await fetch(`/api/admin/projects/${projectId}/milestones/${milestoneId}`);
+        const response = await fetch(
+          `/api/admin/projects/${projectId}/milestones/${milestoneId}`
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -43,7 +47,11 @@ const EditMilestonePage = () => {
         setName(data.name);
         setDescription(data.description || "");
         setDueDate(format(new Date(data.dueDate), "yyyy-MM-dd"));
-        setCompletedDate(data.completedDate ? format(new Date(data.completedDate), "yyyy-MM-dd") : null);
+        setCompletedDate(
+          data.completedDate
+            ? format(new Date(data.completedDate), "yyyy-MM-dd")
+            : null
+        );
         setStatus(data.status);
       } catch (err: any) {
         console.error("Error fetching milestone:", err);
@@ -61,23 +69,28 @@ const EditMilestonePage = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/admin/projects/${projectId}/milestones/${milestoneId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          description,
-          dueDate,
-          completedDate,
-          status,
-        }),
-      });
+      const response = await fetch(
+        `/api/admin/projects/${projectId}/milestones/${milestoneId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            description,
+            dueDate,
+            completedDate,
+            status,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
 
       router.push(`/admin/projects/${projectId}`);
@@ -92,7 +105,9 @@ const EditMilestonePage = () => {
   if (milestoneLoading) {
     return (
       <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center">
-        <p className="text-gray-500 dark:text-gray-400">Loading milestone data...</p>
+        <p className="text-gray-500 dark:text-gray-400">
+          Loading milestone data...
+        </p>
       </div>
     );
   }
@@ -116,9 +131,17 @@ const EditMilestonePage = () => {
         </p>
       </header>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto"
+      >
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Milestone Name</label>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Milestone Name
+          </label>
           <input
             type="text"
             id="name"
@@ -130,7 +153,12 @@ const EditMilestonePage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Description
+          </label>
           <textarea
             id="description"
             rows={3}
@@ -141,7 +169,12 @@ const EditMilestonePage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Due Date</label>
+          <label
+            htmlFor="dueDate"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Due Date
+          </label>
           <input
             type="date"
             id="dueDate"
@@ -153,7 +186,12 @@ const EditMilestonePage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="completedDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Completed Date</label>
+          <label
+            htmlFor="completedDate"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Completed Date
+          </label>
           <input
             type="date"
             id="completedDate"
@@ -164,7 +202,12 @@ const EditMilestonePage = () => {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+          <label
+            htmlFor="status"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Status
+          </label>
           <select
             id="status"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -187,10 +230,19 @@ const EditMilestonePage = () => {
           className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors flex items-center justify-center space-x-2"
           disabled={loading}
         >
-          {loading ? "Updating..." : <><Edit className="w-5 h-5" /><span>Update Milestone</span></>}
+          {loading ? (
+            "Updating..."
+          ) : (
+            <>
+              <Edit className="w-5 h-5" />
+              <span>Update Milestone</span>
+            </>
+          )}
         </motion.button>
 
-        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
+        )}
       </form>
     </div>
   );

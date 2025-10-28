@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { ProjectStatus } from "@prisma/client";
+import { ProjectStatus } from "@/generated/prisma";
 import { Edit } from "lucide-react";
 
 interface User {
@@ -123,7 +123,9 @@ const EditProjectPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
 
       router.push(`/admin/projects/${projectId}`);
@@ -162,9 +164,17 @@ const EditProjectPage = () => {
         </p>
       </header>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto"
+      >
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Project Name</label>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Project Name
+          </label>
           <input
             type="text"
             id="name"
@@ -176,7 +186,12 @@ const EditProjectPage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Description
+          </label>
           <textarea
             id="description"
             rows={3}
@@ -187,7 +202,12 @@ const EditProjectPage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
+          <label
+            htmlFor="imageUrl"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Image URL
+          </label>
           <input
             type="text"
             id="imageUrl"
@@ -198,7 +218,12 @@ const EditProjectPage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="userId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Assign to Client</label>
+          <label
+            htmlFor="userId"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Assign to Client
+          </label>
           <select
             id="userId"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -215,7 +240,12 @@ const EditProjectPage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+          <label
+            htmlFor="status"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Status
+          </label>
           <select
             id="status"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -232,7 +262,12 @@ const EditProjectPage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="progress" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Progress (%)</label>
+          <label
+            htmlFor="progress"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Progress (%)
+          </label>
           <input
             type="number"
             id="progress"
@@ -246,7 +281,12 @@ const EditProjectPage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="totalCost" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Total Cost</label>
+          <label
+            htmlFor="totalCost"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Total Cost
+          </label>
           <input
             type="number"
             id="totalCost"
@@ -259,7 +299,12 @@ const EditProjectPage = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="completionRemarks" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Completion Remarks</label>
+          <label
+            htmlFor="completionRemarks"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Completion Remarks
+          </label>
           <textarea
             id="completionRemarks"
             rows={3}
@@ -277,7 +322,12 @@ const EditProjectPage = () => {
             checked={declaration}
             onChange={(e) => setDeclaration(e.target.checked)}
           />
-          <label htmlFor="declaration" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">Declare Project Complete</label>
+          <label
+            htmlFor="declaration"
+            className="ml-2 block text-sm text-gray-900 dark:text-gray-300"
+          >
+            Declare Project Complete
+          </label>
         </div>
 
         <motion.button
@@ -287,10 +337,19 @@ const EditProjectPage = () => {
           className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors flex items-center justify-center space-x-2"
           disabled={loading}
         >
-          {loading ? "Updating..." : <><Edit className="w-5 h-5" /><span>Update Project</span></>}
+          {loading ? (
+            "Updating..."
+          ) : (
+            <>
+              <Edit className="w-5 h-5" />
+              <span>Update Project</span>
+            </>
+          )}
         </motion.button>
 
-        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
+        )}
       </form>
     </div>
   );

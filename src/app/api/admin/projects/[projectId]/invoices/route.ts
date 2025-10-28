@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { sendInvoiceEmail } from "@/lib/emails";
-import { ProjectStatus } from "@prisma/client"; // Import ProjectStatus for notification icon
+import { ProjectStatus } from "@/generated/prisma"; // Import ProjectStatus for notification icon
 
 export async function GET(
   request: NextRequest,
@@ -50,9 +50,25 @@ export async function POST(
 
   try {
     const body = await request.json();
-    const { invoiceNumber, issueDate, dueDate, totalAmount, status, type, documentUrl, invoiceItems } = body;
+    const {
+      invoiceNumber,
+      issueDate,
+      dueDate,
+      totalAmount,
+      status,
+      type,
+      documentUrl,
+      invoiceItems,
+    } = body;
 
-    if (!invoiceNumber || !issueDate || !dueDate || !totalAmount || !status || !type) {
+    if (
+      !invoiceNumber ||
+      !issueDate ||
+      !dueDate ||
+      !totalAmount ||
+      !status ||
+      !type
+    ) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 

@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { sendInvoiceEmail } from "@/lib/emails";
-import { ProjectStatus } from "@prisma/client"; // Import ProjectStatus for notification icon
+import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
@@ -53,7 +52,16 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    const { invoiceNumber, issueDate, dueDate, totalAmount, status, type, documentUrl, invoiceItems } = body;
+    const {
+      invoiceNumber,
+      issueDate,
+      dueDate,
+      totalAmount,
+      status,
+      type,
+      documentUrl,
+      invoiceItems,
+    } = body;
 
     const updatedInvoice = await prisma.invoice.update({
       where: {

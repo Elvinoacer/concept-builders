@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { RequirementStatus } from "@prisma/client";
+import { RequirementStatus } from "@/generated/prisma";
 import { Edit } from "lucide-react";
 
 interface Requirement {
@@ -18,7 +18,9 @@ const EditRequirementPage = () => {
   const requirementId = params.requirementId as string;
 
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<RequirementStatus>(RequirementStatus.PENDING);
+  const [status, setStatus] = useState<RequirementStatus>(
+    RequirementStatus.PENDING
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [requirementLoading, setRequirementLoading] = useState(true);
@@ -28,7 +30,9 @@ const EditRequirementPage = () => {
 
     const fetchRequirement = async () => {
       try {
-        const response = await fetch(`/api/admin/projects/${projectId}/requirements/${requirementId}`);
+        const response = await fetch(
+          `/api/admin/projects/${projectId}/requirements/${requirementId}`
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -51,20 +55,25 @@ const EditRequirementPage = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/admin/projects/${projectId}/requirements/${requirementId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          description,
-          status,
-        }),
-      });
+      const response = await fetch(
+        `/api/admin/projects/${projectId}/requirements/${requirementId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            description,
+            status,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
 
       router.push(`/admin/projects/${projectId}`);
@@ -79,7 +88,9 @@ const EditRequirementPage = () => {
   if (requirementLoading) {
     return (
       <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center">
-        <p className="text-gray-500 dark:text-gray-400">Loading requirement data...</p>
+        <p className="text-gray-500 dark:text-gray-400">
+          Loading requirement data...
+        </p>
       </div>
     );
   }
@@ -103,9 +114,17 @@ const EditRequirementPage = () => {
         </p>
       </header>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto"
+      >
         <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Description
+          </label>
           <textarea
             id="description"
             rows={3}
@@ -117,7 +136,12 @@ const EditRequirementPage = () => {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+          <label
+            htmlFor="status"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Status
+          </label>
           <select
             id="status"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -140,10 +164,19 @@ const EditRequirementPage = () => {
           className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors flex items-center justify-center space-x-2"
           disabled={loading}
         >
-          {loading ? "Updating..." : <><Edit className="w-5 h-5" /><span>Update Requirement</span></>}
+          {loading ? (
+            "Updating..."
+          ) : (
+            <>
+              <Edit className="w-5 h-5" />
+              <span>Update Requirement</span>
+            </>
+          )}
         </motion.button>
 
-        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
+        )}
       </form>
     </div>
   );
