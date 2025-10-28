@@ -199,7 +199,9 @@ export const authOptions: AuthOptions = {
 
       console.log("Access token expired, refreshing...");
       // @ts-ignore
-      return refreshAccessToken(token);
+      // Temporarily disabled refreshAccessToken to diagnose pending API calls
+      // return refreshAccessToken(token);
+      return token; // Return existing token even if expired, for testing
     },
     async session({ session, token }) {
       // @ts-ignore
