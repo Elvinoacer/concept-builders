@@ -24,7 +24,7 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
       selectedPackage: debouncedPackage,
       selectedExtras: debouncedExtras,
     });
-  }, [debouncedQuantity, debouncedFileType, debouncedPackage, debouncedExtras, item.id, onUpdate]);
+  }, [debouncedQuantity, debouncedFileType, debouncedPackage, debouncedExtras, item.cartItemId]);
 
   let fileTypePrice = 0;
   if (selectedFileType === 'pdf') {

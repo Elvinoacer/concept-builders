@@ -145,7 +145,7 @@ export const useCart = () => {
     }
   };
 
-  const updateItem = async (itemId: string, updates: { quantity?: number; selectedFileType?: string; selectedPackage?: string; selectedExtras?: any[] }) => {
+  const updateItem = useCallback(async (itemId: string, updates: { quantity?: number; selectedFileType?: string; selectedPackage?: string; selectedExtras?: any[] }) => {
     if (status === 'authenticated') {
       try {
         const response = await fetch(`/api/cart/items/${itemId}`, {
@@ -175,7 +175,7 @@ export const useCart = () => {
       localStorage.setItem('cart', JSON.stringify(newCart));
       toast.success('Cart item updated.');
     }
-  };
+  }, [status, cart]);
 
   const cartTotal = useMemo(() => {
     return cart.reduce((total, item) => {
