@@ -19,16 +19,13 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
 }) => {
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold mb-4">Pay with PayPal</h1>
-      <div className="p-4 border rounded-lg">
-        <PayPalButton
-          cart={cart} // Pass cart to PayPalButton
-          finalTotal={finalTotal}
-          appliedDiscountAmount={appliedDiscountAmount}
-          appliedDiscountId={appliedDiscountId}
-          appliedDiscountCode={appliedDiscountCode}
-        />
-      </div>
+      <PayPalButton
+        cart={cart} // Pass cart to PayPalButton
+        finalTotal={finalTotal}
+        appliedDiscountAmount={appliedDiscountAmount}
+        appliedDiscountId={appliedDiscountId}
+        appliedDiscountCode={appliedDiscountCode}
+      />
     </div>
   );
 };
