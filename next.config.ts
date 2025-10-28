@@ -15,6 +15,22 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  // Increase file upload size limits
+  api: {
+    bodyParser: {
+      sizeLimit: "50mb",
+    },
+    responseLimit: "50mb",
+  },
+
+  serverRuntimeConfig: {
+    maxRequestBodySize: "50mb",
+  },
+
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
 };
 
 export default nextConfig;

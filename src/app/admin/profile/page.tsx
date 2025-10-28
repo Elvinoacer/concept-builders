@@ -77,22 +77,20 @@ const AdminProfilePage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
+    const uploadFormData = new FormData(); // Renamed to avoid conflict with component's formData state
+    uploadFormData.append("file", file);
 
     try {
-      // Assuming an API endpoint for file uploads exists
-      // This is a placeholder, replace with actual upload logic
-      const uploadRes = await fetch("/api/upload", {
-        // You might need to create this API
+      const uploadRes = await fetch("/api/files/upload", { // Changed API endpoint
         method: "POST",
-        body: formData,
+        body: uploadFormData, // Use the new FormData object
       });
 
       if (!uploadRes.ok) {
-        throw new Error("Failed to upload image");
+        const errorData = await uploadRes.json();
+        throw new Error(errorData.message || "Failed to upload image");
       }
-      const { url } = await uploadRes.json(); // Assuming API returns { url: string }
+      const { url } = await uploadRes.json();
       setFormData((prev) => ({ ...prev, image: url }));
       toast.success("Profile picture uploaded successfully!");
     } catch (err) {

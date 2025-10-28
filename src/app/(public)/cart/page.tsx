@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 
 const CartPage = () => {
   const { data: session, status } = useSession();
-  const { cart, loading, error, fetchCart, removeItem } = useCart();
+  const { cart, loading, error, fetchCart, removeItem, updateItem } = useCart();
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -94,6 +94,7 @@ const CartPage = () => {
               <CartItemList
                 items={cart}
                 onRemove={removeItem}
+                onUpdate={updateItem}
               />
             </div>
             <div className="lg:w-1/3">

@@ -20,7 +20,7 @@ const CartItemSkeleton = () => (
   </li>
 );
 
-const CartItemList = ({ items, onRemove, loading }) => {
+const CartItemList = ({ items, onRemove, onUpdate, loading }) => {
   if (loading) {
     return (
       <div>
@@ -49,6 +49,7 @@ const CartItemList = ({ items, onRemove, loading }) => {
             key={item.id}
             item={item}
             onRemove={onRemove}
+            onUpdate={onUpdate}
           />
         ))}
       </ul>

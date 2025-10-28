@@ -142,6 +142,38 @@ export const useCart = () => {
     }
   };
 
+  const updateItem = async (itemId: string, updates: { quantity?: number; selectedFileType?: string; selectedPackage?: string; selectedExtras?: any[] }) => {
+    if (status === 'authenticated') {
+      try {
+        const response = await fetch(`/api/cart/items/${itemId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates),
+        });
+        if (response.ok) {
+          const newCart: CartItem[] = await response.json();
+          setCart(newCart);
+          toast.success('Cart item updated.');
+        } else {
+          const errorData = await response.json();
+          toast.error(errorData.error || 'Failed to update item in cart.');
+        }
+      } catch (err) {
+        toast.error('An error occurred while updating the cart.');
+      }
+    } else {
+      const newCart = cart.map(item => {
+        if (item.id === itemId) {
+          return { ...item, ...updates };
+        }
+        return item;
+      });
+      setCart(newCart);
+      localStorage.setItem('cart', JSON.stringify(newCart));
+      toast.success('Cart item updated.');
+    }
+  };
+
   const cartTotal = useMemo(() => {
     return cart.reduce((total, item) => {
       let itemTotal = item.basePrice * item.quantity;
@@ -212,6 +244,7 @@ export const useCart = () => {
     cart,
     addToCart,
     removeItem,
+    updateItem, // Add this line
     cartCount: cart.length,
     cartTotal,
     loading,
