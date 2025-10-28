@@ -29,7 +29,21 @@ export async function GET(req: Request) {
       include: {
         items: {
           include: {
-            design: true, // Include the full design details in the cart item
+            design: {
+              select: {
+                id: true,
+                name: true,
+                basePrice: true,
+                pdfPrice: true,
+                cadPrice: true,
+                pdfAndCadPrice: true,
+                packageOptions: true,
+                files: {
+                  where: { type: 'IMAGE' },
+                  take: 1
+                }
+              }
+            }
           },
           orderBy: {
             createdAt: "asc",
@@ -132,7 +146,21 @@ export async function POST(req: Request) {
       include: {
         items: {
           include: {
-            design: true,
+            design: {
+              select: {
+                id: true,
+                name: true,
+                basePrice: true,
+                pdfPrice: true,
+                cadPrice: true,
+                pdfAndCadPrice: true,
+                packageOptions: true,
+                files: {
+                  where: { type: 'IMAGE' },
+                  take: 1
+                }
+              }
+            }
           },
           orderBy: {
             createdAt: "asc",

@@ -65,7 +65,7 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
         <Image
           alt={item.name}
           className="h-full w-full object-cover object-center"
-          src={item.images && item.images.length > 0 ? item.images[0].url : '/images/category-placeholder.png'}
+          src={item.files && item.files.length > 0 ? item.files[0].url : '/images/category-placeholder.png'}
           width={100}
           height={100}
         />

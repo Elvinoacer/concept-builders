@@ -73,7 +73,21 @@ export async function POST(req: NextRequest) {
       include: {
         items: {
           include: {
-            design: true,
+            design: {
+              select: {
+                id: true,
+                name: true,
+                basePrice: true,
+                pdfPrice: true,
+                cadPrice: true,
+                pdfAndCadPrice: true,
+                packageOptions: true,
+                files: {
+                  where: { type: 'IMAGE' },
+                  take: 1
+                }
+              }
+            }
           },
         },
       },
