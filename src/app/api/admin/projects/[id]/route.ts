@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 
 export async function GET(
   request: Request,
@@ -52,14 +51,12 @@ export async function PUT(
     const { id } = params;
     const body = await request.json();
     // Assuming body contains fields to update for a project
-    // Example: { name: "New Project Name", description: "Updated description" }
+    // Example: { name: "New Project Name", description: "Updated description" };
 
     const updatedProject = await prisma.project.update({
       where: { id },
       data: body, // Use body directly for now, can be refined later
     });
-
-    revalidatePath('/'); // Revalidate the landing page
 
     return NextResponse.json(updatedProject);
   } catch (error) {
@@ -84,8 +81,6 @@ export async function DELETE(
     await prisma.project.delete({
       where: { id },
     });
-
-    revalidatePath('/'); // Revalidate the landing page
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
