@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { InvoiceStatus, InvoiceType } from "@/generated/prisma";
@@ -17,7 +17,7 @@ interface InvoiceItemState {
 const CreateInvoicePage = () => {
   const router = useRouter();
   const params = useParams();
-  const projectId = params.id as string;
+  const projectId = params?.id as string;
 
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [issueDate, setIssueDate] = useState(format(new Date(), "yyyy-MM-dd"));
