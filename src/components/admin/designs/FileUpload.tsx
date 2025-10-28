@@ -7,7 +7,7 @@ import { CgSpinner } from "react-icons/cg";
 import { ProgressBar } from '@/components/ui/progress';
 
 interface FileUploadProps {
-  onUploadSuccess: (files: { url: string; type: string; name: string }[]) => void;
+  onUploadSuccess: (files: { url: string; type: string; originalFileName: string }[]) => void;
   onFileRemove: (fileUrl: string) => void;
   initialFiles: { url: string; type: string; name: string }[];
   fileTypeCategory: string;
@@ -53,24 +53,28 @@ const FileUpload = ({
       setUploadingFiles((prev) => [...prev, ...validationErrors]);
 
       const newFilesData = await Promise.all(
-        acceptedFiles.map(async (file, index) => {
+        acceptedFiles.map(async (file) => {
           try {
-            const signedUrlResponse = await fetch('/api/designs/upload', {
+            const response = await fetch('/api/designs/upload', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 fileName: file.name,
                 fileType: file.type,
-                fileTypeCategory,
+                fileTypeCategory: fileTypeCategory,
               }),
             });
-            const { signedUrl } = await signedUrlResponse.json();
-            const publicUrl = signedUrl.split('?')[0];
+
+            if (!response.ok) {
+              throw new Error('Failed to get presigned URL');
+            }
+
+            const { presignedUrl, url, originalFileName } = await response.json();
 
             const xhr = new XMLHttpRequest();
-            xhr.open('PUT', signedUrl, true);
+            xhr.open('PUT', presignedUrl, true);
             xhr.setRequestHeader('Content-Type', file.type);
-            xhr.setRequestHeader('x-amz-acl', 'public-read');
+            xhr.setRequestHeader('x-amz-acl', 'public-read'); // Add this line to enforce the ACL
 
             xhr.upload.onprogress = (event) => {
               if (event.lengthComputable) {
@@ -86,7 +90,7 @@ const FileUpload = ({
             await new Promise((resolve, reject) => {
               xhr.onload = () => {
                 if (xhr.status === 200) {
-                  resolve({ url: publicUrl, type: fileTypeCategory, name: file.name });
+                  resolve({ url, type: fileTypeCategory, originalFileName });
                 } else {
                   reject(new Error('Upload failed'));
                 }
@@ -96,8 +100,9 @@ const FileUpload = ({
             });
 
             setUploadingFiles((prev) => prev.filter((f) => f.file.name !== file.name));
-            return { url: publicUrl, type: fileTypeCategory, name: file.name };
+            return { url, type: fileTypeCategory, originalFileName };
           } catch (error) {
+            console.error('Upload error:', error);
             setUploadingFiles((prev) =>
               prev.map((f) =>
                 f.file.name === file.name
@@ -110,10 +115,11 @@ const FileUpload = ({
         })
       );
 
-      const successfulUploads = newFilesData.filter((f) => f) as { url: string; type: string; name: string }[];
-      const updatedFiles = [...uploadedFiles, ...successfulUploads];
-      setUploadedFiles(updatedFiles);
-      onUploadSuccess(updatedFiles);
+      const successfulUploads = newFilesData.filter((f) => f) as { url: string; type: string; originalFileName: string }[];
+      if (successfulUploads.length > 0) {
+        setUploadedFiles(prev => [...prev, ...successfulUploads]);
+        onUploadSuccess(successfulUploads);
+      }
     },
     [uploadedFiles, onUploadSuccess, fileTypeCategory]
   );
@@ -181,8 +187,8 @@ const FileUpload = ({
         ))}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
           {uploadedFiles.map((file, index) => {
-            const fileName = file.name || decodeURIComponent(file.url.split('/').pop() || '');
-            const isImage = file.type.startsWith('IMAGE');
+            const fileName = file.originalFileName || decodeURIComponent(file.url.split('/').pop() || '');
+            const isImage = file.type === 'IMAGE' || (file.type === 'FLOOR_PLAN' && /\.(jpe?g|png|gif|bmp)$/i.test(fileName));
 
             return (
               <div key={index} className="relative group bg-background rounded-lg border overflow-hidden">

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FiX, FiPlus, FiSave, FiEdit } from "react-icons/fi";
+import Link from "next/link";
 import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import FileUpload from "./FileUpload";
@@ -93,10 +94,8 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
     }
   }, [designToEdit, isEditMode]);
 
-  const handleUploadSuccess = (newFiles: { url: string; type: string; name: string }[], fileTypeCategory: string) => {
-    const otherFiles = files.filter((f: any) => f.type !== fileTypeCategory);
-    const updatedFiles = newFiles.map(f => ({...f, type: fileTypeCategory, originalFileName: f.name}));
-    setFiles([...otherFiles, ...updatedFiles]);
+  const handleUploadSuccess = (newFiles: { url: string; type: string; originalFileName: string }[]) => {
+    setFiles(prevFiles => [...prevFiles, ...newFiles]);
   };
 
   const handleFileRemove = async (fileUrl: string) => {
@@ -237,7 +236,18 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
           <div className="p-6 border-b border-border flex-shrink-0 flex justify-between items-center bg-gradient-to-r from-blue-600 to-cyan-400 text-white rounded-t-2xl">
             <div className="flex items-center gap-3">
               {isEditMode ? <FiEdit size={24} /> : <FiPlus size={24} />}
-              <h3 className="text-xl font-semibold">{isEditMode ? 'Edit Design' : 'Create New Design'}</h3>
+              <h3 className="text-xl font-semibold">
+              {isEditMode ? 'Edit Design' : 'Create New Design'}
+              {isEditMode ? (
+                <Link href={`/admin/designs/new?id=${designToEdit.id}`} className="text-sm text-yellow-300 hover:text-yellow-100 ml-4">
+                  (Edit in page)
+                </Link>
+              ) : (
+                <Link href="/admin/designs/new" className="text-sm text-yellow-300 hover:text-yellow-100 ml-4">
+                  (Add in page)
+                </Link>
+              )}
+            </h3>
             </div>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <FiX size={20} />
@@ -410,7 +420,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
                 <div>
                   <Label>PDF</Label>
                   <FileUpload
-                    onUploadSuccess={(newFiles) => handleUploadSuccess(newFiles, 'PDF')}
+                    onUploadSuccess={handleUploadSuccess}
                     onFileRemove={handleFileRemove}
                     initialFiles={files.filter((f: any) => f.type === 'PDF')}
                     fileTypeCategory="PDF"
@@ -421,7 +431,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
                 <div>
                   <Label>CAD</Label>
                   <FileUpload
-                    onUploadSuccess={(newFiles) => handleUploadSuccess(newFiles, 'CAD')}
+                    onUploadSuccess={handleUploadSuccess}
                     onFileRemove={handleFileRemove}
                     initialFiles={files.filter((f: any) => f.type === 'CAD')}
                     fileTypeCategory="CAD"
@@ -432,7 +442,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
                 <div>
                   <Label>Floor Plan</Label>
                   <FileUpload
-                    onUploadSuccess={(newFiles) => handleUploadSuccess(newFiles, 'FLOOR_PLAN')}
+                    onUploadSuccess={handleUploadSuccess}
                     onFileRemove={handleFileRemove}
                     initialFiles={files.filter((f: any) => f.type === 'FLOOR_PLAN')}
                     fileTypeCategory="FLOOR_PLAN"
@@ -443,7 +453,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
                 <div>
                   <Label>3D Renders (Images)</Label>
                   <FileUpload
-                    onUploadSuccess={(newFiles) => handleUploadSuccess(newFiles, 'IMAGE')}
+                    onUploadSuccess={handleUploadSuccess}
                     onFileRemove={handleFileRemove}
                     initialFiles={files.filter((f: any) => f.type === 'IMAGE')}
                     fileTypeCategory="IMAGE"

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { v4 as uuidv4 } from "uuid";
 
 if (!process.env.DO_SPACES_ACCESS_KEY || !process.env.DO_SPACES_SECRET_KEY) {
   throw new Error(
@@ -67,19 +68,23 @@ export async function POST(request: Request) {
       });
     }
 
+    const fileExtension = fileName.split(".").pop();
+    const key = `${uuidv4()}.${fileExtension}`;
+
     const command = new PutObjectCommand({
       Bucket: process.env.DO_SPACES_BUCKET,
-      Key: fileName,
+      Key: key,
       ContentType: fileType,
       ACL: "public-read",
     });
 
-    const signedUrl = await getSignedUrl(s3Client, command, {
+    const presignedUrl = await getSignedUrl(s3Client, command, {
       expiresIn: 3600,
-      ACL: "public-read",
     });
 
-    return NextResponse.json({ signedUrl }, { status: 200 });
+    const url = `https://sfo3.digitaloceanspaces.com/${process.env.DO_SPACES_BUCKET}/${key}`;
+
+    return NextResponse.json({ presignedUrl, url, originalFileName: fileName }, { status: 200 });
   } catch (error) {
     console.error("Error creating signed URL:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

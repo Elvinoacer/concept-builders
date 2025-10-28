@@ -1,11 +1,11 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
 
 const s3Client = new S3Client({
-  endpoint: "https://sfo3.digitaloceanspaces.com", // Change to your region
-  region: "sfo3", // Change to your region
+  endpoint: "https://sfo3.digitaloceanspaces.com",
+  region: "sfo3",
   credentials: {
     accessKeyId: process.env.DO_SPACES_ACCESS_KEY as string,
     secretAccessKey: process.env.DO_SPACES_SECRET_KEY as string,
@@ -14,32 +14,29 @@ const s3Client = new S3Client({
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const file = formData.get("file") as File;
+    const { fileName, contentType } = await request.json();
 
-    if (!file) {
-      return new NextResponse("Missing file", { status: 400 });
+    if (!fileName || !contentType) {
+      return new NextResponse("Missing fileName or contentType", { status: 400 });
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const fileExtension = file.name.split(".").pop();
-    const fileName = `${uuidv4()}.${fileExtension}`;
+    const fileExtension = fileName.split(".").pop();
+    const key = `${uuidv4()}.${fileExtension}`;
 
     const command = new PutObjectCommand({
       Bucket: process.env.DO_SPACES_BUCKET,
-      Key: fileName,
-      Body: buffer,
-      ContentType: file.type,
+      Key: key,
+      ContentType: contentType,
       ACL: "public-read",
     });
 
-    await s3Client.send(command);
-    const fileUrl = `https://sfo3.digitaloceanspaces.com/${process.env.DO_SPACES_BUCKET}/${fileName}`;
+    const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL expires in 1 hour
+    const fileUrl = `https://sfo3.digitaloceanspaces.com/${process.env.DO_SPACES_BUCKET}/${key}`;
 
-    return NextResponse.json({ url: fileUrl }, { status: 200 });
+
+    return NextResponse.json({ presignedUrl, url: fileUrl, originalFileName: fileName }, { status: 200 });
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error("Error creating presigned URL:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
