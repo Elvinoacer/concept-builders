@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
-import { ProjectStatus } from "@prisma/client"; // Import ProjectStatus enum
+import { ProjectStatus } from "@/generated/prisma"; // Import ProjectStatus enum
 
 interface Project {
   id: string;
