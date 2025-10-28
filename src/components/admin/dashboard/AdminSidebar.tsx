@@ -29,9 +29,7 @@ const categorizedNavLinks = [
   },
   {
     title: "User Management",
-    links: [
-      { href: "/admin/users", label: "All Users", icon: "group" },
-    ],
+    links: [{ href: "/admin/users", label: "All Users", icon: "group" }],
   },
   {
     title: "Project Management",
@@ -91,33 +89,35 @@ const AdminSidebar = ({
 }) => {
   const pathname = usePathname();
   const sidebar = useRef<any>(null);
-  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(
+    {}
+  );
 
+  // Initialize all categories as open by default
   useEffect(() => {
-    let bestMatch: string | null = null;
-    let activeCategoryTitle: string | null = null;
+    const initialOpenState: Record<string, boolean> = {};
+    categorizedNavLinks.forEach((category) => {
+      initialOpenState[category.title] = true;
+    });
+    setOpenCategories(initialOpenState);
+  }, []);
 
-    for (const category of categorizedNavLinks) {
-      for (const link of category.links) {
-        if (pathname.startsWith(link.href)) {
-          if (bestMatch === null || link.href.length > bestMatch.length) {
-            bestMatch = link.href;
-            activeCategoryTitle = category.title;
-          }
-        }
-      }
+  // Improved active link detection
+  const isLinkActive = (href: string) => {
+    if (href === "/admin") {
+      return pathname === "/admin";
     }
-
-    if (activeCategoryTitle) {
-      setOpenCategories(prev => ({ ...prev, [activeCategoryTitle]: true }));
-    }
-  }, [pathname]);
-
-  const toggleCategory = (title: string) => {
-    setOpenCategories(prev => ({ ...prev, [title]: !prev[title] }));
+    return (
+      pathname === href ||
+      (pathname.startsWith(href + "/") && href !== "/admin")
+    );
   };
 
-  // close on click outside
+  const toggleCategory = (title: string) => {
+    setOpenCategories((prev) => ({ ...prev, [title]: !prev[title] }));
+  };
+
+  // Close sidebar when clicking outside (mobile only)
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!sidebar.current || sidebar.current.contains(target)) return;
@@ -125,17 +125,17 @@ const AdminSidebar = ({
     };
     document.addEventListener("click", clickHandler);
     return () => document.removeEventListener("click", clickHandler);
-  });
+  }, [setSidebarOpen]);
 
-  // close if the esc key is pressed
+  // Close sidebar when ESC key is pressed (mobile only)
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
-      if (!sidebarOpen || keyCode !== 27) return;
+    const keyHandler = ({ key }: KeyboardEvent) => {
+      if (!sidebarOpen || key !== "Escape") return;
       setSidebarOpen(false);
     };
     document.addEventListener("keydown", keyHandler);
     return () => document.removeEventListener("keydown", keyHandler);
-  });
+  }, [sidebarOpen, setSidebarOpen]);
 
   return (
     <aside
@@ -144,74 +144,88 @@ const AdminSidebar = ({
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       } ${isDesktopSidebarOpen ? "w-80" : "w-20"}`}
     >
+      {/* Header */}
       <div className="p-6 flex justify-between items-center">
         <h1
-          className={`text-gray-900 dark:text-white text-xl font-bold ${!isDesktopSidebarOpen && "hidden"}`}
+          className={`text-gray-900 dark:text-white text-xl font-bold ${
+            !isDesktopSidebarOpen && "hidden"
+          }`}
         >
           Concept Builders
         </h1>
         <button
           onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
-          className="hidden md:block"
+          className="hidden md:block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          aria-label={
+            isDesktopSidebarOpen ? "Collapse sidebar" : "Expand sidebar"
+          }
         >
           <span className="material-symbols-outlined text-gray-900 dark:text-white">
             {isDesktopSidebarOpen ? "close" : "menu"}
           </span>
         </button>
       </div>
+
+      {/* Navigation */}
       <nav className="relative z-50 flex-1 px-4 py-2 space-y-4 overflow-y-auto">
         {categorizedNavLinks.map((category) => (
           <div key={category.title}>
             <button
               onClick={() => toggleCategory(category.title)}
-              className={`w-full flex justify-between items-center text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2 ${!isDesktopSidebarOpen && 'hidden'}`}
+              className={`w-full flex justify-between items-center text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2 p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                !isDesktopSidebarOpen && "hidden"
+              }`}
             >
-              {category.title}
-              <span className="material-symbols-outlined">
-                {openCategories[category.title] ? 'expand_less' : 'expand_more'}
+              <span>{category.title}</span>
+              <span className="material-symbols-outlined text-base">
+                {openCategories[category.title] ? "expand_less" : "expand_more"}
               </span>
             </button>
-            {openCategories[category.title] && (
-              <ul className="space-y-1">
-                {category.links.map((link) => {
-                  const isActive = pathname === link.href;
-                  return (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        onClick={() => setSidebarOpen(false)}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium ${
-                          isActive
-                            ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white"
-                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                        } ${!isDesktopSidebarOpen && "justify-center"}`}
-                      >
-                        <span className="material-symbols-outlined">
-                          {link.icon}
-                        </span>
-                        <p className={`${!isDesktopSidebarOpen && "hidden"}`}>
-                          {link.label}
-                        </p>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
+
+            {(isDesktopSidebarOpen || sidebarOpen) &&
+              openCategories[category.title] && (
+                <ul className="space-y-1">
+                  {category.links.map((link) => {
+                    const isActive = isLinkActive(link.href);
+                    return (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          onClick={() => setSidebarOpen(false)}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                            isActive
+                              ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-sm"
+                              : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                          } ${!isDesktopSidebarOpen && "justify-center"}`}
+                        >
+                          <span className="material-symbols-outlined text-lg">
+                            {link.icon}
+                          </span>
+                          <p className={`${!isDesktopSidebarOpen && "hidden"}`}>
+                            {link.label}
+                          </p>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
           </div>
         ))}
       </nav>
+
+      {/* Footer - Logout */}
       <div className={`px-4 py-6 mt-auto ${!isDesktopSidebarOpen && "hidden"}`}>
-        <a
+        <button
           onClick={() => {
             setSidebarOpen(false);
-            signOut({ callbackUrl: "/" }); // Redirect to homepage after logout
+            signOut({ callbackUrl: "/" });
           }}
-          className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer"
+          className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer w-full text-sm font-medium"
         >
           <span className="material-symbols-outlined">logout</span>
-          <p className="text-sm font-medium">Logout</p>
-        </a>
+          Logout
+        </button>
       </div>
     </aside>
   );
