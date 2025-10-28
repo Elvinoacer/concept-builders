@@ -33,68 +33,47 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   try {
     const { id } = params;
     const body = await request.json();
-    const {
-      name,
-      description,
-      basePrice,
-      priceRange,
-      bedrooms,
-      bathrooms,
-      area,
-      floors,
-      categoryId,
-      planDetails,
-      folderId,
-      buildingCostEstimates,
-      buildingCostFactors,
-      packageOptions,
-      files,
-      minBuildingCost,
-      maxBuildingCost,
-      faq,
-      pdfPrice,
-      cadPrice,
-      pdfAndCadPrice,
-    } = body;
 
-    if (!name || !description || !basePrice || !categoryId) {
-      return new NextResponse("Missing required fields", { status: 400 });
+    const updateData: any = {};
+
+    if ('name' in body) updateData.name = body.name;
+    if ('description' in body) updateData.description = body.description;
+    if ('basePrice' in body) updateData.basePrice = body.basePrice;
+    if ('priceRange' in body) updateData.priceRange = body.priceRange;
+    if ('bedrooms' in body) updateData.bedrooms = body.bedrooms;
+    if ('bathrooms' in body) updateData.bathrooms = body.bathrooms;
+    if ('area' in body) updateData.area = body.area;
+    if ('floors' in body) updateData.floors = body.floors;
+    if ('categoryId' in body) updateData.categoryId = body.categoryId;
+    if ('planDetails' in body) updateData.planDetails = body.planDetails;
+    if ('folderId' in body) updateData.folderId = body.folderId; // Can be null to unlink
+    if ('buildingCostEstimates' in body) updateData.buildingCostEstimates = body.buildingCostEstimates;
+    if ('buildingCostFactors' in body) updateData.buildingCostFactors = body.buildingCostFactors;
+    if ('packageOptions' in body) updateData.packageOptions = body.packageOptions;
+    if ('minBuildingCost' in body) updateData.minBuildingCost = body.minBuildingCost;
+    if ('maxBuildingCost' in body) updateData.maxBuildingCost = body.maxBuildingCost;
+    if ('faq' in body) updateData.faq = body.faq;
+    if ('pdfPrice' in body) updateData.pdfPrice = body.pdfPrice;
+    if ('cadPrice' in body) updateData.cadPrice = body.cadPrice;
+    if ('pdfAndCadPrice' in body) updateData.pdfAndCadPrice = body.pdfAndCadPrice;
+
+    // Handle files update only if 'files' is explicitly provided in the body
+    if ('files' in body && Array.isArray(body.files)) {
+      updateData.files = {
+        deleteMany: {},
+        create: body.files.map(
+          (file: { url: string; type: string; originalFileName: string }) => ({
+            url: file.url,
+            type: file.type,
+            originalFileName: file.originalFileName,
+          })
+        ),
+      };
     }
 
     const updatedDesign = await prisma.design.update({
       where: { id },
-      data: {
-        name,
-        description,
-        basePrice,
-        priceRange: priceRange || "",
-        bedrooms,
-        bathrooms,
-        area,
-        floors,
-        categoryId,
-        planDetails: planDetails || [],
-        folderId,
-        buildingCostEstimates,
-        buildingCostFactors,
-        packageOptions,
-        minBuildingCost,
-        maxBuildingCost,
-        faq,
-        pdfPrice,
-        cadPrice,
-        pdfAndCadPrice,
-        files: {
-          deleteMany: {},
-          create: files.map(
-            (file: { url: string; type: string; originalFileName: string }) => ({
-              url: file.url,
-              type: file.type,
-              originalFileName: file.originalFileName,
-            })
-          ),
-        },
-      },
+      data: updateData,
       include: {
         files: true,
         reviews: {
