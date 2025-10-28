@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function GET(request: NextRequest) {
   try {
@@ -199,6 +200,8 @@ export async function POST(request: Request) {
     const newDesign = await prisma.design.create({
       data: designData,
     });
+
+    revalidatePath('/');
 
     return NextResponse.json(newDesign, { status: 201 });
   } catch (error) {

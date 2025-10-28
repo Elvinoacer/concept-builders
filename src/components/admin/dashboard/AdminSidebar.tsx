@@ -31,11 +31,6 @@ const categorizedNavLinks = [
     title: "User Management",
     links: [
       { href: "/admin/users", label: "All Users", icon: "group" },
-      {
-        href: "/admin/custom-design-requests",
-        label: "Custom Requests",
-        icon: "design_services",
-      },
     ],
   },
   {

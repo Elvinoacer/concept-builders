@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function GET(
   request: NextRequest,
@@ -98,6 +99,8 @@ export async function PUT(
       data: updateData,
     });
 
+    revalidatePath('/');
+
     return NextResponse.json(updatedCategory);
   } catch (error) {
     console.error("Error updating category:", error);
@@ -116,6 +119,8 @@ export async function DELETE(
     await prisma.category.delete({
       where: { id: params.id },
     });
+
+    revalidatePath('/');
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {

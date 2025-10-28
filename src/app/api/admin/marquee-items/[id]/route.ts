@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -18,6 +19,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       },
     });
 
+    revalidatePath('/');
+
     return NextResponse.json(updatedMarqueeItem);
   } catch (error) {
     console.error("Error updating marquee item:", error);
@@ -32,6 +35,8 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     await prisma.marqueeItem.delete({
       where: { id },
     });
+
+    revalidatePath('/');
 
     return NextResponse.json({ message: "Marquee item deleted successfully" }, { status: 200 });
   } catch (error) {

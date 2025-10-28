@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -22,6 +23,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       where: { id },
       data: { isFeatured },
     });
+
+    revalidatePath('/');
 
     return NextResponse.json(updatedFeedback);
   } catch (error) {

@@ -1,418 +1,536 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Customer Details - Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Checkout</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <script src="https://cdn.tailwindcss.com?plugins=container-queries"></script>
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              primary: "#137fec",
-              "background-light": "#f6f7f8",
-              "background-dark": "#101922",
-              "foreground-light": "#101922",
-              "foreground-dark": "#f6f7f8",
-              "muted-light": "#6b7280",
-              "muted-dark": "#9ca3af",
-              "border-light": "#e5e7eb",
-              "border-dark": "#374151",
-            },
-            fontFamily: {
-              display: ["Inter", "sans-serif"],
-            },
-            borderRadius: {
-              DEFAULT: "0.25rem",
-              lg: "0.5rem",
-              xl: "0.75rem",
-              full: "9999px",
-            },
-          },
-        },
-      };
-    </script>
     <style>
-      .icon {
-        width: 1.5rem;
-        height: 1.5rem;
-        flex-shrink: 0;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        text-align: center;
+        padding: 20px 0;
+        margin-bottom: 30px;
+        animation: fadeIn 0.8s ease-out;
+      }
+
+      .logo {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .secure-checkout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: #27ae60;
+        font-weight: 500;
+      }
+
+      .secure-checkout i {
+        font-size: 18px;
+      }
+
+      .checkout-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+
+      @media (max-width: 768px) {
+        .checkout-container {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .order-summary {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        animation: slideInLeft 0.7s ease-out;
+      }
+
+      .order-summary h2 {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        color: #2c3e50;
+      }
+
+      .product {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .product-image {
+        width: 80px;
+        height: 80px;
+        background: #f1f3f4;
+        border-radius: 8px;
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #7f8c8d;
+      }
+
+      .product-details {
+        flex: 1;
+      }
+
+      .product-name {
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .product-price {
+        color: #e74c3c;
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .order-totals {
+        margin-top: 20px;
+      }
+
+      .total-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding: 5px 0;
+      }
+
+      .total-line.final {
+        font-weight: 700;
+        font-size: 18px;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+        margin-top: 10px;
+      }
+
+      .payment-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        animation: slideInRight 0.7s ease-out;
+      }
+
+      .payment-section h2 {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        color: #2c3e50;
+      }
+
+      .payment-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .payment-option {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .payment-option:hover {
+        border-color: #3498db;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .payment-option.active {
+        border-color: #3498db;
+        background-color: #f0f8ff;
+      }
+
+      .payment-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 20px;
+        color: white;
+      }
+
+      .paypal .payment-icon {
+        background: #003087;
+      }
+
+      .credit-card .payment-icon {
+        background: #1a1a1a;
+      }
+
+      .mpesa .payment-icon {
+        background: #00a650;
+      }
+
+      .secure-url .payment-icon {
+        background: #e74c3c;
+      }
+
+      .payment-form {
+        margin-top: 20px;
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #2c3e50;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border 0.3s;
+      }
+
+      .form-group input:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .complete-order {
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 15px;
+        font-size: 16px;
+        font-weight: 600;
+        width: 100%;
+        cursor: pointer;
+        transition:
+          background 0.3s,
+          transform 0.2s;
+        margin-top: 10px;
+      }
+
+      .complete-order:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+      }
+
+      .complete-order:active {
+        transform: translateY(0);
+      }
+
+      .security-features {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 25px;
+        color: #7f8c8d;
+        font-size: 14px;
+      }
+
+      .security-features i {
+        color: #27ae60;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .hidden {
+        display: none;
       }
     </style>
   </head>
-  <body
-    class="font-display bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark"
-  >
-    <div class="flex min-h-screen">
-      <aside
-        class="w-64 bg-white dark:bg-background-dark flex-shrink-0 border-r border-border-light dark:border-border-dark"
-      >
-        <div class="p-6">
-          <div class="flex items-center gap-3">
-            <div
-              class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-              style="
-                background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBaS63au7MQE7EDfHhgISgZyALUm00mJtKM27DBjPBUA6wX2zO0FWsNUXGNNpSh_Tz-VT2VnbMaUnKDXN7YTHM6SJ6NX-5NYl__UEABBBcFrKeYVqZjtdxOXfoEQAPt4JdofbeDJq6DADZxG2ZTXrgw75xqjFED4tuquIvzIw4JdqCfgjltqqwPVqbU-NlZVlgVFLXu6EVTK02rXXXN1MDxRL4mvQ5cSxP9itLn1R9O3VwcYOf2XYM3Jc7EWl-VybI22l6sBXdOhPmY');
-              "
-            ></div>
-            <h1
-              class="text-lg font-bold text-foreground-light dark:text-foreground-dark"
-            >
-              Acme Co.
-            </h1>
-          </div>
+  <body>
+    <div class="container">
+      <header>
+        <div class="logo">ShopEase</div>
+        <div class="secure-checkout">
+          <i class="fas fa-lock"></i>
+          <span>Secure Checkout</span>
         </div>
-        <nav class="mt-6 px-4">
-          <a
-            class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary"
-            href="#"
-          >
-            <svg
-              class="icon"
-              fill="currentColor"
-              viewBox="0 0 256 256"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M224,115.55V208a16,16,0,0,1-16,16H168a16,16,0,0,1-16-16V168a8,8,0,0,0-8-8H112a8,8,0,0,0-8,8v40a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V115.55a16,16,0,0,1,5.17-11.78l80-75.48.11-.11a16,16,0,0,1,21.53,0,1.14,1.14,0,0,0,.11.11l80,75.48A16,16,0,0,1,224,115.55Z"
-              ></path>
-            </svg>
-            <span class="text-sm font-medium">Overview</span>
-          </a>
-          <a
-            class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary"
-            href="#"
-          >
-            <svg
-              class="icon"
-              fill="currentColor"
-              viewBox="0 0 256 256"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z"
-              ></path>
-            </svg>
-            <span class="text-sm font-medium">Orders</span>
-          </a>
-          <a
-            class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary"
-            href="#"
-          >
-            <svg
-              class="icon"
-              fill="currentColor"
-              viewBox="0 0 256 256"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z"
-              ></path>
-            </svg>
-            <span class="text-sm font-medium">Projects</span>
-          </a>
-          <a
-            class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary"
-            href="#"
-          >
-            <svg
-              class="icon"
-              fill="currentColor"
-              viewBox="0 0 256 256"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M239.2,97.29a16,16,0,0,0-13.81-11L166,81.17,142.72,25.81h0a15.95,15.95,0,0,0-29.44,0L90.07,81.17,30.61,86.32a16,16,0,0,0-9.11,28.06L66.61,153.8,53.09,212.34a16,16,0,0,0,23.84,17.34l51-31,51.11,31a16,16,0,0,0,23.84-17.34l-13.51-58.6,45.1-39.36A16,16,0,0,0,239.2,97.29Zm-15.22,5-45.1,39.36a16,16,0,0,0-5.08,15.71L187.35,216v0l-51.07-31a15.9,15.9,0,0,0-16.54,0l-51,31h0L82.2,157.4a16,16,0,0,0-5.08-15.71L32,102.35a.37.37,0,0,1,0-.09l59.44-5.14a16,16,0,0,0,13.35-9.75L128,32.08l23.2,55.29a16,16,0,0,0,13.35,9.75L224,102.26S224,102.32,224,102.33Z"
-              ></path>
-            </svg>
-            <span class="text-sm font-medium">Reviews</span>
-          </a>
-          <a
-            class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary"
-            href="#"
-          >
-            <svg
-              class="icon"
-              fill="currentColor"
-              viewBox="0 0 256 256"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M178,32c-20.65,0-38.73,8.88-50,23.89C116.73,40.88,98.65,32,78,32A62.07,62.07,0,0,0,16,94c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,220.66,240,164,240,94A62.07,62.07,0,0,0,178,32ZM128,206.8C109.74,196.16,32,147.69,32,94A46.06,46.06,0,0,1,78,48c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,147.61,146.24,196.15,128,206.8Z"
-              ></path>
-            </svg>
-            <span class="text-sm font-medium">Wishlist</span>
-          </a>
-          <a
-            class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary"
-            href="#"
-          >
-            <svg
-              class="icon"
-              fill="currentColor"
-              viewBox="0 0 256 256"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"
-              ></path>
-            </svg>
-            <span class="text-sm font-medium">Folders</span>
-          </a>
-        </nav>
-      </aside>
-      <main class="flex-1 p-8">
-        <div class="flex items-center text-sm mb-8">
-          <a
-            class="text-muted-light dark:text-muted-dark hover:text-primary"
-            href="#"
-            >Customers</a
-          >
-          <span class="mx-2 text-muted-light dark:text-muted-dark">/</span>
-          <span class="text-foreground-light dark:text-foreground-dark"
-            >Customer Details</span
-          >
-        </div>
-        <div
-          class="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8"
-        >
-          <div
-            class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32"
-            style="
-              background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCP7S6Z6KZyRkqJzg37vojc_G_h3oU79oktwZxW7VsdHq_qbXF-RgyS7zF7xBCQGaMppDXSy9_xYWulMvvsYdA4YsqlKZHOlEAhVePLbkRWoVtxqv-AhFswMWqfhKpYscc82FIPtUvVY4qK434Y6dfjTzS0z1nBWkFaDZVgr0PrXaav5W0E6NKUjPSW8ybSvPBPwseoVssHbVEBDUpaBppGG_cXGCS8VDLZoVE-MTl_TlkCMT_4Z9gPyINfnau2dSCLDeCB5YH2LEIB');
-            "
-          ></div>
-          <div class="flex-1">
-            <h2
-              class="text-3xl font-bold text-foreground-light dark:text-foreground-dark"
-            >
-              Sophia Bennett
-            </h2>
-            <p class="text-muted-light dark:text-muted-dark mt-1">
-              Customer ID: 123456
-            </p>
-            <p class="text-muted-light dark:text-muted-dark">
-              Joined 2 years ago
-            </p>
-          </div>
-        </div>
-        <div class="border-b border-border-light dark:border-border-dark mb-8">
-          <nav class="flex gap-8 -mb-px">
-            <a
-              class="py-4 px-1 border-b-2 border-primary text-primary text-sm font-semibold"
-              href="#"
-              >Account</a
-            >
-            <a
-              class="py-4 px-1 border-b-2 border-transparent text-muted-light dark:text-muted-dark hover:text-primary hover:border-primary text-sm font-semibold"
-              href="#"
-              >Payment &amp; Refunds</a
-            >
-            <a
-              class="py-4 px-1 border-b-2 border-transparent text-muted-light dark:text-muted-dark hover:text-primary hover:border-primary text-sm font-semibold"
-              href="#"
-              >Analytics</a
-            >
-          </nav>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div class="lg:col-span-2 space-y-8">
-            <div
-              class="bg-white dark:bg-background-dark/50 rounded-lg p-6 border border-border-light dark:border-border-dark"
-            >
-              <h3
-                class="text-xl font-bold mb-6 text-foreground-light dark:text-foreground-dark"
-              >
-                Personal Information
-              </h3>
-              <div
-                class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm"
-              >
-                <div
-                  class="flex justify-between py-2 border-b border-border-light dark:border-border-dark sm:border-none sm:grid sm:grid-cols-2"
-                >
-                  <span class="text-muted-light dark:text-muted-dark">ID</span>
-                  <span
-                    class="text-foreground-light dark:text-foreground-dark font-medium"
-                    >789012</span
-                  >
-                </div>
-                <div
-                  class="flex justify-between py-2 border-b border-border-light dark:border-border-dark sm:border-none sm:grid sm:grid-cols-2"
-                >
-                  <span class="text-muted-light dark:text-muted-dark"
-                    >Name</span
-                  >
-                  <span
-                    class="text-foreground-light dark:text-foreground-dark font-medium"
-                    >Sophia Bennett</span
-                  >
-                </div>
-                <div
-                  class="flex justify-between py-2 border-b border-border-light dark:border-border-dark sm:border-none sm:grid sm:grid-cols-2"
-                >
-                  <span class="text-muted-light dark:text-muted-dark"
-                    >Email</span
-                  >
-                  <span
-                    class="text-foreground-light dark:text-foreground-dark font-medium"
-                    >sophia.bennett@email.com</span
-                  >
-                </div>
-                <div
-                  class="flex justify-between py-2 border-b border-border-light dark:border-border-dark sm:border-none sm:grid sm:grid-cols-2"
-                >
-                  <span class="text-muted-light dark:text-muted-dark"
-                    >Email Verified</span
-                  >
-                  <span
-                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
-                    >Yes</span
-                  >
-                </div>
-                <div
-                  class="flex justify-between py-2 border-b border-border-light dark:border-border-dark sm:border-none sm:grid sm:grid-cols-2"
-                >
-                  <span class="text-muted-light dark:text-muted-dark"
-                    >Role</span
-                  >
-                  <span
-                    class="text-foreground-light dark:text-foreground-dark font-medium"
-                    >Customer</span
-                  >
-                </div>
-                <div
-                  class="flex justify-between py-2 border-b border-border-light dark:border-border-dark sm:border-none sm:grid sm:grid-cols-2"
-                >
-                  <span class="text-muted-light dark:text-muted-dark"
-                    >Status</span
-                  >
-                  <span
-                    class="text-foreground-light dark:text-foreground-dark font-medium"
-                    >Active</span
-                  >
-                </div>
-              </div>
+      </header>
+
+      <div class="checkout-container">
+        <div class="order-summary">
+          <h2>Order Summary</h2>
+
+          <div class="product">
+            <div class="product-image">
+              <i class="fas fa-laptop"></i>
             </div>
-            <div
-              class="bg-white dark:bg-background-dark/50 rounded-lg overflow-hidden border border-border-light dark:border-border-dark"
-            >
-              <h3
-                class="text-xl font-bold p-6 text-foreground-light dark:text-foreground-dark"
-              >
-                Login History
-              </h3>
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead class="bg-background-light dark:bg-background-dark/80">
-                    <tr>
-                      <th
-                        class="px-6 py-3 text-left font-semibold text-muted-light dark:text-muted-dark tracking-wider"
-                      >
-                        Created At
-                      </th>
-                      <th
-                        class="px-6 py-3 text-left font-semibold text-muted-light dark:text-muted-dark tracking-wider"
-                      >
-                        IP Address
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody
-                    class="divide-y divide-border-light dark:divide-border-dark"
-                  >
-                    <tr>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-foreground-light dark:text-foreground-dark"
-                      >
-                        2023-01-15 10:00 AM
-                      </td>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-muted-light dark:text-muted-dark"
-                      >
-                        192.168.1.100
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-foreground-light dark:text-foreground-dark"
-                      >
-                        2023-01-16 11:00 AM
-                      </td>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-muted-light dark:text-muted-dark"
-                      >
-                        192.168.1.101
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-foreground-light dark:text-foreground-dark"
-                      >
-                        2023-01-17 12:00 PM
-                      </td>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-muted-light dark:text-muted-dark"
-                      >
-                        192.168.1.102
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+            <div class="product-details">
+              <div class="product-name">
+                Premium Laptop - 15" Display, 16GB RAM
               </div>
+              <div class="product-price">$1,299.00</div>
             </div>
           </div>
-          <div
-            class="bg-white dark:bg-background-dark/50 rounded-lg p-6 border border-border-light dark:border-border-dark h-fit"
-          >
-            <h3
-              class="text-xl font-bold mb-6 text-foreground-light dark:text-foreground-dark"
-            >
-              Social Media Accounts
-            </h3>
-            <div class="space-y-4">
-              <div
-                class="flex items-center justify-between p-4 rounded-lg bg-background-light dark:bg-background-dark/80"
-              >
-                <div>
-                  <p
-                    class="font-semibold text-foreground-light dark:text-foreground-dark"
-                  >
-                    Facebook
-                  </p>
-                  <p class="text-xs text-muted-light dark:text-muted-dark">
-                    Provider
-                  </p>
-                </div>
-                <span class="text-xs font-medium text-primary">Connected</span>
-              </div>
-              <div
-                class="flex items-center justify-between p-4 rounded-lg bg-background-light dark:bg-background-dark/80"
-              >
-                <div>
-                  <p
-                    class="font-semibold text-foreground-light dark:text-foreground-dark"
-                  >
-                    Twitter
-                  </p>
-                  <p class="text-xs text-muted-light dark:text-muted-dark">
-                    Provider
-                  </p>
-                </div>
-                <span class="text-xs font-medium text-primary">Connected</span>
-              </div>
+
+          <div class="product">
+            <div class="product-image">
+              <i class="fas fa-mouse"></i>
+            </div>
+            <div class="product-details">
+              <div class="product-name">Wireless Mouse - Ergonomic Design</div>
+              <div class="product-price">$29.99</div>
+            </div>
+          </div>
+
+          <div class="order-totals">
+            <div class="total-line">
+              <span>Subtotal</span>
+              <span>$1,328.99</span>
+            </div>
+            <div class="total-line">
+              <span>Shipping</span>
+              <span>$15.00</span>
+            </div>
+            <div class="total-line">
+              <span>Tax</span>
+              <span>$119.61</span>
+            </div>
+            <div class="total-line final">
+              <span>Total</span>
+              <span>$1,463.60</span>
             </div>
           </div>
         </div>
-      </main>
+
+        <div class="payment-section">
+          <h2>Payment Method</h2>
+
+          <div class="payment-methods">
+            <div class="payment-option paypal active" data-method="paypal">
+              <div class="payment-icon">
+                <i class="fab fa-paypal"></i>
+              </div>
+              <div class="payment-details">
+                <div class="payment-name">PayPal</div>
+                <div class="payment-desc">Pay with your PayPal account</div>
+              </div>
+            </div>
+
+            <div class="payment-option credit-card" data-method="credit-card">
+              <div class="payment-icon">
+                <i class="far fa-credit-card"></i>
+              </div>
+              <div class="payment-details">
+                <div class="payment-name">Credit Card</div>
+                <div class="payment-desc">
+                  Pay with Visa, Mastercard, or Amex
+                </div>
+              </div>
+            </div>
+
+            <div class="payment-option mpesa" data-method="mpesa">
+              <div class="payment-icon">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+              <div class="payment-details">
+                <div class="payment-name">M-Pesa</div>
+                <div class="payment-desc">Pay with your M-Pesa account</div>
+              </div>
+            </div>
+
+            <div class="payment-option secure-url" data-method="secure-url">
+              <div class="payment-icon">
+                <i class="fas fa-link"></i>
+              </div>
+              <div class="payment-details">
+                <div class="payment-name">Secure Checkout URL</div>
+                <div class="payment-desc">Get a secure payment link</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="payment-form">
+            <div id="paypal-form" class="method-form">
+              <p>
+                You will be redirected to PayPal to complete your payment
+                securely.
+              </p>
+            </div>
+
+            <div id="credit-card-form" class="method-form hidden">
+              <div class="form-group">
+                <label for="card-number">Card Number</label>
+                <input
+                  type="text"
+                  id="card-number"
+                  placeholder="1234 5678 9012 3456"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="card-name">Name on Card</label>
+                <input type="text" id="card-name" placeholder="John Doe" />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="expiry-date">Expiry Date</label>
+                  <input type="text" id="expiry-date" placeholder="MM/YY" />
+                </div>
+
+                <div class="form-group">
+                  <label for="cvv">CVV</label>
+                  <input type="text" id="cvv" placeholder="123" />
+                </div>
+              </div>
+            </div>
+
+            <div id="mpesa-form" class="method-form hidden">
+              <div class="form-group">
+                <label for="phone-number">Phone Number</label>
+                <input
+                  type="text"
+                  id="phone-number"
+                  placeholder="07XX XXX XXX"
+                />
+              </div>
+              <p>
+                You will receive a prompt on your phone to complete the payment.
+              </p>
+            </div>
+
+            <div id="secure-url-form" class="method-form hidden">
+              <div class="form-group">
+                <label for="email-address">Email Address</label>
+                <input
+                  type="email"
+                  id="email-address"
+                  placeholder="your@email.com"
+                />
+              </div>
+              <p>A secure payment link will be sent to your email address.</p>
+            </div>
+
+            <button class="complete-order">Complete Order</button>
+
+            <div class="security-features">
+              <i class="fas fa-shield-alt"></i>
+              <span>Your payment information is secure and encrypted</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const paymentOptions = document.querySelectorAll(".payment-option");
+        const methodForms = document.querySelectorAll(".method-form");
+
+        paymentOptions.forEach((option) => {
+          option.addEventListener("click", function () {
+            // Remove active class from all options
+            paymentOptions.forEach((opt) => opt.classList.remove("active"));
+
+            // Add active class to clicked option
+            this.classList.add("active");
+
+            // Get the selected payment method
+            const method = this.getAttribute("data-method");
+
+            // Hide all forms
+            methodForms.forEach((form) => form.classList.add("hidden"));
+
+            // Show the selected form
+            document
+              .getElementById(`${method}-form`)
+              .classList.remove("hidden");
+          });
+        });
+
+        // Form submission
+        const completeOrderBtn = document.querySelector(".complete-order");
+        completeOrderBtn.addEventListener("click", function () {
+          // Simple animation on button click
+          this.style.transform = "scale(0.98)";
+          setTimeout(() => {
+            this.style.transform = "scale(1)";
+            alert("Order submitted successfully!");
+          }, 150);
+        });
+      });
+    </script>
   </body>
 </html>

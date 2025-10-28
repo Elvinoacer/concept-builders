@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -38,6 +39,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       },
     });
 
+    revalidatePath('/');
+
     return NextResponse.json(updatedBanner);
   } catch (error) {
     console.error("Error updating banner:", error);
@@ -52,6 +55,8 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     await prisma.banner.delete({
       where: { id },
     });
+
+    revalidatePath('/');
 
     return NextResponse.json({ message: "Banner deleted successfully" }, { status: 200 });
   } catch (error) {
