@@ -67,14 +67,33 @@ const CreateProjectPage = () => {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // Simulate image upload - replace with actual upload logic
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-        setImageUrl(e.target?.result as string); // In real app, this would be the uploaded URL
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setLoading(true); // Indicate loading
+    setError(null); // Clear previous errors
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/files/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setImageUrl(data.url); // Set the uploaded URL
+      setImagePreview(data.url); // Update preview with the uploaded URL
+    } catch (err: any) {
+      console.error("Error uploading image:", err);
+      setError(err.message || "Failed to upload image.");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
