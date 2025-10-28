@@ -5,19 +5,19 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { projectId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id } = params;
+    const { projectId } = params;
 
     const project = await prisma.project.findUnique({
-      where: { id },
+      where: { id: projectId },
       // Include any related data that might be needed on the edit page
       // For example:
       // include: {
@@ -39,22 +39,22 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { projectId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id } = params;
+    const { projectId } = params;
     const body = await request.json();
     // Assuming body contains fields to update for a project
     // Example: { name: "New Project Name", description: "Updated description" };
 
     const updatedProject = await prisma.project.update({
-      where: { id },
+      where: { id: projectId },
       data: body, // Use body directly for now, can be refined later
     });
 
@@ -67,19 +67,19 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { projectId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id } = params;
+    const { projectId } = params;
 
     await prisma.project.delete({
-      where: { id },
+      where: { id: projectId },
     });
 
     return new NextResponse(null, { status: 204 });

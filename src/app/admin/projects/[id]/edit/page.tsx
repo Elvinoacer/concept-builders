@@ -28,8 +28,8 @@ interface Project {
 
 const EditProjectPage = () => {
   const router = useRouter();
-  const params = useParams();
-  const projectId = params.id as string;
+  const params = useParams<{ id: string }>();
+  const projectId = params?.id;
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
