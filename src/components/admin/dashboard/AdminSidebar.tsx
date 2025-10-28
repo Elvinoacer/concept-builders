@@ -23,7 +23,7 @@ const categorizedNavLinks = [
     title: "Design Management",
     links: [
       { href: "/admin/designs", label: "All Designs", icon: "folder" },
-      { href: "/admin/designs/new", label: "Add New Design", icon: "add_box" },
+      // { href: "/admin/designs/new", label: "Add New Design", icon: "add_box" },
       { href: "/admin/categories", label: "Categories", icon: "category" },
     ],
   },
