@@ -8,6 +8,14 @@ export async function middleware(req: NextRequest) {
   const isAuthenticated = !!token;
   const userRole = token?.role as string | undefined;
 
+  // If user is authenticated but has no valid role, redirect to homepage as a fallback
+  if (isAuthenticated && (!userRole || !["CLIENT", "ADMIN", "TEAM"].includes(userRole))) {
+    // Avoid redirecting away from the homepage itself
+    if (pathname !== "/") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
   const isAuthPage = pathname.startsWith("/auth");
   const isAdminPage = pathname.startsWith("/admin");
   const isClientDashboardPage = pathname.startsWith("/dashboard");

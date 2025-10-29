@@ -144,73 +144,63 @@ export const authOptions: AuthOptions = {
       return true;
     },
     async signOut({ token }) {
-      // @ts-ignore
-      const userId = token.impersonator?.id || token.user?.id;
+      const userId = (token.impersonator as { id: string })?.id || token.id;
       if (userId) {
         await prisma.user.update({
-          where: { id: userId },
+          where: { id: userId as string },
           data: { impersonatingUserId: null },
         });
       }
     },
-    async jwt ({ token, account, user }) {
-      console.log("--- JWT CALLBACK ENTERED ---");
-      console.log("JWT callback triggered");
+    async jwt({ token, user, account }) {
       // Initial sign in
       if (account && user) {
-        console.log("Initial sign in");
-        token.user = user;
+        token.id = user.id;
+        token.role = user.role;
         token.accessToken = account.access_token;
-        token.accessTokenExpires = Date.now() + (account.expires_at ?? 0) * 1000;
         token.refreshToken = account.refresh_token;
-      }
-
-      // @ts-ignore
-      const userForCheck = token.impersonator || token.user;
-      console.log("User for check:", userForCheck?.email);
-
-      if (userForCheck) {
-        // @ts-ignore
-        const userFromDb = await prisma.user.findUnique({ where: { id: userForCheck.id } });
-        console.log("User from DB:", userFromDb?.email, "Impersonating:", userFromDb?.impersonatingUserId);
-
-        // @ts-ignore
-        if (userFromDb?.impersonatingUserId) {
-          console.log("Admin is impersonating, fetching impersonated user");
-          const impersonatedUser = await prisma.user.findUnique({ where: { id: userFromDb.impersonatingUserId } });
-          if (impersonatedUser) {
-            console.log("Impersonated user found:", impersonatedUser.email);
-            token.user = impersonatedUser;
-            token.impersonator = userFromDb;
-          }
-        } else if (token.impersonator) {
-          console.log("Exiting impersonation");
-          // Exiting impersonation
-          token.user = token.impersonator;
-          delete token.impersonator;
-        }
-      }
-
-      // @ts-ignore
-      if (Date.now() < token.accessTokenExpires) {
-        console.log("Access token is valid");
+        token.accessTokenExpires = Date.now() + (account.expires_at ?? 0) * 1000;
         return token;
       }
 
-      console.log("Access token expired, refreshing...");
-      // @ts-ignore
+      // Return previous token if the access token has not expired yet
+      if (Date.now() < (token.accessTokenExpires as number)) {
+        // Fetch user from DB to get latest role and impersonation status
+        const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+        if (!dbUser) {
+          return { ...token, error: "UserNotFound" };
+        }
+
+        token.role = dbUser.role;
+
+        if (dbUser.impersonatingUserId) {
+          const impersonatedUser = await prisma.user.findUnique({ where: { id: dbUser.impersonatingUserId } });
+          if (impersonatedUser) {
+            token.id = impersonatedUser.id;
+            token.role = impersonatedUser.role;
+            token.impersonator = dbUser;
+          }
+        } else if (token.impersonator) {
+          // Exiting impersonation
+          token.id = (token.impersonator as { id: string }).id;
+          token.role = (token.impersonator as { role: string }).role;
+          delete token.impersonator;
+        }
+        
+        return token;
+      }
+
+      // Access token has expired, try to update it
       return refreshAccessToken(token);
     },
     async session({ session, token }) {
-      // @ts-ignore
-      session.user = token.user;
-      // @ts-ignore
-      session.accessToken = token.accessToken;
-      // @ts-ignore
-      session.error = token.error;
-      // @ts-ignore
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+      }
+      session.accessToken = token.accessToken as string;
+      session.error = token.error as string;
       session.impersonator = token.impersonator;
-
       return session;
     },
   },
