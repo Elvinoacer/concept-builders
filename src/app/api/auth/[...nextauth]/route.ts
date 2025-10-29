@@ -155,11 +155,15 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user, account }) {
       // Initial sign in
       if (account && user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
-        token.accessTokenExpires = Date.now() + (account.expires_at ?? 0) * 1000;
+        // Fetch the user from the database to ensure we have the latest role
+        const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.role = dbUser.role;
+          token.accessToken = account.access_token;
+          token.refreshToken = account.refresh_token;
+          token.accessTokenExpires = Date.now() + (account.expires_at ?? 0) * 1000;
+        }
         return token;
       }
 

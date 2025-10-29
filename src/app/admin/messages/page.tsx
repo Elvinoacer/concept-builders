@@ -85,6 +85,8 @@ const AdminMessagesPage = () => {
             <h2 className="text-xl font-semibold">All Conversations</h2>
             <NewClientConversationModal
               onConversationCreated={handleConversationCreated}
+              existingConversations={conversations}
+              onSelectExistingConversation={setSelectedConversation}
             />
           </div>
           <div className="mt-4">
@@ -115,9 +117,20 @@ const AdminMessagesPage = () => {
           ) : (
             <div className="overflow-y-auto h-full">
               {conversations.map((conversation) => {
-                const otherUser = conversation.users.find(
+                const otherParticipants = conversation.users.filter(
                   (user) => user.email !== session?.user?.email
                 );
+
+                let conversationDisplayName = "";
+                if (otherParticipants.length === 1) {
+                  conversationDisplayName = otherParticipants[0].name || otherParticipants[0].email;
+                } else if (otherParticipants.length > 1) {
+                  conversationDisplayName = otherParticipants.map(p => p.name || p.email).join(", ");
+                } else {
+                  conversationDisplayName = "Self Chat"; // Should not happen in a typical conversation list
+                }
+
+                const displayAvatarUser = otherParticipants[0] || session?.user; // Use the first other participant for avatar, or current user if self-chat
 
                 return (
                   <div
@@ -130,13 +143,13 @@ const AdminMessagesPage = () => {
                         <Avatar className="w-12 h-12 mr-4">
                           <AvatarImage
                             src={
-                              otherUser?.image || "/images/default-avatar.png"
+                              displayAvatarUser?.image || "/images/default-avatar.png"
                             }
                           />
                           <AvatarFallback>
-                            {otherUser?.name?.charAt(0)}
+                            {displayAvatarUser?.name?.charAt(0)}
                           </AvatarFallback>
-                          {otherUser && onlineUsers.includes(otherUser.id) && (
+                          {displayAvatarUser && onlineUsers.includes(displayAvatarUser.id) && (
                             <span className="absolute inset-y-0 inset-x-0 flex items-end justify-end z-20">
                               <span className="block h-4 w-4 rounded-full bg-green-500 ring-2 ring-white dark:ring-gray-800" />
                             </span>
@@ -146,7 +159,7 @@ const AdminMessagesPage = () => {
                       <div className="flex-1">
                         <div className="flex justify-between">
                           <div>
-                            <h3 className="font-semibold">{otherUser?.name}</h3>
+                            <h3 className="font-semibold">{conversationDisplayName}</h3>
                           </div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(
