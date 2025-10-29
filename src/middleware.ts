@@ -43,7 +43,7 @@ export async function middleware(req: NextRequest) {
   else {
     // If they try to access a protected page, redirect to login
     if (isAdminPage || isClientDashboardPage || isCartPage || isCheckoutPage) {
-      const url = new URL("/auth/login", req.url);
+      const url = new URL("/auth", req.url);
       url.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(url);
     }
