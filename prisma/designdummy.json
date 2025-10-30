@@ -1,0 +1,128 @@
+{
+  "name": "Serene Modern Villa",
+  "description": "An exquisite villa blending modern aesthetics with serene natural elements. Features an open-concept living space, large glass walls for ample natural light, and a beautifully landscaped garden with a private pool. Ideal for those who appreciate luxury and tranquility.",
+  "basePrice": 95000,
+  "priceRange": "$95k - $125k",
+  "bedrooms": 5,
+  "bathrooms": 4,
+  "area": 3200,
+  "floors": 2,
+  "planDetails": "5 Bedrooms with en-suite bathrooms\nSpacious open-plan living and dining area\nModern kitchen with island\nGourmet kitchen with high-end appliances\nPrivate home theater\nInfinity pool and landscaped garden\n3-car garage",
+  "categoryId": "clyb3z1x1000008l5g1j2h3k4",
+  "minBuildingCost": 250000,
+  "maxBuildingCost": 400000,
+  "architecturalPdfPrice": 150,
+  "architecturalCadPrice": 350,
+  "structuralPdfPrice": 120,
+  "structuralCadPrice": 300,
+  "billOfQuantitiesPrice": 180,
+  "packageOptions": [
+    {
+      "name": "Smart Home Integration",
+      "price": 2500,
+      "file": {
+        "name": "Smart_Home_Features.pdf",
+        "url": "https://example.com/files/Smart_Home_Features.pdf"
+      }
+    },
+    {
+      "name": "Interior Design Consultation",
+      "price": 1500,
+      "file": {
+        "name": "Interior_Design_Portfolio.pdf",
+        "url": "https://example.com/files/Interior_Design_Portfolio.pdf"
+      }
+    }
+  ],
+  "buildingCostFactors": [
+    {
+      "name": "Excavation and Foundation",
+      "unit": "per cubic meter",
+      "price": 120
+    },
+    {
+      "name": "Structural Steel",
+      "unit": "per ton",
+      "price": 1500
+    },
+    {
+      "name": "High-End Finishing",
+      "unit": "per sqft",
+      "price": 50
+    }
+  ],
+  "buildingCostEstimates": {
+    "basic": {
+      "description": "Standard quality finishes and materials, providing a comfortable and modern living space.",
+      "costBreakdown": [
+        {
+          "item": "General Labor",
+          "cost": 70000
+        },
+        {
+          "item": "Standard Building Materials",
+          "cost": 180000
+        }
+      ]
+    },
+    "luxury": {
+      "description": "Luxury finishes with imported materials, premium appliances, and custom fittings.",
+      "costBreakdown": [
+        {
+          "item": "Specialized Labor",
+          "cost": 120000
+        },
+        {
+          "item": "Luxury & Imported Materials",
+          "cost": 280000
+        }
+      ]
+    }
+  },
+  "architecturalDesign": {
+    "description": "Comprehensive architectural plans for the Serene Modern Villa.",
+    "overview": "Includes detailed floor plans, elevations, cross-sections, and 3D renderings to visualize the final structure.",
+    "pdfFiles": [
+      {
+        "name": "Architectural_Floor_Plans.pdf",
+        "url": "https://example.com/files/Architectural_Floor_Plans.pdf"
+      },
+      {
+        "name": "Architectural_Elevations.pdf",
+        "url": "https://example.com/files/Architectural_Elevations.pdf"
+      }
+    ],
+    "cadFiles": [
+      {
+        "name": "Full_Architectural_Model.dwg",
+        "url": "https://example.com/files/Full_Architectural_Model.dwg"
+      }
+    ]
+  },
+  "structuralDesign": {
+    "description": "Detailed structural engineering drawings and specifications.",
+    "overview": "Covers all structural elements including foundation, framing, and roof structure to ensure stability and safety.",
+    "pdfFiles": [
+      {
+        "name": "Structural_Foundation_Plan.pdf",
+        "url": "https://example.com/files/Structural_Foundation_Plan.pdf"
+      }
+    ],
+    "cadFiles": [
+      {
+        "name": "Full_Structural_Model.dwg",
+        "url": "https://example.com/files/Full_Structural_Model.dwg"
+      }
+    ]
+  },
+  "billOfQuantities": {
+    "description": "A complete bill of quantities for costing and procurement.",
+    "overview": "Provides an itemized list of all materials, parts, and labor required to construct the villa.",
+    "excelFiles": [
+      {
+        "name": "Villa_Bill_of_Quantities.xlsx",
+        "url": "https://example.com/files/Villa_Bill_of_Quantities.xlsx"
+      }
+    ]
+  }
+}

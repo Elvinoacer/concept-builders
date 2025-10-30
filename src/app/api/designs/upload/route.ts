@@ -60,6 +60,7 @@ export async function POST(request: Request) {
         "image/webp",
         "application/pdf",
       ],
+      FILE: ["application/pdf"],
     };
 
     if (!allowedFileTypesByCategory[fileTypeCategory]?.includes(fileType)) {
