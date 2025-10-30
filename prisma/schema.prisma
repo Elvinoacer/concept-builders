@@ -187,7 +187,7 @@ model Design {
   structuralPdfPrice    Float? @default(0)
   structuralCadPrice    Float? @default(0)
   billOfQuantitiesPrice Float? @default(0)
-  packageOptions        Json?
+  packageOptions        PackageOption[]
   buildingCostFactors   Json?
 
   wishlistedBy User[]
@@ -256,6 +256,7 @@ model File {
   // Existing relation to Design
   design      Design?  @relation(fields: [designId], references: [id])
   designId    String?
+  packageOption   PackageOption?
   
   createdAt   DateTime @default(now())
 }
@@ -628,3 +629,14 @@ model DesignView {
   user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 }
+
+model PackageOption {
+  id        String   @id @default(cuid())
+  name      String
+  price     Float
+  file      File?    @relation(fields: [fileId], references: [id])
+  fileId    String?  @unique
+  design    Design   @relation(fields: [designId], references: [id])
+  designId  String
+}
+

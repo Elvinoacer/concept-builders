@@ -49,7 +49,7 @@ const CreateDesignPage = () => {
   });
   
   const [packageOptions, setPackageOptions] = useState<
-    { name: string; price: string }[]
+    { name: string; price: string; file: any[] }[]
   >([]);
   const [buildingCostFactors, setBuildingCostFactors] = useState<{ name: string; unit: string; price: string }[]>([]);
     const [architecturalDesign, setArchitecturalDesign] = useState({ description: '', overview: '', pdfFiles: [], cadFiles: [] });
@@ -126,9 +126,10 @@ const CreateDesignPage = () => {
       structuralCadPrice: parseFloat(structuralCadPrice) || null,
       billOfQuantitiesPrice: parseFloat(billOfQuantitiesPrice) || null,
       packageOptions: {
-        options: packageOptions.map((option) => ({
+        create: packageOptions.map((option) => ({
           name: option.name,
           price: parseFloat(option.price) || 0,
+          file: option.file?.[0] ? { create: { name: option.file[0].name, url: option.file[0].url, type: 'FILE' } } : undefined
         })),
       },
       buildingCostFactors: {
@@ -971,37 +972,59 @@ const CreateDesignPage = () => {
                         {packageOptions.map((option, index) => (
                           <div
                             key={index}
-                            className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
+                            className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 space-y-4"
                           >
-                            <div className="space-y-2 md:col-span-2">
-                              <Label className="text-sm font-medium">
-                                Package Name
-                              </Label>
-                              <Input
-                                placeholder="e.g., Premium Support, 3D Visualization, etc."
-                                value={option.name}
-                                onChange={(e) => {
-                                  const newOptions = [...packageOptions];
-                                  newOptions[index].name = e.target.value;
-                                  setPackageOptions(newOptions);
-                                }}
-                                className="rounded-lg"
-                              />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium">
+                                  Package Name
+                                </Label>
+                                <Input
+                                  placeholder="e.g., Premium Support"
+                                  value={option.name}
+                                  onChange={(e) => {
+                                    const newOptions = [...packageOptions];
+                                    newOptions[index].name = e.target.value;
+                                    setPackageOptions(newOptions);
+                                  }}
+                                  className="rounded-lg"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium">
+                                  Price ($)
+                                </Label>
+                                <Input
+                                  placeholder="e.g., 500"
+                                  type="number"
+                                  value={option.price}
+                                  onChange={(e) => {
+                                    const newOptions = [...packageOptions];
+                                    newOptions[index].price = e.target.value;
+                                    setPackageOptions(newOptions);
+                                  }}
+                                  className="rounded-lg"
+                                />
+                              </div>
                             </div>
                             <div className="space-y-2">
                               <Label className="text-sm font-medium">
-                                Price ($)
+                                Package File (Optional)
                               </Label>
-                              <Input
-                                placeholder="e.g., 500"
-                                type="number"
-                                value={option.price}
-                                onChange={(e) => {
+                              <FileUpload
+                                onUploadSuccess={(files) => {
                                   const newOptions = [...packageOptions];
-                                  newOptions[index].price = e.target.value;
+                                  newOptions[index].file = files;
                                   setPackageOptions(newOptions);
                                 }}
-                                className="rounded-lg"
+                                onFileRemove={() => {
+                                  const newOptions = [...packageOptions];
+                                  newOptions[index].file = [];
+                                  setPackageOptions(newOptions);
+                                }}
+                                initialFiles={option.file}
+                                fileTypeCategory="FILE"
+                                multiple={false}
                               />
                             </div>
                             <Button
@@ -1013,7 +1036,7 @@ const CreateDesignPage = () => {
                                 newOptions.splice(index, 1);
                                 setPackageOptions(newOptions);
                               }}
-                              className="h-10 md:col-span-3"
+                              className="w-full h-10 mt-2"
                             >
                               Remove Package
                             </Button>
@@ -1027,7 +1050,7 @@ const CreateDesignPage = () => {
                           onClick={() =>
                             setPackageOptions([
                               ...packageOptions,
-                              { name: "", price: "" },
+                              { name: "", price: "", file: [] },
                             ])
                           }
                           className="rounded-lg"

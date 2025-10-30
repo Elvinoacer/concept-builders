@@ -41,7 +41,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
     luxury: { description: '', costBreakdown: [{ item: '', cost: '' }] },
   });
   
-  const [packageOptions, setPackageOptions] = useState<{ name: string; price: string }[]>([]);
+  const [packageOptions, setPackageOptions] = useState<{ name: string; price: string; file: any[] }[]>([]);
   const [buildingCostFactors, setBuildingCostFactors] = useState<{ name: string; unit: string; price: string }[]>([]);
   const [architecturalDesign, setArchitecturalDesign] = useState({ description: '', overview: '', pdfFiles: [], cadFiles: [] });
   const [structuralDesign, setStructuralDesign] = useState({ description: '', overview: '', pdfFiles: [], cadFiles: [] });
@@ -99,7 +99,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
       setStructuralPdfPrice(designToEdit.structuralPdfPrice?.toString() || "");
       setStructuralCadPrice(designToEdit.structuralCadPrice?.toString() || "");
       setBillOfQuantitiesPrice(designToEdit.billOfQuantitiesPrice?.toString() || "");
-      setPackageOptions(designToEdit.packageOptions?.options || []);
+      setPackageOptions(designToEdit.packageOptions.map(opt => ({ ...opt, price: opt.price.toString(), file: opt.file ? [opt.file] : [] })) || []);
       setBuildingCostFactors(designToEdit.buildingCostFactors?.options || []);
     }
   }, [designToEdit, isEditMode]);
@@ -150,9 +150,10 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
       structuralCadPrice: parseFloat(structuralCadPrice) || null,
       billOfQuantitiesPrice: parseFloat(billOfQuantitiesPrice) || null,
       packageOptions: {
-        options: packageOptions.map(option => ({
+        create: packageOptions.map(option => ({
           name: option.name,
-          price: parseFloat(option.price) || 0
+          price: parseFloat(option.price) || 0,
+          file: option.file?.[0] ? { create: { name: option.file[0].name, url: option.file[0].url, type: 'FILE' } } : undefined
         }))
       },
       buildingCostFactors: {
@@ -429,36 +430,53 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
               <div className="space-y-4">
                 <h3 className="text-lg font-medium leading-6">Package Options (Fixed Price Add-ons)</h3>
                 {packageOptions.map((option, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <Input
-                      placeholder="Option Name"
-                      value={option.name}
-                      onChange={(e) => {
+                  <div key={index} className="p-4 border rounded-md space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        placeholder="Option Name"
+                        value={option.name}
+                        onChange={(e) => {
+                          const newOptions = [...packageOptions];
+                          newOptions[index].name = e.target.value;
+                          setPackageOptions(newOptions);
+                        }}
+                      />
+                      <Input
+                        placeholder="Price"
+                        type="number"
+                        value={option.price}
+                        onChange={(e) => {
+                          const newOptions = [...packageOptions];
+                          newOptions[index].price = e.target.value;
+                          setPackageOptions(newOptions);
+                        }}
+                      />
+                      <Button type="button" variant="destructive" size="sm" onClick={() => {
                         const newOptions = [...packageOptions];
-                        newOptions[index].name = e.target.value;
+                        newOptions.splice(index, 1);
+                        setPackageOptions(newOptions);
+                      }}>
+                        Remove
+                      </Button>
+                    </div>
+                    <FileUpload
+                      onUploadSuccess={(files) => {
+                        const newOptions = [...packageOptions];
+                        newOptions[index].file = files;
                         setPackageOptions(newOptions);
                       }}
-                    />
-                    <Input
-                      placeholder="Price"
-                      type="number"
-                      value={option.price}
-                      onChange={(e) => {
+                      onFileRemove={() => {
                         const newOptions = [...packageOptions];
-                        newOptions[index].price = e.target.value;
+                        newOptions[index].file = [];
                         setPackageOptions(newOptions);
                       }}
+                      initialFiles={option.file}
+                      fileTypeCategory="FILE"
+                      multiple={false}
                     />
-                    <Button type="button" variant="destructive" size="sm" onClick={() => {
-                      const newOptions = [...packageOptions];
-                      newOptions.splice(index, 1);
-                      setPackageOptions(newOptions);
-                    }}>
-                      Remove
-                    </Button>
                   </div>
                 ))}
-                <Button type="button" variant="outline" size="sm" onClick={() => setPackageOptions([...packageOptions, { name: '', price: '' }])}>
+                <Button type="button" variant="outline" size="sm" onClick={() => setPackageOptions([...packageOptions, { name: '', price: '', file: [] }])}>
                   Add Package Option
                 </Button>
               </div>
