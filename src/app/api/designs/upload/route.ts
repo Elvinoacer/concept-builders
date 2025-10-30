@@ -61,6 +61,7 @@ export async function POST(request: Request) {
         "application/pdf",
       ],
       FILE: ["application/pdf"],
+      EXCEL: ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
     };
 
     if (!allowedFileTypesByCategory[fileTypeCategory]?.includes(fileType)) {

@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { FiFile, FiTrash, FiX } from 'react-icons/fi';
 import { CgSpinner } from "react-icons/cg";
 import { ProgressBar } from '@/components/ui/progress';
+import { toast } from 'sonner';
 
 interface FileUploadProps {
   onUploadSuccess: (files: { url: string; type: string; originalFileName: string }[]) => void;
@@ -39,18 +40,19 @@ const FileUpload = ({
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: any[]) => {
+      if (fileRejections.length > 0) {
+        fileRejections.forEach(({ file, errors }) => {
+          errors.forEach((error: any) => {
+            toast.error(`${file.name}: ${error.message}`);
+          });
+        });
+      }
+
       const newUploadingFiles: UploadingFile[] = acceptedFiles.map((file) => ({
         file,
         progress: 0,
       }));
       setUploadingFiles((prev) => [...prev, ...newUploadingFiles]);
-
-      const validationErrors: UploadingFile[] = fileRejections.map(({ file, errors }: any) => ({
-        file,
-        progress: 0,
-        error: errors.map((e: any) => e.message).join(', '),
-      }));
-      setUploadingFiles((prev) => [...prev, ...validationErrors]);
 
       const newFilesData = await Promise.all(
         acceptedFiles.map(async (file) => {

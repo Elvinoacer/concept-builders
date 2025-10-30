@@ -170,6 +170,8 @@ model Design {
   billOfQuantities    DesignDocuments? @relation("BillOfQuantities")
   
   planDetails String[]
+  images      File[]   @relation("DesignImages")
+  floorPlans  File[]   @relation("DesignFloorPlans")
   files       File[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -256,6 +258,13 @@ model File {
   // Existing relation to Design
   design      Design?  @relation(fields: [designId], references: [id])
   designId    String?
+
+  designImage   Design?  @relation("DesignImages", fields: [designImageId], references: [id])
+  designImageId String?
+
+  designFloorPlan   Design?  @relation("DesignFloorPlans", fields: [designFloorPlanId], references: [id])
+  designFloorPlanId String?
+
   packageOption   PackageOption?
   
   createdAt   DateTime @default(now())
@@ -266,6 +275,7 @@ enum FileType {
   CAD
   EXCEL
   IMAGE
+  FLOOR_PLAN
   OTHER
 }
 

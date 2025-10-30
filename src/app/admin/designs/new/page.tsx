@@ -60,6 +60,8 @@ const CreateDesignPage = () => {
   const [structuralPdfPrice, setStructuralPdfPrice] = useState("");
   const [structuralCadPrice, setStructuralCadPrice] = useState("");
   const [billOfQuantitiesPrice, setBillOfQuantitiesPrice] = useState("");
+  const [images, setImages] = useState<any[]>([]);
+  const [floorPlans, setFloorPlans] = useState<any[]>([]);
 
   const [activeSection, setActiveSection] = useState("basic");
 
@@ -204,6 +206,20 @@ const CreateDesignPage = () => {
             })),
           },
         },
+      },
+      images: {
+        create: images.map((file: any) => ({
+          name: file.name,
+          url: file.url,
+          type: 'IMAGE',
+        })),
+      },
+      floorPlans: {
+        create: floorPlans.map((file: any) => ({
+          name: file.name,
+          url: file.url,
+          type: 'FLOOR_PLAN',
+        })),
       },
     };
 
@@ -474,7 +490,7 @@ const CreateDesignPage = () => {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="area" className="text-sm font-medium">
-                            Area (sq ft)
+                            Area (sq mt)
                           </Label>
                           <Input
                             id="area"
@@ -691,6 +707,36 @@ const CreateDesignPage = () => {
                               fileTypeCategory="EXCEL"
                               multiple
                               accept=".xls, .xlsx"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-lg font-medium leading-6">General Images</h3>
+                          <div className="mt-4">
+                            <Label>Images</Label>
+                            <FileUpload
+                              onUploadSuccess={(files) => setImages(prev => [...prev, ...files])}
+                              onFileRemove={(fileUrl) => setImages(prev => prev.filter(f => f.url !== fileUrl))}
+                              initialFiles={images}
+                              fileTypeCategory="IMAGE"
+                              multiple
+                              accept="image/jpeg, image/png, image/gif, image/webp"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-lg font-medium leading-6">Floor Plans</h3>
+                          <div className="mt-4">
+                            <Label>Floor Plans</Label>
+                            <FileUpload
+                              onUploadSuccess={(files) => setFloorPlans(prev => [...prev, ...files])}
+                              onFileRemove={(fileUrl) => setFloorPlans(prev => prev.filter(f => f.url !== fileUrl))}
+                              initialFiles={floorPlans}
+                              fileTypeCategory="FLOOR_PLAN"
+                              multiple
+                              accept="image/jpeg, image/png, image/gif, image/webp, application/pdf"
                             />
                           </div>
                         </div>
@@ -1025,6 +1071,7 @@ const CreateDesignPage = () => {
                                 initialFiles={option.file}
                                 fileTypeCategory="FILE"
                                 multiple={false}
+                                accept="application/pdf"
                               />
                             </div>
                             <Button

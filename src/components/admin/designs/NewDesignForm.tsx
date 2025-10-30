@@ -51,6 +51,8 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
   const [structuralPdfPrice, setStructuralPdfPrice] = useState("");
   const [structuralCadPrice, setStructuralCadPrice] = useState("");
   const [billOfQuantitiesPrice, setBillOfQuantitiesPrice] = useState("");
+  const [images, setImages] = useState<any[]>([]);
+  const [floorPlans, setFloorPlans] = useState<any[]>([]);
 
   const isEditMode = Boolean(designToEdit);
 
@@ -101,6 +103,8 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
       setBillOfQuantitiesPrice(designToEdit.billOfQuantitiesPrice?.toString() || "");
       setPackageOptions(designToEdit.packageOptions.map(opt => ({ ...opt, price: opt.price.toString(), file: opt.file ? [opt.file] : [] })) || []);
       setBuildingCostFactors(designToEdit.buildingCostFactors?.options || []);
+      setImages(designToEdit.images || []);
+      setFloorPlans(designToEdit.floorPlans || []);
     }
   }, [designToEdit, isEditMode]);
 
@@ -226,6 +230,20 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
             })),
           },
         },
+      },
+      images: {
+        create: images.map((file: any) => ({
+          name: file.name,
+          url: file.url,
+          type: 'IMAGE',
+        })),
+      },
+      floorPlans: {
+        create: floorPlans.map((file: any) => ({
+          name: file.name,
+          url: file.url,
+          type: 'FLOOR_PLAN',
+        })),
       },
     };
 
@@ -473,6 +491,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
                       initialFiles={option.file}
                       fileTypeCategory="FILE"
                       multiple={false}
+                      accept="application/pdf"
                     />
                   </div>
                 ))}
@@ -568,6 +587,36 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
                     fileTypeCategory="EXCEL"
                     multiple
                     accept=".xls, .xlsx"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium leading-6">General Images</h3>
+                <div>
+                  <Label>Images</Label>
+                  <FileUpload
+                    onUploadSuccess={(files) => setImages(prev => [...prev, ...files])}
+                    onFileRemove={(fileUrl) => setImages(prev => prev.filter(f => f.url !== fileUrl))}
+                    initialFiles={images}
+                    fileTypeCategory="IMAGE"
+                    multiple
+                    accept="image/jpeg, image/png, image/gif, image/webp"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium leading-6">Floor Plans</h3>
+                <div>
+                  <Label>Floor Plans</Label>
+                  <FileUpload
+                    onUploadSuccess={(files) => setFloorPlans(prev => [...prev, ...files])}
+                    onFileRemove={(fileUrl) => setFloorPlans(prev => prev.filter(f => f.url !== fileUrl))}
+                    initialFiles={floorPlans}
+                    fileTypeCategory="FLOOR_PLAN"
+                    multiple
+                    accept="image/jpeg, image/png, image/gif, image/webp, application/pdf"
                   />
                 </div>
               </div>
