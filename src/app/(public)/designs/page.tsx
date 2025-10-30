@@ -76,6 +76,23 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
           },
         },
         category: true,
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
       },
     }),
     prisma.design.count({

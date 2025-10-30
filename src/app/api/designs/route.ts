@@ -118,6 +118,23 @@ export async function GET(request: NextRequest) {
           },
         },
         orderItems: true,
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
       },
       orderBy,
     });
@@ -184,14 +201,61 @@ export async function POST(request: Request) {
       pdfPrice,
       cadPrice,
       pdfAndCadPrice,
-      files: {
-        create: files.map(
-          (file: { url: string; type: string; originalFileName: string }) => ({
-            url: file.url,
-            type: file.type,
-            originalFileName: file.originalFileName,
-          })
-        ),
+      architecturalDesign: {
+        create: {
+          type: 'ARCHITECTURAL',
+          description: body.architecturalDesign.description,
+          overview: body.architecturalDesign.overview,
+          pdfFiles: {
+            create: body.architecturalDesign.pdfFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'PDF',
+            })),
+          },
+          cadFiles: {
+            create: body.architecturalDesign.cadFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'CAD',
+            })),
+          },
+        },
+      },
+      structuralDesign: {
+        create: {
+          type: 'STRUCTURAL',
+          description: body.structuralDesign.description,
+          overview: body.structuralDesign.overview,
+          pdfFiles: {
+            create: body.structuralDesign.pdfFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'PDF',
+            })),
+          },
+          cadFiles: {
+            create: body.structuralDesign.cadFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'CAD',
+            })),
+          },
+        },
+      },
+      billOfQuantities: {
+        create: {
+          type: 'BILL_OF_QUANTITIES',
+          description: body.billOfQuantities.description,
+          overview: body.billOfQuantities.overview,
+          excelFiles: {
+            create: body.billOfQuantities.excelFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'EXCEL',
+            })),
+          },
+        },
       },
     };
 

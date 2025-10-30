@@ -45,9 +45,11 @@ export async function DELETE(
                 id: true,
                 name: true,
                 basePrice: true,
-                pdfPrice: true,
-                cadPrice: true,
-                pdfAndCadPrice: true,
+                architecturalPdfPrice: true,
+                architecturalCadPrice: true,
+                structuralPdfPrice: true,
+                structuralCadPrice: true,
+                billOfQuantitiesPrice: true,
                 packageOptions: true,
                 files: {
                   where: { type: 'IMAGE' },
@@ -62,15 +64,6 @@ export async function DELETE(
         },
       },
     });
-
-    const frontendCartItems = updatedCart?.items.map((item) => ({
-      ...item.design,
-      cartItemId: item.id,
-      quantity: item.quantity,
-      selectedFileType: item.selectedFileType,
-      selectedPackage: item.selectedPackage,
-      selectedExtras: item.selectedExtras,
-    })) || [];
 
     return NextResponse.json(frontendCartItems);
 
@@ -101,7 +94,7 @@ export async function PUT(
   try {
     const userId = session.user.id;
     const body = await req.json();
-    const { quantity, selectedFileType, selectedPackage, selectedExtras } = body;
+    const { quantity, selectedDocuments, selectedPackage, selectedExtras } = body;
 
     const userCart = await prisma.cart.findUnique({
       where: { userId },
@@ -128,7 +121,7 @@ export async function PUT(
       },
       data: {
         quantity,
-        selectedFileType,
+        selectedDocuments,
         selectedPackage,
         selectedExtras,
       },
@@ -145,9 +138,11 @@ export async function PUT(
                 id: true,
                 name: true,
                 basePrice: true,
-                pdfPrice: true,
-                cadPrice: true,
-                pdfAndCadPrice: true,
+                architecturalPdfPrice: true,
+                architecturalCadPrice: true,
+                structuralPdfPrice: true,
+                structuralCadPrice: true,
+                billOfQuantitiesPrice: true,
                 packageOptions: true,
                 files: {
                   where: { type: 'IMAGE' },
@@ -167,7 +162,7 @@ export async function PUT(
       ...item.design,
       cartItemId: item.id,
       quantity: item.quantity,
-      selectedFileType: item.selectedFileType,
+      selectedDocuments: item.selectedDocuments,
       selectedPackage: item.selectedPackage,
       selectedExtras: item.selectedExtras,
     })) || [];

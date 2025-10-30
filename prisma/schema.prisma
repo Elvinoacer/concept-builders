@@ -163,6 +163,12 @@ model Design {
   bathrooms   Int?
   area        Float?
   floors      Int?
+  
+  // Organized file structure
+  architecturalDesign DesignDocuments? @relation("ArchitecturalDesign")
+  structuralDesign    DesignDocuments? @relation("StructuralDesign")
+  billOfQuantities    DesignDocuments? @relation("BillOfQuantities")
+  
   planDetails String[]
   files       File[]
   createdAt   DateTime @default(now())
@@ -174,9 +180,13 @@ model Design {
   minBuildingCost       Float?
   maxBuildingCost       Float?
   faq                   Json[]
-  pdfPrice              Float? @default(0)
-  cadPrice              Float? @default(0)
-  pdfAndCadPrice        Float? @default(0)
+  
+  // Pricing for different packages
+  architecturalPdfPrice Float? @default(0)
+  architecturalCadPrice Float? @default(0)
+  structuralPdfPrice    Float? @default(0)
+  structuralCadPrice    Float? @default(0)
+  billOfQuantitiesPrice Float? @default(0)
   packageOptions        Json?
   buildingCostFactors   Json?
 
@@ -192,25 +202,70 @@ model Design {
   designViews  DesignView[]
 }
 
+// New model to organize design documents by type
+model DesignDocuments {
+  id          String   @id @default(cuid())
+  type        DocumentType // ARCHITECTURAL, STRUCTURAL, BILL_OF_QUANTITIES
+  description String?  // Overview of what this document package contains
+  
+  // File references
+  pdfFiles    File[]   @relation("PdfDocuments")
+  cadFiles    File[]   @relation("CadDocuments")
+  excelFiles  File[]   @relation("ExcelDocuments")
+  
+  // Overview/content description
+  overview    String?
+  features    String[]
+  specifications Json? // Can store structured spec data
+  
+  design      Design?   @relation(name: "ArchitecturalDesign", fields: [architecturalDesignId], references: [id], onDelete: Cascade)
+  architecturalDesignId String? @unique
+  structuralDesign      Design?   @relation(name: "StructuralDesign", fields: [structuralDesignId], references: [id], onDelete: Cascade)
+  structuralDesignId String? @unique
+  billOfQuantities      Design?   @relation(name: "BillOfQuantities", fields: [billOfQuantitiesId], references: [id], onDelete: Cascade)
+  billOfQuantitiesId String? @unique
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum DocumentType {
+  ARCHITECTURAL
+  STRUCTURAL 
+  BILL_OF_QUANTITIES
+}
+
+// Updated File model to support document types
 model File {
-  id               String   @id @default(cuid())
-  url              String
-  type             FileType
-  design           Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
-  designId         String
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  version          Int      @default(1)
-  isLatest         Boolean  @default(true)
-  originalFileName String?
-  fileIdentifier   String?
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  type        FileType
+  size        Int?
+  
+  // Relations to different document types
+  pdfDocument    DesignDocuments? @relation("PdfDocuments", fields: [pdfDocumentId], references: [id])
+  pdfDocumentId  String?
+  
+  cadDocument    DesignDocuments? @relation("CadDocuments", fields: [cadDocumentId], references: [id])
+  cadDocumentId  String?
+  
+  excelDocument  DesignDocuments? @relation("ExcelDocuments", fields: [excelDocumentId], references: [id])
+  excelDocumentId String?
+  
+  // Existing relation to Design
+  design      Design?  @relation(fields: [designId], references: [id])
+  designId    String?
+  
+  createdAt   DateTime @default(now())
 }
 
 enum FileType {
-  CAD
   PDF
+  CAD
+  EXCEL
   IMAGE
-  FLOOR_PLAN
+  OTHER
 }
 
 model Review {

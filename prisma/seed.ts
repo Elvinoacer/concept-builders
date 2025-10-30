@@ -178,8 +178,41 @@ async function main() {
           area: design.area,
           floors: design.floors,
           planDetails: design.planDetails,
-          files: {
-            create: design.files
+          architecturalDesign: {
+            create: {
+              type: 'ARCHITECTURAL',
+              description: 'Architectural drawings',
+              overview: 'Architectural drawings overview',
+              pdfFiles: {
+                create: [{ name: 'architectural.pdf', url: '/files/architectural.pdf', type: 'PDF' }]
+              },
+              cadFiles: {
+                create: [{ name: 'architectural.cad', url: '/files/architectural.cad', type: 'CAD' }]
+              }
+            }
+          },
+          structuralDesign: {
+            create: {
+              type: 'STRUCTURAL',
+              description: 'Structural drawings',
+              overview: 'Structural drawings overview',
+              pdfFiles: {
+                create: [{ name: 'structural.pdf', url: '/files/structural.pdf', type: 'PDF' }]
+              },
+              cadFiles: {
+                create: [{ name: 'structural.cad', url: '/files/structural.cad', type: 'CAD' }]
+              }
+            }
+          },
+          billOfQuantities: {
+            create: {
+              type: 'BILL_OF_QUANTITIES',
+              description: 'Bill of Quantities',
+              overview: 'Bill of Quantities overview',
+              excelFiles: {
+                create: [{ name: 'boq.xlsx', url: '/files/boq.xlsx', type: 'EXCEL' }]
+              }
+            }
           }
         },
       });

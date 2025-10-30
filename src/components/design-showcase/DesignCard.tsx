@@ -31,6 +31,11 @@ interface Design {
   discounts?: Discount[];
   orderItems?: OrderItem[];
   basePrice: number;
+  architecturalPdfPrice?: number;
+  architecturalCadPrice?: number;
+  structuralPdfPrice?: number;
+  structuralCadPrice?: number;
+  billOfQuantitiesPrice?: number;
   minBuildingCost?: number;
   maxBuildingCost?: number;
 }
@@ -49,6 +54,14 @@ const DesignCard: React.FC<DesignCardProps> = ({ design, index, showDetails = tr
   const isBestSeller = design.orderItems && design.orderItems.length > 10;
 
   const imageUrl = design.files?.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.png";
+
+  const minPrice = design.basePrice;
+  const maxPrice = design.basePrice +
+    (design.architecturalPdfPrice || 0) +
+    (design.architecturalCadPrice || 0) +
+    (design.structuralPdfPrice || 0) +
+    (design.structuralCadPrice || 0) +
+    (design.billOfQuantitiesPrice || 0);
 
   return (
     <motion.div
@@ -102,7 +115,7 @@ const DesignCard: React.FC<DesignCardProps> = ({ design, index, showDetails = tr
               </p>
             ) : (
               <p className="text-lg font-semibold text-slate-800 dark:text-white">
-                {formatCurrency(design.basePrice)}
+                {minPrice === maxPrice ? formatCurrency(minPrice) : `${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}`}
               </p>
             )}
           </div>

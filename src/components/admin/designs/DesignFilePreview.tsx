@@ -33,7 +33,14 @@ const DesignFilePreview = ({ designId }: DesignFilePreviewProps) => {
     try {
       const response = await fetch(`/api/designs/${designId}`);
       const data = await response.json();
-      setFiles(data.files || []);
+      const allFiles = [
+        ...(data.architecturalDesign?.pdfFiles || []),
+        ...(data.architecturalDesign?.cadFiles || []),
+        ...(data.structuralDesign?.pdfFiles || []),
+        ...(data.structuralDesign?.cadFiles || []),
+        ...(data.billOfQuantities?.excelFiles || []),
+      ];
+      setFiles(allFiles);
     } catch (error) {
       console.error("Error fetching design files:", error);
     } finally {

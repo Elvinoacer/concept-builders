@@ -21,7 +21,27 @@ export async function GET(request: Request) {
     const [designs, totalCount] = await prisma.$transaction([
       prisma.design.findMany({
         where: whereClause,
-        include: { category: true, files: true },
+        include: { 
+        category: true, 
+        files: true,
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
+      },
         orderBy: { createdAt: "desc" },
         skip: skip,
         take: pageSize,

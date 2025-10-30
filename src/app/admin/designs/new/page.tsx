@@ -40,22 +40,26 @@ const CreateDesignPage = () => {
   const [categoryId, setCategoryId] = useState("");
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [files, setFiles] = useState([]);
+  
   const [minBuildingCost, setMinBuildingCost] = useState("");
   const [maxBuildingCost, setMaxBuildingCost] = useState("");
   const [buildingCostEstimates, setBuildingCostEstimates] = useState({
     basic: { description: "", costBreakdown: [{ item: "", cost: "" }] },
     luxury: { description: "", costBreakdown: [{ item: "", cost: "" }] },
   });
-  const [pdfPrice, setPdfPrice] = useState("");
-  const [cadPrice, setCadPrice] = useState("");
-  const [pdfAndCadPrice, setPdfAndCadPrice] = useState("");
+  
   const [packageOptions, setPackageOptions] = useState<
     { name: string; price: string }[]
   >([]);
-  const [buildingCostFactors, setBuildingCostFactors] = useState<
-    { name: string; unit: string; price: string }[]
-  >([]);
+  const [buildingCostFactors, setBuildingCostFactors] = useState<{ name: string; unit: string; price: string }[]>([]);
+    const [architecturalDesign, setArchitecturalDesign] = useState({ description: '', overview: '', pdfFiles: [], cadFiles: [] });
+    const [structuralDesign, setStructuralDesign] = useState({ description: '', overview: '', pdfFiles: [], cadFiles: [] });
+    const [billOfQuantities, setBillOfQuantities] = useState({ description: '', overview: '', excelFiles: [] });
+  const [architecturalPdfPrice, setArchitecturalPdfPrice] = useState("");
+  const [architecturalCadPrice, setArchitecturalCadPrice] = useState("");
+  const [structuralPdfPrice, setStructuralPdfPrice] = useState("");
+  const [structuralCadPrice, setStructuralCadPrice] = useState("");
+  const [billOfQuantitiesPrice, setBillOfQuantitiesPrice] = useState("");
 
   const [activeSection, setActiveSection] = useState("basic");
 
@@ -74,31 +78,7 @@ const CreateDesignPage = () => {
     fetchCategories();
   }, []);
 
-  const handleUploadSuccess = (
-    newFiles: { url: string; type: string; originalFileName: string }[]
-  ) => {
-    setFiles(prevFiles => [...prevFiles, ...newFiles]);
-  };
-
-  const handleFileRemove = async (fileUrl: string) => {
-    try {
-      const key = new URL(fileUrl).pathname.substring(1);
-
-      await fetch("/api/designs/delete-uploaded-file", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ key }),
-      });
-
-      setFiles(files.filter((file: any) => file.url !== fileUrl));
-      toast.success("File deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting file:", error);
-      toast.error("Failed to delete file.");
-    }
-  };
+  
 
   const handleCostBreakdownChange = (
     tier: "basic" | "luxury",
@@ -140,9 +120,11 @@ const CreateDesignPage = () => {
       categoryId,
       minBuildingCost: parseFloat(minBuildingCost) || null,
       maxBuildingCost: parseFloat(maxBuildingCost) || null,
-      pdfPrice: parseFloat(pdfPrice) || null,
-      cadPrice: parseFloat(cadPrice) || null,
-      pdfAndCadPrice: parseFloat(pdfAndCadPrice) || null,
+      architecturalPdfPrice: parseFloat(architecturalPdfPrice) || null,
+      architecturalCadPrice: parseFloat(architecturalCadPrice) || null,
+      structuralPdfPrice: parseFloat(structuralPdfPrice) || null,
+      structuralCadPrice: parseFloat(structuralCadPrice) || null,
+      billOfQuantitiesPrice: parseFloat(billOfQuantitiesPrice) || null,
       packageOptions: {
         options: packageOptions.map((option) => ({
           name: option.name,
@@ -166,11 +148,62 @@ const CreateDesignPage = () => {
           })),
         })
       ),
-      files: files.map((file: any) => ({
-        url: file.url,
-        type: file.type,
-        originalFileName: file.originalFileName,
-      })),
+      architecturalDesign: {
+        create: {
+          type: 'ARCHITECTURAL',
+          description: architecturalDesign.description,
+          overview: architecturalDesign.overview,
+          pdfFiles: {
+            create: architecturalDesign.pdfFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'PDF',
+            })),
+          },
+          cadFiles: {
+            create: architecturalDesign.cadFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'CAD',
+            })),
+          },
+        },
+      },
+      structuralDesign: {
+        create: {
+          type: 'STRUCTURAL',
+          description: structuralDesign.description,
+          overview: structuralDesign.overview,
+          pdfFiles: {
+            create: structuralDesign.pdfFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'PDF',
+            })),
+          },
+          cadFiles: {
+            create: structuralDesign.cadFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'CAD',
+            })),
+          },
+        },
+      },
+      billOfQuantities: {
+        create: {
+          type: 'BILL_OF_QUANTITIES',
+          description: billOfQuantities.description,
+          overview: billOfQuantities.overview,
+          excelFiles: {
+            create: billOfQuantities.excelFiles.map((file: any) => ({
+              name: file.name,
+              url: file.url,
+              type: 'EXCEL',
+            })),
+          },
+        },
+      },
     };
 
     try {
@@ -525,57 +558,31 @@ const CreateDesignPage = () => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor="pdfPrice"
-                            className="text-sm font-medium"
-                          >
-                            PDF Price ($)
-                          </Label>
-                          <Input
-                            id="pdfPrice"
-                            name="pdfPrice"
-                            type="number"
-                            value={pdfPrice}
-                            onChange={(e) => setPdfPrice(e.target.value)}
-                            placeholder="e.g., 0"
-                            className="rounded-xl"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor="cadPrice"
-                            className="text-sm font-medium"
-                          >
-                            CAD Price ($)
-                          </Label>
-                          <Input
-                            id="cadPrice"
-                            name="cadPrice"
-                            type="number"
-                            value={cadPrice}
-                            onChange={(e) => setCadPrice(e.target.value)}
-                            placeholder="e.g., 100"
-                            className="rounded-xl"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor="pdfAndCadPrice"
-                            className="text-sm font-medium"
-                          >
-                            PDF & CAD Price ($)
-                          </Label>
-                          <Input
-                            id="pdfAndCadPrice"
-                            name="pdfAndCadPrice"
-                            type="number"
-                            value={pdfAndCadPrice}
-                            onChange={(e) => setPdfAndCadPrice(e.target.value)}
-                            placeholder="e.g., 150"
-                            className="rounded-xl"
-                          />
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                          Document Pricing
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="architecturalPdfPrice">Architectural PDF Price</Label>
+                            <Input id="architecturalPdfPrice" name="architecturalPdfPrice" type="number" value={architecturalPdfPrice} onChange={(e) => setArchitecturalPdfPrice(e.target.value)} placeholder="e.g., 50" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="architecturalCadPrice">Architectural CAD Price</Label>
+                            <Input id="architecturalCadPrice" name="architecturalCadPrice" type="number" value={architecturalCadPrice} onChange={(e) => setArchitecturalCadPrice(e.target.value)} placeholder="e.g., 100" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="structuralPdfPrice">Structural PDF Price</Label>
+                            <Input id="structuralPdfPrice" name="structuralPdfPrice" type="number" value={structuralPdfPrice} onChange={(e) => setStructuralPdfPrice(e.target.value)} placeholder="e.g., 50" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="structuralCadPrice">Structural CAD Price</Label>
+                            <Input id="structuralCadPrice" name="structuralCadPrice" type="number" value={structuralCadPrice} onChange={(e) => setStructuralCadPrice(e.target.value)} placeholder="e.g., 100" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="billOfQuantitiesPrice">Bill of Quantities Price</Label>
+                            <Input id="billOfQuantitiesPrice" name="billOfQuantitiesPrice" type="number" value={billOfQuantitiesPrice} onChange={(e) => setBillOfQuantitiesPrice(e.target.value)} placeholder="e.g., 80" />
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -597,76 +604,96 @@ const CreateDesignPage = () => {
                         </h2>
                       </div>
 
-                      <div className="space-y-8">
+<div className="space-y-8">
                         <div>
-                          <Label className="text-sm font-medium flex items-center gap-2 mb-4">
-                            <FiFileText className="w-4 h-4" />
-                            PDF Files
-                          </Label>
-                          <FileUpload
-                            onUploadSuccess={handleUploadSuccess}
-                            onFileRemove={handleFileRemove}
-                            initialFiles={files.filter(
-                              (f: any) => f.type === "PDF"
-                            )}
-                            fileTypeCategory="PDF"
-                            multiple
-                            accept="application/pdf"
-                          />
+                          <h3 className="text-lg font-medium leading-6">Architectural Design</h3>
+                          <div className="space-y-2 mt-2">
+                            <Label htmlFor="architectural-description">Description</Label>
+                            <Input id="architectural-description" value={architecturalDesign.description} onChange={(e) => setArchitecturalDesign(prev => ({ ...prev, description: e.target.value }))} />
+                          </div>
+                          <div className="space-y-2 mt-2">
+                            <Label htmlFor="architectural-overview">Overview</Label>
+                            <Textarea id="architectural-overview" value={architecturalDesign.overview} onChange={(e) => setArchitecturalDesign(prev => ({ ...prev, overview: e.target.value }))} />
+                          </div>
+                          <div className="mt-4">
+                            <Label>PDFs</Label>
+                            <FileUpload
+                              onUploadSuccess={(files) => setArchitecturalDesign(prev => ({ ...prev, pdfFiles: [...prev.pdfFiles, ...files] }))}
+                              onFileRemove={(fileUrl) => setArchitecturalDesign(prev => ({ ...prev, pdfFiles: prev.pdfFiles.filter(f => f.url !== fileUrl) }))}
+                              initialFiles={architecturalDesign.pdfFiles}
+                              fileTypeCategory="PDF"
+                              multiple
+                              accept="application/pdf"
+                            />
+                          </div>
+                          <div className="mt-4">
+                            <Label>CADs</Label>
+                            <FileUpload
+                              onUploadSuccess={(files) => setArchitecturalDesign(prev => ({ ...prev, cadFiles: [...prev.cadFiles, ...files] }))}
+                              onFileRemove={(fileUrl) => setArchitecturalDesign(prev => ({ ...prev, cadFiles: prev.cadFiles.filter(f => f.url !== fileUrl) }))}
+                              initialFiles={architecturalDesign.cadFiles}
+                              fileTypeCategory="CAD"
+                              multiple
+                              accept=".dwg, .dxf"
+                            />
+                          </div>
                         </div>
-
                         <div>
-                          <Label className="text-sm font-medium flex items-center gap-2 mb-4">
-                            <FiLayers className="w-4 h-4" />
-                            CAD Files
-                          </Label>
-                          <FileUpload
-                            onUploadSuccess={handleUploadSuccess}
-                            onFileRemove={handleFileRemove}
-                            initialFiles={files.filter(
-                              (f: any) => f.type === "CAD"
-                            )}
-                            fileTypeCategory="CAD"
-                            multiple
-                            accept=".dwg, .dxf"
-                          />
+                          <h3 className="text-lg font-medium leading-6">Structural Design</h3>
+                          <div className="space-y-2 mt-2">
+                            <Label htmlFor="structural-description">Description</Label>
+                            <Input id="structural-description" value={structuralDesign.description} onChange={(e) => setStructuralDesign(prev => ({ ...prev, description: e.target.value }))} />
+                          </div>
+                          <div className="space-y-2 mt-2">
+                            <Label htmlFor="structural-overview">Overview</Label>
+                            <Textarea id="structural-overview" value={structuralDesign.overview} onChange={(e) => setStructuralDesign(prev => ({ ...prev, overview: e.target.value }))} />
+                          </div>
+                          <div className="mt-4">
+                            <Label>PDFs</Label>
+                            <FileUpload
+                              onUploadSuccess={(files) => setStructuralDesign(prev => ({ ...prev, pdfFiles: [...prev.pdfFiles, ...files] }))}
+                              onFileRemove={(fileUrl) => setStructuralDesign(prev => ({ ...prev, pdfFiles: prev.pdfFiles.filter(f => f.url !== fileUrl) }))}
+                              initialFiles={structuralDesign.pdfFiles}
+                              fileTypeCategory="PDF"
+                              multiple
+                              accept="application/pdf"
+                            />
+                          </div>
+                          <div className="mt-4">
+                            <Label>CADs</Label>
+                            <FileUpload
+                              onUploadSuccess={(files) => setStructuralDesign(prev => ({ ...prev, cadFiles: [...prev.cadFiles, ...files] }))}
+                              onFileRemove={(fileUrl) => setStructuralDesign(prev => ({ ...prev, cadFiles: prev.cadFiles.filter(f => f.url !== fileUrl) }))}
+                              initialFiles={structuralDesign.cadFiles}
+                              fileTypeCategory="CAD"
+                              multiple
+                              accept=".dwg, .dxf"
+                            />
+                          </div>
                         </div>
-
                         <div>
-                          <Label className="text-sm font-medium flex items-center gap-2 mb-4">
-                            <FiImage className="w-4 h-4" />
-                            3D Renders & Images
-                          </Label>
-                          <FileUpload
-                            onUploadSuccess={handleUploadSuccess}
-                            onFileRemove={handleFileRemove}
-                            initialFiles={files.filter(
-                              (f: any) => f.type === "IMAGE"
-                            )}
-                            fileTypeCategory="IMAGE"
-                            multiple
-                            accept="image/*"
-                          />
+                          <h3 className="text-lg font-medium leading-6">Bill of Quantities</h3>
+                          <div className="space-y-2 mt-2">
+                            <Label htmlFor="boq-description">Description</Label>
+                            <Input id="boq-description" value={billOfQuantities.description} onChange={(e) => setBillOfQuantities(prev => ({ ...prev, description: e.target.value }))} />
+                          </div>
+                          <div className="space-y-2 mt-2">
+                            <Label htmlFor="boq-overview">Overview</Label>
+                            <Textarea id="boq-overview" value={billOfQuantities.overview} onChange={(e) => setBillOfQuantities(prev => ({ ...prev, overview: e.target.value }))} />
+                          </div>
+                          <div className="mt-4">
+                            <Label>Excel Files</Label>
+                            <FileUpload
+                              onUploadSuccess={(files) => setBillOfQuantities(prev => ({ ...prev, excelFiles: [...prev.excelFiles, ...files] }))}
+                              onFileRemove={(fileUrl) => setBillOfQuantities(prev => ({ ...prev, excelFiles: prev.excelFiles.filter(f => f.url !== fileUrl) }))}
+                              initialFiles={billOfQuantities.excelFiles}
+                              fileTypeCategory="EXCEL"
+                              multiple
+                              accept=".xls, .xlsx"
+                            />
+                          </div>
                         </div>
-
-                        <div>
-                          <Label className="text-sm font-medium flex items-center gap-2 mb-4">
-                            <FiHome className="w-4 h-4" />
-                            Floor Plans
-                          </Label>
-                          <FileUpload
-                            onUploadSuccess={handleUploadSuccess}
-                            onFileRemove={handleFileRemove}
-                            initialFiles={files.filter(
-                              (f: any) => f.type === "FLOOR_PLAN"
-                            )}
-                            fileTypeCategory="FLOOR_PLAN"
-                            multiple
-                            accept="image/*, application/pdf"
-                          />
-                        </div>
-                      </div>
-                    </motion.div>
+                      </div>                    </motion.div>
                   )}
 
                   {/* Cost Estimates Section */}

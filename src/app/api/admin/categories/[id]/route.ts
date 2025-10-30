@@ -30,6 +30,23 @@ export async function GET(
           where: designWhere,
           include: {
             files: true,
+            architecturalDesign: {
+              include: {
+                pdfFiles: true,
+                cadFiles: true,
+              }
+            },
+            structuralDesign: {
+              include: {
+                pdfFiles: true,
+                cadFiles: true,
+              }
+            },
+            billOfQuantities: {
+              include: {
+                excelFiles: true,
+              }
+            }
           },
           skip: designSkip,
           take: designLimit,

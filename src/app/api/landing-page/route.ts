@@ -23,6 +23,23 @@ export async function GET() {
             type: 'IMAGE',
           },
         },
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
       },
     });
 
@@ -46,6 +63,23 @@ export async function GET() {
             type: 'IMAGE',
           },
         },
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
       },
     });
 

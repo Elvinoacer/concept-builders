@@ -11,6 +11,17 @@ import { Design } from "@/generated/prisma";
 interface DesignWithCategoryAndFiles extends Design {
   category: { name: string } | null;
   files: { url: string }[];
+  architecturalDesign?: {
+    pdfFiles: { url: string }[];
+    cadFiles: { url: string }[];
+  } | null;
+  structuralDesign?: {
+    pdfFiles: { url: string }[];
+    cadFiles: { url: string }[];
+  } | null;
+  billOfQuantities?: {
+    excelFiles: { url: string }[];
+  } | null;
 }
 
 const FeaturedDesignManagement = () => {

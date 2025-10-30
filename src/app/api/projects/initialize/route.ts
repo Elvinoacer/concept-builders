@@ -40,6 +40,23 @@ export async function POST(request: NextRequest) {
       },
       include: {
         files: true,
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
       },
     });
 
@@ -52,7 +69,7 @@ export async function POST(request: NextRequest) {
       data: {
         name: `${design.name} Project`,
         description: `Project initialized from design: ${design.name}`,
-        imageUrl: design.files.find(file => file.type === "FLOOR_PLAN")?.url || design.files.find(file => file.type === "IMAGE")?.url || null, // Prioritize FLOOR_PLAN, then IMAGE
+        imageUrl: design.architecturalDesign?.pdfFiles[0]?.url || null,
         userId: userId,
         status: "Planning",
         progress: 0,

@@ -10,15 +10,50 @@ export async function getLandingPageData() {
     featuredDesigns,
   ] = await Promise.all([
     prisma.design.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 8,
-      include: { files: true, category: true },
+include: {
+        files: true,
+        category: true,
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
+      }
     }),
     prisma.design.findMany({
       include: {
         files: true,
         category: true,
         _count: { select: { orderItems: true } },
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
       },
       orderBy: { orderItems: { _count: "desc" } },
       take: 3,
@@ -33,7 +68,7 @@ export async function getLandingPageData() {
           include: {
             files: {
               take: 1,
-              where: { type: { in: ["IMAGE", "FLOOR_PLAN"] } }, // Prioritize image types
+              where: { type: { in: ["IMAGE"] } }, // Prioritize image types
             },
           },
         },
@@ -47,7 +82,27 @@ export async function getLandingPageData() {
     prisma.design.findMany({
       where: { isFeatured: true },
       take: 8,
-      include: { files: true, category: true },
+      include: { 
+        files: true, 
+        category: true,
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
+      },
     }),
   ]);
 

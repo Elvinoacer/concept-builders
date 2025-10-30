@@ -15,7 +15,13 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   const { addToCart } = useCart();
   const { data: session, status } = useSession(); // Get session data
   const router = useRouter(); // Initialize useRouter
-  const [selectedFileType, setSelectedFileType] = useState("pdf");
+  const [selectedDocuments, setSelectedDocuments] = useState({
+    architecturalPdf: false,
+    architecturalCad: false,
+    structuralPdf: false,
+    structuralCad: false,
+    billOfQuantities: false,
+  });
   const [selectedOptions, setSelectedOptions] = useState<
     {
       name: string;
@@ -27,23 +33,29 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   // For now, keeping it empty as per previous logic for additional options
 
   const totalPrice = useMemo(() => {
-    const basePrice = design.basePrice || 0;
-    let fileTypePrice = 0;
-    if (selectedFileType === "pdf") {
-      fileTypePrice = design.pdfPrice || 0;
-    } else if (selectedFileType === "cad") {
-      fileTypePrice = design.cadPrice || 0;
-    } else if (selectedFileType === "pdf-and-cad") {
-      fileTypePrice = design.pdfAndCadPrice || 0;
+    let price = design.basePrice || 0;
+    if (selectedDocuments.architecturalPdf) {
+      price += design.architecturalPdfPrice || 0;
     }
-
+    if (selectedDocuments.architecturalCad) {
+      price += design.architecturalCadPrice || 0;
+    }
+    if (selectedDocuments.structuralPdf) {
+      price += design.structuralPdfPrice || 0;
+    }
+    if (selectedDocuments.structuralCad) {
+      price += design.structuralCadPrice || 0;
+    }
+    if (selectedDocuments.billOfQuantities) {
+      price += design.billOfQuantitiesPrice || 0;
+    }
     const selectedAdditionalOptionsCost = selectedOptions.reduce(
       (sum, option) => sum + (option.price || 0),
       0
     );
 
-    return basePrice + fileTypePrice + selectedAdditionalOptionsCost;
-  }, [design, selectedFileType, selectedOptions]);
+    return price + selectedAdditionalOptionsCost;
+  }, [design, selectedDocuments, selectedOptions]);
 
   const [kesPrice, setKesPrice] = useState<number | null>(null);
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
@@ -87,11 +99,11 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   };
 
   const handleAddToCart = () => {
-    addToCart(design, selectedFileType, selectedFileType, selectedOptions);
+    addToCart(design, selectedDocuments, "", selectedOptions);
   };
 
   const handleBuyNow = async () => {
-    await addToCart(design, selectedFileType, selectedFileType, selectedOptions);
+    await addToCart(design, selectedDocuments, "", selectedOptions);
 
     if (status === "authenticated") {
       router.push("/checkout");
@@ -100,10 +112,12 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
     }
   };
 
-  const fileTypeOptions = [
-    { key: "pdf", label: "PDF", price: design.pdfPrice || 0 },
-    { key: "cad", label: "CAD", price: design.cadPrice || 0 },
-    { key: "pdf-and-cad", label: "PDF & CAD", price: design.pdfAndCadPrice || 0 },
+  const documentOptions = [
+    { key: "architecturalPdf", label: "Architectural PDF", price: design.architecturalPdfPrice || 0 },
+    { key: "architecturalCad", label: "Architectural CAD", price: design.architecturalCadPrice || 0 },
+    { key: "structuralPdf", label: "Structural PDF", price: design.structuralPdfPrice || 0 },
+    { key: "structuralCad", label: "Structural CAD", price: design.structuralCadPrice || 0 },
+    { key: "billOfQuantities", label: "Bill of Quantities", price: design.billOfQuantitiesPrice || 0 },
   ];
 
   return (
@@ -122,22 +136,22 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
 
         <fieldset className="mt-4">
           <legend className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            Select File Type
+            Select Documents
           </legend>
           <div className="space-y-3">
-            {fileTypeOptions.map((option) => (
+            {documentOptions.map((option) => (
               <label
                 key={option.key}
                 htmlFor={option.key}
-                className={`relative flex items-center justify-between rounded-lg p-4 cursor-pointer transition-all border-2 ${selectedFileType === option.key ? "border-blue-500 bg-blue-50 dark:bg-blue-900/50" : "border-gray-300 dark:border-gray-600 hover:border-blue-400"}`}
+                className={`relative flex items-center justify-between rounded-lg p-4 cursor-pointer transition-all border-2 ${selectedDocuments[option.key] ? "border-blue-500 bg-blue-50 dark:bg-blue-900/50" : "border-gray-300 dark:border-gray-600 hover:border-blue-400"}`}
               >
                 <input
-                  type="radio"
+                  type="checkbox"
                   id={option.key}
-                  name="fileType"
+                  name="documentType"
                   value={option.key}
-                  checked={selectedFileType === option.key}
-                  onChange={() => setSelectedFileType(option.key)}
+                  checked={selectedDocuments[option.key]}
+                  onChange={() => setSelectedDocuments(prev => ({ ...prev, [option.key]: !prev[option.key] }))}
                   className="sr-only"
                 />
                 <span className="font-semibold text-gray-800 dark:text-gray-200">
@@ -146,9 +160,9 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
                 <span className="font-bold text-blue-600 dark:text-blue-400">
                   +${option.price}
                 </span>
-                {selectedFileType === option.key && (
+                {selectedDocuments[option.key] && (
                   <motion.div
-                    layoutId="radio-selector"
+                    layoutId={`checkbox-selector-${option.key}`}
                     className="absolute -right-3 -top-3 w-6 h-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center"
                   >
                     <svg

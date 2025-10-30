@@ -1,4 +1,4 @@
-import { S3Client, DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const s3Client = new S3Client({
@@ -9,6 +9,19 @@ const s3Client = new S3Client({
     secretAccessKey: process.env.DO_SPACES_SECRET_KEY!,
   },
 });
+
+export const getSignedUrlForUpload = async (fileName: string, contentType: string) => {
+  const key = `designs/${Date.now()}-${fileName}`;
+  const command = new PutObjectCommand({
+    Bucket: process.env.DO_SPACES_BUCKET!,
+    Key: key,
+    ContentType: contentType,
+    ACL: 'public-read',
+  });
+  const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+  const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.sfo3.digitaloceanspaces.com/${key}`;
+  return { signedUrl, publicUrl, key };
+};
 
 export const getSignedUrlForFiles = async (keys: string[]) => {
   const signedUrls = await Promise.all(

@@ -21,6 +21,17 @@ interface Design {
   basePrice: number;
   isFeatured: boolean;
   files: { url: string; type: string }[];
+  architecturalDesign?: {
+    pdfFiles: { url: string }[];
+    cadFiles: { url: string }[];
+  } | null;
+  structuralDesign?: {
+    pdfFiles: { url: string }[];
+    cadFiles: { url: string }[];
+  } | null;
+  billOfQuantities?: {
+    excelFiles: { url: string }[];
+  } | null;
 }
 
 interface CategoryData {

@@ -37,6 +37,23 @@ export async function GET() {
         include: {
           files: true,
           category: true,
+          architecturalDesign: {
+            include: {
+              pdfFiles: true,
+              cadFiles: true,
+            }
+          },
+          structuralDesign: {
+            include: {
+              pdfFiles: true,
+              cadFiles: true,
+            }
+          },
+          billOfQuantities: {
+            include: {
+              excelFiles: true,
+            }
+          }
         },
       });
       return NextResponse.json(bestSellingDesigns);
@@ -65,6 +82,23 @@ export async function GET() {
             include: {
                 files: true,
                 category: true,
+                architecturalDesign: {
+                  include: {
+                    pdfFiles: true,
+                    cadFiles: true,
+                  }
+                },
+                structuralDesign: {
+                  include: {
+                    pdfFiles: true,
+                    cadFiles: true,
+                  }
+                },
+                billOfQuantities: {
+                  include: {
+                    excelFiles: true,
+                  }
+                }
             },
         });
         return NextResponse.json(bestSellingDesigns);

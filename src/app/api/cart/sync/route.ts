@@ -6,7 +6,7 @@ import { Design } from "@/generated/prisma";
 
 interface CartItem extends Design {
   quantity: number;
-  selectedFileType: string;
+  selectedDocuments: any;
   selectedPackage?: string;
   selectedExtras?: any[];
 }
@@ -37,10 +37,11 @@ export async function POST(req: NextRequest) {
         const existingItem = await tx.cartItem.findFirst({
           where: {
             cartId: userCart.id,
-            designId: item.id,
-            selectedFileType: item.selectedFileType,
-            selectedPackage: item.selectedPackage,
-            selectedExtras: {
+                      designId: item.id,
+                      selectedDocuments: {
+                          equals: item.selectedDocuments,
+                        },
+                      selectedPackage: item.selectedPackage,            selectedExtras: {
               equals: item.selectedExtras,
             },
           },
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
               cartId: userCart.id,
               designId: item.id,
               quantity: item.quantity,
-              selectedFileType: item.selectedFileType,
+              selectedDocuments: item.selectedDocuments,
               selectedPackage: item.selectedPackage,
               selectedExtras: item.selectedExtras,
             },
@@ -78,9 +79,11 @@ export async function POST(req: NextRequest) {
                 id: true,
                 name: true,
                 basePrice: true,
-                pdfPrice: true,
-                cadPrice: true,
-                pdfAndCadPrice: true,
+                architecturalPdfPrice: true,
+                architecturalCadPrice: true,
+                structuralPdfPrice: true,
+                structuralCadPrice: true,
+                billOfQuantitiesPrice: true,
                 packageOptions: true,
                 files: {
                   where: { type: 'IMAGE' },

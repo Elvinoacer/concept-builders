@@ -21,7 +21,27 @@ export async function GET() {
       include: {
         designs: {
           include: {
-            design: true,
+            design: {
+            include: {
+              architecturalDesign: {
+                include: {
+                  pdfFiles: true,
+                  cadFiles: true,
+                }
+              },
+              structuralDesign: {
+                include: {
+                  pdfFiles: true,
+                  cadFiles: true,
+                }
+              },
+              billOfQuantities: {
+                include: {
+                  excelFiles: true,
+                }
+              }
+            }
+          },
           },
         },
       },

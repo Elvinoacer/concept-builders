@@ -16,6 +16,23 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
           },
         },
         category: true,
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
       },
     });
 
@@ -59,16 +76,128 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     if ('pdfAndCadPrice' in body) updateData.pdfAndCadPrice = body.pdfAndCadPrice;
 
     // Handle files update only if 'files' is explicitly provided in the body
-    if ('files' in body && Array.isArray(body.files)) {
-      updateData.files = {
-        deleteMany: {},
-        create: body.files.map(
-          (file: { url: string; type: string; originalFileName: string }) => ({
-            url: file.url,
-            type: file.type,
-            originalFileName: file.originalFileName,
-          })
-        ),
+    
+
+    if (body.architecturalDesign) {
+      updateData.architecturalDesign = {
+        upsert: {
+          create: {
+            type: 'ARCHITECTURAL',
+            description: body.architecturalDesign.description,
+            overview: body.architecturalDesign.overview,
+            pdfFiles: {
+              create: body.architecturalDesign.pdfFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'PDF',
+              })),
+            },
+            cadFiles: {
+              create: body.architecturalDesign.cadFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'CAD',
+              })),
+            },
+          },
+          update: {
+            description: body.architecturalDesign.description,
+            overview: body.architecturalDesign.overview,
+            pdfFiles: {
+              deleteMany: {},
+              create: body.architecturalDesign.pdfFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'PDF',
+              })),
+            },
+            cadFiles: {
+              deleteMany: {},
+              create: body.architecturalDesign.cadFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'CAD',
+              })),
+            },
+          },
+        },
+      };
+    }
+
+    if (body.structuralDesign) {
+      updateData.structuralDesign = {
+        upsert: {
+          create: {
+            type: 'STRUCTURAL',
+            description: body.structuralDesign.description,
+            overview: body.structuralDesign.overview,
+            pdfFiles: {
+              create: body.structuralDesign.pdfFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'PDF',
+              })),
+            },
+            cadFiles: {
+              create: body.structuralDesign.cadFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'CAD',
+              })),
+            },
+          },
+          update: {
+            description: body.structuralDesign.description,
+            overview: body.structuralDesign.overview,
+            pdfFiles: {
+              deleteMany: {},
+              create: body.structuralDesign.pdfFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'PDF',
+              })),
+            },
+            cadFiles: {
+              deleteMany: {},
+              create: body.structuralDesign.cadFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'CAD',
+              })),
+            },
+          },
+        },
+      };
+    }
+
+    if (body.billOfQuantities) {
+      updateData.billOfQuantities = {
+        upsert: {
+          create: {
+            type: 'BILL_OF_QUANTITIES',
+            description: body.billOfQuantities.description,
+            overview: body.billOfQuantities.overview,
+            excelFiles: {
+              create: body.billOfQuantities.excelFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'EXCEL',
+              })),
+            },
+          },
+          update: {
+            description: body.billOfQuantities.description,
+            overview: body.billOfQuantities.overview,
+            excelFiles: {
+              deleteMany: {},
+              create: body.billOfQuantities.excelFiles.map((file: any) => ({
+                name: file.name,
+                url: file.url,
+                type: 'EXCEL',
+              })),
+            },
+          },
+        },
       };
     }
 
@@ -104,7 +233,26 @@ export async function DELETE(
     // 1. Fetch the design and its files
     const design = await prisma.design.findUnique({
       where: { id },
-      include: { files: true },
+      include: { 
+        files: true,
+        architecturalDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        structuralDesign: {
+          include: {
+            pdfFiles: true,
+            cadFiles: true,
+          }
+        },
+        billOfQuantities: {
+          include: {
+            excelFiles: true,
+          }
+        }
+      },
     });
 
     if (!design) {
@@ -112,15 +260,53 @@ export async function DELETE(
     }
 
     // 2. Extract keys for DO Spaces deletion
-    const fileKeys = design.files.map(file => {
-      try {
-        const url = new URL(file.url);
-        return url.pathname.substring(1); // Remove leading '/'
-      } catch (error) {
-        console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
-        return null;
-      }
-    }).filter((key): key is string => key !== null);
+    const fileKeys: string[] = [];
+    if (design.architecturalDesign) {
+      design.architecturalDesign.pdfFiles.forEach(file => {
+        try {
+          const url = new URL(file.url);
+          fileKeys.push(url.pathname.substring(1));
+        } catch (error) {
+          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
+        }
+      });
+      design.architecturalDesign.cadFiles.forEach(file => {
+        try {
+          const url = new URL(file.url);
+          fileKeys.push(url.pathname.substring(1));
+        } catch (error) {
+          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
+        }
+      });
+    }
+    if (design.structuralDesign) {
+      design.structuralDesign.pdfFiles.forEach(file => {
+        try {
+          const url = new URL(file.url);
+          fileKeys.push(url.pathname.substring(1));
+        } catch (error) {
+          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
+        }
+      });
+      design.structuralDesign.cadFiles.forEach(file => {
+        try {
+          const url = new URL(file.url);
+          fileKeys.push(url.pathname.substring(1));
+        } catch (error) {
+          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
+        }
+      });
+    }
+    if (design.billOfQuantities) {
+      design.billOfQuantities.excelFiles.forEach(file => {
+        try {
+          const url = new URL(file.url);
+          fileKeys.push(url.pathname.substring(1));
+        } catch (error) {
+          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
+        }
+      });
+    }
 
     // 3. Delete files from DigitalOcean Spaces
     // if (fileKeys.length > 0) {

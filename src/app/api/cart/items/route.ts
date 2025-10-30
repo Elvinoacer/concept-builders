@@ -24,34 +24,6 @@ export async function GET(req: Request) {
   }
 
   try {
-    const userCart = await prisma.cart.findUnique({
-      where: { userId: session.user.id },
-      include: {
-        items: {
-          include: {
-            design: {
-              select: {
-                id: true,
-                name: true,
-                basePrice: true,
-                pdfPrice: true,
-                cadPrice: true,
-                pdfAndCadPrice: true,
-                packageOptions: true,
-                files: {
-                  where: { type: 'IMAGE' },
-                  take: 1
-                }
-              }
-            }
-          },
-          orderBy: {
-            createdAt: "asc",
-          },
-        },
-        discount: true, // Include discount details
-      },
-    });
 
     if (!userCart) {
       // Return an empty cart object with null discount details if no cart exists
@@ -88,7 +60,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { designId, selectedFileType, selectedPackage, selectedExtras } = await req.json();
+    const { designId, selectedDocuments, selectedPackage, selectedExtras } = await req.json();
     if (!designId) {
       return NextResponse.json(
         { error: "Design ID is required" },
@@ -108,8 +80,9 @@ export async function POST(req: Request) {
     const existingCartItem = await prisma.cartItem.findFirst({
       where: {
         cartId: userCart.id,
-        designId: designId,
-        selectedFileType: selectedFileType, // Add this line
+        selectedDocuments: {
+          equals: selectedDocuments,
+        },
         selectedPackage: selectedPackage,
         selectedExtras: {
           equals: selectedExtras,
@@ -122,7 +95,7 @@ export async function POST(req: Request) {
         where: { id: existingCartItem.id },
         data: {
           quantity: existingCartItem.quantity + 1,
-          selectedFileType: selectedFileType, // Add this line
+          selectedDocuments: selectedDocuments, // Add this line
           selectedPackage: selectedPackage,
           selectedExtras: selectedExtras,
         },
@@ -133,7 +106,7 @@ export async function POST(req: Request) {
           cartId: userCart.id,
           designId: designId,
           quantity: 1,
-          selectedFileType: selectedFileType, // Add this line
+          selectedDocuments: selectedDocuments, // Add this line
           selectedPackage,
           selectedExtras: selectedExtras,
         },
@@ -151,9 +124,11 @@ export async function POST(req: Request) {
                 id: true,
                 name: true,
                 basePrice: true,
-                pdfPrice: true,
-                cadPrice: true,
-                pdfAndCadPrice: true,
+                architecturalPdfPrice: true,
+                architecturalCadPrice: true,
+                structuralPdfPrice: true,
+                structuralCadPrice: true,
+                billOfQuantitiesPrice: true,
                 packageOptions: true,
                 files: {
                   where: { type: 'IMAGE' },
