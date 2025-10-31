@@ -34,6 +34,9 @@ const DesignFilePreview = ({ designId }: DesignFilePreviewProps) => {
       const response = await fetch(`/api/designs/${designId}`);
       const data = await response.json();
       const allFiles = [
+        ...(data.images || []),
+        ...(data.floorPlans || []),
+        ...(data.files || []),
         ...(data.architecturalDesign?.pdfFiles || []),
         ...(data.architecturalDesign?.cadFiles || []),
         ...(data.structuralDesign?.pdfFiles || []),
@@ -131,30 +134,32 @@ const DesignFilePreview = ({ designId }: DesignFilePreviewProps) => {
               <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">{type}</h4>
               <div className="space-y-3">
                 {(filesInCategory as File[]).map((file) => {
-                  const fileName = file.originalFileName || decodeURIComponent(file.url.split("/").pop() || "");
+                  const fileName = file.name || decodeURIComponent(file.url.split("/").pop() || "");
                   return (
-                    <div key={file.id} className="flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg transition-all hover:shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
-                      <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
-                        {['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(file.url.split('.').pop()?.toLowerCase() || '') ?
-                          <img src={file.url} alt={fileName} className="w-10 h-10 rounded-md object-cover" /> :
-                          getFileIcon(file.url)
-                        }
+                    <div key={file.id} className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg transition-all hover:shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
+                          {['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(file.url.split('.').pop()?.toLowerCase() || '') ?
+                            <img src={file.url} alt={fileName} className="w-10 h-10 rounded-md object-cover" /> :
+                            getFileIcon(file.url)
+                          }
+                        </div>
+                        <div className="flex-shrink-0 flex items-center gap-2">
+                          <a href={file.url} target="_blank" rel="noopener noreferrer" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+                            <FiEye className="w-5 h-5" />
+                          </a>
+                          <button onClick={() => handleDownload(file.url, fileName)} className="p-2 text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 transition-colors">
+                            <FiDownload className="w-5 h-5" />
+                          </button>
+                          <button onClick={() => handleDeleteFile(file.id, fileName)} className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                            <FiTrash className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex-grow w-0 ml-4">
+                      <div className="mt-2">
                         <p className="text-sm font-semibold text-gray-800 dark:text-white truncate" title={fileName}>
                           {fileName}
                         </p>
-                      </div>
-                      <div className="flex-shrink-0 ml-4 flex items-center gap-2">
-                        <a href={file.url} target="_blank" rel="noopener noreferrer" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
-                          <FiEye className="w-5 h-5" />
-                        </a>
-                        <button onClick={() => handleDownload(file.url, fileName)} className="p-2 text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 transition-colors">
-                          <FiDownload className="w-5 h-5" />
-                        </button>
-                        <button onClick={() => handleDeleteFile(file.id, fileName)} className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
-                          <FiTrash className="w-5 h-5" />
-                        </button>
                       </div>
                     </div>
                   );

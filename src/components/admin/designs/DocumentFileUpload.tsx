@@ -70,6 +70,7 @@ export default function DocumentFileUpload({ design, documentType, fileType, onU
       xhr.send(file);
     } catch (error) {
       console.error('Error uploading file:', error);
+      toast.error(`Error uploading file: ${error.message}`);
       setUploading(false);
     }
   };

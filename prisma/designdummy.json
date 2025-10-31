@@ -1,127 +1,123 @@
 {
-  "name": "Serene Modern Villa",
-  "description": "An exquisite villa blending modern aesthetics with serene natural elements. Features an open-concept living space, large glass walls for ample natural light, and a beautifully landscaped garden with a private pool. Ideal for those who appreciate luxury and tranquility.",
-  "basePrice": 95000,
-  "priceRange": "$95k - $125k",
-  "bedrooms": 5,
-  "bathrooms": 4,
-  "area": 3200,
-  "floors": 2,
-  "planDetails": "5 Bedrooms with en-suite bathrooms\nSpacious open-plan living and dining area\nModern kitchen with island\nGourmet kitchen with high-end appliances\nPrivate home theater\nInfinity pool and landscaped garden\n3-car garage",
-  "categoryId": "clyb3z1x1000008l5g1j2h3k4",
-  "minBuildingCost": 250000,
-  "maxBuildingCost": 400000,
-  "architecturalPdfPrice": 150,
-  "architecturalCadPrice": 350,
-  "structuralPdfPrice": 120,
-  "structuralCadPrice": 300,
-  "billOfQuantitiesPrice": 180,
+  "name": "Eco-Friendly Cabin Retreat",
+  "description": "A sustainable and charming cabin designed for minimal environmental impact. Features reclaimed wood accents, highly-efficient insulation, and a rooftop solar array. Perfect for nature lovers seeking a modern, off-grid lifestyle.",
+  "basePrice": 45000,
+  "priceRange": "$45k - $65k",
+  "bedrooms": 2,
+  "bathrooms": 1,
+  "area": 1200,
+  "floors": 1,
+  "planDetails": "2 Bedrooms, 1 full bathroom\nOpen-concept living room with a fireplace\nCompact, high-efficiency kitchen\nLarge covered front porch\nRainwater harvesting system\nRooftop deck access",
+  "categoryId": "clyb3z1x1000108l5g1j2h3k4",
+  "minBuildingCost": 120000,
+  "maxBuildingCost": 180000,
+  "architecturalPdfPrice": 80,
+  "architecturalCadPrice": 180,
+  "structuralPdfPrice": 60,
+  "structuralCadPrice": 150,
+  "billOfQuantitiesPrice": 100,
   "packageOptions": [
     {
-      "name": "Smart Home Integration",
-      "price": 2500,
+      "name": "Solar Power Upgrade",
+      "price": 4000,
       "file": {
-        "name": "Smart_Home_Features.pdf",
-        "url": "https://example.com/files/Smart_Home_Features.pdf"
+        "name": "Solar_System_Specs.pdf",
+        "url": "https://example.com/files/Solar_System_Specs.pdf"
       }
     },
     {
-      "name": "Interior Design Consultation",
-      "price": 1500,
+      "name": "Composting Toilet System",
+      "price": 800,
       "file": {
-        "name": "Interior_Design_Portfolio.pdf",
-        "url": "https://example.com/files/Interior_Design_Portfolio.pdf"
+        "name": "Composting_Toilet_Guide.pdf",
+        "url": "https://example.com/files/Composting_Toilet_Guide.pdf"
       }
     }
   ],
   "buildingCostFactors": [
     {
-      "name": "Excavation and Foundation",
-      "unit": "per cubic meter",
-      "price": 120
-    },
-    {
-      "name": "Structural Steel",
-      "unit": "per ton",
-      "price": 1500
-    },
-    {
-      "name": "High-End Finishing",
+      "name": "Insulated Concrete Forms (ICF)",
       "unit": "per sqft",
-      "price": 50
+      "price": 15
+    },
+    {
+      "name": "Reclaimed Wood Flooring",
+      "unit": "per sqft",
+      "price": 18
+    },
+    {
+      "name": "High-Efficiency Windows",
+      "unit": "per window",
+      "price": 600
     }
   ],
   "buildingCostEstimates": {
     "basic": {
-      "description": "Standard quality finishes and materials, providing a comfortable and modern living space.",
+      "description": "Standard sustainable materials and local craftsmanship, focusing on core functionality.",
       "costBreakdown": [
         {
-          "item": "General Labor",
-          "cost": 70000
+          "item": "General Labor (Eco-Certified)",
+          "cost": 40000
         },
         {
-          "item": "Standard Building Materials",
-          "cost": 180000
+          "item": "Standard Eco Materials",
+          "cost": 80000
         }
       ]
     },
     "luxury": {
-      "description": "Luxury finishes with imported materials, premium appliances, and custom fittings.",
+      "description": "Premium, imported sustainable materials, geothermal heating/cooling, and high-end fixtures.",
       "costBreakdown": [
         {
-          "item": "Specialized Labor",
-          "cost": 120000
+          "item": "Specialized Eco Labor",
+          "cost": 60000
         },
         {
-          "item": "Luxury & Imported Materials",
-          "cost": 280000
+          "item": "Premium Sustainable Materials",
+          "cost": 120000
         }
       ]
     }
   },
   "architecturalDesign": {
-    "description": "Comprehensive architectural plans for the Serene Modern Villa.",
-    "overview": "Includes detailed floor plans, elevations, cross-sections, and 3D renderings to visualize the final structure.",
+    "description": "Comprehensive architectural plans for the Eco-Friendly Cabin Retreat.",
+    "overview": "Includes detailed floor plans, elevations, cross-sections, and material specifications for a green build.",
     "pdfFiles": [
       {
-        "name": "Architectural_Floor_Plans.pdf",
-        "url": "https://example.com/files/Architectural_Floor_Plans.pdf"
-      },
-      {
-        "name": "Architectural_Elevations.pdf",
-        "url": "https://example.com/files/Architectural_Elevations.pdf"
+        "name": "Cabin_Floor_Plans.pdf",
+        "url": "https://example.com/files/Cabin_Floor_Plans.pdf"
       }
     ],
     "cadFiles": [
       {
-        "name": "Full_Architectural_Model.dwg",
-        "url": "https://example.com/files/Full_Architectural_Model.dwg"
+        "name": "Cabin_Architectural_Model.dwg",
+        "url": "https://example.com/files/Cabin_Architectural_Model.dwg"
       }
     ]
   },
   "structuralDesign": {
-    "description": "Detailed structural engineering drawings and specifications.",
-    "overview": "Covers all structural elements including foundation, framing, and roof structure to ensure stability and safety.",
+    "description": "Detailed structural engineering drawings focusing on timber framing and foundation.",
+    "overview": "Covers all structural elements for a stable and durable cabin structure in various climates.",
     "pdfFiles": [
       {
-        "name": "Structural_Foundation_Plan.pdf",
-        "url": "https://example.com/files/Structural_Foundation_Plan.pdf"
+        "name": "Structural_Timber_Framing.pdf",
+        "url": "https://example.com/files/Structural_Timber_Framing.pdf"
       }
     ],
     "cadFiles": [
       {
-        "name": "Full_Structural_Model.dwg",
-        "url": "https://example.com/files/Full_Structural_Model.dwg"
+        "name": "Cabin_Structural_Model.dwg",
+        "url": "https://example.com/files/Cabin_Structural_Model.dwg"
       }
     ]
   },
   "billOfQuantities": {
-    "description": "A complete bill of quantities for costing and procurement.",
-    "overview": "Provides an itemized list of all materials, parts, and labor required to construct the villa.",
+    "description": "A complete bill of quantities for costing and procurement of eco-friendly materials.",
+    "overview": "Provides an itemized list of all materials, parts, and labor, with a focus on sustainable sourcing.",
     "excelFiles": [
       {
-        "name": "Villa_Bill_of_Quantities.xlsx",
-        "url": "https://example.com/files/Villa_Bill_of_Quantities.xlsx"
+        "name": "Cabin_Bill_of_Quantities.xlsx",
+        "url": "https://example.com/files/Cabin_Bill_of_Quantities.xlsx"
       }
     ]
   }

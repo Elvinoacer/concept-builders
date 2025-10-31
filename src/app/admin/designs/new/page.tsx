@@ -105,8 +105,25 @@ const CreateDesignPage = () => {
     setBuildingCostEstimates(newEstimates);
   };
 
+  const validateForm = () => {
+    const errors = [];
+    if (!name.trim()) errors.push("Design Name is required.");
+    if (!description.trim()) errors.push("Description is required.");
+    if (!categoryId) errors.push("Category is required.");
+    if (!basePrice || parseFloat(basePrice) <= 0) errors.push("Base Price must be a positive number.");
+    if (images.length === 0) errors.push("At least one image is required.");
+    return errors;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const formErrors = validateForm();
+    if (formErrors.length > 0) {
+      toast.error(formErrors.join("\n"));
+      return;
+    }
+
     setIsSubmitting(true);
 
     const payload = {
@@ -131,7 +148,7 @@ const CreateDesignPage = () => {
         create: packageOptions.map((option) => ({
           name: option.name,
           price: parseFloat(option.price) || 0,
-          file: option.file?.[0] ? { create: { name: option.file[0].name, url: option.file[0].url, type: 'FILE' } } : undefined
+          file: option.file?.[0] ? { create: { name: option.file[0].originalFileName, url: option.file[0].url, type: 'FILE' } } : undefined
         })),
       },
       buildingCostFactors: {
@@ -158,14 +175,14 @@ const CreateDesignPage = () => {
           overview: architecturalDesign.overview,
           pdfFiles: {
             create: architecturalDesign.pdfFiles.map((file: any) => ({
-              name: file.name,
+              name: file.originalFileName,
               url: file.url,
               type: 'PDF',
             })),
           },
           cadFiles: {
             create: architecturalDesign.cadFiles.map((file: any) => ({
-              name: file.name,
+              name: file.originalFileName,
               url: file.url,
               type: 'CAD',
             })),
@@ -179,14 +196,14 @@ const CreateDesignPage = () => {
           overview: structuralDesign.overview,
           pdfFiles: {
             create: structuralDesign.pdfFiles.map((file: any) => ({
-              name: file.name,
+              name: file.originalFileName,
               url: file.url,
               type: 'PDF',
             })),
           },
           cadFiles: {
             create: structuralDesign.cadFiles.map((file: any) => ({
-              name: file.name,
+              name: file.originalFileName,
               url: file.url,
               type: 'CAD',
             })),
@@ -200,7 +217,7 @@ const CreateDesignPage = () => {
           overview: billOfQuantities.overview,
           excelFiles: {
             create: billOfQuantities.excelFiles.map((file: any) => ({
-              name: file.name,
+              name: file.originalFileName,
               url: file.url,
               type: 'EXCEL',
             })),
@@ -209,14 +226,14 @@ const CreateDesignPage = () => {
       },
       images: {
         create: images.map((file: any) => ({
-          name: file.name,
+          name: file.originalFileName,
           url: file.url,
           type: 'IMAGE',
         })),
       },
       floorPlans: {
         create: floorPlans.map((file: any) => ({
-          name: file.name,
+          name: file.originalFileName,
           url: file.url,
           type: 'FLOOR_PLAN',
         })),
@@ -1071,7 +1088,6 @@ const CreateDesignPage = () => {
                                 initialFiles={option.file}
                                 fileTypeCategory="FILE"
                                 multiple={false}
-                                accept="application/pdf"
                               />
                             </div>
                             <Button

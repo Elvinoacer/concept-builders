@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         "image/webp",
         "application/pdf",
       ],
-      FILE: ["application/pdf"],
+      FILE: ["application/pdf", "image/jpeg", "image/png", "image/gif", "image/webp", ".doc", ".docx", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
       EXCEL: ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
     };
 
@@ -89,6 +89,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ presignedUrl, url, originalFileName: fileName }, { status: 200 });
   } catch (error) {
     console.error("Error creating signed URL:", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return new NextResponse(error.message, { status: 500 });
   }
 }

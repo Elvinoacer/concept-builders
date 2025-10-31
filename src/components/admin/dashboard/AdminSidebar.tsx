@@ -35,6 +35,7 @@ const categorizedNavLinks = [
     title: "Project Management",
     links: [
       { href: "/admin/projects", label: "All Projects", icon: "construction" },
+      { href: "/admin/ongoing-projects", label: "Ongoing Projects", icon: "construction" },
       {
         href: "/admin/projects/new",
         label: "Create Project",
@@ -145,11 +146,13 @@ const AdminSidebar = ({
       } ${isDesktopSidebarOpen ? "w-80" : "w-20"}`}
     >
       <div className="p-6 flex justify-between items-center">
-        <h1
-          className={`text-gray-900 dark:text-white text-xl font-bold ${!isDesktopSidebarOpen && "hidden"}`}
-        >
-          Concept Builders
-        </h1>
+        <Link href="/">
+          <h1
+            className={`text-gray-900 dark:text-white text-xl font-bold ${!isDesktopSidebarOpen && "hidden"} cursor-pointer`}
+          >
+            Concept Builders
+          </h1>
+        </Link>
         <button
           onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
           className="hidden md:block"

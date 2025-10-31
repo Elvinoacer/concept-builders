@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Category, Design, File } from "@/generated/prisma"; // Import Design and File
 
 interface CategoryWithDesignsAndFiles extends Category {
-  designs: (Design & { files: File[] })[];
+  designs: (Design & { files: File[]; images: File[] })[];
+  _count: { designs: number };
 }
 
 interface FeaturedCategoriesProps {
@@ -28,21 +29,20 @@ const FeaturedCategories = ({
             key={category.id || index}
             href={`/design-showcase?category=${category.name}`}
           >
-            <div className="group flex flex-col gap-3 md:gap-4">
-              <div className="overflow-hidden rounded-lg">
-                <div
-                  className="w-full bg-center bg-no-repeat aspect-[4/3] bg-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                  style={{
-                    backgroundImage: `url("${category.designs?.[0]?.files?.[0]?.url || category.image || "/images/category-placeholder.png"}")`,
-                  }}
-                ></div>
-              </div>
-              <div>
-                <h3 className="text-slate-800 text-base md:text-lg lg:text-xl font-semibold dark:text-gray-200 text-center md:text-left">
-                  {category.name}
-                </h3>
-              </div>
-            </div>
+                        <div className="group relative block bg-black rounded-lg overflow-hidden min-h-80">
+                          <div
+                            className="absolute inset-0 bg-center bg-no-repeat bg-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                            style={{
+                              backgroundImage: `url("${category.designs?.[0]?.images?.[0]?.url || category.image || "/images/category-placeholder.png"}")`,
+                            }}
+                          ></div>
+                          <div className="relative flex flex-col justify-end h-full p-4 sm:p-6 lg:p-8 bg-gradient-to-t from-black/80 to-transparent">
+                            <h3 className="text-white text-lg md:text-xl font-bold">
+                              {category.name}
+                            </h3>
+                            <p className="text-sm text-gray-300">{category._count.designs} designs</p>
+                          </div>
+                        </div>
           </Link>
         ))}
       </div>

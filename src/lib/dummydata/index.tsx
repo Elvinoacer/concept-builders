@@ -71,8 +71,6 @@ export interface Cost {
   icon: string;
 }
 
-
-
 export interface Purchase {
   id: number;
   name: string;
@@ -115,10 +113,6 @@ export const costBreakdown = {
   ],
 };
 
-
-
-
-
 export const designTabIcons = {
   Basic: "🏠",
   Standard: "🏡",
@@ -149,10 +143,34 @@ export const adminStats = {
   conversionRate: 2.5,
   totalOrders: 150,
   kpis: [
-    { title: 'Total Revenue', key: 'totalSales', prefix: '$', change: '+12.5%', icon: 'monetization_on' },
-    { title: 'Total Visitors', key: 'totalVisitors', prefix: '', change: '+8.2%', icon: 'people' },
-    { title: 'Conversion Rate', key: 'conversionRate', suffix: '%', change: '-1.8%', icon: 'touch_app' },
-    { title: 'Total Orders', key: 'totalOrders', prefix: '', change: '+5.3%', icon: 'shopping_cart' },
+    {
+      title: "Total Revenue",
+      key: "totalSales",
+      prefix: "$",
+      change: "+12.5%",
+      icon: "monetization_on",
+    },
+    {
+      title: "Total Visitors",
+      key: "totalVisitors",
+      prefix: "",
+      change: "+8.2%",
+      icon: "people",
+    },
+    {
+      title: "Conversion Rate",
+      key: "conversionRate",
+      suffix: "%",
+      change: "-1.8%",
+      icon: "touch_app",
+    },
+    {
+      title: "Total Orders",
+      key: "totalOrders",
+      prefix: "",
+      change: "+5.3%",
+      icon: "shopping_cart",
+    },
   ],
   trendingProducts: [
     { id: 1, name: "Modern Farmhouse", sales: 25 },
@@ -174,8 +192,6 @@ export const adminStats = {
     { month: "Jun", sales: 20000 },
   ],
 };
-
-
 
 export const contactHeader = {
   title: "Get in Touch",
@@ -216,8 +232,7 @@ export const aboutHeader = {
 
 export const mission = {
   title: "Design. Structure. Legacy.",
-  description:
-    `"Where Vision Meets Precision."
+  description: `"Where Vision Meets Precision."
 
 At Concept Builders KE, we don't just construct buildings — we bring concepts to life. Our name is more than a brand. It's a philosophy rooted in creative design, structural excellence, and client-focused delivery:
 
@@ -229,8 +244,7 @@ At Concept Builders KE, we don't just construct buildings — we bring concepts 
 
 export const vision = {
   title: "Concept Builders KE",
-  description:
-    `Based in Nakuru | Proudly Kenyan | Built for Tomorrow.
+  description: `Based in Nakuru | Proudly Kenyan | Built for Tomorrow.
 #Njengat'itiDesigns#ConceptBuildersK1`,
 };
 
@@ -465,18 +479,15 @@ export const designs: DesignCard[] = [
   },
 ];
 
-
-
-
-
 export const navLinks = [
   { href: "/", label: "Home" },
   { href: "/categories", label: "Categories" },
   { href: "/design-showcase", label: "Design Showcase" },
   { href: "/designs", label: "Plans" },
   { href: "/custom-design", label: "Custom Design" },
-  { href: "/about", label: "About" },
-  { href: "/blog", label: "Blog" },
+  { href: "/ongoing-projects", label: "Projects" },
+  // { href: "/about", label: "About" },
+  // { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -521,8 +532,13 @@ export const socialLinks = [
   {
     href: "https://www.tiktok.com/@wilsonwarainy?is_from_webapp=1&sender_device=pc",
     icon: (props: SVGProps<SVGSVGElement>) => (
-      <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z"/>
+      <svg
+        {...props}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z" />
       </svg>
     ),
   },

@@ -4,8 +4,11 @@ import Link from "next/link";
 import { Design } from "@/generated/prisma";
 
 interface NewPlansProps {
-  newPlans: Design[] &
-    { files: { url: string }[]; category: { name: string } | null }[];
+  newPlans: (Design & {
+    files: { url: string }[];
+    images: { url: string }[];
+    category: { name: string } | null;
+  })[];
 }
 
 const NewPlans = ({ newPlans }: NewPlansProps) => {
@@ -30,7 +33,7 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
               <div className="relative h-64 w-full overflow-hidden">
                 <Image
                   src={
-                    design.files?.find(f => f.type === 'IMAGE')?.url || "/images/category-placeholder.png"
+                    design.images?.[0]?.url || "/images/category-placeholder.png"
                   }
                   alt={design.name}
                   fill

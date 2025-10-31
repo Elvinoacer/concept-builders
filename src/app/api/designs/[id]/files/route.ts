@@ -12,6 +12,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const design = await prisma.design.findUnique({
       where: { id },
       include: {
+        images: true,
+        floorPlans: true,
+        files: true,
         architecturalDesign: {
           include: {
             pdfFiles: true,
@@ -37,12 +40,18 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 
     const allFiles = [
+      ...(design.images || []),
+      ...(design.floorPlans || []),
+      ...(design.files || []),
       ...(design.architecturalDesign?.pdfFiles || []),
       ...(design.architecturalDesign?.cadFiles || []),
       ...(design.structuralDesign?.pdfFiles || []),
       ...(design.structuralDesign?.cadFiles || []),
       ...(design.billOfQuantities?.excelFiles || []),
     ];
+
+    // Sort files by creation date, newest first
+    allFiles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     const paginatedFiles = allFiles.slice(skip, skip + limit);
     const totalPages = Math.ceil(allFiles.length / limit);

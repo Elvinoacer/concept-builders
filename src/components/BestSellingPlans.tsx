@@ -5,8 +5,11 @@ import Link from "next/link";
 import { Design } from "@/generated/prisma";
 
 interface BestSellingPlansProps {
-  bestSellingPlans: Design[] &
-    { files: { url: string }[]; category: { name: string } | null }[];
+  bestSellingPlans: (Design & {
+    files: { url: string }[];
+    images: { url: string }[];
+    category: { name: string } | null;
+  })[];
 }
 
 const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
@@ -25,7 +28,7 @@ const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
               <div className="relative h-48 sm:h-56 md:h-64 w-full">
                 <Image
                   src={
-                    design.files?.find(f => f.type === 'IMAGE')?.url || "/images/category-placeholder.png"
+                    design.images?.[0]?.url || "/images/category-placeholder.png"
                   }
                   alt={design.name}
                   fill

@@ -46,9 +46,12 @@ export async function GET(request: NextRequest) {
           select: { designs: true },
         },
         designs: {
+          orderBy: {
+            createdAt: 'asc',
+          },
           take: 1,
           include: {
-            files: {
+            images: {
               where: {
                 type: "IMAGE",
               },

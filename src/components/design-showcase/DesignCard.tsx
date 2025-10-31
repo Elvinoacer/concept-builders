@@ -27,6 +27,7 @@ interface Design {
   name: string;
   description: string;
   files: File[];
+  images: File[];
   isFeatured?: boolean;
   discounts?: Discount[];
   orderItems?: OrderItem[];
@@ -53,7 +54,7 @@ const DesignCard: React.FC<DesignCardProps> = ({ design, index, showDetails = tr
 
   const isBestSeller = design.orderItems && design.orderItems.length > 10;
 
-  const imageUrl = design.files?.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.png";
+  const imageUrl = design.images?.[0]?.url || "/images/category-placeholder.png";
 
   const minPrice = design.basePrice;
   const maxPrice = design.basePrice +

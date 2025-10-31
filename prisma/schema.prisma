@@ -58,8 +58,8 @@ model User {
   referralBonusConverted   Float             @default(0)
 
   // New self-referencing relation for referred users
-  referredUsers            User[]            @relation("ReferredBy") // Users referred by this user
-  referrer                 User?             @relation("ReferredBy", fields: [referredByCode], references: [referralCode]) // The user who referred this user
+  referredUsers User[] @relation("ReferredBy") // Users referred by this user
+  referrer      User?  @relation("ReferredBy", fields: [referredByCode], references: [referralCode]) // The user who referred this user
 }
 
 model Cart {
@@ -79,8 +79,8 @@ model CartItem {
   id               String   @id @default(cuid())
   cart             Cart     @relation(fields: [cartId], references: [id])
   cartId           String
-  design           Design   @relation(fields: [designId], references: [id])
-  designId         String
+    design   Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
+    designId String
   quantity         Int      @default(1)
   createdAt        DateTime @default(now())
   selectedFileType String?
@@ -154,7 +154,7 @@ model Folder {
 }
 
 model Design {
-  id          String   @id @default(cuid())
+  id          String @id @default(cuid())
   name        String
   description String
   basePrice   Float
@@ -163,12 +163,12 @@ model Design {
   bathrooms   Int?
   area        Float?
   floors      Int?
-  
+
   // Organized file structure
   architecturalDesign DesignDocuments? @relation("ArchitecturalDesign")
   structuralDesign    DesignDocuments? @relation("StructuralDesign")
   billOfQuantities    DesignDocuments? @relation("BillOfQuantities")
-  
+
   planDetails String[]
   images      File[]   @relation("DesignImages")
   floorPlans  File[]   @relation("DesignFloorPlans")
@@ -182,13 +182,13 @@ model Design {
   minBuildingCost       Float?
   maxBuildingCost       Float?
   faq                   Json[]
-  
+
   // Pricing for different packages
-  architecturalPdfPrice Float? @default(0)
-  architecturalCadPrice Float? @default(0)
-  structuralPdfPrice    Float? @default(0)
-  structuralCadPrice    Float? @default(0)
-  billOfQuantitiesPrice Float? @default(0)
+  architecturalPdfPrice Float?          @default(0)
+  architecturalCadPrice Float?          @default(0)
+  structuralPdfPrice    Float?          @default(0)
+  structuralCadPrice    Float?          @default(0)
+  billOfQuantitiesPrice Float?          @default(0)
   packageOptions        PackageOption[]
   buildingCostFactors   Json?
 
@@ -206,68 +206,71 @@ model Design {
 
 // New model to organize design documents by type
 model DesignDocuments {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   type        DocumentType // ARCHITECTURAL, STRUCTURAL, BILL_OF_QUANTITIES
-  description String?  // Overview of what this document package contains
-  
-  // File references
-  pdfFiles    File[]   @relation("PdfDocuments")
-  cadFiles    File[]   @relation("CadDocuments")
-  excelFiles  File[]   @relation("ExcelDocuments")
-  
-  // Overview/content description
-  overview    String?
-  features    String[]
-  specifications Json? // Can store structured spec data
-  
-  design      Design?   @relation(name: "ArchitecturalDesign", fields: [architecturalDesignId], references: [id], onDelete: Cascade)
-  architecturalDesignId String? @unique
-  structuralDesign      Design?   @relation(name: "StructuralDesign", fields: [structuralDesignId], references: [id], onDelete: Cascade)
-  structuralDesignId String? @unique
-  billOfQuantities      Design?   @relation(name: "BillOfQuantities", fields: [billOfQuantitiesId], references: [id], onDelete: Cascade)
-  billOfQuantitiesId String? @unique
+  description String? // Overview of what this document package contains
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  // File references
+  pdfFiles   File[] @relation("PdfDocuments")
+  cadFiles   File[] @relation("CadDocuments")
+  excelFiles File[] @relation("ExcelDocuments")
+
+  // Overview/content description
+  overview       String?
+  features       String[]
+  specifications Json? // Can store structured spec data
+
+  design                Design? @relation(name: "ArchitecturalDesign", fields: [architecturalDesignId], references: [id], onDelete: Cascade)
+  architecturalDesignId String? @unique
+  structuralDesign      Design? @relation(name: "StructuralDesign", fields: [structuralDesignId], references: [id], onDelete: Cascade)
+  structuralDesignId    String? @unique
+  billOfQuantities      Design? @relation(name: "BillOfQuantities", fields: [billOfQuantitiesId], references: [id], onDelete: Cascade)
+  billOfQuantitiesId    String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum DocumentType {
   ARCHITECTURAL
-  STRUCTURAL 
+  STRUCTURAL
   BILL_OF_QUANTITIES
 }
 
 // Updated File model to support document types
 model File {
-  id          String   @id @default(cuid())
-  name        String
-  url         String
-  type        FileType
-  size        Int?
-  
-  // Relations to different document types
-  pdfDocument    DesignDocuments? @relation("PdfDocuments", fields: [pdfDocumentId], references: [id])
-  pdfDocumentId  String?
-  
-  cadDocument    DesignDocuments? @relation("CadDocuments", fields: [cadDocumentId], references: [id])
-  cadDocumentId  String?
-  
-  excelDocument  DesignDocuments? @relation("ExcelDocuments", fields: [excelDocumentId], references: [id])
-  excelDocumentId String?
-  
-  // Existing relation to Design
-  design      Design?  @relation(fields: [designId], references: [id])
-  designId    String?
+  id   String   @id @default(cuid())
+  name String
+  url  String
+  type FileType
+  size Int?
+  version Int @default(1)
+  isLatest Boolean @default(true)
+  fileIdentifier String?
 
-  designImage   Design?  @relation("DesignImages", fields: [designImageId], references: [id])
+  // Relations to different document types
+  pdfDocument   DesignDocuments? @relation("PdfDocuments", fields: [pdfDocumentId], references: [id])
+  pdfDocumentId String?
+
+  cadDocument   DesignDocuments? @relation("CadDocuments", fields: [cadDocumentId], references: [id])
+  cadDocumentId String?
+
+  excelDocument   DesignDocuments? @relation("ExcelDocuments", fields: [excelDocumentId], references: [id])
+  excelDocumentId String?
+
+  // Existing relation to Design
+  design   Design? @relation(fields: [designId], references: [id], onDelete: Cascade)
+  designId String?
+
+  designImage   Design? @relation("DesignImages", fields: [designImageId], references: [id], onDelete: Cascade)
   designImageId String?
 
-  designFloorPlan   Design?  @relation("DesignFloorPlans", fields: [designFloorPlanId], references: [id])
+  designFloorPlan   Design? @relation("DesignFloorPlans", fields: [designFloorPlanId], references: [id], onDelete: Cascade)
   designFloorPlanId String?
 
-  packageOption   PackageOption?
-  
-  createdAt   DateTime @default(now())
+  packageOption PackageOption?
+
+  createdAt DateTime @default(now())
 }
 
 enum FileType {
@@ -276,6 +279,7 @@ enum FileType {
   EXCEL
   IMAGE
   FLOOR_PLAN
+  FILE
   OTHER
 }
 
@@ -286,7 +290,7 @@ model Review {
   authorId  String
   author    User     @relation(fields: [authorId], references: [id])
   designId  String
-  design    Design   @relation(fields: [designId], references: [id])
+  design    Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
 
@@ -477,7 +481,7 @@ model Discount {
 }
 
 model DesignDiscount {
-  design     Design   @relation(fields: [designId], references: [id])
+  design     Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
   designId   String
   discount   Discount @relation(fields: [discountId], references: [id])
   discountId String
@@ -514,6 +518,7 @@ enum ProjectStatus {
   COMPLETED
   ON_HOLD
   CANCELLED
+  NEARING_COMPLETION
 }
 
 enum MilestoneStatus {
@@ -619,14 +624,14 @@ model InvoiceItem {
 }
 
 model MonthlyCost {
-  id             String   @id @default(cuid())
-  month          DateTime // Store as first day of the month
-  digitalOcean   Float
-  resendEmails   Float
-  hosting        Float
-  total          Float
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id           String   @id @default(cuid())
+  month        DateTime // Store as first day of the month
+  digitalOcean Float
+  resendEmails Float
+  hosting      Float
+  total        Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@unique([month]) // Ensure only one record per month
 }
@@ -635,18 +640,58 @@ model DesignView {
   id        String   @id @default(cuid())
   designId  String
   design    Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
-  userId    String?  // Optional: if we want to track views by logged-in users
+  userId    String? // Optional: if we want to track views by logged-in users
   user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 }
 
-model PackageOption {
-  id        String   @id @default(cuid())
-  name      String
-  price     Float
-  file      File?    @relation(fields: [fileId], references: [id])
-  fileId    String?  @unique
-  design    Design   @relation(fields: [designId], references: [id])
-  designId  String
+model OngoingProject {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+
+  clientName  String?
+  location    String?
+
+  status      ProjectStatus @default(PLANNING)
+  category    ProjectCategory
+
+  startDate   DateTime?
+  estimatedCompletionDate DateTime?
+  completedAt DateTime?
+
+  featuredImage String?
+  gallery       Json?
+
+  size        String?
+  value       String?
+
+  highlights  String[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  published   Boolean  @default(false)
+
+  @@map("ongoing_projects")
 }
 
+enum ProjectCategory {
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+  RENOVATION
+  INFRASTRUCTURE
+  INTERIOR_FIT_OUT
+}
+
+
+model PackageOption {
+  id       String  @id @default(cuid())
+  name     String
+  price    Float
+  file     File?   @relation(fields: [fileId], references: [id])
+  fileId   String? @unique
+  design   Design  @relation(fields: [designId], references: [id], onDelete: Cascade)
+  designId String
+}

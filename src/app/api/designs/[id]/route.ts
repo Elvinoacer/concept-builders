@@ -1,8 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { s3Client } from "@/lib/do-spaces";
 import prisma from "@/lib/prisma";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { revalidatePath } from "next/cache";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params;
 
@@ -10,29 +15,36 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       where: { id },
       include: {
         files: true,
+        images: true,
+        floorPlans: true,
         reviews: {
           include: {
             author: true,
           },
         },
-        category: true,
+
         architecturalDesign: {
           include: {
             pdfFiles: true,
             cadFiles: true,
-          }
+          },
         },
         structuralDesign: {
           include: {
             pdfFiles: true,
             cadFiles: true,
-          }
+          },
         },
         billOfQuantities: {
           include: {
             excelFiles: true,
-          }
-        }
+          },
+        },
+        packageOptions: {
+          include: {
+            file: true,
+          },
+        },
       },
     });
 
@@ -47,56 +59,64 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params;
     const body = await request.json();
 
     const updateData: any = {};
 
-    if ('name' in body) updateData.name = body.name;
-    if ('description' in body) updateData.description = body.description;
-    if ('basePrice' in body) updateData.basePrice = body.basePrice;
-    if ('priceRange' in body) updateData.priceRange = body.priceRange;
-    if ('bedrooms' in body) updateData.bedrooms = body.bedrooms;
-    if ('bathrooms' in body) updateData.bathrooms = body.bathrooms;
-    if ('area' in body) updateData.area = body.area;
-    if ('floors' in body) updateData.floors = body.floors;
-    if ('categoryId' in body) updateData.categoryId = body.categoryId;
-    if ('planDetails' in body) updateData.planDetails = body.planDetails;
-    if ('folderId' in body) updateData.folderId = body.folderId; // Can be null to unlink
-    if ('buildingCostEstimates' in body) updateData.buildingCostEstimates = body.buildingCostEstimates;
-    if ('buildingCostFactors' in body) updateData.buildingCostFactors = body.buildingCostFactors;
-    if ('packageOptions' in body) updateData.packageOptions = body.packageOptions;
-    if ('minBuildingCost' in body) updateData.minBuildingCost = body.minBuildingCost;
-    if ('maxBuildingCost' in body) updateData.maxBuildingCost = body.maxBuildingCost;
-    if ('faq' in body) updateData.faq = body.faq;
-    if ('pdfPrice' in body) updateData.pdfPrice = body.pdfPrice;
-    if ('cadPrice' in body) updateData.cadPrice = body.cadPrice;
-    if ('pdfAndCadPrice' in body) updateData.pdfAndCadPrice = body.pdfAndCadPrice;
+    if ("name" in body) updateData.name = body.name;
+    if ("description" in body) updateData.description = body.description;
+    if ("basePrice" in body) updateData.basePrice = body.basePrice;
+    if ("priceRange" in body) updateData.priceRange = body.priceRange;
+    if ("bedrooms" in body) updateData.bedrooms = body.bedrooms;
+    if ("bathrooms" in body) updateData.bathrooms = body.bathrooms;
+    if ("area" in body) updateData.area = body.area;
+    if ("floors" in body) updateData.floors = body.floors;
+    if ("categoryId" in body) updateData.categoryId = body.categoryId;
+    if ("planDetails" in body) updateData.planDetails = body.planDetails;
+    if ("folderId" in body) updateData.folderId = body.folderId; // Can be null to unlink
+    if ("buildingCostEstimates" in body)
+      updateData.buildingCostEstimates = body.buildingCostEstimates;
+    if ("buildingCostFactors" in body)
+      updateData.buildingCostFactors = body.buildingCostFactors;
+    if ("packageOptions" in body)
+      updateData.packageOptions = body.packageOptions;
+    if ("minBuildingCost" in body)
+      updateData.minBuildingCost = body.minBuildingCost;
+    if ("maxBuildingCost" in body)
+      updateData.maxBuildingCost = body.maxBuildingCost;
+    if ("faq" in body) updateData.faq = body.faq;
+    if ("pdfPrice" in body) updateData.pdfPrice = body.pdfPrice;
+    if ("cadPrice" in body) updateData.cadPrice = body.cadPrice;
+    if ("pdfAndCadPrice" in body)
+      updateData.pdfAndCadPrice = body.pdfAndCadPrice;
 
     // Handle files update only if 'files' is explicitly provided in the body
-    
 
     if (body.architecturalDesign) {
       updateData.architecturalDesign = {
         upsert: {
           create: {
-            type: 'ARCHITECTURAL',
+            type: "ARCHITECTURAL",
             description: body.architecturalDesign.description,
             overview: body.architecturalDesign.overview,
             pdfFiles: {
               create: body.architecturalDesign.pdfFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'PDF',
+                type: "PDF",
               })),
             },
             cadFiles: {
               create: body.architecturalDesign.cadFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'CAD',
+                type: "CAD",
               })),
             },
           },
@@ -108,7 +128,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
               create: body.architecturalDesign.pdfFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'PDF',
+                type: "PDF",
               })),
             },
             cadFiles: {
@@ -116,7 +136,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
               create: body.architecturalDesign.cadFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'CAD',
+                type: "CAD",
               })),
             },
           },
@@ -128,21 +148,21 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       updateData.structuralDesign = {
         upsert: {
           create: {
-            type: 'STRUCTURAL',
+            type: "STRUCTURAL",
             description: body.structuralDesign.description,
             overview: body.structuralDesign.overview,
             pdfFiles: {
               create: body.structuralDesign.pdfFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'PDF',
+                type: "PDF",
               })),
             },
             cadFiles: {
               create: body.structuralDesign.cadFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'CAD',
+                type: "CAD",
               })),
             },
           },
@@ -154,7 +174,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
               create: body.structuralDesign.pdfFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'PDF',
+                type: "PDF",
               })),
             },
             cadFiles: {
@@ -162,7 +182,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
               create: body.structuralDesign.cadFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'CAD',
+                type: "CAD",
               })),
             },
           },
@@ -174,14 +194,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       updateData.billOfQuantities = {
         upsert: {
           create: {
-            type: 'BILL_OF_QUANTITIES',
+            type: "BILL_OF_QUANTITIES",
             description: body.billOfQuantities.description,
             overview: body.billOfQuantities.overview,
             excelFiles: {
               create: body.billOfQuantities.excelFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'EXCEL',
+                type: "EXCEL",
               })),
             },
           },
@@ -193,7 +213,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
               create: body.billOfQuantities.excelFiles.map((file: any) => ({
                 name: file.name,
                 url: file.url,
-                type: 'EXCEL',
+                type: "EXCEL",
               })),
             },
           },
@@ -214,7 +234,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       },
     });
 
-    revalidatePath('/');
+    revalidatePath("/");
 
     return NextResponse.json(updatedDesign, { status: 200 });
   } catch (error) {
@@ -230,28 +250,36 @@ export async function DELETE(
   try {
     const { id } = params;
 
-    // 1. Fetch the design and its files
+    console.log(`Starting deletion process for design: ${id}`);
+
+    // 1. Fetch the design to get file details before deletion
     const design = await prisma.design.findUnique({
       where: { id },
-      include: { 
-        files: true,
+      include: {
+        images: true,
+        floorPlans: true,
+        packageOptions: {
+          include: {
+            file: true,
+          },
+        },
         architecturalDesign: {
           include: {
             pdfFiles: true,
             cadFiles: true,
-          }
+          },
         },
         structuralDesign: {
           include: {
             pdfFiles: true,
             cadFiles: true,
-          }
+          },
         },
         billOfQuantities: {
           include: {
             excelFiles: true,
-          }
-        }
+          },
+        },
       },
     });
 
@@ -259,73 +287,188 @@ export async function DELETE(
       return NextResponse.json({ error: "Design not found" }, { status: 404 });
     }
 
-    // 2. Extract keys for DO Spaces deletion
-    const fileKeys: string[] = [];
+    // 2. Extract ALL file URLs for deletion from DigitalOcean Spaces
+    const fileUrls: string[] = [];
+    const addFileUrls = (files: Array<{ url: string }>) => {
+      files.forEach((file) => {
+        if (file.url && file.url.startsWith("http")) {
+          fileUrls.push(file.url);
+        }
+      });
+    };
+
+    addFileUrls(design.images);
+    addFileUrls(design.floorPlans);
+    design.packageOptions.forEach((option) => {
+      if (option.file?.url) {
+        fileUrls.push(option.file.url);
+      }
+    });
     if (design.architecturalDesign) {
-      design.architecturalDesign.pdfFiles.forEach(file => {
-        try {
-          const url = new URL(file.url);
-          fileKeys.push(url.pathname.substring(1));
-        } catch (error) {
-          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
-        }
-      });
-      design.architecturalDesign.cadFiles.forEach(file => {
-        try {
-          const url = new URL(file.url);
-          fileKeys.push(url.pathname.substring(1));
-        } catch (error) {
-          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
-        }
-      });
+      addFileUrls(design.architecturalDesign.pdfFiles);
+      addFileUrls(design.architecturalDesign.cadFiles);
     }
     if (design.structuralDesign) {
-      design.structuralDesign.pdfFiles.forEach(file => {
-        try {
-          const url = new URL(file.url);
-          fileKeys.push(url.pathname.substring(1));
-        } catch (error) {
-          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
-        }
-      });
-      design.structuralDesign.cadFiles.forEach(file => {
-        try {
-          const url = new URL(file.url);
-          fileKeys.push(url.pathname.substring(1));
-        } catch (error) {
-          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
-        }
-      });
+      addFileUrls(design.structuralDesign.pdfFiles);
+      addFileUrls(design.structuralDesign.cadFiles);
     }
     if (design.billOfQuantities) {
-      design.billOfQuantities.excelFiles.forEach(file => {
-        try {
-          const url = new URL(file.url);
-          fileKeys.push(url.pathname.substring(1));
-        } catch (error) {
-          console.error(`Invalid URL found for file ${file.id}: ${file.url}`);
-        }
+      addFileUrls(design.billOfQuantities.excelFiles);
+    }
+
+    console.log(`Found ${fileUrls.length} files to delete from Spaces`);
+
+    // 3. Delete files from DigitalOcean Spaces (non-blocking)
+    if (fileUrls.length > 0) {
+      deleteFilesFromSpacesBackground(fileUrls).catch((error) => {
+        console.error("Background file deletion failed:", error);
       });
     }
 
-    // 3. Delete files from DigitalOcean Spaces
-    // if (fileKeys.length > 0) {
-    //   await deleteFiles(fileKeys);
-    // }
-
-    // 4. Delete the design from the database (Prisma will cascade delete related files)
+    // 4. Delete the design from the database (cascading deletes will handle the rest)
     await prisma.design.delete({
       where: { id },
     });
 
-    revalidatePath('/');
+    console.log(`Successfully deleted design: ${id}`);
 
-    return NextResponse.json({ message: "Design and associated files deleted successfully" });
+    // 5. Revalidate paths
+    revalidatePath("/");
+    revalidatePath("/admin/designs");
+    revalidatePath("/designs");
+    revalidatePath("/api/designs");
+
+    return NextResponse.json({
+      success: true,
+      message: "Design deleted successfully",
+      deletedFilesCount: fileUrls.length,
+      designName: design.name,
+    });
   } catch (error) {
-    console.error("Error deleting design and files:", error);
+    console.error("Error deleting design:", error);
+
+    // More specific error handling
+    if (error instanceof Error) {
+      const errorMessage = error.message.toLowerCase();
+
+      if (
+        errorMessage.includes("foreign key") ||
+        errorMessage.includes("constraint")
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Cannot delete design because it is referenced by other records. Please remove all references first.",
+          },
+          { status: 409 }
+        );
+      }
+
+      return NextResponse.json(
+        { error: `Failed to delete design: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal server error while deleting design" },
       { status: 500 }
     );
   }
+}
+
+// Background file deletion - doesn't block the response
+async function deleteFilesFromSpacesBackground(fileUrls: string[]) {
+  try {
+    console.log(
+      `Starting background deletion of ${fileUrls.length} files from Spaces`
+    );
+
+    const deletePromises = fileUrls.map(async (fileUrl) => {
+      try {
+        const key = extractKeyFromUrl(fileUrl);
+        if (!key) {
+          console.warn(`Skipping invalid URL: ${fileUrl}`);
+          return;
+        }
+
+        const command = new DeleteObjectCommand({
+          Bucket: process.env.DO_SPACES_BUCKET!,
+          Key: key,
+        });
+
+        await s3Client.send(command);
+        console.log(`✓ Deleted from Spaces: ${key}`);
+      } catch (error) {
+        console.error(`✗ Failed to delete from Spaces: ${fileUrl}`, error);
+        // Don't throw - continue with other deletions
+      }
+    });
+
+    const results = await Promise.allSettled(deletePromises);
+
+    const successful = results.filter(
+      (result) => result.status === "fulfilled"
+    ).length;
+    const failed = results.filter(
+      (result) => result.status === "rejected"
+    ).length;
+
+    console.log(
+      `Background file deletion completed: ${successful} successful, ${failed} failed`
+    );
+  } catch (error) {
+    console.error("Background file deletion process failed:", error);
+  }
+}
+
+// Helper function to extract key from URL (compatible with your existing upload format)
+function extractKeyFromUrl(url: string): string | null {
+  try {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname;
+
+    // Remove leading slash if present
+    let key = pathname.startsWith("/") ? pathname.substring(1) : pathname;
+
+    // If the URL contains the bucket name in the path, remove it
+    const bucketName = process.env.DO_SPACES_BUCKET;
+    if (bucketName && key.startsWith(`${bucketName}/`)) {
+      key = key.substring(bucketName.length + 1);
+    }
+
+    // Handle different DigitalOcean Spaces URL formats
+    // Your existing upload might create URLs like:
+    // https://bucket.region.digitaloceanspaces.com/key
+    // or https://region.digitaloceanspaces.com/bucket/key
+
+    return key;
+  } catch (error) {
+    console.error(`Invalid URL format: ${url}`, error);
+    return null;
+  }
+}
+
+// Alternative: If you want to wait for file deletion (slower but more reliable)
+async function deleteFilesFromSpacesWait(fileUrls: string[]) {
+  const deletePromises = fileUrls.map(async (fileUrl) => {
+    const key = extractKeyFromUrl(fileUrl);
+    if (!key) return;
+
+    try {
+      const command = new DeleteObjectCommand({
+        Bucket: process.env.DO_SPACES_BUCKET!,
+        Key: key,
+      });
+
+      await s3Client.send(command);
+      return { success: true, key };
+    } catch (error) {
+      console.error(`Failed to delete: ${key}`, error);
+      return { success: false, key, error };
+    }
+  });
+
+  const results = await Promise.allSettled(deletePromises);
+  return results;
 }

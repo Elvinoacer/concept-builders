@@ -230,7 +230,7 @@ export default function CategoriesPage() {
                   `}
                   >
                     <Image
-                      src={category.designs[0]?.files[0]?.url || "/images/placeholder.png"}
+                      src={category.designs[0]?.images[0]?.url || "/images/placeholder.png"}
                       alt={category.name}
                       layout="fill"
                       objectFit="cover"

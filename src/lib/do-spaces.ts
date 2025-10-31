@@ -1,7 +1,14 @@
-import { S3Client, DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+// src/lib/do-spaces.ts
+import {
+  S3Client,
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const s3Client = new S3Client({
+export const s3Client = new S3Client({
   endpoint: `https://sfo3.digitaloceanspaces.com`,
   region: "sfo3",
   credentials: {
@@ -10,13 +17,16 @@ const s3Client = new S3Client({
   },
 });
 
-export const getSignedUrlForUpload = async (fileName: string, contentType: string) => {
+export const getSignedUrlForUpload = async (
+  fileName: string,
+  contentType: string
+) => {
   const key = `designs/${Date.now()}-${fileName}`;
   const command = new PutObjectCommand({
     Bucket: process.env.DO_SPACES_BUCKET!,
     Key: key,
     ContentType: contentType,
-    ACL: 'public-read',
+    ACL: "public-read",
   });
   const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
   const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.sfo3.digitaloceanspaces.com/${key}`;
@@ -65,7 +75,9 @@ export const deleteFiles = async (keys: string[]) => {
 
   try {
     await s3Client.send(new DeleteObjectsCommand(deleteParams));
-    console.log(`Successfully deleted ${keys.length} files from DigitalOcean Spaces.`);
+    console.log(
+      `Successfully deleted ${keys.length} files from DigitalOcean Spaces.`
+    );
   } catch (error) {
     console.error("Error deleting files from DigitalOcean Spaces:", error);
     throw error;

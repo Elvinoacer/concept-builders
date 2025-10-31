@@ -11,6 +11,7 @@ export async function getLandingPageData() {
   ] = await Promise.all([
     prisma.design.findMany({
 include: {
+        images: true,
         files: true,
         category: true,
         architecturalDesign: {
@@ -34,6 +35,7 @@ include: {
     }),
     prisma.design.findMany({
       include: {
+        images: true,
         files: true,
         category: true,
         _count: { select: { orderItems: true } },
@@ -63,10 +65,13 @@ include: {
       take: 4,
       orderBy: { name: "asc" },
       include: {
+        _count: {
+          select: { designs: true },
+        },
         designs: {
           take: 1,
           include: {
-            files: {
+            images: {
               take: 1,
               where: { type: { in: ["IMAGE"] } }, // Prioritize image types
             },
@@ -83,6 +88,7 @@ include: {
       where: { isFeatured: true },
       take: 8,
       include: { 
+        images: true,
         files: true, 
         category: true,
         architecturalDesign: {

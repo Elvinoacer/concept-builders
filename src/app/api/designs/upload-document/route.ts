@@ -35,25 +35,54 @@ export async function POST(req: NextRequest) {
       designDocument = await prisma.designDocuments.create({ data });
     }
 
-    // 3. Create File record
-    const fileData = {
+    // 3. Handle versioning
+    const existingFile = await prisma.file.findFirst({
+        where: {
+            name: fileName,
+            OR: [
+                { pdfDocumentId: designDocument.id },
+                { cadDocumentId: designDocument.id },
+                { excelDocumentId: designDocument.id },
+            ]
+        },
+        orderBy: {
+            version: 'desc',
+        },
+    });
+
+    let newVersion = 1;
+    if (existingFile) {
+        newVersion = existingFile.version + 1;
+        await prisma.file.update({
+            where: { id: existingFile.id },
+            data: { isLatest: false },
+        });
+    }
+
+    // 4. Create File record
+    const fileData: any = {
       name: fileName,
       url: publicUrl,
       type: fileType,
+      version: newVersion,
+      isLatest: true,
+      fileIdentifier: fileName,
     };
 
     if (fileType === 'PDF') {
-      await prisma.file.create({ data: { ...fileData, pdfDocumentId: designDocument.id } });
+      fileData.pdfDocumentId = designDocument.id;
     } else if (fileType === 'CAD') {
-      await prisma.file.create({ data: { ...fileData, cadDocumentId: designDocument.id } });
+      fileData.cadDocumentId = designDocument.id;
     } else if (fileType === 'EXCEL') {
-      await prisma.file.create({ data: { ...fileData, excelDocumentId: designDocument.id } });
+      fileData.excelDocumentId = designDocument.id;
     }
+
+    await prisma.file.create({ data: fileData });
 
     return NextResponse.json({ signedUrl, publicUrl });
 
   } catch (error) {
     console.error('Error getting signed URL:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return new NextResponse(error.message, { status: 500 });
   }
 }

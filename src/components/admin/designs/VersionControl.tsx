@@ -17,7 +17,7 @@ interface File {
   type: string;
   version: number;
   isLatest: boolean;
-  originalFileName: string;
+  name: string;
   fileIdentifier: string;
   createdAt: string; // Assuming createdAt is a string from the API
 }
@@ -138,8 +138,8 @@ const VersionControl = ({ designId }: VersionControlProps) => {
                     scope="row"
                     className="px-2 py-2 md:px-4 md:py-4 sm:px-6 font-medium text-foreground whitespace-nowrap"
                   >
-                    <span title={decodeURIComponent(file.originalFileName || file.url.split('/').pop() || '')}>
-                      {truncateFileName(decodeURIComponent(file.originalFileName || file.url.split('/').pop() || ''))}
+                    <span title={decodeURIComponent(file.name || file.url.split('/').pop() || '')}>
+                      {truncateFileName(decodeURIComponent(file.name || file.url.split('/').pop() || ''))}
                     </span>
                   </th>
                   <td className="px-2 py-2 md:px-4 md:py-4 sm:px-6 whitespace-nowrap">
@@ -161,7 +161,7 @@ const VersionControl = ({ designId }: VersionControlProps) => {
                       <FiEye className="inline-block w-4 h-4 mr-1" /> View
                     </a>
                     <button
-                      onClick={() => handleDownload(file.url, decodeURIComponent(file.originalFileName || file.url.split('/').pop() || ''))}
+                      onClick={() => handleDownload(file.url, decodeURIComponent(file.name || file.url.split('/').pop() || ''))}
                       className="font-medium text-green-500 hover:underline whitespace-nowrap"
                     >
                       <FiDownload className="inline-block w-4 h-4 mr-1" /> Download

@@ -72,9 +72,9 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
     return <NotFoundState />;
   }
 
-  const images = design.files?.filter(file => file.type === 'IMAGE') || [];
-  const renderings = design.files?.filter(file => file.type === 'IMAGE') || [];
-  const floorPlan = design.files?.find(file => file.type === 'FLOOR_PLAN');
+  const images = design.images || [];
+  const renderings = design.images || []; // Assuming renderings are the same as images for now
+  const floorPlans = design.floorPlans || [];
 
   return (
     <ThemeProvider
@@ -97,7 +97,7 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
               />
               <DesignGallery images={images} />
               <Renderings renderings={renderings} />
-              {floorPlan && <FloorPlan floorPlanUrl={floorPlan.url} />}
+              {floorPlans.map((fp) => <FloorPlan key={fp.id} floorPlanUrl={fp.url} />)}
               {design && <DesignTabs design={design} />}
             </div>
 

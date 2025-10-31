@@ -5,6 +5,7 @@ import ConfirmationModal from "@/components/admin/designs/ConfirmationModal";
 import DesignFilePreview from "@/components/admin/designs/DesignFilePreview";
 import DesignFileUpload from "@/components/admin/designs/DesignFileUpload";
 import NewDesignForm from "@/components/admin/designs/NewDesignForm";
+import PackageOptionsManager from "@/components/admin/designs/PackageOptionsManager";
 import VersionControl from "@/components/admin/designs/VersionControl";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -80,8 +81,15 @@ const DesignPage = () => {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await fetch(`/api/designs/${id}`, { method: "DELETE" });
-      router.push("/admin/designs");
+      const response = await fetch(`/api/designs/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(`Design "${data.designName}" deleted successfully.`);
+        router.push("/admin/designs");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to delete design.");
+      }
     } catch (error) {
       console.error("Error deleting design:", error);
       toast.error("Failed to delete design.");
@@ -442,6 +450,9 @@ const DesignPage = () => {
               </div>
             </div>
           )}
+
+          {/* Package Options Manager */}
+          <PackageOptionsManager designId={design.id} initialOptions={design.packageOptions || []} />
 
           {/* Reviews */}
           {design.reviews && design.reviews.length > 0 && (

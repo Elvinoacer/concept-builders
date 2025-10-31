@@ -4,6 +4,7 @@ import DesignCard from "./design-showcase/DesignCard";
 interface DesignWithCategoryAndFiles extends Design {
   category: { name: string } | null;
   files: { url: string }[];
+  images: { url: string }[];
 }
 
 interface FeaturedDesignsProps {
