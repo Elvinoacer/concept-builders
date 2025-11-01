@@ -12,22 +12,24 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   }
 
   try {
-    // Increment the views count on the Design model
-    await prisma.design.update({
-      where: { id: designId },
-      data: {
-        views: {
-          increment: 1,
+    await prisma.$transaction(async (tx) => {
+      await tx.design.update({
+        where: { id: designId },
+        data: {
+          views: {
+            increment: 1,
+          },
         },
-      },
-    });
+      });
 
-    // Create a new DesignView record
-    await prisma.designView.create({
-      data: {
-        designId: designId,
-        userId: session?.user?.id, // Link to user if logged in
-      },
+      if (session?.user?.id) {
+        await tx.designView.create({
+          data: {
+            designId: designId,
+            userId: session.user.id,
+          },
+        });
+      }
     });
 
     return new NextResponse('View tracked successfully', { status: 200 });

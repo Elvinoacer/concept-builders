@@ -108,12 +108,14 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   };
 
   const handleBuyNow = async () => {
-    await addToCart(design, selectedDocuments, "", selectedOptions);
+    const success = await addToCart(design, selectedDocuments, "", selectedOptions);
 
-    if (status === "authenticated") {
-      router.push("/checkout");
-    } else {
-      await signIn("google", { callbackUrl: "/checkout" });
+    if (success) {
+      if (status === "authenticated") {
+        router.push("/checkout");
+      } else {
+        await signIn("google", { callbackUrl: "/checkout" });
+      }
     }
   };
 
@@ -312,15 +314,15 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
         </motion.fieldset>
 
         {/* Package Options */}
-        {design.packageOptions?.options &&
-          design.packageOptions.options.length > 0 && (
+        {design.packageOptions &&
+          design.packageOptions.length > 0 && (
             <motion.div className="mt-8 space-y-4" variants={itemVariants}>
               <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2 flex items-center gap-3">
                 <PlusCircle className="w-6 h-6 text-primary" />
                 Package Customizations
               </h3>
               <div className="space-y-3">
-                {design.packageOptions.options.map((option: any) => (
+                {design.packageOptions.map((option: any) => (
                   <motion.div
                     key={option.name}
                     className={`flex items-center justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${

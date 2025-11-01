@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
                           equals: item.selectedDocuments,
                         },
                       selectedPackage: item.selectedPackage,            selectedExtras: {
-              equals: item.selectedExtras,
+              equals: JSON.stringify(item.selectedExtras),
             },
           },
         });
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
               quantity: item.quantity,
               selectedDocuments: item.selectedDocuments,
               selectedPackage: item.selectedPackage,
-              selectedExtras: item.selectedExtras,
+              selectedExtras: JSON.stringify(item.selectedExtras),
             },
           });
         }

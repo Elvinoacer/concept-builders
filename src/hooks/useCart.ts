@@ -108,22 +108,27 @@ export const useCart = () => {
           }));
           setCart(frontendCartItems);
           toast.success('Added to cart!');
+          return true; // Add this line
         } else {
           const errorData = await response.json();
           toast.error(errorData.message || errorData.error || 'Failed to add to cart.');
+          return false; // Add this line
         }
       } catch (err) {
         toast.error('An error occurred while adding to cart.');
+        return false; // Add this line
       }
     } else {
       const existingItem = cart.find(item => item.id === design.id && JSON.stringify(item.selectedDocuments) === JSON.stringify(selectedDocuments) && item.selectedPackage === selectedPackage && JSON.stringify(item.selectedExtras) === JSON.stringify(selectedExtras));
       if (existingItem) {
         toast.info('This design is already in your cart.');
+        return false; // Add this line
       } else {
         const newCart = [...cart, { ...design, quantity: 1, selectedDocuments, selectedPackage, selectedExtras }];
         setCart(newCart);
         localStorage.setItem('cart', JSON.stringify(newCart));
         toast.success('Added to cart!');
+        return true; // Add this line
       }
     }
   };
@@ -146,7 +151,7 @@ export const useCart = () => {
             toast.error('An error occurred while removing from cart.');
         }
     } else {
-        const newCart = cart.filter(item => item.id !== designId);
+        const newCart = cart.filter(item => item.cartItemId !== cartItemId);
         setCart(newCart);
         localStorage.setItem('cart', JSON.stringify(newCart));
         toast.success('Removed from cart.');
