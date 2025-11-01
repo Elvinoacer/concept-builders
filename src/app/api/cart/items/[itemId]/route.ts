@@ -141,20 +141,9 @@ export async function PUT(
         items: {
           include: {
             design: {
-              select: {
-                id: true,
-                name: true,
-                basePrice: true,
-                architecturalPdfPrice: true,
-                architecturalCadPrice: true,
-                structuralPdfPrice: true,
-                structuralCadPrice: true,
-                billOfQuantitiesPrice: true,
+              include: {
+                images: true,
                 packageOptions: true,
-                files: {
-                  where: { type: 'IMAGE' },
-                  take: 1
-                }
               }
             }
           },
