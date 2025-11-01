@@ -24,6 +24,36 @@ export async function GET(req: Request) {
   }
 
   try {
+    const userCart = await prisma.cart.findUnique({
+      where: { userId: session.user.id },
+      include: {
+        items: {
+          include: {
+            design: {
+              select: {
+                id: true,
+                name: true,
+                basePrice: true,
+                architecturalPdfPrice: true,
+                architecturalCadPrice: true,
+                structuralPdfPrice: true,
+                structuralCadPrice: true,
+                billOfQuantitiesPrice: true,
+                packageOptions: true,
+                files: {
+                  where: { type: 'IMAGE' },
+                  take: 1
+                }
+              }
+            }
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
+        discount: true, // Include discount details
+      },
+    });
 
     if (!userCart) {
       // Return an empty cart object with null discount details if no cart exists
