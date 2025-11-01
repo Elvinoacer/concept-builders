@@ -109,6 +109,7 @@ export async function GET(request: NextRequest) {
       skip,
       take: limit,
       include: {
+        images: true,
         files: true,
         reviews: true,
         category: true,
