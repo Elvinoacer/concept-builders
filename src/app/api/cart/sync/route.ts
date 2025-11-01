@@ -41,7 +41,8 @@ export async function POST(req: NextRequest) {
                       selectedDocuments: {
                           equals: item.selectedDocuments,
                         },
-                      selectedPackage: item.selectedPackage,            selectedExtras: {
+                      selectedPackage: item.selectedPackage,
+            selectedExtras: {
               equals: JSON.stringify(item.selectedExtras),
             },
           },
