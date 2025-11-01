@@ -24,6 +24,11 @@ export async function GET(req: Request) {
   }
 
   try {
+    const userCart = await prisma.cart.findUnique({
+      where: { userId: session.user.id },
+      include: {
+        items: {
+          include: {
             design: {
               include: {
                 images: true,
@@ -38,8 +43,8 @@ export async function GET(req: Request) {
                 structuralPdfPrice: true,
                 structuralCadPrice: true,
                 billOfQuantitiesPrice: true,
-              }
-            }
+              },
+            },
           },
           orderBy: {
             createdAt: "asc",
@@ -84,7 +89,8 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { designId, selectedFileTypes, selectedPackages, selectedExtras } = await req.json();
+    const { designId, selectedFileTypes, selectedPackages, selectedExtras } =
+      await req.json();
     if (!designId) {
       return NextResponse.json(
         { error: "Design ID is required" },
@@ -160,8 +166,8 @@ export async function POST(req: Request) {
                 structuralPdfPrice: true,
                 structuralCadPrice: true,
                 billOfQuantitiesPrice: true,
-              }
-            }
+              },
+            },
           },
           orderBy: {
             createdAt: "asc",
