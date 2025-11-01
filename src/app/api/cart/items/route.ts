@@ -89,6 +89,13 @@ export async function POST(req: Request) {
   try {
     const { designId, selectedFileTypes, selectedPackages, selectedExtras } =
       await req.json();
+
+    // Normalize arrays for consistent comparison
+    const normalizedSelectedFileTypes = selectedFileTypes ? [...selectedFileTypes].sort() : [];
+    const normalizedSelectedPackages = selectedPackages ? [...selectedPackages].sort() : [];
+    // For selectedExtras (array of objects), sort by a stable property like 'id'
+    const normalizedSelectedExtras = selectedExtras ? [...selectedExtras].sort((a: any, b: any) => a.id.localeCompare(b.id)) : [];
+
     if (!designId) {
       return NextResponse.json(
         { error: "Design ID is required" },
@@ -110,13 +117,13 @@ export async function POST(req: Request) {
         cartId: userCart.id,
         designId: designId,
         selectedFileTypes: {
-          equals: selectedFileTypes,
+          equals: normalizedSelectedFileTypes,
         },
         selectedPackage: {
-          equals: selectedPackages,
+          equals: normalizedSelectedPackages,
         },
         selectedExtras: {
-          equals: selectedExtras,
+          equals: normalizedSelectedExtras,
         },
       },
     });
@@ -126,9 +133,9 @@ export async function POST(req: Request) {
         where: { id: existingCartItem.id },
         data: {
           quantity: existingCartItem.quantity + 1,
-          selectedFileTypes: selectedFileTypes,
-          selectedPackage: selectedPackages,
-          selectedExtras: selectedExtras,
+          selectedFileTypes: normalizedSelectedFileTypes,
+          selectedPackage: normalizedSelectedPackages,
+          selectedExtras: normalizedSelectedExtras,
         },
       });
     } else {
@@ -137,9 +144,9 @@ export async function POST(req: Request) {
           cartId: userCart.id,
           designId: designId,
           quantity: 1,
-          selectedFileTypes: selectedFileTypes,
-          selectedPackage: selectedPackages,
-          selectedExtras: selectedExtras,
+          selectedFileTypes: normalizedSelectedFileTypes,
+          selectedPackage: normalizedSelectedPackages,
+          selectedExtras: normalizedSelectedExtras,
         },
       });
     }
