@@ -79,7 +79,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { designId, selectedDocuments, selectedPackage, selectedExtras } = await req.json();
+    const { designId, selectedFileTypes, selectedPackages, selectedExtras } = await req.json();
     if (!designId) {
       return NextResponse.json(
         { error: "Design ID is required" },
@@ -99,10 +99,13 @@ export async function POST(req: Request) {
     const existingCartItem = await prisma.cartItem.findFirst({
       where: {
         cartId: userCart.id,
-        selectedDocuments: {
-          equals: selectedDocuments,
+        designId: designId,
+        selectedFileTypes: {
+          equals: selectedFileTypes,
         },
-        selectedPackage: selectedPackage,
+        selectedPackage: {
+          equals: selectedPackages,
+        },
         selectedExtras: {
           equals: selectedExtras,
         },
@@ -114,8 +117,8 @@ export async function POST(req: Request) {
         where: { id: existingCartItem.id },
         data: {
           quantity: existingCartItem.quantity + 1,
-          selectedDocuments: selectedDocuments, // Add this line
-          selectedPackage: selectedPackage,
+          selectedFileTypes: selectedFileTypes,
+          selectedPackage: selectedPackages,
           selectedExtras: selectedExtras,
         },
       });
@@ -125,8 +128,8 @@ export async function POST(req: Request) {
           cartId: userCart.id,
           designId: designId,
           quantity: 1,
-          selectedDocuments: selectedDocuments, // Add this line
-          selectedPackage,
+          selectedFileTypes: selectedFileTypes,
+          selectedPackage: selectedPackages,
           selectedExtras: selectedExtras,
         },
       });
