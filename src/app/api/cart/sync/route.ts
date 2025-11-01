@@ -39,11 +39,11 @@ export async function POST(req: NextRequest) {
             cartId: userCart.id,
                       designId: item.id,
                       selectedDocuments: {
-                          equals: JSON.stringify(item.selectedDocuments),
+                          equals: item.selectedDocuments,
                         },
                       selectedPackage: item.selectedPackage,
             selectedExtras: {
-              equals: JSON.stringify(item.selectedExtras),
+              equals: item.selectedExtras,
             },
           },
         });
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
               quantity: item.quantity,
               selectedDocuments: item.selectedDocuments,
               selectedPackage: item.selectedPackage,
-              selectedExtras: JSON.stringify(item.selectedExtras),
+              selectedExtras: item.selectedExtras,
             },
           });
         }

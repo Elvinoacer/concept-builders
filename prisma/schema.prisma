@@ -83,11 +83,11 @@ model CartItem {
     designId String
   quantity         Int      @default(1)
   createdAt        DateTime @default(now())
-  selectedFileType String?
+  selectedDocuments Json?
   selectedPackage  String?
   selectedExtras   Json?
 
-  @@unique([cartId, designId, selectedFileType, selectedPackage, selectedExtras])
+  @@unique([cartId, designId, selectedDocuments, selectedPackage, selectedExtras])
 }
 
 model LoginHistory {

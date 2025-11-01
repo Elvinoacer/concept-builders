@@ -115,7 +115,7 @@ export async function POST(req: Request) {
         },
         selectedPackage: selectedPackage,
         selectedExtras: {
-          equals: JSON.stringify(selectedExtras),
+          equals: selectedExtras,
         },
       },
     });
@@ -127,7 +127,7 @@ export async function POST(req: Request) {
           quantity: existingCartItem.quantity + 1,
           selectedDocuments: selectedDocuments, // Add this line
           selectedPackage: selectedPackage,
-          selectedExtras: JSON.stringify(selectedExtras),
+          selectedExtras: selectedExtras,
         },
       });
     } else {
@@ -138,7 +138,7 @@ export async function POST(req: Request) {
           quantity: 1,
           selectedDocuments: selectedDocuments, // Add this line
           selectedPackage,
-          selectedExtras: JSON.stringify(selectedExtras),
+          selectedExtras: selectedExtras,
         },
       });
     }
