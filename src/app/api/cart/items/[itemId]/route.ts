@@ -41,39 +41,30 @@ export async function DELETE(
         items: {
           include: {
             design: {
-              select: {
-                id: true,
-                name: true,
-                basePrice: true,
-                architecturalPdfPrice: true,
-                architecturalCadPrice: true,
-                structuralPdfPrice: true,
-                structuralCadPrice: true,
-                billOfQuantitiesPrice: true,
+              include: {
+                images: true,
                 packageOptions: true,
-                files: {
-                  where: { type: 'IMAGE' },
-                  take: 1
-                }
-              }
-            }
+              },
+            },
           },
           orderBy: {
             createdAt: "asc",
           },
         },
       },
-    const frontendCartItems = updatedCart?.items.map((item) => ({
-      ...item.design,
-      cartItemId: item.id,
-      quantity: item.quantity,
-      selectedFileTypes: item.selectedFileTypes,
-      selectedPackages: item.selectedPackage,
-      selectedExtras: item.selectedExtras,
-    })) || [];
+    });
+
+    const frontendCartItems =
+      updatedCart?.items.map((item) => ({
+        ...item.design,
+        cartItemId: item.id,
+        quantity: item.quantity,
+        selectedFileTypes: item.selectedFileTypes,
+        selectedPackages: item.selectedPackage,
+        selectedExtras: item.selectedExtras,
+      })) || [];
 
     return NextResponse.json(frontendCartItems);
-
   } catch (error) {
     console.error("Failed to remove item from cart:", error);
     return NextResponse.json(
@@ -101,7 +92,7 @@ export async function PUT(
   try {
     const userId = session.user.id;
     const body = await req.json();
-    const { quantity, selectedDocuments, selectedPackage, selectedExtras } = body;
+    const { quantity, selectedPackage, selectedExtras } = body;
 
     const userCart = await prisma.cart.findUnique({
       where: { userId },
@@ -112,14 +103,17 @@ export async function PUT(
     }
 
     const cartItem = await prisma.cartItem.findFirst({
-        where: {
-            id: itemId,
-            cartId: userCart.id,
-        }
+      where: {
+        id: itemId,
+        cartId: userCart.id,
+      },
     });
 
     if (!cartItem) {
-        return NextResponse.json({ error: "Cart item not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Cart item not found" },
+        { status: 404 }
+      );
     }
 
     const updatedItem = await prisma.cartItem.update({
@@ -128,7 +122,6 @@ export async function PUT(
       },
       data: {
         quantity,
-        selectedDocuments,
         selectedPackage,
         selectedExtras,
       },
@@ -144,8 +137,8 @@ export async function PUT(
               include: {
                 images: true,
                 packageOptions: true,
-              }
-            }
+              },
+            },
           },
           orderBy: {
             createdAt: "asc",
@@ -154,17 +147,17 @@ export async function PUT(
       },
     });
 
-    const frontendCartItems = updatedCart?.items.map((item) => ({
-      ...item.design,
-      cartItemId: item.id,
-      quantity: item.quantity,
-      selectedFileTypes: item.selectedFileTypes,
-      selectedPackages: item.selectedPackage,
-      selectedExtras: item.selectedExtras,
-    })) || [];
+    const frontendCartItems =
+      updatedCart?.items.map((item) => ({
+        ...item.design,
+        cartItemId: item.id,
+        quantity: item.quantity,
+        selectedFileTypes: item.selectedFileTypes,
+        selectedPackages: item.selectedPackage,
+        selectedExtras: item.selectedExtras,
+      })) || [];
 
     return NextResponse.json(frontendCartItems);
-
   } catch (error) {
     console.error("Failed to update item in cart:", error);
     return NextResponse.json(
