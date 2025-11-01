@@ -202,10 +202,16 @@ export const useCart = () => {
 
       if (item.selectedFileTypes) {
         item.selectedFileTypes.forEach(type => {
-          if (type === 'pdf') {
-            itemTotal += item.pdfPrice || 0;
-          } else if (type === 'cad') {
-            itemTotal += item.cadPrice || 0;
+          if (type === 'architecturalPdf') {
+            itemTotal += item.architecturalPdfPrice || 0;
+          } else if (type === 'architecturalCad') {
+            itemTotal += item.architecturalCadPrice || 0;
+          } else if (type === 'structuralPdf') {
+            itemTotal += item.structuralPdfPrice || 0;
+          } else if (type === 'structuralCad') {
+            itemTotal += item.structuralCadPrice || 0;
+          } else if (type === 'billOfQuantities') {
+            itemTotal += item.billOfQuantitiesPrice || 0;
           }
         });
       }
