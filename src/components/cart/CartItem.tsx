@@ -101,7 +101,13 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
           <div className="mt-2">
             <p className="text-sm text-slate-500 dark:text-gray-400">File Types:</p>
             <div className="flex flex-col gap-1 mt-1">
-              {[ { type: 'pdf', label: 'PDF' }, { type: 'cad', label: 'CAD' } ].map(fileTypeOption => (
+              {[ 
+                { type: 'architecturalPdf', label: 'Architectural PDF' }, 
+                { type: 'architecturalCad', label: 'Architectural CAD' },
+                { type: 'structuralPdf', label: 'Structural PDF' },
+                { type: 'structuralCad', label: 'Structural CAD' },
+                { type: 'billOfQuantities', label: 'Bill of Quantities' }
+              ].map(fileTypeOption => (
                 <label key={fileTypeOption.type} className="flex items-center gap-2 text-sm">
                   <input 
                     type="checkbox"

@@ -24,15 +24,20 @@ export async function GET(req: Request) {
   }
 
   try {
-    const userCart = await prisma.cart.findUnique({
-      where: { userId: session.user.id },
-      include: {
-        items: {
-          include: {
             design: {
               include: {
                 images: true,
                 packageOptions: true,
+              },
+              select: {
+                id: true,
+                name: true,
+                basePrice: true,
+                architecturalPdfPrice: true,
+                architecturalCadPrice: true,
+                structuralPdfPrice: true,
+                structuralCadPrice: true,
+                billOfQuantitiesPrice: true,
               }
             }
           },
@@ -145,6 +150,16 @@ export async function POST(req: Request) {
               include: {
                 images: true,
                 packageOptions: true,
+              },
+              select: {
+                id: true,
+                name: true,
+                basePrice: true,
+                architecturalPdfPrice: true,
+                architecturalCadPrice: true,
+                structuralPdfPrice: true,
+                structuralCadPrice: true,
+                billOfQuantitiesPrice: true,
               }
             }
           },
