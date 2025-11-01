@@ -1,14 +1,21 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
-import { Design } from '@/generated/prisma'; // Use generated Prisma Design type
+import { Design, File } from '@/generated/prisma'; // Use generated Prisma Design type
+
+interface PackageOption {
+  id: string;
+  name: string;
+  price: number;
+  file?: File; // Optional, as per schema
+}
 
 interface CartItem extends Design {
   cartItemId: string;
   quantity: number;
   selectedFileTypes: string[];
   selectedPackages?: string[];
-  selectedExtras?: any[];
+  selectedExtras?: PackageOption[];
 }
 
 export const useCart = () => {
@@ -33,7 +40,14 @@ export const useCart = () => {
           quantity: item.quantity,
           selectedFileTypes: item.selectedFileTypes || [],
           selectedPackages: item.selectedPackages || [],
-          selectedExtras: typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras,
+          selectedExtras: (() => {
+            try {
+              return typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras;
+            } catch (e) {
+              console.error("Error parsing selectedExtras from API in fetchCart:", e, item.selectedExtras);
+              return []; // Default to empty array on error
+            }
+          })(),
         }));
         setCart(frontendCartItems);
       } else {
@@ -245,7 +259,14 @@ export const useCart = () => {
             quantity: item.quantity,
             selectedFileTypes: item.selectedFileTypes || [],
             selectedPackages: item.selectedPackages || [],
-            selectedExtras: typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras,
+            selectedExtras: (() => {
+              try {
+                return typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras;
+              } catch (e) {
+                console.error("Error parsing selectedExtras from API in syncCart:", e, item.selectedExtras);
+                return []; // Default to empty array on error
+              }
+            })(),
           })));
           localStorage.removeItem('cart');
           toast.success('Cart synced successfully!');

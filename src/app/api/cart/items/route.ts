@@ -32,6 +32,7 @@ export async function GET(req: Request) {
             design: {
               include: {
                 images: true,
+                packageOptions: true,
               }
             }
           },
@@ -140,6 +141,7 @@ export async function POST(req: Request) {
             design: {
               include: {
                 images: true,
+                packageOptions: true,
               }
             }
           },

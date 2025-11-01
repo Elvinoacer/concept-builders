@@ -56,7 +56,7 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
     if (isChecked) {
       setSelectedExtras([...selectedExtras, extra]);
     } else {
-      setSelectedExtras(selectedExtras.filter(e => e.name !== extra.name));
+      setSelectedExtras(selectedExtras.filter(e => e.id !== extra.id));
     }
   };
 
@@ -134,15 +134,15 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
             </div>
           )}
 
-          {item.packageOptions && item.packageOptions.options && item.packageOptions.options.length > 0 && (
+          {item.design.packageOptions && item.design.packageOptions.length > 0 && (
             <div className="mt-2">
               <p className="text-sm text-slate-500 dark:text-gray-400">Extras:</p>
               <div className="flex flex-col gap-1 mt-1">
-                {item.packageOptions.options.map(extra => (
-                  <label key={extra.name} className="flex items-center gap-2 text-sm">
+                {item.design.packageOptions.map(extra => (
+                  <label key={extra.id} className="flex items-center gap-2 text-sm">
                     <input 
                       type="checkbox"
-                      checked={selectedExtras.some(e => e.name === extra.name)}
+                      checked={selectedExtras.some(e => e.id === extra.id)}
                       onChange={(e) => handleExtraChange(extra, e.target.checked)}
                       className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600"
                     />
