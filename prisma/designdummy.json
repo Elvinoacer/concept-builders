@@ -51,8 +51,9 @@
       "price": 600
     }
   ],
-  "buildingCostEstimates": {
-    "basic": {
+  "buildingCostEstimates": [
+    {
+      "tier": "basic",
       "description": "Standard sustainable materials and local craftsmanship, focusing on core functionality.",
       "costBreakdown": [
         {
@@ -65,7 +66,8 @@
         }
       ]
     },
-    "luxury": {
+    {
+      "tier": "luxury",
       "description": "Premium, imported sustainable materials, geothermal heating/cooling, and high-end fixtures.",
       "costBreakdown": [
         {
@@ -78,7 +80,7 @@
         }
       ]
     }
-  },
+  ],
   "architecturalDesign": {
     "description": "Comprehensive architectural plans for the Eco-Friendly Cabin Retreat.",
     "overview": "Includes detailed floor plans, elevations, cross-sections, and material specifications for a green build.",

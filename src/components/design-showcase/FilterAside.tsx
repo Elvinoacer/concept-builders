@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { ReadonlyURLSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import CategoryModal from "./CategoryModal";
 
 interface FilterAsideProps {
   onClose?: () => void;
@@ -10,8 +11,6 @@ interface FilterAsideProps {
   updateSearchParams: (newParams: Record<string, string | null>) => void;
   handleClearFilters: () => void;
 }
-
-import CategoryModal from "./CategoryModal";
 
 const FilterAside: React.FC<FilterAsideProps> = ({
   onClose,
@@ -31,8 +30,9 @@ const FilterAside: React.FC<FilterAsideProps> = ({
     searchParams.get("styles")?.split(",") || []
   );
   const [minSize, setMinSize] = useState(searchParams.get("minSize") || "500");
-  const [maxSize, setMaxSize] = useState(searchParams.get("maxSize") || "500");
+  const [maxSize, setMaxSize] = useState(searchParams.get("maxSize") || "5000");
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [localChanges, setLocalChanges] = useState(false);
 
   useEffect(() => {
     setPriceType(searchParams.get("priceType") || "design");
@@ -41,13 +41,14 @@ const FilterAside: React.FC<FilterAsideProps> = ({
     setBedrooms(searchParams.get("bedrooms") || "Any");
     setStyles(searchParams.get("styles")?.split(",") || []);
     setMinSize(searchParams.get("minSize") || "500");
-    setMaxSize(searchParams.get("maxSize") || "500");
+    setMaxSize(searchParams.get("maxSize") || "5000");
+    setLocalChanges(false);
   }, [searchParams]);
 
   const handlePriceTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPriceType = e.target.value;
     setPriceType(newPriceType);
-    updateSearchParams({ priceType: newPriceType });
+    setLocalChanges(true);
   };
 
   const handleStyleChange = (style: string, isChecked: boolean) => {
@@ -58,6 +59,7 @@ const FilterAside: React.FC<FilterAsideProps> = ({
       newStyles = newStyles.filter((s) => s !== style);
     }
     setStyles(newStyles);
+    setLocalChanges(true);
   };
 
   const handleApplyFilters = () => {
@@ -68,7 +70,9 @@ const FilterAside: React.FC<FilterAsideProps> = ({
       styles: styles.length > 0 ? styles.join(",") : null,
       minSize: minSize,
       maxSize: maxSize,
+      priceType: priceType,
     });
+    setLocalChanges(false);
   };
 
   const handleClear = () => {
@@ -78,183 +82,367 @@ const FilterAside: React.FC<FilterAsideProps> = ({
     setBedrooms("Any");
     setStyles([]);
     setMinSize("500");
-    setMaxSize("500");
+    setMaxSize("5000");
+    setLocalChanges(false);
     handleClearFilters();
   };
 
+  const architecturalStyles = [
+    "Modern",
+    "Contemporary",
+    "Traditional",
+    "Minimalist",
+    "Industrial",
+    "Scandinavian",
+    "Mediterranean",
+    "Victorian",
+    "Colonial",
+    "Craftsman",
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.4,
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3 },
+    },
+  };
+
   return (
-    <motion.aside
-      className="w-full md:pr-8"
-      initial={{ opacity: 0, x: -50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
-            Filters
-          </h2>
-          <button onClick={onClose} className="md:hidden">
-            <span className="material-symbols-outlined">close</span>
-          </button>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">
-            Price Range
-          </h3>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                id="designCost"
-                name="priceType"
-                value="design"
-                checked={priceType === "design"}
-                onChange={handlePriceTypeChange}
-              />
-              <label htmlFor="designCost">Design Cost</label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                id="buildingCost"
-                name="priceType"
-                value="building"
-                checked={priceType === "building"}
-                onChange={handlePriceTypeChange}
-              />
-              <label htmlFor="buildingCost">Building Cost</label>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4"
-              placeholder="Min Price"
-              type="number"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-            />
-            <span className="text-gray-500">-</span>
-            <input
-              className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-12 px-4"
-              placeholder="Max Price"
-              type="number"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-            />
-          </div>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">
-            Bedrooms
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {["Any", "1", "2", "3", "4+"].map((option) => (
-              <button
-                key={option}
-                onClick={() => setBedrooms(option)}
-                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                  bedrooms === option
-                    ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white"
-                    : "bg-gray-200 dark:bg-gray-800 text-slate-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700"
-                }`}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">
-            Architectural Style
-          </h3>
-          <div className="space-y-2">
-            {styles.slice(0, 5).map((style) => (
-              <label
-                key={style}
-                className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
-              >
-                <input
-                  className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary"
-                  type="checkbox"
-                  checked={styles.includes(style)}
-                  onChange={(e) => handleStyleChange(style, e.target.checked)}
-                />
-                {style}
-              </label>
-            ))}
-          </div>
-          <button
-            onClick={() => setIsCategoryModalOpen(true)}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-2"
+    <>
+      <motion.aside
+        className="w-full md:pr-6"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        <div className="space-y-8 p-1">
+          {/* Header */}
+          <motion.div
+            className="flex items-center justify-between pb-4 border-b border-gray-200/60 dark:border-gray-700/60"
+            variants={itemVariants}
           >
-            More Categories
-          </button>
-        </div>
-        <CategoryModal
-          isOpen={isCategoryModalOpen}
-          onClose={() => setIsCategoryModalOpen(false)}
-          onApply={setStyles}
-          initialSelectedCategories={styles}
-        />
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-white">
-            Size (sq ft)
-          </h3>
-          <div className="relative">
-            <input
-              type="range"
-              min="500"
-              max="5000"
-              step="100"
-              value={maxSize}
-              onChange={(e) => setMaxSize(e.target.value)}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 range-slider"
-            />
-            <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
-              <span>500</span>
-              <span>{maxSize} sq ft</span>
-              <span>5000</span>
+            <div>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                Filters
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Refine your design search
+              </p>
             </div>
-          </div>
-        </div>
+            <motion.button
+              onClick={onClose}
+              className="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="material-symbols-outlined text-xl">close</span>
+            </motion.button>
+          </motion.div>
 
-        <style jsx>{`
-          .range-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(to right, #2563eb, #0891b2);
-            cursor: pointer;
-            margin-top: -8px;
-          }
+          {/* Price Type */}
+          <motion.div variants={itemVariants}>
+            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-xl text-primary">
+                attach_money
+              </span>
+              Price Type
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                {
+                  value: "design",
+                  label: "Design Cost",
+                  icon: "design_services",
+                },
+                {
+                  value: "building",
+                  label: "Building Cost",
+                  icon: "architecture",
+                },
+              ].map((option) => (
+                <motion.label
+                  key={option.value}
+                  className={`relative flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                    priceType === option.value
+                      ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                      : "border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 hover:border-primary/50"
+                  }`}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <input
+                    type="radio"
+                    name="priceType"
+                    value={option.value}
+                    checked={priceType === option.value}
+                    onChange={handlePriceTypeChange}
+                    className="sr-only"
+                  />
+                  <span className="material-symbols-outlined text-2xl mb-2">
+                    {option.icon}
+                  </span>
+                  <span className="text-sm font-medium text-center">
+                    {option.label}
+                  </span>
+                </motion.label>
+              ))}
+            </div>
+          </motion.div>
 
-          .range-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(to right, #2563eb, #0891b2);
-            cursor: pointer;
-          }
-        `}</style>
-        <div className="flex gap-4">
-          <button
-            onClick={handleClear}
-            className="w-full rounded-lg bg-gray-200 dark:bg-gray-700 py-3 font-bold text-slate-800 dark:text-gray-200 transition hover:bg-gray-300 dark:hover:bg-gray-600"
+          {/* Price Range */}
+          <motion.div variants={itemVariants}>
+            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-xl text-primary">
+                payments
+              </span>
+              Price Range
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                    trending_down
+                  </span>
+                  <input
+                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3 pl-10 pr-4 text-sm text-slate-800 dark:text-gray-100 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                    placeholder="Min Price"
+                    type="number"
+                    value={minPrice}
+                    onChange={(e) => {
+                      setMinPrice(e.target.value);
+                      setLocalChanges(true);
+                    }}
+                  />
+                </div>
+                <div className="relative flex-1">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                    trending_up
+                  </span>
+                  <input
+                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3 pl-10 pr-4 text-sm text-slate-800 dark:text-gray-100 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                    placeholder="Max Price"
+                    type="number"
+                    value={maxPrice}
+                    onChange={(e) => {
+                      setMaxPrice(e.target.value);
+                      setLocalChanges(true);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Bedrooms */}
+          <motion.div variants={itemVariants}>
+            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-xl text-primary">
+                bed
+              </span>
+              Bedrooms
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {["Any", "1", "2", "3", "4+"].map((option) => (
+                <motion.button
+                  key={option}
+                  onClick={() => {
+                    setBedrooms(option);
+                    setLocalChanges(true);
+                  }}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
+                    bedrooms === option
+                      ? "bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg shadow-primary/25"
+                      : "bg-white/80 dark:bg-gray-800/80 text-slate-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:shadow-md"
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {option}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Architectural Style */}
+          <motion.div variants={itemVariants}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-xl text-primary">
+                  styles
+                </span>
+                Architectural Style
+              </h3>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {styles.length} selected
+              </span>
+            </div>
+            <div className="space-y-3 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
+              {architecturalStyles.slice(0, 6).map((style) => (
+                <motion.label
+                  key={style}
+                  className="flex items-center gap-3 p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 hover:border-primary/30 cursor-pointer transition-all duration-300 group"
+                  whileHover={{ x: 4 }}
+                >
+                  <div className="relative">
+                    <input
+                      className="sr-only"
+                      type="checkbox"
+                      checked={styles.includes(style)}
+                      onChange={(e) =>
+                        handleStyleChange(style, e.target.checked)
+                      }
+                    />
+                    <div
+                      className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300 ${
+                        styles.includes(style)
+                          ? "bg-primary border-primary"
+                          : "border-gray-300 dark:border-gray-600 group-hover:border-primary"
+                      }`}
+                    >
+                      {styles.includes(style) && (
+                        <span className="material-symbols-outlined text-white text-sm">
+                          check
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-sm text-slate-800 dark:text-gray-200 font-medium">
+                    {style}
+                  </span>
+                </motion.label>
+              ))}
+            </div>
+            <motion.button
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="w-full mt-3 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-primary hover:text-primary transition-all duration-300 flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="material-symbols-outlined text-lg">add</span>
+              More Categories
+            </motion.button>
+          </motion.div>
+
+          {/* Size Range */}
+          <motion.div variants={itemVariants}>
+            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-xl text-primary">
+                square_foot
+              </span>
+              Size Range
+              <span className="text-sm font-normal text-primary ml-auto">
+                {minSize} - {maxSize} sq ft
+              </span>
+            </h3>
+            <div className="space-y-6">
+              <div className="relative py-4">
+                <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+                  <motion.div
+                    className="absolute h-2 bg-gradient-to-r from-primary to-blue-500 rounded-full"
+                    initial={false}
+                    animate={{
+                      left: `${(parseInt(minSize) / 5000) * 100}%`,
+                      right: `${100 - (parseInt(maxSize) / 5000) * 100}%`,
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-4">
+                  <span>500 sq ft</span>
+                  <span>5000 sq ft</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block">
+                    Min Size
+                  </label>
+                  <input
+                    type="number"
+                    min="500"
+                    max="5000"
+                    value={minSize}
+                    onChange={(e) => {
+                      setMinSize(e.target.value);
+                      setLocalChanges(true);
+                    }}
+                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 py-2.5 px-3 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block">
+                    Max Size
+                  </label>
+                  <input
+                    type="number"
+                    min="500"
+                    max="5000"
+                    value={maxSize}
+                    onChange={(e) => {
+                      setMaxSize(e.target.value);
+                      setLocalChanges(true);
+                    }}
+                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 py-2.5 px-3 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                  />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Action Buttons */}
+          <motion.div
+            className="flex gap-3 pt-4 border-t border-gray-200/60 dark:border-gray-700/60"
+            variants={itemVariants}
           >
-            Clear
-          </button>
-          <button
-            onClick={handleApplyFilters}
-            className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-cyan-400 py-3 font-bold text-white transition hover:opacity-90"
-          >
-            Apply
-          </button>
+            <motion.button
+              onClick={handleClear}
+              className="flex-1 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-600 font-semibold text-slate-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="material-symbols-outlined text-lg">refresh</span>
+              Clear
+            </motion.button>
+            <motion.button
+              onClick={handleApplyFilters}
+              disabled={!localChanges}
+              className={`flex-1 py-3.5 rounded-xl font-semibold text-white transition-all duration-300 flex items-center justify-center gap-2 ${
+                localChanges
+                  ? "bg-gradient-to-r from-primary to-blue-600 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 cursor-pointer"
+                  : "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
+              }`}
+              whileHover={localChanges ? { scale: 1.02 } : {}}
+              whileTap={localChanges ? { scale: 0.98 } : {}}
+            >
+              <span className="material-symbols-outlined text-lg">check</span>
+              Apply
+            </motion.button>
+          </motion.div>
         </div>
-      </div>
-    </motion.aside>
+      </motion.aside>
+
+      {/* Category Modal */}
+      <CategoryModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        onApply={setStyles}
+        initialSelectedCategories={styles}
+      />
+    </>
   );
 };
 

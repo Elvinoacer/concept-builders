@@ -218,9 +218,9 @@ export const contactInfo = [
 ];
 
 export const location = {
-  position: { lat: -0.303043, lng: 36.059429 },
+  position: { lat: -0.285245, lng: 36.0683192 },
   destination: "Concept+Builders",
-  directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=-0.303043,36.059429`,
+  directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=-0.285245,36.0683192`,
   apiKey: "AIzaSyA4LjOh_5kbr4YzACmeRUaFwcr5-JV10q4",
 };
 
