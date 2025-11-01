@@ -30,10 +30,6 @@ export async function GET(req: Request) {
         items: {
           include: {
             design: {
-              include: {
-                images: true,
-                packageOptions: true,
-              },
               select: {
                 id: true,
                 name: true,
@@ -43,6 +39,8 @@ export async function GET(req: Request) {
                 structuralPdfPrice: true,
                 structuralCadPrice: true,
                 billOfQuantitiesPrice: true,
+                images: true,
+                packageOptions: true,
               },
             },
           },
@@ -153,10 +151,6 @@ export async function POST(req: Request) {
         items: {
           include: {
             design: {
-              include: {
-                images: true,
-                packageOptions: true,
-              },
               select: {
                 id: true,
                 name: true,
@@ -166,6 +160,8 @@ export async function POST(req: Request) {
                 structuralPdfPrice: true,
                 structuralCadPrice: true,
                 billOfQuantitiesPrice: true,
+                images: true,
+                packageOptions: true,
               },
             },
           },
