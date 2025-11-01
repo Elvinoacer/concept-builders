@@ -104,11 +104,17 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   };
 
   const handleAddToCart = () => {
-    addToCart(design, selectedDocuments, "", selectedOptions);
+    const fileTypesArray = Object.keys(selectedDocuments).filter(
+      (key) => selectedDocuments[key as keyof typeof selectedDocuments]
+    );
+    addToCart(design, fileTypesArray, [], selectedOptions);
   };
 
   const handleBuyNow = async () => {
-    const success = await addToCart(design, selectedDocuments, "", selectedOptions);
+    const fileTypesArray = Object.keys(selectedDocuments).filter(
+      (key) => selectedDocuments[key as keyof typeof selectedDocuments]
+    );
+    const success = await addToCart(design, fileTypesArray, [], selectedOptions);
 
     if (success) {
       if (status === "authenticated") {
