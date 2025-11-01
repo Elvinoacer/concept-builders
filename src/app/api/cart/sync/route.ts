@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
             cartId: userCart.id,
                       designId: item.id,
                       selectedDocuments: {
-                          equals: item.selectedDocuments,
+                          equals: JSON.stringify(item.selectedDocuments),
                         },
                       selectedPackage: item.selectedPackage,
             selectedExtras: {
