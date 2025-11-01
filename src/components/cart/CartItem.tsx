@@ -134,7 +134,7 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
             </div>
           )}
 
-          {item.design.packageOptions && item.design.packageOptions.length > 0 && (
+          {item.design && item.design.packageOptions && item.design.packageOptions.length > 0 && (
             <div className="mt-2">
               <p className="text-sm text-slate-500 dark:text-gray-400">Extras:</p>
               <div className="flex flex-col gap-1 mt-1">
