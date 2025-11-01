@@ -8,35 +8,43 @@ import { useDebounce } from '@/hooks/useDebounce';
 
 const CartItem = ({ item, onRemove, onUpdate }) => {
   const [quantity, setQuantity] = useState(item.quantity);
-  const [selectedFileType, setSelectedFileType] = useState(item.selectedFileType);
-  const [selectedPackage, setSelectedPackage] = useState(item.selectedPackage);
+  const [selectedFileTypes, setSelectedFileTypes] = useState<string[]>(item.selectedFileTypes || []);
+  const [selectedPackages, setSelectedPackages] = useState<string[]>(item.selectedPackages || []);
   const [selectedExtras, setSelectedExtras] = useState(item.selectedExtras || []);
 
   const debouncedQuantity = useDebounce(quantity, 500);
-  const debouncedFileType = useDebounce(selectedFileType, 500);
-  const debouncedPackage = useDebounce(selectedPackage, 500);
+  const debouncedSelectedFileTypes = useDebounce(selectedFileTypes, 500);
+  const debouncedSelectedPackages = useDebounce(selectedPackages, 500);
   const debouncedExtras = useDebounce(selectedExtras, 500);
 
   useEffect(() => {
     onUpdate(item.cartItemId, {
       quantity: debouncedQuantity,
-      selectedFileType: debouncedFileType,
-      selectedPackage: debouncedPackage,
+      selectedFileTypes: debouncedSelectedFileTypes,
+      selectedPackages: debouncedSelectedPackages,
       selectedExtras: debouncedExtras,
     });
-  }, [debouncedQuantity, debouncedFileType, debouncedPackage, debouncedExtras, item.cartItemId]);
+  }, [debouncedQuantity, debouncedSelectedFileTypes, debouncedSelectedPackages, debouncedExtras, item.cartItemId]);
 
   let fileTypePrice = 0;
-  if (selectedFileType === 'pdf') {
-    fileTypePrice = item.pdfPrice || 0;
-  } else if (selectedFileType === 'cad') {
-    fileTypePrice = item.cadPrice || 0;
-  } else if (selectedFileType === 'pdf-and-cad') {
-    fileTypePrice = item.pdfAndCadPrice || 0;
-  }
+  selectedFileTypes.forEach(type => {
+    if (type === 'pdf') {
+      fileTypePrice += item.pdfPrice || 0;
+    } else if (type === 'cad') {
+      fileTypePrice += item.cadPrice || 0;
+    }
+  });
+
+  let packagePrice = 0;
+  selectedPackages.forEach(packageName => {
+    const pkg = item.packageOptions.find(p => p.name === packageName);
+    if (pkg) {
+      packagePrice += pkg.price || 0;
+    }
+  });
 
   const extrasPrice = selectedExtras.reduce((sum, extra) => sum + extra.price, 0) || 0;
-  const itemTotalPrice = (item.basePrice + fileTypePrice + extrasPrice) * quantity;
+  const itemTotalPrice = (item.basePrice + fileTypePrice + packagePrice + extrasPrice) * quantity;
 
   const handleQuantityChange = (newQuantity) => {
     if (newQuantity >= 1) {
@@ -49,6 +57,22 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
       setSelectedExtras([...selectedExtras, extra]);
     } else {
       setSelectedExtras(selectedExtras.filter(e => e.name !== extra.name));
+    }
+  };
+
+  const handleFileTypeChange = (type, isChecked) => {
+    if (isChecked) {
+      setSelectedFileTypes([...selectedFileTypes, type]);
+    } else {
+      setSelectedFileTypes(selectedFileTypes.filter(t => t !== type));
+    }
+  };
+
+  const handlePackageChange = (packageName, isChecked) => {
+    if (isChecked) {
+      setSelectedPackages([...selectedPackages, packageName]);
+    } else {
+      setSelectedPackages(selectedPackages.filter(name => name !== packageName));
     }
   };
 
@@ -74,33 +98,39 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{item.name}</h3>
           
-          <div className="mt-2 flex items-center gap-4">
-            <label htmlFor={`fileType-${item.id}`} className="text-sm text-slate-500 dark:text-gray-400">File Type:</label>
-            <select 
-              id={`fileType-${item.id}`}
-              value={selectedFileType}
-              onChange={(e) => setSelectedFileType(e.target.value)}
-              className="block w-full rounded-md border-gray-300 py-1.5 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-            >
-              <option value="pdf">PDF</option>
-              <option value="cad">CAD</option>
-              <option value="pdf-and-cad">PDF & CAD</option>
-            </select>
+          <div className="mt-2">
+            <p className="text-sm text-slate-500 dark:text-gray-400">File Types:</p>
+            <div className="flex flex-col gap-1 mt-1">
+              {[ { type: 'pdf', label: 'PDF' }, { type: 'cad', label: 'CAD' } ].map(fileTypeOption => (
+                <label key={fileTypeOption.type} className="flex items-center gap-2 text-sm">
+                  <input 
+                    type="checkbox"
+                    checked={selectedFileTypes.includes(fileTypeOption.type)}
+                    onChange={(e) => handleFileTypeChange(fileTypeOption.type, e.target.checked)}
+                    className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600"
+                  />
+                  {fileTypeOption.label}
+                </label>
+              ))}
+            </div>
           </div>
 
           {item.packageOptions && item.packageOptions.length > 0 && (
-            <div className="mt-2 flex items-center gap-4">
-              <label htmlFor={`package-${item.id}`} className="text-sm text-slate-500 dark:text-gray-400">Package:</label>
-              <select 
-                id={`package-${item.id}`}
-                value={selectedPackage}
-                onChange={(e) => setSelectedPackage(e.target.value)}
-                className="block w-full rounded-md border-gray-300 py-1.5 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-              >
+            <div className="mt-2">
+              <p className="text-sm text-slate-500 dark:text-gray-400">Packages:</p>
+              <div className="flex flex-col gap-1 mt-1">
                 {item.packageOptions.map(pkg => (
-                  <option key={pkg.name} value={pkg.name}>{pkg.name}</option>
+                  <label key={pkg.name} className="flex items-center gap-2 text-sm">
+                    <input 
+                      type="checkbox"
+                      checked={selectedPackages.includes(pkg.name)}
+                      onChange={(e) => handlePackageChange(pkg.name, e.target.checked)}
+                      className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600"
+                    />
+                    {pkg.name} (+${pkg.price.toFixed(2)})
+                  </label>
                 ))}
-              </select>
+              </div>
             </div>
           )}
 
@@ -153,6 +183,14 @@ const CartItem = ({ item, onRemove, onUpdate }) => {
       </div>
     </motion.li>
   );
+};
+
+const handleFileTypeChange = (type, isChecked) => {
+  if (isChecked) {
+    setSelectedFileTypes([...selectedFileTypes, type]);
+  } else {
+    setSelectedFileTypes(selectedFileTypes.filter(t => t !== type));
+  }
 };
 
 export default CartItem;
