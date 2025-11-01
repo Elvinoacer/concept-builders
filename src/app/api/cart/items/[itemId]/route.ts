@@ -63,7 +63,14 @@ export async function DELETE(
           },
         },
       },
-    });
+    const frontendCartItems = updatedCart?.items.map((item) => ({
+      ...item.design,
+      cartItemId: item.id,
+      quantity: item.quantity,
+      selectedFileTypes: item.selectedFileTypes,
+      selectedPackages: item.selectedPackage,
+      selectedExtras: item.selectedExtras,
+    })) || [];
 
     return NextResponse.json(frontendCartItems);
 
@@ -162,8 +169,8 @@ export async function PUT(
       ...item.design,
       cartItemId: item.id,
       quantity: item.quantity,
-      selectedDocuments: item.selectedDocuments,
-      selectedPackage: item.selectedPackage,
+      selectedFileTypes: item.selectedFileTypes,
+      selectedPackages: item.selectedPackage,
       selectedExtras: item.selectedExtras,
     })) || [];
 
