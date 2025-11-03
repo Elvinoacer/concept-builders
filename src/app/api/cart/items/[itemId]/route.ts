@@ -54,17 +54,7 @@ export async function DELETE(
       },
     });
 
-    const frontendCartItems =
-      updatedCart?.items.map((item) => ({
-        ...item.design,
-        cartItemId: item.id,
-        quantity: item.quantity,
-        selectedFileTypes: item.selectedFileTypes,
-        selectedPackages: item.selectedPackage,
-        selectedExtras: item.selectedExtras,
-      })) || [];
-
-    return NextResponse.json(frontendCartItems);
+    return NextResponse.json(updatedCart);
   } catch (error) {
     console.error("Failed to remove item from cart:", error);
     return NextResponse.json(
@@ -91,40 +81,20 @@ export async function PUT(
 
   try {
     const userId = session.user.id;
-    const body = await req.json();
-    const { quantity, selectedPackage, selectedExtras } = body;
+    const { quantity, selectedFileTypes, selectedPackages, selectedExtras } = await req.json();
 
-    const userCart = await prisma.cart.findUnique({
-      where: { userId },
-    });
+    const updateData: any = {};
+    if (quantity !== undefined) updateData.quantity = quantity;
+    if (selectedFileTypes !== undefined) updateData.selectedFileTypes = selectedFileTypes;
+    if (selectedPackages !== undefined) updateData.selectedPackage = selectedPackages;
+    if (selectedExtras !== undefined) updateData.selectedExtras = selectedExtras;
 
-    if (!userCart) {
-      return NextResponse.json({ error: "Cart not found" }, { status: 404 });
-    }
-
-    const cartItem = await prisma.cartItem.findFirst({
-      where: {
-        id: itemId,
-        cartId: userCart.id,
-      },
-    });
-
-    if (!cartItem) {
-      return NextResponse.json(
-        { error: "Cart item not found" },
-        { status: 404 }
-      );
-    }
 
     const updatedItem = await prisma.cartItem.update({
       where: {
         id: itemId,
       },
-      data: {
-        quantity,
-        selectedPackage,
-        selectedExtras,
-      },
+      data: updateData,
     });
 
     // Fetch the updated cart to return to the client
@@ -147,17 +117,7 @@ export async function PUT(
       },
     });
 
-    const frontendCartItems =
-      updatedCart?.items.map((item) => ({
-        ...item.design,
-        cartItemId: item.id,
-        quantity: item.quantity,
-        selectedFileTypes: item.selectedFileTypes,
-        selectedPackages: item.selectedPackage,
-        selectedExtras: item.selectedExtras,
-      })) || [];
-
-    return NextResponse.json(frontendCartItems);
+    return NextResponse.json(updatedCart);
   } catch (error) {
     console.error("Failed to update item in cart:", error);
     return NextResponse.json(

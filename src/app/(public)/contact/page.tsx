@@ -1,8 +1,12 @@
 
+"use client";
+
 import ContactForm from "@/components/contact/ContactForm";
 import ContactHeader from "@/components/contact/ContactHeader";
 import ContactInfo from "@/components/contact/ContactInfo";
-import Location from "@/components/contact/Location";
+import dynamic from "next/dynamic";
+
+const Location = dynamic(() => import("@/components/contact/Location"), { ssr: false });
 
 const ContactPage = () => {
   return (

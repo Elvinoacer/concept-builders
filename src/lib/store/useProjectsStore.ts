@@ -1,6 +1,5 @@
-
-import create from 'zustand';
-import axios from 'axios';
+import axios from "axios";
+import { create } from "zustand";
 
 const useProjectsStore = create((set) => ({
   projects: [],
@@ -20,8 +19,11 @@ const useProjectsStore = create((set) => ({
   createProject: async (data) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.post('/api/projects', data);
-      set((state) => ({ projects: [...state.projects, response.data], loading: false }));
+      const response = await axios.post("/api/projects", data);
+      set((state) => ({
+        projects: [...state.projects, response.data],
+        loading: false,
+      }));
     } catch (error) {
       set({ error: error.message, loading: false });
     }
@@ -32,7 +34,9 @@ const useProjectsStore = create((set) => ({
     try {
       const response = await axios.put(`/api/projects/${id}`, data);
       set((state) => ({
-        projects: state.projects.map((project) => (project.id === id ? response.data : project)),
+        projects: state.projects.map((project) =>
+          project.id === id ? response.data : project
+        ),
         loading: false,
       }));
     } catch (error) {

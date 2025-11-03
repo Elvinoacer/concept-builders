@@ -1,6 +1,5 @@
-
-import create from 'zustand';
-import axios from 'axios';
+import { create } from "zustand";
+import axios from "axios";
 
 const useUsersStore = create((set) => ({
   users: [],
@@ -10,7 +9,7 @@ const useUsersStore = create((set) => ({
   fetchUsers: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get('/api/users');
+      const response = await axios.get("/api/users");
       set({ users: response.data, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
@@ -22,7 +21,9 @@ const useUsersStore = create((set) => ({
     try {
       const response = await axios.put(`/api/users/${id}`, data);
       set((state) => ({
-        users: state.users.map((user) => (user.id === id ? response.data : user)),
+        users: state.users.map((user) =>
+          user.id === id ? response.data : user
+        ),
         loading: false,
       }));
     } catch (error) {

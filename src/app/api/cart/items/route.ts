@@ -129,15 +129,10 @@ export async function POST(req: Request) {
     });
 
     if (existingCartItem) {
-      await prisma.cartItem.update({
-        where: { id: existingCartItem.id },
-        data: {
-          quantity: existingCartItem.quantity + 1,
-          selectedFileTypes: normalizedSelectedFileTypes,
-          selectedPackage: normalizedSelectedPackages,
-          selectedExtras: normalizedSelectedExtras,
-        },
-      });
+      return NextResponse.json(
+        { error: "This item is already in your cart" },
+        { status: 409 }
+      );
     } else {
       await prisma.cartItem.create({
         data: {

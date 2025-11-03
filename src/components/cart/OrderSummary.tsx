@@ -1,12 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/useCart";
+import { Globe, Shield, Zap } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Shield, Zap, Globe } from "lucide-react";
 
-const OrderSummary = ({ items, loading }) => {
+const OrderSummary = ({ loading }) => {
   const { cartTotal, appliedDiscountAmount } = useCart();
   const [usdToKesRate, setUsdToKesRate] = useState<number | null>(null);
   const [isFetchingRate, setIsFetchingRate] = useState(true);

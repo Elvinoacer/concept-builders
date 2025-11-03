@@ -53,7 +53,7 @@ const CartItemList = ({ items, onRemove, onUpdate, loading }) => {
       <div className="space-y-4">
         {items.map((item) => (
           <div
-            key={item.id}
+            key={item.cartItemId}
             className="transform transition-transform duration-200 hover:scale-[1.02]"
           >
             <CartItem item={item} onRemove={onRemove} onUpdate={onUpdate} />

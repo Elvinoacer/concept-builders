@@ -10,7 +10,9 @@ export async function getLandingPageData() {
     featuredDesigns,
   ] = await Promise.all([
     prisma.design.findMany({
-include: {
+      orderBy: { createdAt: "desc" },
+      take: 10, // Limit to 10 new plans
+      include: {
         images: true,
         files: true,
         category: true,
@@ -83,7 +85,7 @@ include: {
       orderBy: { createdAt: "desc" },
       take: 3,
     }),
-    prisma.testimonial.findMany(),
+    prisma.testimonial.findMany({ take: 5 }),
     prisma.design.findMany({
       where: { isFeatured: true },
       take: 8,

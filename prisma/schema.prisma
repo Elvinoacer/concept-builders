@@ -76,16 +76,16 @@ model Cart {
 }
 
 model CartItem {
-  id               String   @id @default(cuid())
-  cart             Cart     @relation(fields: [cartId], references: [id])
-  cartId           String
-    design   Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
-    designId String
-  quantity         Int      @default(1)
-  createdAt        DateTime @default(now())
+  id                String   @id @default(cuid())
+  cart              Cart     @relation(fields: [cartId], references: [id])
+  cartId            String
+  design            Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
+  designId          String
+  quantity          Int      @default(1)
+  createdAt         DateTime @default(now())
   selectedFileTypes String[]
-  selectedPackage  String[]
-  selectedExtras   Json?
+  selectedPackage   String[]
+  selectedExtras    Json?
 
   @@unique([cartId, designId, selectedFileTypes, selectedPackage, selectedExtras])
 }
@@ -239,13 +239,13 @@ enum DocumentType {
 
 // Updated File model to support document types
 model File {
-  id   String   @id @default(cuid())
-  name String
-  url  String
-  type FileType
-  size Int?
-  version Int @default(1)
-  isLatest Boolean @default(true)
+  id             String   @id @default(cuid())
+  name           String
+  url            String
+  type           FileType
+  size           Int?
+  version        Int      @default(1)
+  isLatest       Boolean  @default(true)
   fileIdentifier String?
 
   // Relations to different document types
@@ -646,32 +646,32 @@ model DesignView {
 }
 
 model OngoingProject {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   title       String
-  slug        String   @unique
+  slug        String  @unique
   description String?
 
-  clientName  String?
-  location    String?
+  clientName String?
+  location   String?
 
-  status      ProjectStatus @default(PLANNING)
-  category    ProjectCategory
+  status   ProjectStatus   @default(PLANNING)
+  category ProjectCategory
 
-  startDate   DateTime?
+  startDate               DateTime?
   estimatedCompletionDate DateTime?
-  completedAt DateTime?
+  completedAt             DateTime?
 
   featuredImage String?
   gallery       Json?
 
-  size        String?
-  value       String?
+  size  String?
+  value String?
 
-  highlights  String[]
+  highlights String[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  published   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean  @default(false)
 
   @@map("ongoing_projects")
 }
@@ -684,7 +684,6 @@ enum ProjectCategory {
   INFRASTRUCTURE
   INTERIOR_FIT_OUT
 }
-
 
 model PackageOption {
   id       String  @id @default(cuid())

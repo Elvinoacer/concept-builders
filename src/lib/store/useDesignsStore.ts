@@ -1,6 +1,5 @@
-
-import create from 'zustand';
-import axios from 'axios';
+import { create } from "zustand";
+import axios from "axios";
 
 const useDesignsStore = create((set) => ({
   designs: [],
@@ -10,7 +9,9 @@ const useDesignsStore = create((set) => ({
   fetchDesigns: async (page = 1, limit = 10) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get(`/api/designs?page=${page}&limit=${limit}`);
+      const response = await axios.get(
+        `/api/designs?page=${page}&limit=${limit}`
+      );
       set({ designs: response.data, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
@@ -20,8 +21,11 @@ const useDesignsStore = create((set) => ({
   createDesign: async (data) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.post('/api/designs', data);
-      set((state) => ({ designs: [...state.designs, response.data], loading: false }));
+      const response = await axios.post("/api/designs", data);
+      set((state) => ({
+        designs: [...state.designs, response.data],
+        loading: false,
+      }));
     } catch (error) {
       set({ error: error.message, loading: false });
     }
@@ -32,7 +36,9 @@ const useDesignsStore = create((set) => ({
     try {
       const response = await axios.put(`/api/designs/${id}`, data);
       set((state) => ({
-        designs: state.designs.map((design) => (design.id === id ? response.data : design)),
+        designs: state.designs.map((design) =>
+          design.id === id ? response.data : design
+        ),
         loading: false,
       }));
     } catch (error) {

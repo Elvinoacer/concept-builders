@@ -1,6 +1,5 @@
-
-import create from 'zustand';
-import axios from 'axios';
+import { create } from "zustand";
+import axios from "axios";
 
 const useOrdersStore = create((set) => ({
   orders: [],
@@ -10,7 +9,7 @@ const useOrdersStore = create((set) => ({
   fetchOrders: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get('/api/orders');
+      const response = await axios.get("/api/orders");
       set({ orders: response.data, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });

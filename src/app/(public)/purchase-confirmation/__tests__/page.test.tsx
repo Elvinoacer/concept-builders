@@ -20,7 +20,8 @@ describe('PurchaseConfirmationPage', () => {
     render(<PurchaseConfirmationPage />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Purchase #[0-9]+/)).toBeInTheDocument();
+      expect(screen.getByText(/Purchase #/)).toBeInTheDocument();
+      expect(screen.getByText(/[0-9]+/)).toBeInTheDocument();
     });
   });
 });

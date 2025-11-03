@@ -6,8 +6,8 @@ import { Design } from "@/generated/prisma";
 
 interface CartItem extends Design {
   quantity: number;
-  selectedDocuments: any;
-  selectedPackage?: string;
+  selectedFileTypes: string[];
+  selectedPackages?: string[];
   selectedExtras?: any[];
 }
 
@@ -34,16 +34,18 @@ export async function POST(req: NextRequest) {
 
     await prisma.$transaction(async (tx) => {
       for (const item of localCartItems) {
+        const normalizedSelectedFileTypes = item.selectedFileTypes ? [...item.selectedFileTypes].sort() : [];
+        const normalizedSelectedExtras = item.selectedExtras ? [...item.selectedExtras].sort((a: any, b: any) => a.id.localeCompare(b.id)) : [];
+
         const existingItem = await tx.cartItem.findFirst({
           where: {
             cartId: userCart.id,
-                      designId: item.id,
-                      selectedDocuments: {
-                          equals: item.selectedDocuments,
-                        },
-                      selectedPackage: item.selectedPackage,
+            designId: item.id,
+            selectedFileTypes: {
+              equals: normalizedSelectedFileTypes,
+            },
             selectedExtras: {
-              equals: item.selectedExtras,
+              equals: normalizedSelectedExtras,
             },
           },
         });
@@ -61,9 +63,8 @@ export async function POST(req: NextRequest) {
               cartId: userCart.id,
               designId: item.id,
               quantity: item.quantity,
-              selectedDocuments: item.selectedDocuments,
-              selectedPackage: item.selectedPackage,
-              selectedExtras: item.selectedExtras,
+              selectedFileTypes: normalizedSelectedFileTypes,
+              selectedExtras: normalizedSelectedExtras,
             },
           });
         }
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
             design: {
               include: {
                 images: true,
+                packageOptions: true,
               }
             }
           },

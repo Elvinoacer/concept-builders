@@ -1,46 +1,69 @@
 import React from 'react';
+import { Design } from '@/generated/prisma';
 
 interface IncludedItemsProps {
-  selectedPackage?: string;
-  selectedExtras?: any[];
+  selectedFileTypes: string[];
+  selectedExtras: any[];
+  design: Design & { packageOptions: { id: string; name: string; price: number; fileId: string | null; designId: string }[] };
 }
 
-const IncludedItems: React.FC<IncludedItemsProps> = ({ selectedPackage, selectedExtras }) => {
-  const getPackageName = (pkg: string) => {
-    switch (pkg) {
-      case 'pdf':
-        return 'PDF Files';
-      case 'cad':
-        return 'CAD Files';
-      case 'pdf-and-cad':
-        return 'PDF + CAD Files';
-      default:
-        return pkg;
-    }
-  };
+const getFileTypeName = (type: string) => {
+  switch (type) {
+    case 'architecturalPdf':
+      return 'Architectural PDF';
+    case 'architecturalCad':
+      return 'Architectural CAD';
+    case 'structuralPdf':
+      return 'Structural PDF';
+    case 'structuralCad':
+      return 'Structural CAD';
+    case 'billOfQuantities':
+      return 'Bill of Quantities';
+    default:
+      return type;
+  }
+};
 
+const getFileTypePrice = (type: string, design: Design) => {
+  switch (type) {
+    case 'architecturalPdf':
+      return design.architecturalPdfPrice;
+    case 'architecturalCad':
+      return design.architecturalCadPrice;
+    case 'structuralPdf':
+      return design.structuralPdfPrice;
+    case 'structuralCad':
+      return design.structuralCadPrice;
+    case 'billOfQuantities':
+      return design.billOfQuantitiesPrice;
+    default:
+      return 0;
+  }
+};
+
+const IncludedItems: React.FC<IncludedItemsProps> = ({
+  selectedFileTypes,
+  selectedExtras,
+  design,
+}) => {
   return (
-    <div className="mt-2 pl-20">
-      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">What's included:</h4>
-      <div className="mt-2 space-y-2">
-        {selectedPackage && (
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg text-gray-500">description</span>
-              <span>{getPackageName(selectedPackage)}</span>
-            </div>
-          </div>
-        )}
-        {selectedExtras?.map((extra: any) => (
-          <div key={extra.name} className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg text-gray-500">add_circle</span>
-              <span>{extra.name}</span>
-            </div>
-            <span className="font-medium text-gray-800 dark:text-gray-200">+${extra.price.toFixed(2)}</span>
-          </div>
-        ))}
-      </div>
+    <div className="space-y-2">
+      {selectedFileTypes.map((type) => (
+        <div key={type} className="flex justify-between text-sm">
+          <span className="text-gray-600">{getFileTypeName(type)}</span>
+          <span className="font-medium">
+            {getFileTypePrice(type, design) ? `$${getFileTypePrice(type, design).toFixed(2)}` : 'Included'}
+          </span>
+        </div>
+      ))}
+      {selectedExtras.map((extra) => (
+        <div key={extra.id} className="flex justify-between text-sm">
+          <span className="text-gray-600">{extra.name}</span>
+          <span className="font-medium">
+            {extra.price ? `$${extra.price.toFixed(2)}` : 'Included'}
+          </span>
+        </div>
+      ))}
     </div>
   );
 };
