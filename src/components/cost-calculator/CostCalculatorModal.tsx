@@ -11,7 +11,7 @@ const CostCalculatorModal: React.FC<CostCalculatorModalProps> = ({ children }) =
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-4xl">
         <DialogHeader>
           <DialogTitle>Building Cost Calculator</DialogTitle>
         </DialogHeader>
