@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Heart, Search, XCircle, Check } from "lucide-react";
-import { useCart } from "@/hooks/useCart"; // Import the useCart hook
+import { Heart, Search, XCircle, Eye } from "lucide-react";
+// Removed useCart hook as it's no longer needed for this component
 
 interface WishlistItem {
   id: string;
@@ -39,11 +39,7 @@ const WishlistSkeleton = () => (
 const WishlistPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const { cart, addToCart } = useCart(); // Use the cart hook
-
-  const isItemInCart = (designId: string) => {
-    return cart.some((item) => item.design.id === designId);
-  };
+  // Removed cart and addToCart from useCart hook
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,32 +97,7 @@ const WishlistPage = () => {
     );
   };
 
-  const handleAddToCart = async (designId: string) => {
-    if (!session) {
-      toast.error("Please log in to add items to your cart.");
-      router.push("/login");
-      return;
-    }
 
-    try {
-      const response = await fetch(`/api/designs/${designId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch design details.");
-      }
-      const design = await response.json();
-
-      // Assuming default selections for file types, package, and extras
-      // You might need a modal to let the user choose these options
-      const defaultPackage = design.packages.find(p => p.isDefault) || design.packages[0];
-      const selectedFileTypes = defaultPackage.files.map(f => f.id);
-
-      await addToCart(design, selectedFileTypes, defaultPackage.id, []);
-      toast.success("Design added to cart!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to add design to cart.");
-    }
-  };
 
   const filteredWishlist = useMemo(
     () =>
@@ -279,25 +250,15 @@ const WishlistPage = () => {
                   ${design.basePrice.toFixed(2)}
                 </p>
                 <div className="mt-auto">
-                  {isItemInCart(design.id) ? (
-                    <motion.button
-                      disabled
-                      className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                    >
-                      <Check className="w-5 h-5" />
-                      <span>In Cart</span>
-                    </motion.button>
-                  ) : (
-                    <motion.button
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => handleAddToCart(design.id)}
-                      className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-bold shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-cyan-500 transition-all"
-                    >
-                      <ShoppingCart className="w-5 h-5" />
-                      <span>Add to Cart</span>
-                    </motion.button>
-                  )}
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => router.push(`/designs/${design.id}`)}
+                    className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-bold shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-cyan-500 transition-all"
+                  >
+                    <Eye className="w-5 h-5" />
+                    <span>View Details</span>
+                  </motion.button>
                 </div>
               </div>
             </motion.div>
