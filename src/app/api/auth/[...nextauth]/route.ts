@@ -1,12 +1,11 @@
-import NextAuth, { AuthOptions } from 'next-auth';
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
-import FacebookProvider from 'next-auth/providers/facebook';
-import bcrypt from 'bcryptjs';
-import prisma from '@/lib/prisma';
-import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server'; // Import NextRequest
+import prisma from "@/lib/prisma";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import bcrypt from "bcryptjs";
+import NextAuth, { AuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import { cookies } from "next/headers";
+import { NextRequest } from "next/server"; // Import NextRequest
 
 async function refreshAccessToken(token: any) {
   try {
@@ -73,14 +72,14 @@ export const authOptions: AuthOptions = {
     }),
 
     CredentialsProvider({
-      name: 'Credentials',
+      name: "Credentials",
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Please enter your email and password');
+          throw new Error("Please enter your email and password");
         }
 
         const user = await prisma.user.findUnique({
@@ -90,11 +89,13 @@ export const authOptions: AuthOptions = {
         });
 
         if (!user) {
-          throw new Error('No user found with this email');
+          throw new Error("No user found with this email");
         }
 
         if (!user.hashedPassword) {
-          throw new Error('Account created via social login. Please use social login or set a password.');
+          throw new Error(
+            "Account created via social login. Please use social login or set a password."
+          );
         }
 
         const isCorrectPassword = await bcrypt.compare(
@@ -103,7 +104,7 @@ export const authOptions: AuthOptions = {
         );
 
         if (!isCorrectPassword) {
-          throw new Error('Incorrect password');
+          throw new Error("Incorrect password");
         }
 
         return user;
@@ -111,12 +112,12 @@ export const authOptions: AuthOptions = {
     }),
   ],
   session: {
-    strategy: 'jwt',
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
   events: {
     async signIn({ user, isNewUser }) {
-      const ipAddress = globalThis.tempSignInIp || 'Unknown';
+      const ipAddress = globalThis.tempSignInIp || "Unknown";
       delete globalThis.tempSignInIp; // Clean up
 
       await prisma.loginHistory.create({
@@ -128,7 +129,7 @@ export const authOptions: AuthOptions = {
 
       if (isNewUser) {
         const cookieStore = cookies();
-        const referral = cookieStore.get('referral')?.value;
+        const referral = cookieStore.get("referral")?.value;
         if (referral) {
           await prisma.user.update({
             where: { id: user.id! },
@@ -161,7 +162,8 @@ export const authOptions: AuthOptions = {
           token.role = dbUser.role;
           token.accessToken = account.access_token;
           token.refreshToken = account.refresh_token;
-          token.accessTokenExpires = Date.now() + (account.expires_at ?? 0) * 1000;
+          token.accessTokenExpires =
+            Date.now() + (account.expires_at ?? 0) * 1000;
         }
         return token;
       }
@@ -169,7 +171,9 @@ export const authOptions: AuthOptions = {
       // Return previous token if the access token has not expired yet
       if (Date.now() < (token.accessTokenExpires as number)) {
         // Fetch user from DB to get latest role and impersonation status
-        const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+        });
         if (!dbUser) {
           return { ...token, error: "UserNotFound" };
         }
@@ -177,7 +181,9 @@ export const authOptions: AuthOptions = {
         token.role = dbUser.role;
 
         if (dbUser.impersonatingUserId) {
-          const impersonatedUser = await prisma.user.findUnique({ where: { id: dbUser.impersonatingUserId } });
+          const impersonatedUser = await prisma.user.findUnique({
+            where: { id: dbUser.impersonatingUserId },
+          });
           if (impersonatedUser) {
             token.id = impersonatedUser.id;
             token.role = impersonatedUser.role;
@@ -189,7 +195,7 @@ export const authOptions: AuthOptions = {
           token.role = (token.impersonator as { role: string }).role;
           delete token.impersonator;
         }
-        
+
         return token;
       }
 
@@ -212,13 +218,13 @@ export const authOptions: AuthOptions = {
 const handler = NextAuth(authOptions);
 
 async function getHandler(req: NextRequest, context: any) {
-  if (req.nextUrl.pathname.includes('callback') && req.method === 'GET') {
-    const forwarded = req.headers.get('x-forwarded-for');
+  if (req.nextUrl.pathname.includes("callback")) {
+    const forwarded = req.headers.get("x-forwarded-for");
     const ip = forwarded
-      ? (Array.isArray(forwarded)
-          ? forwarded[0]
-          : forwarded.split(/\s*,\s*/)[0])
-      : req.headers.get('x-real-ip') || req.ip || 'Unknown';
+      ? Array.isArray(forwarded)
+        ? forwarded[0]
+        : forwarded.split(/\s*,\s*/)[0]
+      : req.headers.get("x-real-ip") || req.ip || "Unknown";
 
     globalThis.tempSignInIp = ip;
   }
@@ -228,6 +234,17 @@ async function getHandler(req: NextRequest, context: any) {
 }
 
 async function postHandler(req: NextRequest, context: any) {
+  if (req.nextUrl.pathname.includes("callback")) {
+    const forwarded = req.headers.get("x-forwarded-for");
+    const ip = forwarded
+      ? Array.isArray(forwarded)
+        ? forwarded[0]
+        : forwarded.split(/\s*,\s*/)[0]
+      : req.headers.get("x-real-ip") || req.ip || "Unknown";
+
+    globalThis.tempSignInIp = ip;
+  }
+
   // @ts-ignore
   return await handler(req, context);
 }

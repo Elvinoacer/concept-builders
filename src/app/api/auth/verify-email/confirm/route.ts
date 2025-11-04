@@ -1,12 +1,16 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+// src/app/api/auth/verify-email/confirm/route.ts
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
 
   if (!token) {
-    return NextResponse.json({ success: false, message: 'Verification token is missing' }, { status: 400 });
+    return NextResponse.json(
+      { success: false, message: "Verification token is missing" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -18,7 +22,10 @@ export async function GET(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ success: false, message: 'Invalid or expired verification token' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Invalid or expired verification token" },
+        { status: 400 }
+      );
     }
 
     await prisma.user.update({
@@ -31,9 +38,12 @@ export async function GET(request: Request) {
     });
 
     // Redirect to a success page or login page
-    return NextResponse.redirect(new URL('/auth?verified=true', request.url));
+    return NextResponse.redirect(new URL("/auth?verified=true", request.url));
   } catch (error) {
-    console.error('Error verifying email:', error);
-    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+    console.error("Error verifying email:", error);
+    return NextResponse.json(
+      { success: false, message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

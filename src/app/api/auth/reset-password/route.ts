@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
+// src/app/api/auth/reset-password/route.ts
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
@@ -8,12 +9,21 @@ export async function POST(request: Request) {
     const { token, newPassword } = body;
 
     if (!token || !newPassword) {
-      return NextResponse.json({ success: false, message: 'Missing token or new password' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Missing token or new password" },
+        { status: 400 }
+      );
     }
 
     // Minimum password length check
     if (newPassword.length < 6) {
-      return NextResponse.json({ success: false, message: 'Password must be at least 6 characters long' }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Password must be at least 6 characters long",
+        },
+        { status: 400 }
+      );
     }
 
     const user = await prisma.user.findFirst({
@@ -24,7 +34,10 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ success: false, message: 'Invalid or expired password reset token' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Invalid or expired password reset token" },
+        { status: 400 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -38,9 +51,15 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ success: true, message: 'Password has been reset successfully' }, { status: 200 });
+    return NextResponse.json(
+      { success: true, message: "Password has been reset successfully" },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error('Error resetting password:', error);
-    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+    console.error("Error resetting password:", error);
+    return NextResponse.json(
+      { success: false, message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

@@ -9,7 +9,10 @@ export async function middleware(req: NextRequest) {
   const userRole = token?.role as string | undefined;
 
   // If user is authenticated but has no valid role, redirect to homepage as a fallback
-  if (isAuthenticated && (!userRole || !["CLIENT", "ADMIN", "TEAM"].includes(userRole))) {
+  if (
+    isAuthenticated &&
+    (!userRole || !["CLIENT", "ADMIN", "TEAM"].includes(userRole))
+  ) {
     // Avoid redirecting away from the homepage itself
     if (pathname !== "/") {
       return NextResponse.redirect(new URL("/", req.url));
@@ -45,8 +48,7 @@ export async function middleware(req: NextRequest) {
       // Admin/Team trying to access client cart/checkout
       return NextResponse.redirect(new URL("/admin", req.url));
     }
-
-  } 
+  }
   // If the user is not authenticated
   else {
     // If they try to access a protected page, redirect to login
