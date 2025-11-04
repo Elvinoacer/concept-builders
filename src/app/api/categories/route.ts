@@ -59,12 +59,6 @@ export async function GET(request: NextRequest) {
                 mode: "insensitive",
               },
             },
-            {
-              description: {
-                contains: search,
-                mode: "insensitive",
-              },
-            },
           ],
         }
       : {};
