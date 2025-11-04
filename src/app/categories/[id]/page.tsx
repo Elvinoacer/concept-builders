@@ -17,7 +17,7 @@ interface Design {
   id: string;
   name: string;
   description: string;
-  files: { url: string; type: string }[];
+  images: { url: string; type: string }[];
   isFeatured: boolean;
   reviews: any[];
   discounts: any[];

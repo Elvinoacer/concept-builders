@@ -39,7 +39,7 @@ export async function GET(
           skip,
           take: limit,
           include: {
-            files: true,
+            images: true,
             reviews: true,
             discounts: {
               include: {
