@@ -201,7 +201,7 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
                   whileInView="visible"
                   viewport={{ once: true }}
                 >
-                  {design && <DesignTabs design={design} />}
+                  {design && <DesignTabs design={design} onFaqSubmitted={fetchDesign} />}
                 </motion.div>
               </motion.div>
 

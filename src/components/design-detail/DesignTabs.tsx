@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WhatsIncludedTab from "./WhatsIncludedTab";
+import FaqForm from "./FaqForm";
 
-const DesignTabs = ({ design }) => {
+const DesignTabs = ({ design, onFaqSubmitted }) => {
   const tabs = [
     { id: "plan-details", label: "Plan Details", icon: "description" },
     { id: "whats-included", label: "What's Included", icon: "inventory_2" },
@@ -15,6 +16,7 @@ const DesignTabs = ({ design }) => {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [reviewsCurrentPage, setReviewsCurrentPage] = useState(1);
+  const [showFaqForm, setShowFaqForm] = useState(false);
   const reviewsPerPage = 10;
 
   const handleTabClick = (tabId) => {
@@ -250,8 +252,15 @@ const DesignTabs = ({ design }) => {
                         </AnimatePresence>
                       </motion.div>
                     ))}
-                  </motion.div>
-                ) : (
+                      <div className="mt-8 text-center">
+                        <button
+                          onClick={() => setShowFaqForm(true)}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                          Ask a Question
+                        </button>
+                      </div>
+                    ) : (
                   <motion.div
                     className="text-center py-12"
                     variants={itemVariants}
@@ -262,7 +271,22 @@ const DesignTabs = ({ design }) => {
                     <p className="text-gray-500 dark:text-gray-400 text-lg">
                       No frequently asked questions for this design yet.
                     </p>
+                    <button
+                      onClick={() => setShowFaqForm(true)}
+                      className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      Ask a Question
+                    </button>
                   </motion.div>
+                )}
+                {showFaqForm && (
+                  <FaqForm
+                    designId={design.id}
+                    onFaqSubmitted={() => {
+                      setShowFaqForm(false);
+                      onFaqSubmitted();
+                    }}
+                  />
                 )}
               </motion.div>
             )}
