@@ -59,7 +59,9 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true,
+      // This is a security risk, as it can lead to account takeover if a user's email account is compromised.
+      // A better approach is to link accounts only when the user is already authenticated with one of the accounts.
+      allowDangerousEmailAccountLinking: false,
       authorization: {
         params: {
           prompt: "consent",
@@ -69,10 +71,7 @@ export const authOptions: AuthOptions = {
         },
       },
     }),
-    FacebookProvider({
-      clientId: process.env.FACEBOOK_CLIENT_ID!,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
-    }),
+
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
