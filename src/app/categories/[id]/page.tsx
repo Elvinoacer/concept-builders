@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { FiAlertTriangle } from "react-icons/fi";
 import { useEffect, useState } from "react";
+import Image from "next/image"; // Ensure this import is from "next/image" and not conflicting with the browser's native Image object
 
 interface Design {
   id: string;
@@ -32,6 +33,7 @@ interface Category {
   name: string;
   description: string;
   designs: Design[];
+  image?: string; // Add the image property to the Category interface
   _count: {
     designs: number;
   };
@@ -47,7 +49,10 @@ interface CategoryPageProps {
   };
 }
 
-export default function CategoryPage({ params, searchParams }: CategoryPageProps) {
+export default function CategoryPage({
+  params,
+  searchParams,
+}: CategoryPageProps) {
   const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +86,9 @@ export default function CategoryPage({ params, searchParams }: CategoryPageProps
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
-        <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">Loading...</p>
+        <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+          Loading...
+        </p>
       </div>
     );
   }
@@ -99,9 +106,7 @@ export default function CategoryPage({ params, searchParams }: CategoryPageProps
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-3">
             An Error Occurred
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-8">
-            {error}
-          </p>
+          <p className="text-gray-600 dark:text-gray-300 mb-8">{error}</p>
           <Link
             href="/categories"
             className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-transform transform hover:scale-105 duration-300 ease-in-out shadow-md"
@@ -152,7 +157,9 @@ export default function CategoryPage({ params, searchParams }: CategoryPageProps
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold">{category.name} Designs</h1>
+          <h1 className="text-4xl md:text-5xl font-bold">
+            {category.name} Designs
+          </h1>
           <p className="text-lg md:text-xl mt-2">{category.description}</p>
         </div>
       </header>
@@ -183,7 +190,9 @@ export default function CategoryPage({ params, searchParams }: CategoryPageProps
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <p className="text-gray-600 dark:text-gray-300">{category._count.designs} designs</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              {category._count.designs} designs
+            </p>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
