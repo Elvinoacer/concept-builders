@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Design } from "@/generated/prisma";
+import { motion } from "framer-motion";
 
 interface NewPlansProps {
   newPlans: (Design & {
@@ -11,57 +12,231 @@ interface NewPlansProps {
 }
 
 const NewPlans = ({ newPlans }: NewPlansProps) => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: {
+      y: 60,
+      opacity: 0,
+      scale: 0.95,
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+        duration: 0.7,
+      },
+    },
+  };
+
+  const hoverVariants = {
+    hover: {
+      y: -8,
+      scale: 1.02,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 25,
+      },
+    },
+  };
+
   return (
-    <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-            Explore Our Newest Plans
+    <section className="relative py-16 md:py-20 lg:py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-10 -left-10 w-72 h-72 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 -right-10 w-72 h-72 bg-gradient-to-r from-cyan-400/10 to-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/5 to-cyan-400/5 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16 md:mb-20 lg:mb-24"
+        >
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-4">
+            New & Featured Plans
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">
-            Fresh designs hot off the press, featuring the latest architectural
-            trends and innovations.
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            Discover our latest architectural innovations and trending designs
+            that redefine modern living
           </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-4xl mx-auto">
-          {newPlans.map((design) => (
-            <div
+        </motion.div>
+
+        {/* Plans Grid */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 max-w-6xl mx-auto"
+        >
+          {newPlans.map((design, index) => (
+            <motion.div
               key={design.id}
-              className="group relative border rounded-xl overflow-hidden shadow-lg dark:bg-gray-800 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+              variants={cardVariants}
+              whileHover="hover"
+              className="group relative"
             >
-              <div className="relative h-64 w-full overflow-hidden">
-                <Image
-                  src={
-                    design.images?.[0]?.url || "/images/category-placeholder.png"
-                  }
-                  alt={design.name}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-                <div className="absolute top-4 right-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-800 dark:text-gray-200">
-                  {design.category?.name}
+              <div className="relative bg-white dark:bg-gray-800 rounded-2xl lg:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-700/50 group-hover:border-blue-300/50 dark:group-hover:border-cyan-400/30">
+                {/* New Badge */}
+                <div className="absolute top-4 left-4 z-20">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 text-sm font-bold rounded-full shadow-lg flex items-center">
+                    <span className="material-symbols-outlined text-base mr-2">
+                      new_releases
+                    </span>
+                    New
+                  </div>
                 </div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2 truncate">
-                  {design.name}
-                </h3>
-                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-4 mb-4">
-                  {/* These details are not in the new schema, so I will remove them */}
+
+                {/* Featured Badge for First Item */}
+                {index === 0 && (
+                  <div className="absolute top-4 right-4 z-20">
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 text-sm font-bold rounded-full shadow-lg flex items-center">
+                      <span className="material-symbols-outlined text-base mr-2">
+                        star
+                      </span>
+                      Featured
+                    </div>
+                  </div>
+                )}
+
+                {/* Image Container */}
+                <div className="relative h-80 sm:h-96 w-full overflow-hidden">
+                  <Image
+                    src={
+                      design.images?.[0]?.url ||
+                      "/images/category-placeholder.png"
+                    }
+                    alt={design.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    priority={index < 2}
+                  />
+
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-500" />
+
+                  {/* Category Badge */}
+                  <div className="absolute bottom-4 left-4 z-20">
+                    <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-semibold text-gray-800 dark:text-gray-200 border border-white/20 shadow-lg">
+                      {design.category?.name || "Uncategorized"}
+                    </div>
+                  </div>
+
+                  {/* Shine Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 </div>
-                <div className="mt-6 text-center">
-                  <Link
-                    href={`/designs/${design.id}`}
-                    className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold px-5 py-3 rounded-lg hover:from-blue-700 hover:to-cyan-500 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+
+                {/* Content */}
+                <div className="relative p-8 md:p-10 z-10">
+                  <div className="mb-6">
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4 leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors duration-300">
+                      {design.name}
+                    </h3>
+
+                    {/* Design Features */}
+                    <div className="flex flex-wrap gap-3 mb-4">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg">
+                        <span className="material-symbols-outlined text-base mr-1.5 text-blue-500">
+                          schedule
+                        </span>
+                        Latest Design
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg">
+                        <span className="material-symbols-outlined text-base mr-1.5 text-green-500">
+                          trending_up
+                        </span>
+                        Trending
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="text-center"
                   >
-                    View Details
-                  </Link>
+                    <Link
+                      href={`/designs/${design.id}`}
+                      className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 text-lg font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/btn"
+                    >
+                      Explore Design
+                      <span className="material-symbols-outlined ml-3 text-xl group-hover/btn:translate-x-1 transition-transform duration-300">
+                        arrow_forward
+                      </span>
+                    </Link>
+                  </motion.div>
                 </div>
+
+                {/* Hover Border Effect */}
+                <div className="absolute inset-0 rounded-2xl lg:rounded-3xl border-2 border-transparent bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-padding opacity-0 group-hover:opacity-100 transition-opacity duration-500 -m-0.5" />
               </div>
-            </div>
+
+              {/* Background Glow */}
+              <div className="absolute inset-0 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-10 blur-md transition-opacity duration-500 -z-10" />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
+
+        {/* CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="text-center mt-16 md:mt-20"
+        >
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-2xl p-8 md:p-12 border border-blue-200/50 dark:border-blue-700/30">
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Stay Ahead with New Designs
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6 max-w-2xl mx-auto">
+              Be the first to explore our latest architectural innovations and
+              get inspired by cutting-edge designs.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/designs?sort=newest"
+                className="inline-flex items-center bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 text-lg font-semibold rounded-2xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/cta"
+              >
+                View All New Designs
+                <span className="material-symbols-outlined ml-3 text-xl group-hover/cta:translate-x-1 transition-transform duration-300">
+                  trending_flat
+                </span>
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-8 py-4 text-lg font-semibold rounded-2xl border border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-cyan-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/cta2"
+              >
+                Get Custom Design
+                <span className="material-symbols-outlined ml-3 text-xl group-hover/cta2:translate-x-1 transition-transform duration-300">
+                  design_services
+                </span>
+              </Link>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
