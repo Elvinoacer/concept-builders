@@ -47,6 +47,7 @@ const LoginForm = ({ setAuthMode }: { setAuthMode: React.Dispatch<React.SetState
       }
     } else if (result?.ok) {
       router.push(callbackUrl);
+      router.refresh();
     }
   };
 
