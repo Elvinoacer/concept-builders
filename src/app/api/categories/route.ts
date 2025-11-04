@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
             createdAt: 'asc',
           },
           take: 1,
-          include: {
+          select: {
             images: {
               where: {
                 type: "IMAGE",
