@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import { FiBed, FiBath, FiMaximize, FiLayers } from "react-icons/fi";
+
 interface File {
   url: string;
   type: string;
@@ -40,6 +42,10 @@ interface Design {
   billOfQuantitiesPrice?: number;
   minBuildingCost?: number;
   maxBuildingCost?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  area?: number;
+  floors?: number;
 }
 
 interface DesignCardProps {
@@ -129,6 +135,26 @@ const DesignCard: React.FC<DesignCardProps> = ({
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
           {design.description}
         </p>
+
+        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <div className="flex items-center gap-2">
+            <FiBed />
+            <span>{design.bedrooms} Beds</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FiBath />
+            <span>{design.bathrooms} Baths</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FiMaximize />
+            <span>{design.area} sqmt</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FiLayers />
+            <span>{design.floors} Floors</span>
+          </div>
+        </div>
+
         {showDetails && (
           <div className="mt-4 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
             {priceType === "building" &&
