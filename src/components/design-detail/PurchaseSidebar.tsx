@@ -46,9 +46,6 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
     if (cartItem) {
       setSelectedFileTypes(cartItem.selectedFileTypes);
       setSelectedExtras(cartItem.selectedExtras || []);
-    } else {
-      // If the item is not in the cart, maybe reset selections or handle as needed
-      // For now, we'll leave selections as they are so user can build a new configuration
     }
   }, [cartItem]);
 
@@ -128,8 +125,6 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
 
   const handleAddToCart = () => {
     if (cartItem) {
-      // If item is already in cart, maybe show a notification or update it
-      // For now, let's just notify the user.
       alert(
         "This configuration is already in your cart. You can adjust the quantity in the cart page."
       );
@@ -149,7 +144,6 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       if (status === "authenticated") {
         router.push("/checkout");
       } else {
-        // Prompt to sign in, then redirect to checkout
         signIn("google", { callbackUrl: "/checkout" });
       }
     }
@@ -162,6 +156,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       price: design.architecturalPdfPrice || 0,
       icon: FileText,
       description: "Detailed PDF blueprints and plans",
+      category: "architectural",
     },
     {
       key: "architecturalCad",
@@ -169,6 +164,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       price: design.architecturalCadPrice || 0,
       icon: Building2,
       description: "Editable CAD files for modifications",
+      category: "architectural",
     },
     {
       key: "structuralPdf",
@@ -176,6 +172,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       price: design.structuralPdfPrice || 0,
       icon: FileText,
       description: "Structural engineering drawings",
+      category: "structural",
     },
     {
       key: "structuralCad",
@@ -183,6 +180,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       price: design.structuralCadPrice || 0,
       icon: Building2,
       description: "Structural CAD files for engineers",
+      category: "structural",
     },
     {
       key: "billOfQuantities",
@@ -190,8 +188,25 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       price: design.billOfQuantitiesPrice || 0,
       icon: Calculator,
       description: "Material and cost breakdown",
+      category: "additional",
     },
   ];
+
+  // Group document options by category for better organization
+  const groupedDocuments = useMemo(() => {
+    const groups = {
+      architectural: documentOptions.filter(
+        (doc) => doc.category === "architectural"
+      ),
+      structural: documentOptions.filter(
+        (doc) => doc.category === "structural"
+      ),
+      additional: documentOptions.filter(
+        (doc) => doc.category === "additional"
+      ),
+    };
+    return groups;
+  }, [documentOptions]);
 
   const containerVariants = {
     hidden: { opacity: 0, x: 50 },
@@ -224,99 +239,104 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
 
   return (
     <motion.div
-      className="sticky top-24 space-y-6"
+      className="sticky top-6 lg:top-24 space-y-6 w-full max-w-md mx-auto lg:mx-0"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       {/* Main Purchase Card */}
       <motion.div
-        className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border-2 border-gray-200/50 dark:border-gray-700/50"
+        className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl p-6 lg:p-8 rounded-3xl shadow-2xl border-2 border-gray-200/50 dark:border-gray-700/50"
         variants={itemVariants}
       >
-        {/* Document Selection */}
-        <motion.fieldset className="mt-6" variants={itemVariants}>
-          <legend className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4 flex items-center gap-3">
-            <FileText className="w-6 h-6 text-primary" />
-            Select Documents
-          </legend>
-          <div className="space-y-4">
-            {documentOptions.map((option) => {
-              const IconComponent = option.icon;
-              const isChecked = selectedFileTypes.includes(option.key);
-              return (
-                <motion.label
-                  key={option.key}
-                  htmlFor={option.key}
-                  className={`relative flex items-start gap-4 rounded-2xl p-4 cursor-pointer transition-all duration-300 border-2 group ${
-                    isChecked
-                      ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-                      : "border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 hover:border-primary/50 hover:shadow-md"
-                  }`}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <input
-                    type="checkbox"
-                    id={option.key}
-                    name="documentType"
-                    value={option.key}
-                    checked={isChecked}
-                    onChange={() => handleFileTypeToggle(option.key)}
-                    className="sr-only"
+        {/* Header Section */}
+        <motion.div className="text-center mb-6" variants={itemVariants}>
+          <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            Purchase Options
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm lg:text-base">
+            Customize your package and get instant access
+          </p>
+        </motion.div>
+
+        {/* Document Selection - Organized by Category */}
+        <motion.div className="space-y-6" variants={itemVariants}>
+          {/* Architectural Documents */}
+          <motion.fieldset variants={itemVariants}>
+            <legend className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4 flex items-center gap-3">
+              <Building2 className="w-5 h-5 text-primary" />
+              Architectural Plans
+            </legend>
+            <div className="space-y-3">
+              {groupedDocuments.architectural.map((option) => {
+                const IconComponent = option.icon;
+                const isChecked = selectedFileTypes.includes(option.key);
+                return (
+                  <DocumentOption
+                    key={option.key}
+                    option={option}
+                    isChecked={isChecked}
+                    onToggle={handleFileTypeToggle}
+                    IconComponent={IconComponent}
                   />
+                );
+              })}
+            </div>
+          </motion.fieldset>
 
-                  {/* Checkbox Indicator */}
-                  <motion.div
-                    className={`flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center mt-1 transition-all duration-300 ${
-                      isChecked
-                        ? "bg-primary border-primary"
-                        : "border-gray-400 group-hover:border-primary"
-                    }`}
-                  >
-                    {isChecked && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 500 }}
-                      >
-                        <CheckCircle className="w-4 h-4 text-white" />
-                      </motion.div>
-                    )}
-                  </motion.div>
+          {/* Structural Documents */}
+          <motion.fieldset variants={itemVariants}>
+            <legend className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4 flex items-center gap-3">
+              <Shield className="w-5 h-5 text-primary" />
+              Structural Plans
+            </legend>
+            <div className="space-y-3">
+              {groupedDocuments.structural.map((option) => {
+                const IconComponent = option.icon;
+                const isChecked = selectedFileTypes.includes(option.key);
+                return (
+                  <DocumentOption
+                    key={option.key}
+                    option={option}
+                    isChecked={isChecked}
+                    onToggle={handleFileTypeToggle}
+                    IconComponent={IconComponent}
+                  />
+                );
+              })}
+            </div>
+          </motion.fieldset>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <IconComponent className="w-5 h-5 text-primary" />
-                      <span className="font-semibold text-slate-800 dark:text-white text-lg">
-                        {option.label}
-                      </span>
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      {option.description}
-                    </p>
-                  </div>
-
-                  {/* Price */}
-                  <motion.span
-                    className="font-bold text-primary text-lg flex-shrink-0"
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    +${option.price.toLocaleString()}
-                  </motion.span>
-                </motion.label>
-              );
-            })}
-          </div>
-        </motion.fieldset>
+          {/* Additional Documents */}
+          <motion.fieldset variants={itemVariants}>
+            <legend className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4 flex items-center gap-3">
+              <FileText className="w-5 h-5 text-primary" />
+              Additional Documents
+            </legend>
+            <div className="space-y-3">
+              {groupedDocuments.additional.map((option) => {
+                const IconComponent = option.icon;
+                const isChecked = selectedFileTypes.includes(option.key);
+                return (
+                  <DocumentOption
+                    key={option.key}
+                    option={option}
+                    isChecked={isChecked}
+                    onToggle={handleFileTypeToggle}
+                    IconComponent={IconComponent}
+                  />
+                );
+              })}
+            </div>
+          </motion.fieldset>
+        </motion.div>
 
         {/* Package Options */}
         {design.packageOptions && design.packageOptions.length > 0 && (
           <motion.div className="mt-8 space-y-4" variants={itemVariants}>
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2 flex items-center gap-3">
-              <PlusCircle className="w-6 h-6 text-primary" />
-              Package Customizations
+            <h3 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2 flex items-center gap-3">
+              <PlusCircle className="w-5 h-5 text-primary" />
+              Customizations
             </h3>
             <div className="space-y-3">
               {design.packageOptions.map((option: any) => {
@@ -324,46 +344,12 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
                   (e) => e.id === option.id
                 );
                 return (
-                  <motion.div
-                    key={option.name}
-                    className={`flex items-center justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 group ${
-                      isChecked
-                        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-                        : "border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 hover:border-primary/50 hover:shadow-md"
-                    }`}
-                    onClick={() => handleExtraToggle(option)}
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <motion.div
-                        className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
-                          isChecked
-                            ? "bg-primary border-primary"
-                            : "border-gray-400 group-hover:border-primary"
-                        }`}
-                      >
-                        {isChecked && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring", stiffness: 500 }}
-                          >
-                            <CheckCircle className="w-4 h-4 text-white" />
-                          </motion.div>
-                        )}
-                      </motion.div>
-                      <span className="font-medium text-slate-800 dark:text-gray-100 text-lg">
-                        {option.name}
-                      </span>
-                    </div>
-                    <motion.span
-                      className="font-bold text-primary text-lg"
-                      whileHover={{ scale: 1.1 }}
-                    >
-                      +${option.price.toLocaleString()}
-                    </motion.span>
-                  </motion.div>
+                  <ExtraOption
+                    key={option.id}
+                    option={option}
+                    isChecked={isChecked}
+                    onToggle={handleExtraToggle}
+                  />
                 );
               })}
             </div>
@@ -372,13 +358,18 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
 
         {/* Total Price Section */}
         <motion.div
-          className="mt-8 pt-8 border-t border-gray-200/50 dark:border-gray-700/50"
+          className="mt-8 pt-6 border-t border-gray-200/50 dark:border-gray-700/50"
           variants={itemVariants}
         >
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-xl font-medium text-gray-600 dark:text-gray-400">
-              Total Price:
-            </p>
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                Total Amount
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Including all selected items
+              </p>
+            </div>
             <div className="text-right">
               <AnimatePresence mode="wait">
                 <motion.p
@@ -386,13 +377,13 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
                   variants={priceVariants}
                   initial="initial"
                   animate="updated"
-                  className="text-4xl font-extrabold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent"
+                  className="text-3xl lg:text-4xl font-extrabold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent"
                 >
                   ${totalPrice.toLocaleString()}
                 </motion.p>
               </AnimatePresence>
               <motion.p
-                className="text-lg text-gray-500 dark:text-gray-400 mt-2"
+                className="text-base text-gray-500 dark:text-gray-400 mt-1"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -401,58 +392,61 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
                   ? `KES ${kesPrice.toLocaleString()}`
                   : "Converting..."}
               </motion.p>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link
-                  href={`/currency-converter?amount=${totalPrice}`}
-                  className="text-primary hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 text-sm font-medium inline-flex items-center gap-1 mt-1"
-                >
-                  View more conversions
-                  <Zap className="w-4 h-4" />
-                </Link>
-              </motion.div>
-              <CostCalculatorModal>
-                <Button variant="outline" className="w-full mt-4">
-                  Cost Calculator
-                </Button>
-              </CostCalculatorModal>
             </div>
+          </div>
+
+          {/* Utility Buttons */}
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <CostCalculatorModal>
+              <Button variant="outline" className="w-full h-12 text-sm">
+                <Calculator className="w-4 h-4 mr-2" />
+                Cost Calculator
+              </Button>
+            </CostCalculatorModal>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                href={`/currency-converter?amount=${totalPrice}`}
+                className="flex items-center justify-center w-full h-12 px-4 text-sm font-medium text-primary border-2 border-primary/20 rounded-xl hover:border-primary/40 transition-colors duration-300"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                More Currencies
+              </Link>
+            </motion.div>
           </div>
         </motion.div>
 
         {/* Action Buttons */}
         <motion.div
-          className="mt-8 grid grid-cols-1 gap-4"
+          className="mt-6 grid grid-cols-1 gap-3"
           variants={itemVariants}
         >
           <motion.button
-            whileHover={{ scale: 1.02, y: -2 }}
+            whileHover={{ scale: 1.02, y: -1 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleBuyNow}
-            className="w-full flex items-center justify-center gap-3 rounded-2xl h-16 px-8 bg-gradient-to-r from-primary to-blue-600 text-white text-xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 group"
+            className="w-full flex items-center justify-center gap-3 rounded-2xl h-14 lg:h-16 px-6 bg-gradient-to-r from-primary to-blue-600 text-white text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 group"
           >
-            <Zap className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+            <Zap className="w-5 h-5 lg:w-6 lg:h-6 group-hover:scale-110 transition-transform duration-300" />
             Buy Now
-            <Shield className="w-5 h-5 opacity-80" />
+            <Shield className="w-4 h-4 lg:w-5 lg:h-5 opacity-80" />
           </motion.button>
 
           <motion.button
-            whileHover={{ scale: 1.02, y: -2 }}
+            whileHover={{ scale: 1.02, y: -1 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleAddToCart}
-            disabled={!!cartItem} // Disable button if item is already in cart
-            className="w-full flex items-center justify-center gap-3 rounded-2xl h-16 px-8 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border-2 border-gray-300 dark:border-gray-600 text-slate-800 dark:text-gray-200 text-xl font-bold shadow-lg hover:shadow-xl hover:border-primary/50 transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!!cartItem}
+            className="w-full flex items-center justify-center gap-3 rounded-2xl h-14 lg:h-16 px-6 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border-2 border-gray-300 dark:border-gray-600 text-slate-800 dark:text-gray-200 text-lg font-bold shadow-lg hover:shadow-xl hover:border-primary/50 transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {cartItem ? (
               <>
-                <CheckCircle className="w-6 h-6 text-green-500" /> In Cart
+                <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-green-500" />
+                <span>Added to Cart</span>
               </>
             ) : (
               <>
-                <ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />{" "}
-                Add to Cart
+                <ShoppingCart className="w-5 h-5 lg:w-6 lg:h-6 group-hover:scale-110 transition-transform duration-300" />
+                <span>Add to Cart</span>
               </>
             )}
           </motion.button>
@@ -460,20 +454,23 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       </motion.div>
 
       {/* Additional Info Cards */}
-      <motion.div className="space-y-4" variants={containerVariants}>
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+        variants={containerVariants}
+      >
         {/* Security Badge */}
         <motion.div
-          className="bg-green-50/80 dark:bg-green-900/20 backdrop-blur-sm p-6 rounded-2xl border-2 border-green-200/50 dark:border-green-700/30"
+          className="bg-green-50/80 dark:bg-green-900/20 backdrop-blur-sm p-4 lg:p-6 rounded-2xl border-2 border-green-200/50 dark:border-green-700/30"
           variants={itemVariants}
           whileHover={{ y: -2, scale: 1.01 }}
         >
           <div className="flex items-center gap-3">
-            <Shield className="w-8 h-8 text-green-600 dark:text-green-400" />
+            <Shield className="w-6 h-6 lg:w-8 lg:h-8 text-green-600 dark:text-green-400" />
             <div>
-              <h4 className="font-semibold text-slate-800 dark:text-white">
+              <h4 className="font-semibold text-slate-800 dark:text-white text-sm lg:text-base">
                 Secure Purchase
               </h4>
-              <p className="text-green-700 dark:text-green-300 text-sm">
+              <p className="text-green-700 dark:text-green-300 text-xs lg:text-sm">
                 256-bit SSL encryption
               </p>
             </div>
@@ -482,18 +479,18 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
 
         {/* Instant Download */}
         <motion.div
-          className="bg-blue-50/80 dark:bg-blue-900/20 backdrop-blur-sm p-6 rounded-2xl border-2 border-blue-200/50 dark:border-blue-700/30"
+          className="bg-blue-50/80 dark:bg-blue-900/20 backdrop-blur-sm p-4 lg:p-6 rounded-2xl border-2 border-blue-200/50 dark:border-blue-700/30"
           variants={itemVariants}
           whileHover={{ y: -2, scale: 1.01 }}
         >
           <div className="flex items-center gap-3">
-            <Download className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            <Download className="w-6 h-6 lg:w-8 lg:h-8 text-blue-600 dark:text-blue-400" />
             <div>
-              <h4 className="font-semibold text-slate-800 dark:text-white">
+              <h4 className="font-semibold text-slate-800 dark:text-white text-sm lg:text-base">
                 Instant Access
               </h4>
-              <p className="text-blue-700 dark:text-blue-300 text-sm">
-                Download immediately after purchase
+              <p className="text-blue-700 dark:text-blue-300 text-xs lg:text-sm">
+                Download immediately
               </p>
             </div>
           </div>
@@ -502,5 +499,121 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
     </motion.div>
   );
 };
+
+// Extracted Document Option Component for better organization
+const DocumentOption: React.FC<{
+  option: any;
+  isChecked: boolean;
+  onToggle: (key: string) => void;
+  IconComponent: any;
+}> = ({ option, isChecked, onToggle, IconComponent }) => (
+  <motion.label
+    htmlFor={option.key}
+    className={`relative flex items-start gap-3 rounded-xl p-3 cursor-pointer transition-all duration-300 border-2 group ${
+      isChecked
+        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+        : "border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 hover:border-primary/50 hover:shadow-md"
+    }`}
+    whileHover={{ y: -1 }}
+    whileTap={{ scale: 0.98 }}
+  >
+    <input
+      type="checkbox"
+      id={option.key}
+      name="documentType"
+      value={option.key}
+      checked={isChecked}
+      onChange={() => onToggle(option.key)}
+      className="sr-only"
+    />
+
+    {/* Checkbox Indicator */}
+    <motion.div
+      className={`flex-shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center mt-0.5 transition-all duration-300 ${
+        isChecked
+          ? "bg-primary border-primary"
+          : "border-gray-400 group-hover:border-primary"
+      }`}
+    >
+      {isChecked && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 500 }}
+        >
+          <CheckCircle className="w-3 h-3 text-white" />
+        </motion.div>
+      )}
+    </motion.div>
+
+    {/* Content */}
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-2 mb-1">
+        <IconComponent className="w-4 h-4 text-primary" />
+        <span className="font-semibold text-slate-800 dark:text-white text-sm lg:text-base">
+          {option.label}
+        </span>
+      </div>
+      <p className="text-gray-600 dark:text-gray-400 text-xs lg:text-sm leading-tight">
+        {option.description}
+      </p>
+    </div>
+
+    {/* Price */}
+    <motion.span
+      className="font-bold text-primary text-sm lg:text-base flex-shrink-0 ml-2"
+      whileHover={{ scale: 1.1 }}
+    >
+      +${option.price.toLocaleString()}
+    </motion.span>
+  </motion.label>
+);
+
+// Extracted Extra Option Component for better organization
+const ExtraOption: React.FC<{
+  option: any;
+  isChecked: boolean;
+  onToggle: (extra: any) => void;
+}> = ({ option, isChecked, onToggle }) => (
+  <motion.div
+    className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 group ${
+      isChecked
+        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+        : "border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 hover:border-primary/50 hover:shadow-md"
+    }`}
+    onClick={() => onToggle(option)}
+    whileHover={{ y: -1 }}
+    whileTap={{ scale: 0.98 }}
+  >
+    <div className="flex items-center space-x-3">
+      <motion.div
+        className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-300 ${
+          isChecked
+            ? "bg-primary border-primary"
+            : "border-gray-400 group-hover:border-primary"
+        }`}
+      >
+        {isChecked && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 500 }}
+          >
+            <CheckCircle className="w-3 h-3 text-white" />
+          </motion.div>
+        )}
+      </motion.div>
+      <span className="font-medium text-slate-800 dark:text-gray-100 text-sm lg:text-base">
+        {option.name}
+      </span>
+    </div>
+    <motion.span
+      className="font-bold text-primary text-sm lg:text-base"
+      whileHover={{ scale: 1.1 }}
+    >
+      +${option.price.toLocaleString()}
+    </motion.span>
+  </motion.div>
+);
 
 export default PurchaseSidebar;
