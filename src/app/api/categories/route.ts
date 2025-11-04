@@ -41,7 +41,12 @@ export async function GET(request: NextRequest) {
 
     const categories = await prisma.category.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        isFeatured: true,
+        image: true,
         _count: {
           select: { designs: true },
         },
