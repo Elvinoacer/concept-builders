@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Heart, Search, XCircle } from "lucide-react";
+import { ShoppingCart, Heart, Search, XCircle, Check } from "lucide-react";
 import { useCart } from "@/hooks/useCart"; // Import the useCart hook
 
 interface WishlistItem {
@@ -39,7 +39,11 @@ const WishlistSkeleton = () => (
 const WishlistPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const { addToCart } = useCart(); // Use the cart hook
+  const { cart, addToCart } = useCart(); // Use the cart hook
+
+  const isItemInCart = (designId: string) => {
+    return cart.some((item) => item.design.id === designId);
+  };
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -275,15 +279,25 @@ const WishlistPage = () => {
                   ${design.basePrice.toFixed(2)}
                 </p>
                 <div className="mt-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => handleAddToCart(design.id)}
-                    className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-bold shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-cyan-500 transition-all"
-                  >
-                    <ShoppingCart className="w-5 h-5" />
-                    <span>Add to Cart</span>
-                  </motion.button>
+                  {isItemInCart(design.id) ? (
+                    <motion.button
+                      disabled
+                      className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    >
+                      <Check className="w-5 h-5" />
+                      <span>In Cart</span>
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => handleAddToCart(design.id)}
+                      className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-bold shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-cyan-500 transition-all"
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                      <span>Add to Cart</span>
+                    </motion.button>
+                  )}
                 </div>
               </div>
             </motion.div>
