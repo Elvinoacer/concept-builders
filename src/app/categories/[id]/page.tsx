@@ -1,3 +1,5 @@
+"use client";
+
 import DesignCard from "@/components/design-showcase/DesignCard";
 import {
   Pagination,
@@ -12,6 +14,7 @@ import {
 } from "@/components/ui/pagination";
 import Link from "next/link";
 import { FiAlertTriangle } from "react-icons/fi";
+import { useEffect, useState } from "react";
 
 interface Design {
   id: string;
@@ -24,6 +27,16 @@ interface Design {
   basePrice: number;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+  designs: Design[];
+  _count: {
+    designs: number;
+  };
+}
+
 interface CategoryPageProps {
   params: {
     id: string;
@@ -34,29 +47,71 @@ interface CategoryPageProps {
   };
 }
 
-async function getCategory(id: string, page: number = 1, search: string = "") {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/categories/${id}?page=${page}&search=${search}`
-    );
-    if (!res.ok) {
-      return null;
-    }
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch category:", error);
-    return null;
-  }
-}
-
-export default async function CategoryPage({
-  params,
-  searchParams,
-}: CategoryPageProps) {
+export default function CategoryPage({ params, searchParams }: CategoryPageProps) {
+  const [category, setCategory] = useState<Category | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
   const search = searchParams.search || "";
-  const category = await getCategory(params.id, page, search);
+
+  useEffect(() => {
+    const getCategory = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/categories/${params.id}?page=${page}&search=${search}`
+        );
+        if (!res.ok) {
+          throw new Error("Failed to fetch category");
+        }
+        const data = await res.json();
+        setCategory(data);
+      } catch (error) {
+        setError("Failed to load category. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getCategory();
+  }, [params.id, page, search]);
+
   const totalPages = category ? Math.ceil(category._count.designs / 10) : 0;
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+        <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gray-100 dark:bg-gray-900 text-center px-4">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg max-w-md w-full">
+          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 rounded-full flex items-center justify-center">
+            <FiAlertTriangle
+              size={40}
+              className="text-red-500 dark:text-red-400"
+            />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-3">
+            An Error Occurred
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-8">
+            {error}
+          </p>
+          <Link
+            href="/categories"
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-transform transform hover:scale-105 duration-300 ease-in-out shadow-md"
+          >
+            Explore Other Categories
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!category) {
     return (
