@@ -3,6 +3,7 @@
 import BannerManagement from "@/components/admin/settings/BannerManagement";
 import FeaturedDesignManagement from "@/components/admin/settings/FeaturedDesignManagement";
 import MarqueeManagement from "@/components/admin/settings/MarqueeManagement";
+import FaqManagement from "@/components/admin/settings/FaqManagement";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -134,6 +135,8 @@ const SettingsPage = () => {
         return <FeaturedDesignManagement />;
       case "marquee":
         return <MarqueeManagement />;
+      case "faq":
+        return <FaqManagement />;
       default:
         return null;
     }
@@ -198,6 +201,13 @@ const SettingsPage = () => {
                 className="w-full justify-start"
               >
                 Marquee
+              </Button>
+              <Button
+                variant={activeTab === "faq" ? "secondary" : "ghost"}
+                onClick={() => setActiveTab("faq")}
+                className="w-full justify-start"
+              >
+                FAQ Management
               </Button>
             </nav>
           </Card>
