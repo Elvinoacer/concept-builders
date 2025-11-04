@@ -201,66 +201,69 @@ const DesignTabs = ({ design, onFaqSubmitted }) => {
                   Frequently Asked Questions
                 </motion.h3>
                 {Array.isArray(design.faq) && design.faq.length > 0 ? (
-                  <motion.div
-                    className="space-y-4"
-                    variants={containerVariants}
-                  >
-                    {design.faq.map((item, index) => (
-                      <motion.div
-                        key={index}
-                        className="rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm overflow-hidden group"
-                        variants={itemVariants}
-                        whileHover={{ scale: 1.01 }}
-                      >
-                        <motion.button
-                          className="w-full flex justify-between items-center p-6 text-left font-semibold text-lg text-slate-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-300"
-                          onClick={() => handleFaqToggle(index)}
-                          whileHover={{ x: 4 }}
+                  <>
+                    <motion.div
+                      className="space-y-4"
+                      variants={containerVariants}
+                    >
+                      {design.faq.map((item, index) => (
+                        <motion.div
+                          key={index}
+                          className="rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm overflow-hidden group"
+                          variants={itemVariants}
+                          whileHover={{ scale: 1.01 }}
                         >
-                          <span className="flex items-center gap-3">
-                            <span className="material-symbols-outlined text-primary text-xl">
-                              help
-                            </span>
-                            {item.question}
-                          </span>
-                          <motion.span
-                            className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
-                            animate={{ rotate: openFaq === index ? 180 : 0 }}
-                            transition={{ duration: 0.3 }}
+                          <motion.button
+                            className="w-full flex justify-between items-center p-6 text-left font-semibold text-lg text-slate-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-300"
+                            onClick={() => handleFaqToggle(index)}
+                            whileHover={{ x: 4 }}
                           >
-                            <span className="material-symbols-outlined text-lg">
-                              expand_more
+                            <span className="flex items-center gap-3">
+                              <span className="material-symbols-outlined text-primary text-xl">
+                                help
+                              </span>
+                              {item.question}
                             </span>
-                          </motion.span>
-                        </motion.button>
-                        <AnimatePresence>
-                          {openFaq === index && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.4, ease: "easeInOut" }}
-                              className="overflow-hidden"
+                            <motion.span
+                              className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+                              animate={{ rotate: openFaq === index ? 180 : 0 }}
+                              transition={{ duration: 0.3 }}
                             >
-                              <div className="p-6 pt-2 border-t border-gray-200/50 dark:border-gray-700/50">
-                                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
-                                  {item.answer}
-                                </p>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </motion.div>
-                    ))}
-                      <div className="mt-8 text-center">
-                        <button
-                          onClick={() => setShowFaqForm(true)}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                          Ask a Question
-                        </button>
-                      </div>
-                    ) : (
+                              <span className="material-symbols-outlined text-lg">
+                                expand_more
+                              </span>
+                            </motion.span>
+                          </motion.button>
+                          <AnimatePresence>
+                            {openFaq === index && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.4, ease: "easeInOut" }}
+                                className="overflow-hidden"
+                              >
+                                <div className="p-6 pt-2 border-t border-gray-200/50 dark:border-gray-700/50">
+                                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
+                                    {item.answer}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                    <div className="mt-8 text-center">
+                      <button
+                        onClick={() => setShowFaqForm(true)}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        Ask a Question
+                      </button>
+                    </div>
+                  </>
+                ) : (
                   <motion.div
                     className="text-center py-12"
                     variants={itemVariants}
