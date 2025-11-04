@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Design, File, Category } from "@/generated/prisma";
 
 interface DesignWithRelations extends Design {
-  files: File[];
+  images: File[];
   category: Category;
 }
 
@@ -69,8 +69,7 @@ const DesignCard = ({ design, isFavorited }: { design: DesignWithRelations, isFa
   const rotateY = isHovered ? mousePosition.x / 10 - 20 : 0;
 
   const categoryName = design.category.name;
-  const imageFile = design.files?.find(file => file.type === 'IMAGE');
-  const imageUrl = imageFile?.url || "/images/category-placeholder.png";
+  const imageUrl = design.images?.[0]?.url || "/images/category-placeholder.png";
   const price = design.basePrice;
   const bedrooms = design.bedrooms;
   const bathrooms = design.bathrooms;

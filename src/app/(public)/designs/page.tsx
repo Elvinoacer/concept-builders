@@ -70,11 +70,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
       skip,
       take: pageSize,
       include: {
-        files: {
-          where: {
-            type: "IMAGE",
-          },
-        },
+        images: true,
         category: true,
         architecturalDesign: {
           include: {
