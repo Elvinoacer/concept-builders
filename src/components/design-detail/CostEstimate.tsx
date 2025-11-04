@@ -1,8 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { costEstimateIcons } from "@/lib/dummydata";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import PricingCalculatorModal from "./PricingCalculatorModal";
 
 interface CostEstimateProps {
   design: any;
@@ -16,7 +14,6 @@ const CostEstimate: React.FC<CostEstimateProps> = ({
   currentEstimate,
 }) => {
   const [openBreakdown, setOpenBreakdown] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Reset breakdown state when activeTier changes
   const handleToggleBreakdown = () => {
@@ -213,43 +210,7 @@ const CostEstimate: React.FC<CostEstimateProps> = ({
             </div>
           </div>
         </motion.div>
-
-        {/* Pricing Calculator CTA */}
-        <motion.div
-          className="mt-10 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
-          <div className="bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-2xl p-6 border border-primary/20">
-            <h3 className="text-xl font-semibold text-slate-800 dark:text-white mb-3">
-              Need a Custom Quote?
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-              Use our interactive calculator to get a personalized cost estimate
-              based on your specific requirements and location.
-            </p>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                size="lg"
-                onClick={() => setIsModalOpen(true)}
-                className="bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 rounded-2xl font-semibold text-lg"
-              >
-                <span className="material-symbols-outlined mr-3 text-xl">
-                  calculate
-                </span>
-                Open Pricing Calculator
-              </Button>
-            </motion.div>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      <PricingCalculatorModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        design={design}
-      />
+      </motion.div>{" "}
     </>
   );
 };
