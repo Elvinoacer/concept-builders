@@ -91,6 +91,7 @@ const LoginForm = ({
               )}
             </span>
             <input
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm h-12 px-4 bg-gray-50 pr-12 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
               id="email"
               placeholder="Enter your email"
               type="email"
