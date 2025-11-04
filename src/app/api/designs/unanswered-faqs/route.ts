@@ -3,23 +3,22 @@ import prisma from "@/lib/prisma";
 
 export async function GET(req: Request) {
   try {
-    const designs = await prisma.design.findMany({
-      where: {
-        faq: {
-          some: {
-            answer: "",
-          },
-        },
-      },
-    });
+    const designs = await prisma.design.findMany();
 
-    const designsWithUnansweredFaqs = designs.map(design => {
-        const unansweredFaqs = (design.faq as any[]).filter(faq => faq.answer === "");
-        return {
-            ...design,
-            faq: unansweredFaqs
+    const designsWithUnansweredFaqs = designs
+      .map(design => {
+        if (Array.isArray(design.faq)) {
+          const unansweredFaqs = (design.faq as any[]).filter(faq => faq.answer === "");
+          if (unansweredFaqs.length > 0) {
+            return {
+              ...design,
+              faq: unansweredFaqs
+            };
+          }
         }
-    })
+        return null;
+      })
+      .filter(Boolean);
 
     return NextResponse.json(designsWithUnansweredFaqs);
   } catch (error) {
