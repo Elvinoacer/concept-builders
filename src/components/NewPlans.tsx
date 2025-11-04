@@ -5,7 +5,6 @@ import { Design } from "@/generated/prisma";
 
 interface NewPlansProps {
   newPlans: (Design & {
-    files: { url: string }[];
     images: { url: string }[];
     category: { name: string } | null;
   })[];

@@ -6,7 +6,6 @@ import { Design } from "@/generated/prisma";
 
 interface BestSellingPlansProps {
   bestSellingPlans: (Design & {
-    files: { url: string }[];
     images: { url: string }[];
     category: { name: string } | null;
   })[];

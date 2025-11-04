@@ -34,19 +34,19 @@ export async function GET(
               include: {
                 pdfFiles: true,
                 cadFiles: true,
-              }
+              },
             },
             structuralDesign: {
               include: {
                 pdfFiles: true,
                 cadFiles: true,
-              }
+              },
             },
             billOfQuantities: {
               include: {
                 excelFiles: true,
-              }
-            }
+              },
+            },
           },
           skip: designSkip,
           take: designLimit,
@@ -96,7 +96,7 @@ export async function PUT(
       data: body,
     });
 
-    revalidatePath('/'); // Revalidate the homepage to show updated featured categories
+    revalidatePath("/"); // Revalidate the homepage to show updated featured categories
 
     return NextResponse.json(updatedCategory);
   } catch (error) {
@@ -117,7 +117,7 @@ export async function DELETE(
       where: { id: params.id },
     });
 
-    revalidatePath('/'); // Revalidate the homepage after deleting a category
+    revalidatePath("/"); // Revalidate the homepage after deleting a category
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {

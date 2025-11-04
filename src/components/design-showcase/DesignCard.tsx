@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { FiBed, FiBath, FiMaximize, FiLayers } from "react-icons/fi";
+import { FaBath, FaBed } from "react-icons/fa";
+import { FiLayers, FiMaximize } from "react-icons/fi";
 
 interface File {
   url: string;
@@ -29,7 +30,6 @@ interface Design {
   id: string;
   name: string;
   description: string;
-  files: File[];
   images: File[];
   isFeatured?: boolean;
   discounts?: Discount[];
@@ -138,11 +138,11 @@ const DesignCard: React.FC<DesignCardProps> = ({
 
         <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
           <div className="flex items-center gap-2">
-            <FiBed />
+            <FaBed />
             <span>{design.bedrooms} Beds</span>
           </div>
           <div className="flex items-center gap-2">
-            <FiBath />
+            <FaBath />
             <span>{design.bathrooms} Baths</span>
           </div>
           <div className="flex items-center gap-2">

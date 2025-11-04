@@ -12,10 +12,33 @@ export async function getLandingPageData() {
     prisma.design.findMany({
       orderBy: { createdAt: "desc" },
       take: 10, // Limit to 10 new plans
-      include: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        basePrice: true,
+        architecturalPdfPrice: true,
+        architecturalCadPrice: true,
+        structuralPdfPrice: true,
+        structuralCadPrice: true,
+        billOfQuantitiesPrice: true,
+        minBuildingCost: true,
+        maxBuildingCost: true,
+        bedrooms: true,
+        bathrooms: true,
+        area: true,
+        floors: true,
+        isFeatured: true,
         images: true,
-        files: true,
         category: true,
+        discounts: {
+          include: {
+            discount: true,
+          },
+        },
+        orderItems: {
+          select: { id: true },
+        },
         architecturalDesign: {
           include: {
             pdfFiles: true,
@@ -36,10 +59,30 @@ export async function getLandingPageData() {
       }
     }),
     prisma.design.findMany({
-      include: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        basePrice: true,
+        architecturalPdfPrice: true,
+        architecturalCadPrice: true,
+        structuralPdfPrice: true,
+        structuralCadPrice: true,
+        billOfQuantitiesPrice: true,
+        minBuildingCost: true,
+        maxBuildingCost: true,
+        bedrooms: true,
+        bathrooms: true,
+        area: true,
+        floors: true,
+        isFeatured: true,
         images: true,
-        files: true,
         category: true,
+        discounts: {
+          include: {
+            discount: true,
+          },
+        },
         _count: { select: { orderItems: true } },
         architecturalDesign: {
           include: {
@@ -89,10 +132,33 @@ export async function getLandingPageData() {
     prisma.design.findMany({
       where: { isFeatured: true },
       take: 8,
-      include: { 
+      select: { 
+        id: true,
+        name: true,
+        description: true,
+        basePrice: true,
+        architecturalPdfPrice: true,
+        architecturalCadPrice: true,
+        structuralPdfPrice: true,
+        structuralCadPrice: true,
+        billOfQuantitiesPrice: true,
+        minBuildingCost: true,
+        maxBuildingCost: true,
+        bedrooms: true,
+        bathrooms: true,
+        area: true,
+        floors: true,
+        isFeatured: true,
         images: true,
-        files: true, 
         category: true,
+        discounts: {
+          include: {
+            discount: true,
+          },
+        },
+        orderItems: {
+          select: { id: true },
+        },
         architecturalDesign: {
           include: {
             pdfFiles: true,

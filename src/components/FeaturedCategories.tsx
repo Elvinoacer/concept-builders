@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Category, Design, File } from "@/generated/prisma"; // Import Design and File
 
 interface CategoryWithDesignsAndFiles extends Category {
-  designs: (Design & { files: File[]; images: File[] })[];
+  designs: (Design & { images: File[] })[];
   _count: { designs: number };
 }
 
