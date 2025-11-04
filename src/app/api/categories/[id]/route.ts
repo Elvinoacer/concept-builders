@@ -38,15 +38,6 @@ export async function GET(
           where: designsWhere,
           skip,
           take: limit,
-          include: {
-            images: true,
-            reviews: true,
-            discounts: {
-              include: {
-                discount: true,
-              },
-            },
-          },
           select: {
             id: true,
             name: true,
@@ -54,7 +45,11 @@ export async function GET(
             images: true,
             isFeatured: true,
             reviews: true,
-            discounts: true,
+            discounts: {
+              include: {
+                discount: true,
+              },
+            },
             basePrice: true,
             bedrooms: true,
             bathrooms: true,

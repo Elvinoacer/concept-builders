@@ -81,44 +81,19 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 dark:from-gray-900 dark:via-blue-950/20 dark:to-cyan-950/10">
       {/* Header */}
-      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-gray-200/60 dark:border-gray-700/60 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 dark:from-blue-400 dark:via-purple-400 dark:to-cyan-300">
-                Categories
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">
-                Discover our curated collection of categories
-              </p>
-            </div>
-
-            {/* View Controls */}
-            <div className="flex items-center gap-3">
-              <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-md transition-all duration-200 ${
-                    viewMode === "grid"
-                      ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400"
-                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                  }`}
-                >
-                  <FiGrid size={18} />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-md transition-all duration-200 ${
-                    viewMode === "list"
-                      ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400"
-                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                  }`}
-                >
-                  <FiList size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
+      <header className="relative h-64 rounded-b-2xl flex items-center justify-center text-center text-white overflow-hidden">
+        <Image
+          src="/images/banner-1.png"
+          alt="Categories background"
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="relative z-10">
+          <h1 className="text-4xl md:text-5xl font-bold">Categories</h1>
+          <p className="text-lg md:text-xl mt-2">
+            Discover our curated collection of categories
+          </p>
         </div>
       </header>
 
@@ -202,81 +177,69 @@ export default function CategoriesPage() {
           <div
             className={`px-4 sm:px-0 ${
               viewMode === "grid"
-                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                : "grid grid-cols-1 gap-4 max-w-4xl mx-auto"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+                : "grid grid-cols-1 gap-6 max-w-4xl mx-auto"
             }`}
           >
             {categories.map((category: any) => (
               <Link href={`/categories/${category.id}`} key={category.id}>
                 <div
-                  className={`
-                  group cursor-pointer transition-all duration-500 transform hover:scale-[1.02]
-                  ${
+                  className={`group cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl rounded-2xl overflow-hidden ${
                     viewMode === "grid"
-                      ? "bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-sm hover:shadow-2xl border border-gray-200/60 dark:border-gray-700/60 overflow-hidden"
-                      : "bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-xl border border-gray-200/60 dark:border-gray-700/60 p-6 flex items-center gap-6"
-                  }
-                `}
+                      ? "bg-white dark:bg-gray-800 shadow-lg"
+                      : "bg-white dark:bg-gray-800 shadow-md flex items-center"
+                  }`}
                 >
-                  {/* Image Container */}
                   <div
-                    className={`
-                    relative overflow-hidden bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20
-                    ${
+                    className={`relative overflow-hidden ${
                       viewMode === "grid"
                         ? "h-64 w-full"
-                        : "h-24 w-24 rounded-xl flex-shrink-0"
-                    }
-                  `}
+                        : "h-24 w-24 flex-shrink-0"
+                    }`}
                   >
                     <Image
-                      src={category.designs[0]?.images[0]?.url || "/images/placeholder.png"}
+                      src={
+                        category.designs[0]?.images[0]?.url ||
+                        "/images/placeholder.png"
+                      }
                       alt={category.name}
-                      layout="fill"
-                      objectFit="cover"
-                      className="transition-transform duration-700 group-hover:scale-110"
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   </div>
 
-                  {/* Content */}
-                  <div className={viewMode === "grid" ? "p-6" : "flex-1"}>
-                    <div className="flex items-center justify-between">
+                  <div
+                    className={`p-6 flex-1 ${
+                      viewMode === "list"
+                        ? "flex justify-between items-center"
+                        : ""
+                    }`}
+                  >
+                    <div>
                       <h2
-                        className={`
-                        font-semibold text-gray-800 dark:text-white transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400
-                        ${viewMode === "grid" ? "text-xl mb-2" : "text-lg"}
-                      `}
+                        className={`font-bold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 ${
+                          viewMode === "grid" ? "text-2xl mb-2" : "text-xl"
+                        }`}
                       >
                         {category.name}
                       </h2>
-                      {category.isFeatured && (
-                        <div className="text-xs font-semibold text-white bg-green-500 rounded-full px-2 py-1">
-                          Best Seller
-                        </div>
+                      {viewMode === "grid" && category.description && (
+                        <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-base">
+                          {category.description}
+                        </p>
                       )}
                     </div>
-                    {viewMode === "grid" && category.description && (
-                      <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
-                        {category.description}
-                      </p>
-                    )}
                     <div className="flex items-center justify-between mt-4">
-                      <div
-                        className={`
-                        flex items-center text-blue-600 dark:text-blue-400 font-medium transition-all duration-200 group-hover:translate-x-1
-                        ${viewMode === "grid" ? "mt-4" : "mt-2"}
-                      `}
-                      >
-                        <span className="text-sm">Explore</span>
-                        <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">
-                          →
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-base text-gray-500 dark:text-gray-400">
                         {category._count.designs} designs
                       </div>
+                      <div className="flex items-center text-blue-600 dark:text-blue-400 font-semibold transition-all duration-300 group-hover:translate-x-1">
+                        <span className="text-base">Explore</span>
+                        <span className="ml-1 transition-transform duration-300 group-hover:translate-x-1">
+                          →
+                        </span>
+                      </div>{" "}
                     </div>
                   </div>
                 </div>

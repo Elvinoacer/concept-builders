@@ -143,43 +143,49 @@ export default function CategoryPage({ params, searchParams }: CategoryPageProps
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <header className="bg-white dark:bg-gray-800 shadow-md">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400">
-            {category.name} Designs
-          </h1>
-          <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
-            {category.description}
-          </p>
-          <div className="mt-8 max-w-md mx-auto">
-            <div className="relative">
-              <input
-                type="search"
-                name="search"
-                id="search"
-                className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-full px-6 py-4"
-                placeholder={`Search in ${category.name}...`}
-              />
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                <svg
-                  className="h-5 w-5 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
+      <header className="relative h-64 rounded-b-2xl flex items-center justify-center text-center text-white overflow-hidden">
+        <Image
+          src={category.image || "/images/banner-2.png"}
+          alt={category.name}
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="relative z-10">
+          <h1 className="text-4xl md:text-5xl font-bold">{category.name} Designs</h1>
+          <p className="text-lg md:text-xl mt-2">{category.description}</p>
         </div>
       </header>
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-12 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-8">
+          <div className="relative w-full max-w-md">
+            <input
+              type="search"
+              name="search"
+              id="search"
+              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-full px-6 py-4"
+              placeholder={`Search in ${category.name}...`}
+            />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <svg
+                className="h-5 w-5 text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <p className="text-gray-600 dark:text-gray-300">{category._count.designs} designs</p>
+          </div>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {category.designs.length === 0 ? (
             <div className="text-center text-muted-foreground col-span-3">
