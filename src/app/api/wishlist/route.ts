@@ -24,7 +24,11 @@ export async function GET(request: NextRequest) {
             id: true,
             name: true,
             basePrice: true, // Include basePrice
-            files: true,
+            images: {
+              select: {
+                url: true,
+              },
+            },
           }
         },
       },
@@ -72,7 +76,7 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
-    return new NextResponse(null, { status: 204 });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error removing item from wishlist:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
