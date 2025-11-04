@@ -1,19 +1,32 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FaHardHat, FaCalculator, FaChartPie, FaInfoCircle } from 'react-icons/fa';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { useEffect, useState } from "react";
+import {
+  FaCalculator,
+  FaChartPie,
+  FaHardHat,
+  FaInfoCircle,
+} from "react-icons/fa";
+
+import { qualityPrices, locationMultipliers, sitePrepMultipliers } from '@/lib/cost-calculator-data';
 
 const CostCalculator = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [buildingType, setBuildingType] = useState('residential');
+  const [buildingType, setBuildingType] = useState("residential");
   const [area, setArea] = useState(2000);
-  const [quality, setQuality] = useState('standard');
+  const [quality, setQuality] = useState('basic');
   const [floors, setFloors] = useState(1);
   const [location, setLocation] = useState('suburban');
   const [sitePrep, setSitePrep] = useState('moderate');
@@ -35,32 +48,8 @@ const CostCalculator = () => {
   }, [buildingType, area, quality, floors, location, sitePrep]);
 
   const calculateCost = () => {
-    const baseCosts = {
-      residential: 150,
-      apartment: 130,
-      commercial: 200,
-      industrial: 180,
-    };
-    const qualityMultipliers = {
-      economy: 0.8,
-      standard: 1.0,
-      premium: 1.3,
-      luxury: 1.8,
-    };
-    const locationMultipliers = {
-      rural: 0.9,
-      suburban: 1.0,
-      urban: 1.2,
-      metro: 1.4,
-    };
-    const sitePrepMultipliers = {
-      simple: 0.95,
-      moderate: 1.0,
-      complex: 1.2,
-    };
-
-    let baseCost = baseCosts[buildingType] * area;
-    let total = baseCost * qualityMultipliers[quality] * locationMultipliers[location] * sitePrepMultipliers[sitePrep];
+    let baseCost = qualityPrices[quality] * area;
+    let total = baseCost * locationMultipliers[location] * sitePrepMultipliers[sitePrep];
 
     if (floors > 1) {
       total *= 1 + (floors - 1) * 0.1;
@@ -76,13 +65,13 @@ const CostCalculator = () => {
   };
 
   const formatCurrency = (amount) => {
-    return '$' + Math.round(amount).toLocaleString();
+    return 'KES ' + Math.round(amount).toLocaleString();
   };
 
   const resetCalculator = () => {
     setBuildingType('residential');
     setArea(2000);
-    setQuality('standard');
+    setQuality('basic');
     setFloors(1);
     setLocation('suburban');
     setSitePrep('moderate');
@@ -127,17 +116,22 @@ const CostCalculator = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="economy">Economy</SelectItem>
+                    <SelectItem value="basic">Basic</SelectItem>
                     <SelectItem value="standard">Standard</SelectItem>
                     <SelectItem value="premium">Premium</SelectItem>
-                    <SelectItem value="luxury">Luxury</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <label>Number of Floors</label>
                 <div className="flex items-center gap-4">
-                  <Slider value={[floors]} onValueChange={(value) => setFloors(value[0])} min={1} max={10} step={1} />
+                  <Slider
+                    value={[floors]}
+                    onValueChange={(value) => setFloors(value[0])}
+                    min={1}
+                    max={10}
+                    step={1}
+                  />
                   <span className="font-bold text-primary">{floors}</span>
                 </div>
               </div>
@@ -148,10 +142,18 @@ const CostCalculator = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="rural">Rural Area (Lower Cost)</SelectItem>
-                    <SelectItem value="suburban">Suburban Area (Average Cost)</SelectItem>
-                    <SelectItem value="urban">Urban Area (Higher Cost)</SelectItem>
-                    <SelectItem value="metro">Metropolitan Area (Highest Cost)</SelectItem>
+                    <SelectItem value="rural">
+                      Rural Area (Lower Cost)
+                    </SelectItem>
+                    <SelectItem value="suburban">
+                      Suburban Area (Average Cost)
+                    </SelectItem>
+                    <SelectItem value="urban">
+                      Urban Area (Higher Cost)
+                    </SelectItem>
+                    <SelectItem value="metro">
+                      Metropolitan Area (Highest Cost)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -163,35 +165,76 @@ const CostCalculator = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="simple">Simple (Flat land)</SelectItem>
-                    <SelectItem value="moderate">Moderate (Slight slope)</SelectItem>
-                    <SelectItem value="complex">Complex (Steep slope, rocky)</SelectItem>
+                    <SelectItem value="moderate">
+                      Moderate (Slight slope)
+                    </SelectItem>
+                    <SelectItem value="complex">
+                      Complex (Steep slope, rocky)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex gap-4">
-                <Button onClick={calculateCost} className="w-full">Calculate Cost</Button>
-                <Button onClick={resetCalculator} variant="outline" className="w-full">Reset</Button>
+                <Button onClick={calculateCost} className="w-full">
+                  Calculate Cost
+                </Button>
+                <Button
+                  onClick={resetCalculator}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Reset
+                </Button>
               </div>
             </div>
           </div>
           <div className="w-full md:w-1/2 p-8 bg-gradient-to-br from-primary-light to-secondary text-white flex flex-col justify-between">
             <div>
-              <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3"><FaChartPie /> Cost Estimate</h2>
+              <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+                <FaChartPie /> Cost Estimate
+              </h2>
               <div className="text-center my-4">
-                <p className="text-5xl font-bold">{formatCurrency(totalCost)}</p>
+                <p className="text-5xl font-bold">
+                  {formatCurrency(totalCost)}
+                </p>
               </div>
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><p>Foundation & Structure</p><p>{formatCurrency(foundationCost)}</p></div>
-                <div className="flex justify-between"><p>Exterior Work</p><p>{formatCurrency(exteriorCost)}</p></div>
-                <div className="flex justify-between"><p>Interior Finishing</p><p>{formatCurrency(interiorCost)}</p></div>
-                <div className="flex justify-between"><p>Mechanical Systems</p><p>{formatCurrency(mechanicalCost)}</p></div>
-                <div className="flex justify-between"><p>Site Preparation</p><p>{formatCurrency(siteCost)}</p></div>
-                <div className="flex justify-between"><p>Permits & Fees</p><p>{formatCurrency(permitsCost)}</p></div>
+                <div className="flex justify-between">
+                  <p>Foundation & Structure</p>
+                  <p>{formatCurrency(foundationCost)}</p>
+                </div>
+                <div className="flex justify-between">
+                  <p>Exterior Work</p>
+                  <p>{formatCurrency(exteriorCost)}</p>
+                </div>
+                <div className="flex justify-between">
+                  <p>Interior Finishing</p>
+                  <p>{formatCurrency(interiorCost)}</p>
+                </div>
+                <div className="flex justify-between">
+                  <p>Mechanical Systems</p>
+                  <p>{formatCurrency(mechanicalCost)}</p>
+                </div>
+                <div className="flex justify-between">
+                  <p>Site Preparation</p>
+                  <p>{formatCurrency(siteCost)}</p>
+                </div>
+                <div className="flex justify-between">
+                  <p>Permits & Fees</p>
+                  <p>{formatCurrency(permitsCost)}</p>
+                </div>
               </div>
             </div>
             <div className="mt-8 p-4 bg-black bg-opacity-20 rounded-lg">
-              <h3 className="font-semibold flex items-center gap-2"><FaInfoCircle /> Notes & Assumptions</h3>
-              <p className="text-xs mt-2">This calculator provides estimates based on average construction costs. Actual costs may vary based on specific materials, labor rates, design complexity, and market conditions. Always consult with a professional contractor for precise quotes.</p>
+              <h3 className="font-semibold flex items-center gap-2">
+                <FaInfoCircle /> Notes & Assumptions
+              </h3>
+              <p className="text-xs mt-2">
+                This calculator provides estimates based on average construction
+                costs. Actual costs may vary based on specific materials, labor
+                rates, design complexity, and market conditions. Always consult
+                with a professional contractor for precise quotes.
+              </p>
             </div>
           </div>
         </Card>
