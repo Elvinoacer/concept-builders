@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
           },
           take: 1,
           select: {
+            id: true,
             images: {
               where: {
                 type: "IMAGE",
