@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const LoginForm = ({ setAuthMode }: { setAuthMode: React.Dispatch<React.SetStateAction<string>> }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,6 +10,8 @@ const LoginForm = ({ setAuthMode }: { setAuthMode: React.Dispatch<React.SetState
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +22,7 @@ const LoginForm = ({ setAuthMode }: { setAuthMode: React.Dispatch<React.SetState
       redirect: false,
       email,
       password,
+      callbackUrl,
     });
 
     setLoading(false);
@@ -43,7 +46,7 @@ const LoginForm = ({ setAuthMode }: { setAuthMode: React.Dispatch<React.SetState
         setError(result.error);
       }
     } else if (result?.ok) {
-      router.push('/dashboard'); // Redirect to dashboard on successful login
+      router.push(callbackUrl);
     }
   };
 
