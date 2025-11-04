@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 
 const navSections = [
   {
@@ -76,6 +77,10 @@ const Sidebar = ({
     if (window.innerWidth < 768) {
       setIsSidebarOpen(false);
     }
+  };
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' });
   };
 
   return (
@@ -153,14 +158,13 @@ const Sidebar = ({
         })}
       </div>
       <div className="mt-auto">
-        <Link
-          href="/auth"
-          onClick={handleLinkClick}
-          className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-all dark:text-gray-300 dark:hover:bg-gray-700"
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-all dark:text-gray-300 dark:hover:bg-gray-700 w-full"
         >
           <span className="material-symbols-outlined">logout</span>
           <p className="text-sm">Logout</p>
-        </Link>
+        </button>
       </div>
     </aside>
   );
