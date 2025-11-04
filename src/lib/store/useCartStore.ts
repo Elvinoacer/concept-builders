@@ -229,7 +229,6 @@ const useCartStore = create<CartStore>()(
           toast.error("An error occurred while removing item from cart.");
         }
       } else {
-        // For unauthenticated users, remove from local storage
         const newCart = cart.filter((item) => item.cartItemId !== cartItemId);
         setCart(newCart);
         localStorage.setItem("cart", JSON.stringify(newCart));
@@ -237,16 +236,45 @@ const useCartStore = create<CartStore>()(
       }
     },
 
-    updateItem: (cartItemId, updates, status) => {
+    updateItem: async (cartItemId, updates, status) => {
       const { cart, setCart } = get();
-      const newCart = cart.map((item) =>
-        item.cartItemId === cartItemId ? { ...item, ...updates } : item
-      );
-      setCart(newCart);
-      if (status === "unauthenticated") {
+
+      if (status === "authenticated") {
+        try {
+          const response = await fetch(`/api/cart/items/${cartItemId}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updates),
+            }
+          );
+
+          if (response.ok) {
+            const updatedCart = await response.json();
+            const frontendCartItems = updatedCart.items.map((item: any) => ({
+              cartItemId: item.id,
+              quantity: item.quantity,
+              selectedFileTypes: item.selectedFileTypes || [],
+              selectedExtras: item.selectedExtras || [],
+              design: item.design,
+            }));
+            setCart(frontendCartItems);
+            toast.success("Cart updated.");
+          } else {
+            const errorData = await response.json();
+            toast.error(errorData.error || "Failed to update cart.");
+          }
+        } catch (err) {
+          toast.error("An error occurred while updating cart.");
+        }
+      } else {
+        const newCart = cart.map((item) =>
+          item.cartItemId === cartItemId ? { ...item, ...updates } : item
+        );
+        setCart(newCart);
         localStorage.setItem("cart", JSON.stringify(newCart));
+        toast.success("Cart updated.");
       }
-      toast.success("Cart updated.");
     },
 
     clearCart: (status) => {
