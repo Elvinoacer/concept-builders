@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ShoppingCart, Heart, Search, XCircle } from "lucide-react";
+import { useCart } from "@/hooks/useCart"; // Import the useCart hook
 
 interface WishlistItem {
   id: string;
@@ -38,6 +39,7 @@ const WishlistSkeleton = () => (
 const WishlistPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const { addToCart } = useCart(); // Use the cart hook
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -102,21 +104,24 @@ const WishlistPage = () => {
       return;
     }
 
-    toast.promise(
-      fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ designId, quantity: 1 }),
-      }).then((res) => {
-        if (!res.ok) throw new Error("Failed to add item to cart.");
-        return res.json();
-      }),
-      {
-        loading: "Adding to cart...",
-        success: "Design added to cart!",
-        error: (err) => `Failed to add design to cart: ${err.message}`,
+    try {
+      const response = await fetch(`/api/designs/${designId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch design details.");
       }
-    );
+      const design = await response.json();
+
+      // Assuming default selections for file types, package, and extras
+      // You might need a modal to let the user choose these options
+      const defaultPackage = design.packages.find(p => p.isDefault) || design.packages[0];
+      const selectedFileTypes = defaultPackage.files.map(f => f.id);
+
+      await addToCart(design, selectedFileTypes, defaultPackage.id, []);
+      toast.success("Design added to cart!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to add design to cart.");
+    }
   };
 
   const filteredWishlist = useMemo(
