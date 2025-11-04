@@ -68,14 +68,6 @@ export default async function Home() {
 
           {/* Featured Designs */}
           <section className="relative">
-            <div className="text-center mb-10 md:mb-14">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-3">
-                Featured Designs
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg max-w-2xl mx-auto">
-                Discover our most popular and innovative design solutions
-              </p>
-            </div>
             <FeaturedDesigns featuredDesigns={featuredDesigns} />
           </section>
 
