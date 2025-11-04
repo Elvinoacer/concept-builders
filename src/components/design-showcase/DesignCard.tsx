@@ -5,8 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { FaBath, FaBed } from "react-icons/fa";
-import { FiLayers, FiMaximize } from "react-icons/fi";
+import { FaBath, FaBed, FaLayerGroup, FaExpandArrowsAlt } from "react-icons/fa";
 
 interface File {
   url: string;
@@ -146,11 +145,11 @@ const DesignCard: React.FC<DesignCardProps> = ({
             <span>{design.bathrooms} Baths</span>
           </div>
           <div className="flex items-center gap-2">
-            <FiMaximize />
+            <FaExpandArrowsAlt />
             <span>{design.area} sqmt</span>
           </div>
           <div className="flex items-center gap-2">
-            <FiLayers />
+            <FaLayerGroup />
             <span>{design.floors} Floors</span>
           </div>
         </div>
