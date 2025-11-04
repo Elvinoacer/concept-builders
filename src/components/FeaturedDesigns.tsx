@@ -2,6 +2,7 @@
 import { Design } from "@/generated/prisma";
 import DesignCard from "./design-showcase/DesignCard";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 interface DesignWithCategoryAndFiles extends Design {
   category: { name: string } | null;
@@ -14,6 +15,7 @@ interface FeaturedDesignsProps {
 }
 
 const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
+  const router = useRouter();
   if (!featuredDesigns || featuredDesigns.length === 0) {
     return null;
   }
@@ -231,13 +233,23 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
               custom design tailored to your vision.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="inline-flex items-center bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 text-lg font-semibold rounded-2xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/cta">
+              <button
+                onClick={() => {
+                  router.push("/design-showcase");
+                }}
+                className="inline-flex items-center bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 text-lg font-semibold rounded-2xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/cta"
+              >
                 Explore All Designs
                 <span className="material-symbols-outlined ml-3 text-xl group-hover/cta:translate-x-1 transition-transform duration-300">
                   explore
                 </span>
               </button>
-              <button className="inline-flex items-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-8 py-4 text-lg font-semibold rounded-2xl border border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-cyan-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/cta2">
+              <button
+                onClick={() => {
+                  router.push("/custom-design");
+                }}
+                className="inline-flex items-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-8 py-4 text-lg font-semibold rounded-2xl border border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-cyan-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/cta2"
+              >
                 Get Custom Design
                 <span className="material-symbols-outlined ml-3 text-xl group-hover/cta2:translate-x-1 transition-transform duration-300">
                   design_services
