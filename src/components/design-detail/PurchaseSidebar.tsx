@@ -20,6 +20,7 @@ import {
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import CostCalculatorModal from "@/components/cost-calculator/CostCalculatorModal";
+import { Button } from "../ui/button";
 
 const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   const { cart, addToCart, updateItem } = useCart();
@@ -31,10 +32,13 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
 
   // Memoize to find the specific cart item corresponding to this design page
   const cartItem = useMemo(() => {
-    return cart.find(item => 
-      item.design.id === design.id &&
-      JSON.stringify(item.selectedFileTypes.sort()) === JSON.stringify(selectedFileTypes.sort()) &&
-      JSON.stringify(item.selectedExtras?.map(e => e.id).sort() || []) === JSON.stringify(selectedExtras.map(e => e.id).sort())
+    return cart.find(
+      (item) =>
+        item.design.id === design.id &&
+        JSON.stringify(item.selectedFileTypes.sort()) ===
+          JSON.stringify(selectedFileTypes.sort()) &&
+        JSON.stringify(item.selectedExtras?.map((e) => e.id).sort() || []) ===
+          JSON.stringify(selectedExtras.map((e) => e.id).sort())
     );
   }, [cart, design.id, selectedFileTypes, selectedExtras]);
 
@@ -48,19 +52,28 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
     }
   }, [cartItem]);
 
-
   const totalPrice = useMemo(() => {
     let price = design.basePrice || 0;
-    selectedFileTypes.forEach(type => {
+    selectedFileTypes.forEach((type) => {
       switch (type) {
-        case 'architecturalPdf': price += design.architecturalPdfPrice || 0; break;
-        case 'architecturalCad': price += design.architecturalCadPrice || 0; break;
-        case 'structuralPdf': price += design.structuralPdfPrice || 0; break;
-        case 'structuralCad': price += design.structuralCadPrice || 0; break;
-        case 'billOfQuantities': price += design.billOfQuantitiesPrice || 0; break;
+        case "architecturalPdf":
+          price += design.architecturalPdfPrice || 0;
+          break;
+        case "architecturalCad":
+          price += design.architecturalCadPrice || 0;
+          break;
+        case "structuralPdf":
+          price += design.structuralPdfPrice || 0;
+          break;
+        case "structuralCad":
+          price += design.structuralCadPrice || 0;
+          break;
+        case "billOfQuantities":
+          price += design.billOfQuantitiesPrice || 0;
+          break;
       }
     });
-    selectedExtras.forEach(extra => {
+    selectedExtras.forEach((extra) => {
       price += extra.price || 0;
     });
     return price;
@@ -98,17 +111,17 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   }, [totalPrice, exchangeRate]);
 
   const handleFileTypeToggle = (fileType: string) => {
-    setSelectedFileTypes(prev =>
+    setSelectedFileTypes((prev) =>
       prev.includes(fileType)
-        ? prev.filter(ft => ft !== fileType)
+        ? prev.filter((ft) => ft !== fileType)
         : [...prev, fileType]
     );
   };
 
   const handleExtraToggle = (extra: any) => {
-    setSelectedExtras(prev =>
-      prev.some(e => e.id === extra.id)
-        ? prev.filter(e => e.id !== extra.id)
+    setSelectedExtras((prev) =>
+      prev.some((e) => e.id === extra.id)
+        ? prev.filter((e) => e.id !== extra.id)
         : [...prev, extra]
     );
   };
@@ -117,14 +130,21 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
     if (cartItem) {
       // If item is already in cart, maybe show a notification or update it
       // For now, let's just notify the user.
-      alert("This configuration is already in your cart. You can adjust the quantity in the cart page.");
+      alert(
+        "This configuration is already in your cart. You can adjust the quantity in the cart page."
+      );
     } else {
       addToCart(design, selectedFileTypes, [], selectedExtras);
     }
   };
 
   const handleBuyNow = async () => {
-    const success = await addToCart(design, selectedFileTypes, [], selectedExtras);
+    const success = await addToCart(
+      design,
+      selectedFileTypes,
+      [],
+      selectedExtras
+    );
     if (success) {
       if (status === "authenticated") {
         router.push("/checkout");
@@ -300,7 +320,9 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
             </h3>
             <div className="space-y-3">
               {design.packageOptions.map((option: any) => {
-                const isChecked = selectedExtras.some(e => e.id === option.id);
+                const isChecked = selectedExtras.some(
+                  (e) => e.id === option.id
+                );
                 return (
                   <motion.div
                     key={option.name}
@@ -342,7 +364,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
                       +${option.price.toLocaleString()}
                     </motion.span>
                   </motion.div>
-                )
+                );
               })}
             </div>
           </motion.div>
@@ -351,7 +373,8 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
         {/* Total Price Section */}
         <motion.div
           className="mt-8 pt-8 border-t border-gray-200/50 dark:border-gray-700/50"
-          variants={itemVariants}>
+          variants={itemVariants}
+        >
           <div className="flex justify-between items-center mb-4">
             <p className="text-xl font-medium text-gray-600 dark:text-gray-400">
               Total Price:
@@ -391,7 +414,9 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
                 </Link>
               </motion.div>
               <CostCalculatorModal>
-                <Button variant="outline" className="w-full mt-4">Cost Calculator</Button>
+                <Button variant="outline" className="w-full mt-4">
+                  Cost Calculator
+                </Button>
               </CostCalculatorModal>
             </div>
           </div>
@@ -421,9 +446,14 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
             className="w-full flex items-center justify-center gap-3 rounded-2xl h-16 px-8 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border-2 border-gray-300 dark:border-gray-600 text-slate-800 dark:text-gray-200 text-xl font-bold shadow-lg hover:shadow-xl hover:border-primary/50 transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {cartItem ? (
-              <><CheckCircle className="w-6 h-6 text-green-500" /> In Cart</>
+              <>
+                <CheckCircle className="w-6 h-6 text-green-500" /> In Cart
+              </>
             ) : (
-              <><ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" /> Add to Cart</>
+              <>
+                <ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />{" "}
+                Add to Cart
+              </>
             )}
           </motion.button>
         </motion.div>
