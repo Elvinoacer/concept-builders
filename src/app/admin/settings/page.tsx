@@ -1,29 +1,18 @@
 "use client";
 
 import BannerManagement from "@/components/admin/settings/BannerManagement";
+import FaqManagement from "@/components/admin/settings/FaqManagement";
 import FeaturedDesignManagement from "@/components/admin/settings/FeaturedDesignManagement";
 import MarqueeManagement from "@/components/admin/settings/MarqueeManagement";
-import FaqManagement from "@/components/admin/settings/FaqManagement";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 import { useState } from "react";
-import { toast } from "sonner";
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState("banners");
 
   const renderContent = () => {
     switch (activeTab) {
-
       case "banners":
         return <BannerManagement />;
       case "featured-designs":
@@ -46,7 +35,6 @@ const SettingsPage = () => {
         <aside className="lg:w-1/4">
           <Card className="p-0">
             <nav className="flex flex-col p-4 space-y-1">
-
               <Button
                 variant={activeTab === "banners" ? "secondary" : "ghost"}
                 onClick={() => setActiveTab("banners")}

@@ -42,7 +42,6 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
   });
   
   const [packageOptions, setPackageOptions] = useState<{ name: string; price: string; file: any[] }[]>([]);
-  const [buildingCostFactors, setBuildingCostFactors] = useState<{ name: string; unit: string; price: string }[]>([]);
   const [architecturalDesign, setArchitecturalDesign] = useState({ description: '', overview: '', pdfFiles: [], cadFiles: [] });
   const [structuralDesign, setStructuralDesign] = useState({ description: '', overview: '', pdfFiles: [], cadFiles: [] });
   const [billOfQuantities, setBillOfQuantities] = useState({ description: '', overview: '', excelFiles: [] });
@@ -102,7 +101,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
       setStructuralCadPrice(designToEdit.structuralCadPrice?.toString() || "");
       setBillOfQuantitiesPrice(designToEdit.billOfQuantitiesPrice?.toString() || "");
       setPackageOptions(designToEdit.packageOptions.map(opt => ({ ...opt, price: opt.price.toString(), file: opt.file ? [opt.file] : [] })) || []);
-      setBuildingCostFactors(designToEdit.buildingCostFactors?.options || []);
+
       setImages(designToEdit.images || []);
       setFloorPlans(designToEdit.floorPlans || []);
     }
@@ -177,13 +176,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
           file: option.file?.[0] ? { create: { name: option.file[0].originalFileName, url: option.file[0].url, type: 'FILE' } } : undefined
         }))
       },
-      buildingCostFactors: {
-        options: buildingCostFactors.map(option => ({
-          name: option.name,
-          unit: option.unit,
-          price: parseFloat(option.price) || 0
-        }))
-      },
+
       buildingCostEstimates: Object.entries(buildingCostEstimates).map(([tier, data]) => ({
         tier,
         description: data.description,
@@ -386,53 +379,7 @@ const NewDesignForm = ({ onClose, folderId, designToEdit, onSuccess }: NewDesign
                 </div>
               </div>
 
-              {/* Building Cost Factors */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium leading-6">Building Cost Factors</h3>
-                {buildingCostFactors.map((factor, index) => (
-                  <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center">
-                    <Input
-                      placeholder="Factor Name"
-                      value={factor.name}
-                      onChange={(e) => {
-                        const newFactors = [...buildingCostFactors];
-                        newFactors[index].name = e.target.value;
-                        setBuildingCostFactors(newFactors);
-                      }}
-                      className="md:col-span-2"
-                    />
-                    <Input
-                      placeholder="Unit (e.g., per sqft)"
-                      value={factor.unit}
-                      onChange={(e) => {
-                        const newFactors = [...buildingCostFactors];
-                        newFactors[index].unit = e.target.value;
-                        setBuildingCostFactors(newFactors);
-                      }}
-                    />
-                    <Input
-                      placeholder="Price per Unit"
-                      type="number"
-                      value={factor.price}
-                      onChange={(e) => {
-                        const newFactors = [...buildingCostFactors];
-                        newFactors[index].price = e.target.value;
-                        setBuildingCostFactors(newFactors);
-                      }}
-                    />
-                    <Button type="button" variant="destructive" size="sm" onClick={() => {
-                      const newFactors = [...buildingCostFactors];
-                      newFactors.splice(index, 1);
-                      setBuildingCostFactors(newFactors);
-                    }}>
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" size="sm" onClick={() => setBuildingCostFactors([...buildingCostFactors, { name: '', unit: '', price: '' }])}>
-                  Add Building Cost Factor
-                </Button>
-              </div>
+
 
               {/* File Type Pricing */}
               <div className="space-y-4">

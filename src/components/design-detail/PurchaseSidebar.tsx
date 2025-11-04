@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import CostCalculatorModal from "@/components/cost-calculator/CostCalculatorModal";
 
 const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   const { cart, addToCart, updateItem } = useCart();
@@ -389,6 +390,9 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
                   <Zap className="w-4 h-4" />
                 </Link>
               </motion.div>
+              <CostCalculatorModal>
+                <Button variant="outline" className="w-full mt-4">Cost Calculator</Button>
+              </CostCalculatorModal>
             </div>
           </div>
         </motion.div>

@@ -48,10 +48,11 @@ const CreateDesignPage = () => {
     luxury: { description: "", costBreakdown: [{ item: "", cost: "" }] },
   });
   
-  const [packageOptions, setPackageOptions] = useState<
-    { name: string; price: string; file: any[] }[]
-  >([]);
-  const [buildingCostFactors, setBuildingCostFactors] = useState<{ name: string; unit: string; price: string }[]>([]);
+    const [packageOptions, setPackageOptions] = useState<{
+  
+      name: string; price: string; file: any[] }[]
+  
+    >([]);
     const [architecturalDesign, setArchitecturalDesign] = useState({ description: '', overview: '', pdfFiles: [], cadFiles: [] });
     const [structuralDesign, setStructuralDesign] = useState({ description: '', overview: '', pdfFiles: [], cadFiles: [] });
     const [billOfQuantities, setBillOfQuantities] = useState({ description: '', overview: '', excelFiles: [] });
@@ -151,13 +152,7 @@ const CreateDesignPage = () => {
           file: option.file?.[0] ? { create: { name: option.file[0].originalFileName, url: option.file[0].url, type: 'FILE' } } : undefined
         })),
       },
-      buildingCostFactors: {
-        options: buildingCostFactors.map((option) => ({
-          name: option.name,
-          unit: option.unit,
-          price: parseFloat(option.price) || 0,
-        })),
-      },
+
       buildingCostEstimates: Object.entries(buildingCostEstimates).map(
         ([tier, data]) => ({
           tier,
@@ -813,93 +808,7 @@ const CreateDesignPage = () => {
                         </div>
                       </div>
 
-                      {/* Building Cost Factors */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                          Building Cost Factors
-                        </h3>
-                        {buildingCostFactors.map((factor, index) => (
-                          <div
-                            key={index}
-                            className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
-                          >
-                            <div className="space-y-2">
-                              <Label className="text-sm font-medium">
-                                Factor Name
-                              </Label>
-                              <Input
-                                placeholder="e.g., Foundation"
-                                value={factor.name}
-                                onChange={(e) => {
-                                  const newFactors = [...buildingCostFactors];
-                                  newFactors[index].name = e.target.value;
-                                  setBuildingCostFactors(newFactors);
-                                }}
-                                className="rounded-lg"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm font-medium">
-                                Unit
-                              </Label>
-                              <Input
-                                placeholder="e.g., per sqft"
-                                value={factor.unit}
-                                onChange={(e) => {
-                                  const newFactors = [...buildingCostFactors];
-                                  newFactors[index].unit = e.target.value;
-                                  setBuildingCostFactors(newFactors);
-                                }}
-                                className="rounded-lg"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm font-medium">
-                                Price per Unit
-                              </Label>
-                              <Input
-                                placeholder="e.g., 50"
-                                type="number"
-                                value={factor.price}
-                                onChange={(e) => {
-                                  const newFactors = [...buildingCostFactors];
-                                  newFactors[index].price = e.target.value;
-                                  setBuildingCostFactors(newFactors);
-                                }}
-                                className="rounded-lg"
-                              />
-                            </div>
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => {
-                                const newFactors = [...buildingCostFactors];
-                                newFactors.splice(index, 1);
-                                setBuildingCostFactors(newFactors);
-                              }}
-                              className="h-10"
-                            >
-                              Remove
-                            </Button>
-                          </div>
-                        ))}
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            setBuildingCostFactors([
-                              ...buildingCostFactors,
-                              { name: "", unit: "", price: "" },
-                            ])
-                          }
-                          className="rounded-lg"
-                        >
-                          <FiPlus className="mr-2" />
-                          Add Building Cost Factor
-                        </Button>
-                      </div>
+
 
                       {/* Cost Breakdown */}
                       <div className="space-y-6">
