@@ -18,30 +18,90 @@ import { useEffect, useState } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FiGrid, FiList, FiSearch } from "react-icons/fi";
 
+// Define TypeScript interfaces
+interface CategoryImage {
+  url: string;
+}
+
+interface CategoryDesign {
+  id: string;
+  images: CategoryImage[];
+}
+
+interface Category {
+  id: string;
+  name: string;
+  description: string | null;
+  isFeatured: boolean;
+  image: string | null;
+  _count: {
+    designs: number;
+  };
+  designs: CategoryDesign[];
+}
+
+interface CategoriesResponse {
+  categories: Category[];
+  totalPages: number;
+  currentPage: number;
+  totalCategories: number;
+  error?: string;
+  message?: string;
+}
+
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchCategories = async () => {
     setIsLoading(true);
-    const response = await fetch(
-      `/api/categories?search=${searchQuery}&page=${currentPage}&limit=9`
-    );
-    const data = await response.json();
-    setCategories(data.categories);
-    setTotalPages(data.totalPages);
-    setIsLoading(false);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/categories?search=${encodeURIComponent(searchQuery)}&page=${currentPage}&limit=9`
+      );
+
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Failed to fetch categories" }));
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      const data: CategoriesResponse = await response.json();
+
+      if (data.error) {
+        throw new Error(data.message || data.error);
+      }
+
+      setCategories(data.categories || []);
+      setTotalPages(data.totalPages || 1);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to load categories"
+      );
+      setCategories([]);
+      setTotalPages(1);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchCategories();
     }, 300);
+
     return () => clearTimeout(timeoutId);
   }, [currentPage, searchQuery]);
 
@@ -53,8 +113,11 @@ export default function CategoriesPage() {
   };
 
   const getPaginationRange = () => {
+    if (totalPages <= 1) return [1];
+
     const delta = 2;
-    const range = [];
+    const range: (number | string)[] = [];
+
     for (
       let i = Math.max(2, currentPage - delta);
       i <= Math.min(totalPages - 1, currentPage + delta);
@@ -78,6 +141,21 @@ export default function CategoriesPage() {
     return range;
   };
 
+  const getCategoryImageUrl = (category: Category): string => {
+    // Try category image first
+    if (category.image) {
+      return category.image;
+    }
+
+    // Then try design images
+    if (category.designs?.[0]?.images?.[0]?.url) {
+      return category.designs[0].images[0].url;
+    }
+
+    // Fallback to placeholder
+    return "/images/placeholder.png";
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 dark:from-gray-900 dark:via-blue-950/20 dark:to-cyan-950/10">
       {/* Header */}
@@ -87,6 +165,7 @@ export default function CategoriesPage() {
           alt="Categories background"
           fill
           className="object-cover"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="relative z-10">
@@ -130,8 +209,33 @@ export default function CategoriesPage() {
           </div>
         </div>
 
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-8">
+            <div className="max-w-md mx-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
+              <div className="w-12 h-12 mx-auto mb-4 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center">
+                <span className="text-red-600 dark:text-red-400 text-xl">
+                  ⚠️
+                </span>
+              </div>
+              <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">
+                Error Loading Categories
+              </h3>
+              <p className="text-red-600 dark:text-red-400 text-sm mb-4">
+                {error}
+              </p>
+              <button
+                onClick={fetchCategories}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 text-sm"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Loading State */}
-        {isLoading ? (
+        {isLoading && !error && (
           <div className="flex flex-col items-center justify-center h-64 gap-4">
             <div className="relative">
               <CgSpinner
@@ -144,8 +248,10 @@ export default function CategoriesPage() {
               Discovering categories...
             </p>
           </div>
-        ) : categories.length === 0 ? (
-          /* Empty State */
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !error && categories.length === 0 && (
           <div className="text-center py-16">
             <div className="max-w-md mx-auto">
               <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center">
@@ -172,8 +278,10 @@ export default function CategoriesPage() {
               )}
             </div>
           </div>
-        ) : (
-          /* Categories Grid/List */
+        )}
+
+        {/* Categories Grid/List */}
+        {!isLoading && !error && categories.length > 0 && (
           <div
             className={`px-4 sm:px-0 ${
               viewMode === "grid"
@@ -181,7 +289,7 @@ export default function CategoriesPage() {
                 : "grid grid-cols-1 gap-6 max-w-4xl mx-auto"
             }`}
           >
-            {categories.map((category: any) => (
+            {categories.map((category) => (
               <Link href={`/categories/${category.id}`} key={category.id}>
                 <div
                   className={`group cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl rounded-2xl overflow-hidden ${
@@ -198,13 +306,15 @@ export default function CategoriesPage() {
                     }`}
                   >
                     <Image
-                      src={
-                        category.designs[0]?.images[0]?.url ||
-                        "/images/placeholder.png"
-                      }
+                      src={getCategoryImageUrl(category)}
                       alt={category.name}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      sizes={
+                        viewMode === "grid"
+                          ? "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          : "96px"
+                      }
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   </div>
@@ -232,14 +342,14 @@ export default function CategoriesPage() {
                     </div>
                     <div className="flex items-center justify-between mt-4">
                       <div className="text-base text-gray-500 dark:text-gray-400">
-                        {category._count.designs} designs
+                        {category._count?.designs || 0} designs
                       </div>
                       <div className="flex items-center text-blue-600 dark:text-blue-400 font-semibold transition-all duration-300 group-hover:translate-x-1">
                         <span className="text-base">Explore</span>
                         <span className="ml-1 transition-transform duration-300 group-hover:translate-x-1">
                           →
                         </span>
-                      </div>{" "}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -249,7 +359,7 @@ export default function CategoriesPage() {
         )}
 
         {/* Pagination */}
-        {categories.length > 0 && (
+        {!isLoading && !error && categories.length > 0 && totalPages > 1 && (
           <div className="mt-12 px-4 sm:px-0">
             <Pagination>
               <PaginationContent>
@@ -260,7 +370,7 @@ export default function CategoriesPage() {
                     className={
                       currentPage === 1
                         ? "pointer-events-none opacity-50"
-                        : undefined
+                        : "cursor-pointer"
                     }
                   />
                 </PaginationItem>
@@ -271,14 +381,14 @@ export default function CategoriesPage() {
                     className={
                       currentPage === 1
                         ? "pointer-events-none opacity-50"
-                        : undefined
+                        : "cursor-pointer"
                     }
                   />
                 </PaginationItem>
                 {getPaginationRange().map((page, index) => {
                   if (page === "...") {
                     return (
-                      <PaginationItem key={index}>
+                      <PaginationItem key={`ellipsis-${index}`}>
                         <PaginationEllipsis />
                       </PaginationItem>
                     );
@@ -289,6 +399,7 @@ export default function CategoriesPage() {
                       <PaginationLink
                         onClick={() => handlePageChange(page as number)}
                         isActive={currentPage === page}
+                        className="cursor-pointer"
                       >
                         {page}
                       </PaginationLink>
@@ -302,7 +413,7 @@ export default function CategoriesPage() {
                     className={
                       totalPages === currentPage
                         ? "pointer-events-none opacity-50"
-                        : undefined
+                        : "cursor-pointer"
                     }
                   />
                 </PaginationItem>
@@ -313,7 +424,7 @@ export default function CategoriesPage() {
                     className={
                       totalPages === currentPage
                         ? "pointer-events-none opacity-50"
-                        : undefined
+                        : "cursor-pointer"
                     }
                   />
                 </PaginationItem>
