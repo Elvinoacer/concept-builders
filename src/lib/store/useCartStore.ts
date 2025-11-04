@@ -201,14 +201,40 @@ const useCartStore = create<CartStore>()(
       return true;
     },
 
-    removeItem: (cartItemId, status) => {
-      const { cart, setCart } = get();
-      const newCart = cart.filter((item) => item.cartItemId !== cartItemId);
-      setCart(newCart);
-      if (status === "unauthenticated") {
+    removeItem: async (cartItemId, status) => {
+      const { cart, setCart, fetchCart } = get();
+
+      if (status === "authenticated") {
+        try {
+          const response = await fetch(`/api/cart/items/${cartItemId}`, {
+            method: "DELETE",
+          });
+
+          if (response.ok) {
+            const updatedCart = await response.json();
+            const frontendCartItems = updatedCart.items.map((item: any) => ({
+              cartItemId: item.id,
+              quantity: item.quantity,
+              selectedFileTypes: item.selectedFileTypes || [],
+              selectedExtras: item.selectedExtras || [],
+              design: item.design,
+            }));
+            setCart(frontendCartItems);
+            toast.success("Removed from cart.");
+          } else {
+            const errorData = await response.json();
+            toast.error(errorData.error || "Failed to remove item from cart.");
+          }
+        } catch (err) {
+          toast.error("An error occurred while removing item from cart.");
+        }
+      } else {
+        // For unauthenticated users, remove from local storage
+        const newCart = cart.filter((item) => item.cartItemId !== cartItemId);
+        setCart(newCart);
         localStorage.setItem("cart", JSON.stringify(newCart));
+        toast.success("Removed from cart.");
       }
-      toast.success("Removed from cart.");
     },
 
     updateItem: (cartItemId, updates, status) => {
