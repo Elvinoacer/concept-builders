@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CostEstimate from "./CostEstimate";
+import CostCalculatorModal from "@/components/cost-calculator/CostCalculatorModal";
 
 const CostToBuildTab = ({ design }) => {
   const [activeTier, setActiveTier] = useState("basic");
@@ -235,16 +236,20 @@ const CostToBuildTab = ({ design }) => {
             <h5 className="font-semibold text-slate-800 dark:text-white mb-2">
               Important Notes
             </h5>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              These estimates are based on current market rates and may vary
-              depending on your location, site conditions, and material
-              availability. For a precise quote tailored to your specific
-              requirements, please contact our architectural consultants.
-            </p>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                            These estimates are based on current market rates and may vary
+                            depending on your location, site conditions, and material
+                            availability. For a precise quote tailored to your specific
+                            requirements, please contact our architectural consultants.
+                          </p>
+                          <CostCalculatorModal>
+                            <button className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                              Open Full Cost Calculator
+                            </button>
+                          </CostCalculatorModal>
+                        </div>
+                      </div>
+                    </motion.div>    </motion.div>
   );
 };
 
