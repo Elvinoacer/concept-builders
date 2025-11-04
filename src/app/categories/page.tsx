@@ -334,9 +334,9 @@ export default function CategoriesPage() {
                       >
                         {category.name}
                       </h2>
-                      {viewMode === "grid" && category.description && (
+                      {viewMode === "grid" && (
                         <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-base">
-                          {category.description}
+                          {/* No description available for categories */}
                         </p>
                       )}
                     </div>

@@ -156,12 +156,9 @@ export default function CategoryPage({
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-        <div className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold">
-            {category.name} Designs
-          </h1>
-          <p className="text-lg md:text-xl mt-2">{category.description}</p>
-        </div>
+                <div className="relative z-10">
+                  <h1 className="text-4xl md:text-5xl font-bold">{category.name} Designs</h1>
+                </div>
       </header>
       <main className="max-w-7xl mx-auto py-12 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
