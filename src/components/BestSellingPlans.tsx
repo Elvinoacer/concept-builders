@@ -27,12 +27,10 @@ const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
     hidden: {
       y: 50,
       opacity: 0,
-      scale: 0.95,
     },
     visible: {
       y: 0,
       opacity: 1,
-      scale: 1,
       transition: {
         type: "spring",
         stiffness: 100,
@@ -44,12 +42,21 @@ const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
 
   const hoverVariants = {
     hover: {
-      y: -8,
-      scale: 1.02,
+      y: -6,
       transition: {
         type: "spring",
         stiffness: 400,
         damping: 25,
+      },
+    },
+  };
+
+  const imageHoverVariants = {
+    hover: {
+      scale: 1.08,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
       },
     },
   };
@@ -95,7 +102,7 @@ const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
               whileHover="hover"
               className="group relative"
             >
-              <div className="relative bg-white dark:bg-gray-800 rounded-2xl lg:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-700/50 group-hover:border-blue-300/50 dark:group-hover:border-cyan-400/30">
+              <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-700/50 group-hover:border-blue-200 dark:group-hover:border-cyan-400">
                 {/* Best Seller Badge */}
                 <div className="absolute top-4 left-4 z-20">
                   <div className="bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-3 py-1.5 text-sm font-bold rounded-full shadow-lg flex items-center">
@@ -108,28 +115,38 @@ const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
 
                 {/* Image Container */}
                 <div className="relative h-64 sm:h-72 md:h-80 w-full overflow-hidden">
-                  <Image
-                    src={
-                      design.images?.[0]?.url ||
-                      "/images/category-placeholder.png"
-                    }
-                    alt={design.name}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
+                  <motion.div
+                    variants={imageHoverVariants}
+                    className="w-full h-full"
+                  >
+                    <Image
+                      src={
+                        design.images?.[0]?.url ||
+                        "/images/category-placeholder.png"
+                      }
+                      alt={design.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </motion.div>
 
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
 
-                  {/* Shine Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  {/* Subtle Shine Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 opacity-50" />
+
+                  {/* Top Corner Accent */}
+                  <div className="absolute top-0 right-0 w-10 h-10 overflow-hidden">
+                    <div className="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  </div>
                 </div>
 
                 {/* Content */}
                 <div className="relative p-6 md:p-8 z-10">
                   <div className="mb-4">
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2 leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors duration-300">
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2 leading-tight line-clamp-2">
                       {design.name}
                     </h3>
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
@@ -164,13 +181,13 @@ const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
 
                   {/* CTA Button */}
                   <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     className="text-center"
                   >
                     <Link
                       href={`/designs/${design.id}`}
-                      className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-4 text-lg font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/btn"
+                      className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-4 text-lg font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl group/btn"
                     >
                       View Details
                       <span className="material-symbols-outlined ml-2 text-lg group-hover/btn:translate-x-1 transition-transform duration-300">
@@ -180,12 +197,16 @@ const BestSellingPlans = ({ bestSellingPlans }: BestSellingPlansProps) => {
                   </motion.div>
                 </div>
 
-                {/* Hover Border Effect */}
-                <div className="absolute inset-0 rounded-2xl lg:rounded-3xl border-2 border-transparent bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-padding opacity-0 group-hover:opacity-100 transition-opacity duration-500 -m-0.5" />
-              </div>
+                {/* Bottom Accent Line */}
+                <motion.div
+                  className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  initial={false}
+                  whileHover={{ opacity: 1 }}
+                />
 
-              {/* Background Glow */}
-              <div className="absolute inset-0 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-10 blur-md transition-opacity duration-500 -z-10" />
+                {/* Very Subtle Background Glow */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-500/2 to-yellow-500/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+              </div>
             </motion.div>
           ))}
         </motion.div>

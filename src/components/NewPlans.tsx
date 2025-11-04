@@ -27,12 +27,10 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
     hidden: {
       y: 60,
       opacity: 0,
-      scale: 0.95,
     },
     visible: {
       y: 0,
       opacity: 1,
-      scale: 1,
       transition: {
         type: "spring",
         stiffness: 100,
@@ -44,12 +42,21 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
 
   const hoverVariants = {
     hover: {
-      y: -8,
-      scale: 1.02,
+      y: -6,
       transition: {
         type: "spring",
         stiffness: 400,
         damping: 25,
+      },
+    },
+  };
+
+  const imageHoverVariants = {
+    hover: {
+      scale: 1.05,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
       },
     },
   };
@@ -96,7 +103,7 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
               whileHover="hover"
               className="group relative"
             >
-              <div className="relative bg-white dark:bg-gray-800 rounded-2xl lg:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-700/50 group-hover:border-blue-300/50 dark:group-hover:border-cyan-400/30">
+              <div className="relative bg-white dark:bg-gray-800 rounded-2xl lg:rounded-3xl shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-700/50 group-hover:border-blue-200 dark:group-hover:border-cyan-400">
                 {/* New Badge */}
                 <div className="absolute top-4 left-4 z-20">
                   <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 text-sm font-bold rounded-full shadow-lg flex items-center">
@@ -121,20 +128,25 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
 
                 {/* Image Container */}
                 <div className="relative h-80 sm:h-96 w-full overflow-hidden">
-                  <Image
-                    src={
-                      design.images?.[0]?.url ||
-                      "/images/category-placeholder.png"
-                    }
-                    alt={design.name}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    priority={index < 2}
-                  />
+                  <motion.div
+                    variants={imageHoverVariants}
+                    className="w-full h-full"
+                  >
+                    <Image
+                      src={
+                        design.images?.[0]?.url ||
+                        "/images/category-placeholder.png"
+                      }
+                      alt={design.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      priority={index < 2}
+                    />
+                  </motion.div>
 
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-500" />
+                  {/* Subtle Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
 
                   {/* Category Badge */}
                   <div className="absolute bottom-4 left-4 z-20">
@@ -143,8 +155,8 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
                     </div>
                   </div>
 
-                  {/* Shine Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  {/* Subtle Shine Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 opacity-60" />
                 </div>
 
                 {/* Content */}
@@ -156,13 +168,13 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
 
                     {/* Design Features */}
                     <div className="flex flex-wrap gap-3 mb-4">
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded-lg border border-gray-200/50 dark:border-gray-600/50">
                         <span className="material-symbols-outlined text-base mr-1.5 text-blue-500">
                           schedule
                         </span>
                         Latest Design
                       </div>
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded-lg border border-gray-200/50 dark:border-gray-600/50">
                         <span className="material-symbols-outlined text-base mr-1.5 text-green-500">
                           trending_up
                         </span>
@@ -173,13 +185,13 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
 
                   {/* CTA Button */}
                   <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     className="text-center"
                   >
                     <Link
                       href={`/designs/${design.id}`}
-                      className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 text-lg font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/btn"
+                      className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 text-lg font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl group/btn"
                     >
                       Explore Design
                       <span className="material-symbols-outlined ml-3 text-xl group-hover/btn:translate-x-1 transition-transform duration-300">
@@ -189,12 +201,21 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
                   </motion.div>
                 </div>
 
-                {/* Hover Border Effect */}
-                <div className="absolute inset-0 rounded-2xl lg:rounded-3xl border-2 border-transparent bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-padding opacity-0 group-hover:opacity-100 transition-opacity duration-500 -m-0.5" />
+                {/* Subtle Corner Accent */}
+                <div className="absolute top-0 right-0 w-12 h-12 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-0 h-0 border-l-[24px] border-l-transparent border-t-[24px] border-t-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </div>
+
+                {/* Bottom Accent Line */}
+                <motion.div
+                  className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  initial={false}
+                  whileHover={{ opacity: 1 }}
+                />
               </div>
 
-              {/* Background Glow */}
-              <div className="absolute inset-0 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-10 blur-md transition-opacity duration-500 -z-10" />
+              {/* Very Subtle Background Glow */}
+              <div className="absolute inset-0 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-blue-500/3 to-cyan-400/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
             </motion.div>
           ))}
         </motion.div>

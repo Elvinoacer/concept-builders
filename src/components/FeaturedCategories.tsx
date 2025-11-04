@@ -35,12 +35,10 @@ const FeaturedCategories = ({
     hidden: {
       y: 40,
       opacity: 0,
-      scale: 0.95,
     },
     visible: {
       y: 0,
       opacity: 1,
-      scale: 1,
       transition: {
         type: "spring",
         stiffness: 100,
@@ -52,12 +50,21 @@ const FeaturedCategories = ({
 
   const hoverVariants = {
     hover: {
-      y: -8,
-      scale: 1.02,
+      y: -6,
       transition: {
         type: "spring",
         stiffness: 400,
         damping: 25,
+      },
+    },
+  };
+
+  const imageHoverVariants = {
+    hover: {
+      scale: 1.08,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
       },
     },
   };
@@ -109,33 +116,38 @@ const FeaturedCategories = ({
               >
                 <motion.div
                   variants={hoverVariants}
-                  className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-700/50 group-hover:border-blue-300/50 dark:group-hover:border-cyan-400/30"
+                  className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-700/50 group-hover:border-blue-200 dark:group-hover:border-cyan-400"
                 >
                   {/* Image Container */}
                   <div className="relative h-72 sm:h-80 md:h-96 overflow-hidden">
-                    <Image
-                      src={
-                        category.designs?.[0]?.images?.[0]?.url ||
-                        category.image ||
-                        "/images/category-placeholder.png"
-                      }
-                      alt={category.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
+                    <motion.div
+                      variants={imageHoverVariants}
+                      className="w-full h-full"
+                    >
+                      <Image
+                        src={
+                          category.designs?.[0]?.images?.[0]?.url ||
+                          category.image ||
+                          "/images/category-placeholder.png"
+                        }
+                        alt={category.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      />
+                    </motion.div>
 
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-500" />
 
-                    {/* Shine Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                    {/* Subtle Shine Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 opacity-50" />
 
                     {/* Content Overlay */}
                     <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 text-white z-10">
                       <motion.h3
                         className="text-xl md:text-2xl font-bold mb-2 leading-tight"
-                        whileHover={{ x: 5 }}
+                        whileHover={{ x: 3 }}
                         transition={{ type: "spring", stiffness: 400 }}
                       >
                         {category.name}
@@ -143,8 +155,8 @@ const FeaturedCategories = ({
 
                       <div className="flex items-center justify-between">
                         <motion.p
-                          className="text-blue-200 dark:text-cyan-200 font-semibold text-sm md:text-base flex items-center"
-                          whileHover={{ x: 3 }}
+                          className="text-blue-100 dark:text-cyan-100 font-semibold text-sm md:text-base flex items-center"
+                          whileHover={{ x: 2 }}
                         >
                           <span className="material-symbols-outlined text-lg mr-1">
                             design_services
@@ -154,8 +166,8 @@ const FeaturedCategories = ({
 
                         {/* Arrow Indicator */}
                         <motion.div
-                          className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg"
-                          whileHover={{ scale: 1.1 }}
+                          className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30 group-hover:bg-white/30 transition-all duration-300"
+                          whileHover={{ scale: 1.1, rotate: 5 }}
                           transition={{ type: "spring", stiffness: 400 }}
                         >
                           <span className="material-symbols-outlined text-white text-sm">
@@ -165,12 +177,21 @@ const FeaturedCategories = ({
                       </div>
                     </div>
 
-                    {/* Hover Border Effect */}
-                    <div className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-padding opacity-0 group-hover:opacity-100 transition-opacity duration-500 -m-0.5" />
+                    {/* Top Corner Accent */}
+                    <div className="absolute top-0 right-0 w-10 h-10 overflow-hidden">
+                      <div className="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    </div>
                   </div>
 
-                  {/* Background Glow */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-10 blur-md transition-opacity duration-500 -z-10" />
+                  {/* Bottom Accent Line */}
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    initial={false}
+                    whileHover={{ opacity: 1 }}
+                  />
+
+                  {/* Very Subtle Background Glow */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/2 to-cyan-400/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
                 </motion.div>
               </Link>
             </motion.div>
