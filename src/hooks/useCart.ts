@@ -57,6 +57,7 @@ export const useCart = () => {
 
   return {
     cart,
+    cartId: useCartStore.getState().cartId,
     loading,
     error,
     appliedDiscountAmount,

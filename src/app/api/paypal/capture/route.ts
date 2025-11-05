@@ -103,6 +103,9 @@ export async function POST(request: Request) {
           orderId: order.id,
           designId: item.designId,
           quantity: item.quantity,
+          selectedFileType: item.selectedFileType,
+          selectedPackage: item.selectedPackage,
+          selectedExtras: item.selectedExtras,
         })),
       });
 

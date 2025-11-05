@@ -68,7 +68,9 @@ const PurchasedDesigns = ({ searchQuery }: { searchQuery: string }) => {
                   <div className="bg-gray-100 dark:bg-gray-700 p-5 rounded-xl flex items-center">
                     <span className="material-symbols-outlined text-4xl text-blue-600 dark:text-blue-400">description</span>
                     <div className="ml-5">
-                      <p className="font-bold text-xl text-gray-900 dark:text-white">Digital Download</p>
+                      <p className="font-bold text-xl text-gray-900 dark:text-white">{design.selectedPackage || 'Digital Download'}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">File Type: {design.selectedFileType}</p>
+                      {design.selectedExtras && <p className="text-sm text-gray-500 dark:text-gray-400">Extras: {JSON.parse(design.selectedExtras).map((extra: any) => extra.name).join(', ')}</p>}
                     </div>
                   </div>
                 </div>

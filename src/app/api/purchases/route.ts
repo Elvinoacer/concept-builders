@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     });
 
     let purchasedDesigns = orders.flatMap(order => 
-      order.items.map(item => ({...item.design, createdAt: order.createdAt}))
+      order.items.map(item => ({...item.design, createdAt: order.createdAt, selectedFileType: item.selectedFileType, selectedPackage: item.selectedPackage, selectedExtras: item.selectedExtras}))
     );
 
     // Apply filtering

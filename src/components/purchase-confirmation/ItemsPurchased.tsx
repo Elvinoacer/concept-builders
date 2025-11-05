@@ -18,6 +18,11 @@ const ItemsPurchased = ({ items }) => {
             <div className="flex flex-col justify-center">
               <p className="text-gray-900 dark:text-white text-base font-medium leading-normal">{item.design.name}</p>
               <p className="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Plan ID: {item.design.id}</p>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {item.selectedFileType && <p>File Type: {item.selectedFileType}</p>}
+                {item.selectedPackage && <p>Package: {item.selectedPackage}</p>}
+                {item.selectedExtras && <p>Extras: {JSON.parse(item.selectedExtras).map((extra: any) => extra.name).join(', ')}</p>}
+              </div>
             </div>
           </div>
         );

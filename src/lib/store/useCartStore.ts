@@ -14,6 +14,7 @@ interface CartItem {
 
 interface CartStore {
   cart: CartItem[];
+  cartId: string | null;
   loading: boolean;
   error: string | null;
   appliedDiscountAmount: number;
@@ -21,7 +22,7 @@ interface CartStore {
   appliedDiscountCode: string | null;
 
   // Actions
-  setCart: (cart: CartItem[]) => void;
+  setCart: (cart: any) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setAppliedDiscount: (
@@ -56,13 +57,14 @@ interface CartStore {
 const useCartStore = create<CartStore>()(
   devtools((set, get) => ({
     cart: [],
+    cartId: null,
     loading: true,
     error: null,
     appliedDiscountAmount: 0,
     appliedDiscountId: null,
     appliedDiscountCode: null,
 
-    setCart: (cart) => set({ cart }),
+    setCart: (cart) => set({ cart: cart.items, cartId: cart.id }),
     setLoading: (loading) => set({ loading }),
     setError: (error) => set({ error }),
     setAppliedDiscount: (amount, id, code) =>
@@ -83,14 +85,7 @@ const useCartStore = create<CartStore>()(
           const response = await fetch("/api/cart/items");
           if (response.ok) {
             const fullCart = await response.json();
-            const frontendCartItems = fullCart.items.map((item: any) => ({
-              cartItemId: item.id,
-              quantity: item.quantity,
-              selectedFileTypes: item.selectedFileTypes || [],
-              selectedExtras: item.selectedExtras || [],
-              design: item.design,
-            }));
-            set({ cart: frontendCartItems });
+            setCart(fullCart);
           } else {
             const errorData = await response.json();
             set({ error: errorData.error || "Failed to fetch cart", cart: [] });
@@ -174,14 +169,7 @@ const useCartStore = create<CartStore>()(
 
             if (response.ok) {
               const updatedCart = await response.json();
-              const frontendCartItems = updatedCart.items.map((item: any) => ({
-                cartItemId: item.id,
-                quantity: item.quantity,
-                selectedFileTypes: item.selectedFileTypes || [],
-                selectedExtras: item.selectedExtras || [],
-                design: item.design,
-              }));
-              setCart(frontendCartItems);
+              setCart(updatedCart);
               toast.success("Added to cart!");
             } else {
               const errorData = await response.json();
@@ -193,7 +181,7 @@ const useCartStore = create<CartStore>()(
         })();
       } else {
         const newCart = [...cart, newItem];
-        setCart(newCart);
+        setCart({ items: newCart, id: null });
         localStorage.setItem("cart", JSON.stringify(newCart));
         toast.success("Added to cart!");
       }
@@ -212,14 +200,7 @@ const useCartStore = create<CartStore>()(
 
           if (response.ok) {
             const updatedCart = await response.json();
-            const frontendCartItems = updatedCart.items.map((item: any) => ({
-              cartItemId: item.id,
-              quantity: item.quantity,
-              selectedFileTypes: item.selectedFileTypes || [],
-              selectedExtras: item.selectedExtras || [],
-              design: item.design,
-            }));
-            setCart(frontendCartItems);
+            setCart(updatedCart);
             toast.success("Removed from cart.");
           } else {
             const errorData = await response.json();
@@ -230,7 +211,7 @@ const useCartStore = create<CartStore>()(
         }
       } else {
         const newCart = cart.filter((item) => item.cartItemId !== cartItemId);
-        setCart(newCart);
+        setCart({ items: newCart, id: null });
         localStorage.setItem("cart", JSON.stringify(newCart));
         toast.success("Removed from cart.");
       }
@@ -251,14 +232,7 @@ const useCartStore = create<CartStore>()(
 
           if (response.ok) {
             const updatedCart = await response.json();
-            const frontendCartItems = updatedCart.items.map((item: any) => ({
-              cartItemId: item.id,
-              quantity: item.quantity,
-              selectedFileTypes: item.selectedFileTypes || [],
-              selectedExtras: item.selectedExtras || [],
-              design: item.design,
-            }));
-            setCart(frontendCartItems);
+            setCart(updatedCart);
             toast.success("Cart updated.");
           } else {
             const errorData = await response.json();
@@ -271,7 +245,7 @@ const useCartStore = create<CartStore>()(
         const newCart = cart.map((item) =>
           item.cartItemId === cartItemId ? { ...item, ...updates } : item
         );
-        setCart(newCart);
+        setCart({ items: newCart, id: null });
         localStorage.setItem("cart", JSON.stringify(newCart));
         toast.success("Cart updated.");
       }

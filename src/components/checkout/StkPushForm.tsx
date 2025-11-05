@@ -21,6 +21,7 @@ export default function StkPushForm({
   appliedDiscountId,
   appliedDiscountCode,
 }: StkPushFormProps) {
+  const { cartId } = useCart();
   const { data: session } = useSession();
   const router = useRouter();
   const [phone, setPhone] = useState("");
@@ -81,7 +82,7 @@ export default function StkPushForm({
       toast.success("STK Push initiated successfully! Check your phone.");
       // Start polling for order status
       const pollInterval = setInterval(async () => {
-        const statusRes = await fetch(`/api/orders/status?cartId=${cart.id}`); // Assuming cart.id is available and unique
+        const statusRes = await fetch(`/api/orders/status?cartId=${cartId}`); // Assuming cart.id is available and unique
         const statusData = await statusRes.json();
 
         if (statusData.status === 'PAID' && statusData.orderId) {
@@ -106,7 +107,6 @@ export default function StkPushForm({
     }
     setLoading(false);
   };
-
   return (
     <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
