@@ -6,25 +6,25 @@ const paymentMethods = [
   {
     id: "paypal",
     name: "PayPal",
-    icon: "fab fa-paypal",
+    image: "/payments/paypal.png",
     description: "Pay with your PayPal account",
   },
   {
     id: "credit-card",
     name: "Credit Card",
-    icon: "far fa-credit-card",
+    image: "/payments/visa-master.webp",
     description: "Pay with Visa, Mastercard, or Amex",
   },
   {
     id: "mpesa",
     name: "M-Pesa",
-    icon: "fas fa-mobile-alt",
+    image: "/payments/mpesa.png",
     description: "Pay with your M-Pesa account",
   },
   {
     id: "secure-url",
     name: "Secure Checkout URL",
-    icon: "fas fa-link",
+    image: "/payments/apple-pay.webp",
     description: "Get a secure payment link",
   },
 ];
@@ -44,8 +44,8 @@ const PaymentMethodSelector = ({ selectedMethod, onSelect }) => {
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
           >
-            <div className={`w-10 h-10 flex items-center justify-center rounded-md text-white text-xl ${method.id === 'paypal' ? 'bg-[#003087]' : method.id === 'credit-card' ? 'bg-gray-800' : method.id === 'mpesa' ? 'bg-[#00A650]' : 'bg-red-500'}`}>
-              <i className={method.icon}></i>
+            <div className="w-12 h-8 flex items-center justify-center rounded-md overflow-hidden">
+              <img src={method.image} alt={method.name} className="object-contain w-full h-full" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{method.name}</h3>

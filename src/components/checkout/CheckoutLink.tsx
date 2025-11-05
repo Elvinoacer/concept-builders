@@ -12,6 +12,27 @@ interface CheckoutLinkProps {
   appliedDiscountCode: string | null;
 }
 
+const paymentMethods = [
+  { name: 'M-Pesa', image: '/payments/mpesa.png' },
+  { name: 'Visa/Mastercard', image: '/payments/visa-master.webp' },
+  { name: 'Apple Pay', image: '/payments/apple-pay.webp' },
+  { name: 'Google Pay', image: '/payments/google-pay.png' },
+];
+
+const PaymentMethodGallery = () => {
+  return (
+    <div className="flex items-center justify-center space-x-4 p-4 bg-gray-100 rounded-lg">
+      {paymentMethods.map((method) => (
+        <div key={method.name} className="flex flex-col items-center">
+          <div className="w-24 h-16 flex items-center justify-center rounded-md overflow-hidden border border-gray-200">
+            <img src={method.image} alt={method.name} className="object-contain w-full h-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export default function CheckoutLink({
   cart,
   finalTotal,
@@ -83,11 +104,12 @@ export default function CheckoutLink({
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         Generate Card/Bank Checkout Link
       </h2>
+      <PaymentMethodGallery />
       {!checkoutUrl ? (
         <button
           onClick={handleGenerateLink}
           disabled={loading || finalTotal <= 0 || isFetchingRate || rateError}
-          className="w-full bg-blue-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+          className="w-full bg-blue-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors mt-6"
         >
           {loading ? "Generating..." : isFetchingRate ? "Fetching rate..." : rateError ? "Error" : `Generate Link for KES ${amountKES}`}
         </button>
