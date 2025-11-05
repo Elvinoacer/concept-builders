@@ -86,19 +86,23 @@ const CostCalculator = () => {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "dark bg-gray-900" : "bg-gray-50"}`}
+      className={`min-h-screen transition-colors duration-300 ${
+        isDarkMode ? "dark bg-gray-900" : "bg-gray-50"
+      }`}
     >
       <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex items-center gap-3 sm:gap-4">
-            <FaHardHat className="text-3xl sm:text-4xl text-primary" />
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <FaHardHat className="text-3xl sm:text-4xl bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text" />
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent">
               BuildCost Pro
             </h1>
           </div>
           <div className="flex items-center gap-2 self-end sm:self-auto">
             <span
-              className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}
+              className={`text-sm font-medium ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
             >
               {isDarkMode ? "Dark" : "Light"}
             </span>
@@ -124,14 +128,15 @@ const CostCalculator = () => {
                 isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              <FaCalculator className="text-primary" /> Project Details
+              <FaCalculator className="bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text" />
+              <span>Project Details</span>
             </h2>
             <div className="space-y-4 sm:space-y-6">
               {/* Building Type */}
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
+                    isDarkMode ? "text-gray-100" : "text-gray-800"
                   }`}
                 >
                   Building Type
@@ -140,15 +145,17 @@ const CostCalculator = () => {
                   <SelectTrigger
                     className={`w-full transition-colors duration-300 ${
                       isDarkMode
-                        ? "bg-gray-700 border-gray-600 text-white"
-                        : "bg-white border-gray-300"
+                        ? "bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                        : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
                     }`}
                   >
-                    <SelectValue />
+                    <SelectValue placeholder="Select building type" />
                   </SelectTrigger>
                   <SelectContent
                     className={
-                      isDarkMode ? "bg-gray-700 border-gray-600 text-white" : ""
+                      isDarkMode
+                        ? "bg-gray-700 border-gray-600 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
                     }
                   >
                     <SelectItem value="residential">
@@ -171,7 +178,7 @@ const CostCalculator = () => {
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
+                    isDarkMode ? "text-gray-100" : "text-gray-800"
                   }`}
                 >
                   Total Area (sq mt)
@@ -184,9 +191,10 @@ const CostCalculator = () => {
                   max="100000"
                   className={`transition-colors duration-300 ${
                     isDarkMode
-                      ? "bg-gray-700 border-gray-600 text-white"
-                      : "bg-white border-gray-300"
+                      ? "bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                      : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
                   }`}
+                  placeholder="Enter area in square meters"
                 />
               </div>
 
@@ -194,7 +202,7 @@ const CostCalculator = () => {
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
+                    isDarkMode ? "text-gray-100" : "text-gray-800"
                   }`}
                 >
                   Construction Quality
@@ -203,15 +211,17 @@ const CostCalculator = () => {
                   <SelectTrigger
                     className={`w-full transition-colors duration-300 ${
                       isDarkMode
-                        ? "bg-gray-700 border-gray-600 text-white"
-                        : "bg-white border-gray-300"
+                        ? "bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                        : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
                     }`}
                   >
-                    <SelectValue />
+                    <SelectValue placeholder="Select quality level" />
                   </SelectTrigger>
                   <SelectContent
                     className={
-                      isDarkMode ? "bg-gray-700 border-gray-600 text-white" : ""
+                      isDarkMode
+                        ? "bg-gray-700 border-gray-600 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
                     }
                   >
                     <SelectItem value="basic">Basic</SelectItem>
@@ -225,7 +235,7 @@ const CostCalculator = () => {
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
+                    isDarkMode ? "text-gray-100" : "text-gray-800"
                   }`}
                 >
                   Number of Floors
@@ -238,12 +248,14 @@ const CostCalculator = () => {
                     max={10}
                     step={1}
                     className={`flex-1 transition-colors duration-300 ${
-                      isDarkMode ? "[&_[data-slot=track]]:bg-gray-600" : ""
+                      isDarkMode
+                        ? "[&_[data-slot=track]]:bg-gray-600 [&_[data-slot=range]]:bg-gradient-to-r from-blue-600 to-cyan-400"
+                        : "[&_[data-slot=range]]:bg-gradient-to-r from-blue-600 to-cyan-400"
                     }`}
                   />
                   <span
                     className={`font-bold min-w-8 text-center transition-colors duration-300 ${
-                      isDarkMode ? "text-primary-300" : "text-primary"
+                      isDarkMode ? "text-cyan-300" : "text-blue-600"
                     }`}
                   >
                     {floors}
@@ -255,7 +267,7 @@ const CostCalculator = () => {
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
+                    isDarkMode ? "text-gray-100" : "text-gray-800"
                   }`}
                 >
                   Location Factor
@@ -264,15 +276,17 @@ const CostCalculator = () => {
                   <SelectTrigger
                     className={`w-full transition-colors duration-300 ${
                       isDarkMode
-                        ? "bg-gray-700 border-gray-600 text-white"
-                        : "bg-white border-gray-300"
+                        ? "bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                        : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
                     }`}
                   >
-                    <SelectValue />
+                    <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent
                     className={
-                      isDarkMode ? "bg-gray-700 border-gray-600 text-white" : ""
+                      isDarkMode
+                        ? "bg-gray-700 border-gray-600 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
                     }
                   >
                     <SelectItem value="rural">
@@ -295,7 +309,7 @@ const CostCalculator = () => {
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
+                    isDarkMode ? "text-gray-100" : "text-gray-800"
                   }`}
                 >
                   Site Preparation Complexity
@@ -304,15 +318,17 @@ const CostCalculator = () => {
                   <SelectTrigger
                     className={`w-full transition-colors duration-300 ${
                       isDarkMode
-                        ? "bg-gray-700 border-gray-600 text-white"
-                        : "bg-white border-gray-300"
+                        ? "bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                        : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
                     }`}
                   >
-                    <SelectValue />
+                    <SelectValue placeholder="Select site complexity" />
                   </SelectTrigger>
                   <SelectContent
                     className={
-                      isDarkMode ? "bg-gray-700 border-gray-600 text-white" : ""
+                      isDarkMode
+                        ? "bg-gray-700 border-gray-600 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
                     }
                   >
                     <SelectItem value="simple">Simple (Flat land)</SelectItem>
@@ -328,7 +344,10 @@ const CostCalculator = () => {
 
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
-                <Button onClick={calculateCost} className="w-full sm:flex-1">
+                <Button
+                  onClick={calculateCost}
+                  className="w-full sm:flex-1 bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 text-white"
+                >
                   Calculate Cost
                 </Button>
                 <Button
@@ -336,8 +355,8 @@ const CostCalculator = () => {
                   variant="outline"
                   className={`w-full sm:flex-1 transition-colors duration-300 ${
                     isDarkMode
-                      ? "border-gray-600 text-gray-200 hover:bg-gray-700"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      ? "border-gray-600 text-gray-200 hover:bg-gray-700 hover:text-white"
+                      : "border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   Reset
@@ -347,59 +366,65 @@ const CostCalculator = () => {
           </div>
 
           {/* Results Section */}
-          <div className="w-full lg:w-1/2 p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-primary to-secondary text-white flex flex-col justify-between">
+          <div className="w-full lg:w-1/2 p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-blue-600 to-cyan-400 text-white flex flex-col justify-between">
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 flex items-center gap-3">
-                <FaChartPie /> Cost Estimate
+                <FaChartPie className="text-white" />
+                <span>Cost Estimate</span>
               </h2>
               <div className="text-center my-4 sm:my-6">
-                <p className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+                <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
                   {formatCurrency(totalCost)}
                 </p>
-                <p className="text-sm sm:text-base mt-2 opacity-90">
+                <p className="text-sm sm:text-base mt-2 text-blue-100 font-medium">
                   Total Estimated Cost
                 </p>
               </div>
               <div className="space-y-3 sm:space-y-4 text-sm sm:text-base">
-                <div className="flex justify-between items-center py-2 border-b border-white/20">
-                  <p>Foundation & Structure</p>
-                  <p className="font-semibold">
+                <div className="flex justify-between items-center py-2 border-b border-blue-400/30">
+                  <p className="text-blue-50">Foundation & Structure</p>
+                  <p className="font-semibold text-white">
                     {formatCurrency(foundationCost)}
                   </p>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-white/20">
-                  <p>Exterior Work</p>
-                  <p className="font-semibold">
+                <div className="flex justify-between items-center py-2 border-b border-blue-400/30">
+                  <p className="text-blue-50">Exterior Work</p>
+                  <p className="font-semibold text-white">
                     {formatCurrency(exteriorCost)}
                   </p>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-white/20">
-                  <p>Interior Finishing</p>
-                  <p className="font-semibold">
+                <div className="flex justify-between items-center py-2 border-b border-blue-400/30">
+                  <p className="text-blue-50">Interior Finishing</p>
+                  <p className="font-semibold text-white">
                     {formatCurrency(interiorCost)}
                   </p>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-white/20">
-                  <p>Mechanical Systems</p>
-                  <p className="font-semibold">
+                <div className="flex justify-between items-center py-2 border-b border-blue-400/30">
+                  <p className="text-blue-50">Mechanical Systems</p>
+                  <p className="font-semibold text-white">
                     {formatCurrency(mechanicalCost)}
                   </p>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-white/20">
-                  <p>Site Preparation</p>
-                  <p className="font-semibold">{formatCurrency(siteCost)}</p>
+                <div className="flex justify-between items-center py-2 border-b border-blue-400/30">
+                  <p className="text-blue-50">Site Preparation</p>
+                  <p className="font-semibold text-white">
+                    {formatCurrency(siteCost)}
+                  </p>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <p>Permits & Fees</p>
-                  <p className="font-semibold">{formatCurrency(permitsCost)}</p>
+                  <p className="text-blue-50">Permits & Fees</p>
+                  <p className="font-semibold text-white">
+                    {formatCurrency(permitsCost)}
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-black bg-opacity-20 rounded-lg">
-              <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
-                <FaInfoCircle /> Notes & Assumptions
+            <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-black/20 rounded-lg border border-white/10">
+              <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base text-white">
+                <FaInfoCircle className="text-blue-200" />
+                <span>Notes & Assumptions</span>
               </h3>
-              <p className="text-xs sm:text-sm mt-2 opacity-90 leading-relaxed">
+              <p className="text-xs sm:text-sm mt-2 text-blue-100 leading-relaxed">
                 This calculator provides estimates based on average construction
                 costs. Actual costs may vary based on specific materials, labor
                 rates, design complexity, and market conditions. Always consult
