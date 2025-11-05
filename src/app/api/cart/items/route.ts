@@ -69,7 +69,12 @@ export async function GET(req: Request) {
       );
     }
 
-    return NextResponse.json(userCart);
+    const itemsWithCartItemId = userCart.items.map((item) => ({
+      ...item,
+      cartItemId: item.id,
+    }));
+
+    return NextResponse.json({ ...userCart, items: itemsWithCartItemId });
   } catch (error) {
     console.error("Failed to fetch cart items:", error);
     return NextResponse.json(

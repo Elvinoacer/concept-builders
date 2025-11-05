@@ -14,24 +14,28 @@ const SocialLogins = () => {
 
   return (
     <div>
-      <div className="relative my-4 md:my-6">
+      {/* Divider */}
+      <div className="relative my-4 xs:my-5 sm:my-6 md:my-7">
         <div aria-hidden="true" className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+          <span className="bg-white px-2 xs:px-3 text-xs xs:text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
             Or continue with
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+      {/* Social Login Buttons */}
+      <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
+        {/* Google Button */}
         <button
           onClick={() => handleSignIn("google")}
-          className="flex items-center justify-center w-full rounded-md border border-gray-300 bg-white py-2.5 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
+          className="flex items-center justify-center w-full rounded-lg xs:rounded-xl border border-gray-300 bg-white py-2 xs:py-2.5 sm:py-3 px-3 xs:px-4 text-xs xs:text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 xs:focus:ring-offset-2 focus:ring-gray-400 transition-all duration-300 hover:shadow-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-500"
         >
           <svg
             aria-hidden="true"
-            className="h-5 w-5 mr-2"
+            className="h-4 w-4 xs:h-5 xs:w-5 mr-1.5 xs:mr-2 flex-shrink-0"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
@@ -40,15 +44,17 @@ const SocialLogins = () => {
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"></path>
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path>
           </svg>
-          Google
+          <span className="truncate">Google</span>
         </button>
+
+        {/* Facebook Button */}
         <button
           onClick={() => handleSignIn("facebook")}
-          className="flex items-center justify-center w-full rounded-md border border-gray-300 bg-white py-2.5 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
+          className="flex items-center justify-center w-full rounded-lg xs:rounded-xl border border-gray-300 bg-white py-2 xs:py-2.5 sm:py-3 px-3 xs:px-4 text-xs xs:text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 xs:focus:ring-offset-2 focus:ring-gray-400 transition-all duration-300 hover:shadow-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-500"
         >
           <svg
             aria-hidden="true"
-            className="h-5 w-5 mr-2"
+            className="h-4 w-4 xs:h-5 xs:w-5 mr-1.5 xs:mr-2 flex-shrink-0"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
@@ -58,7 +64,7 @@ const SocialLogins = () => {
               fillRule="evenodd"
             ></path>
           </svg>
-          Facebook
+          <span className="truncate">Facebook</span>
         </button>
       </div>
     </div>
