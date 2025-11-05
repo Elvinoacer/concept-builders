@@ -23,7 +23,7 @@ import CostCalculatorModal from "@/components/cost-calculator/CostCalculatorModa
 import { Button } from "../ui/button";
 
 const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
-  const { cart, addToCart, updateItem } = useCart();
+  const { cart, addToCart } = useCart();
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -131,7 +131,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
         "This configuration is already in your cart. You can adjust the quantity in the cart page."
       );
     } else {
-      addToCart(design, selectedFileTypes, [], selectedExtras);
+      addToCart(design, selectedFileTypes, selectedExtras);
     }
   };
 
@@ -139,7 +139,6 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
     const success = await addToCart(
       design,
       selectedFileTypes,
-      [],
       selectedExtras
     );
     if (success) {

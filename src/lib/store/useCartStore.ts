@@ -40,7 +40,6 @@ interface CartStore {
   addToCart: (
     design: Design,
     selectedFileTypes: string[],
-    selectedPackage: string[],
     selectedExtras: any[],
     status: string
   ) => boolean;

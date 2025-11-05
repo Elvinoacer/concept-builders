@@ -35,8 +35,8 @@ export const useCart = () => {
     };
   }, [status, fetchCart]);
 
-  const addToCart = (design, selectedFileTypes, selectedPackage, selectedExtras) => {
-    return addToCartStore(design, selectedFileTypes, selectedPackage, selectedExtras, status);
+  const addToCart = (design, selectedFileTypes, selectedExtras) => {
+    return addToCartStore(design, selectedFileTypes, selectedExtras, status);
   };
 
   const removeItem = (cartItemId) => {
