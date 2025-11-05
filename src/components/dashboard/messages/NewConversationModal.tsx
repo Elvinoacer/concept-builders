@@ -72,8 +72,11 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({ onConversat
               <div 
                 key={admin.id} 
                 onClick={() => setSelectedAdmin(admin)}
-                className={`p-2 rounded-md cursor-pointer ${selectedAdmin?.id === admin.id ? 'bg-blue-100 dark:bg-blue-900' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
-                {admin.name} ({admin.email})
+                className={`p-2 rounded-md cursor-pointer flex items-center justify-between ${selectedAdmin?.id === admin.id ? 'bg-blue-100 dark:bg-blue-900' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
+                <span className="font-medium text-gray-800 dark:text-gray-200">{admin.name?.split(' ')[0]}</span>
+                {admin.adminRole && (
+                  <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">{admin.adminRole}</span>
+                )}
               </div>
             ))}
           </div>
