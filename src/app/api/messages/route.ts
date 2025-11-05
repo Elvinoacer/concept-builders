@@ -200,6 +200,11 @@ export async function POST(request: NextRequest) {
       include: {
         sender: true,
         attachments: true, // Include attachments in the response
+        conversation: {
+          include: {
+            users: true,
+          },
+        },
       },
     });
 

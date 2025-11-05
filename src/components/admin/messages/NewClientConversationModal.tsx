@@ -24,7 +24,7 @@ const NewClientConversationModal: React.FC<NewClientConversationModalProps> = ({
   const [selectedClient, setSelectedClient] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false); // Add this state
-  const socket = useSocket(); // Get the socket instance
+  const { socket } = useSocket(); // Get the socket instance
   const { data: session } = useSession(); // Get session
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const NewClientConversationModal: React.FC<NewClientConversationModalProps> = ({
 
     // Check for existing conversation
     const existingConv = existingConversations.find(conv =>
-      conv.users.some(user => user.id === selectedClient.id) &&
+      conv.users && conv.users.some(user => user.id === selectedClient.id) &&
       conv.users.some(user => user.id === session.user.id) // Assuming session.user.id is the admin's ID
     );
 
