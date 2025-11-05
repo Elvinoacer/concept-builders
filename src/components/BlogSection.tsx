@@ -91,6 +91,8 @@ const BlogSection = ({ recentPosts }: BlogSectionProps) => {
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
               />
               {/* Image Overlay Gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500" />
@@ -161,6 +163,8 @@ const BlogSection = ({ recentPosts }: BlogSectionProps) => {
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                     sizes="(max-width: 640px) 100vw, 40vw"
+                    placeholder="blur"
+                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                   />
                   {/* Image Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent opacity-50 group-hover:opacity-20 transition-opacity duration-500" />

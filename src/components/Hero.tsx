@@ -78,6 +78,8 @@ const Hero = ({ banners }: HeroProps) => {
                   priority
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
                   quality={90}
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 />
                 {/* Enhanced Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />

@@ -191,6 +191,8 @@ const Testimonials = () => {
                         fill
                         className="rounded-2xl object-cover border-4 border-white dark:border-gray-800 shadow-lg"
                         sizes="80px"
+                        placeholder="blur"
+                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                       />
                       {/* Online Indicator */}
                       <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
