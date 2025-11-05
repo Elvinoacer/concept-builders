@@ -6,7 +6,8 @@ import { Message as MessageType } from '@/generated/prisma';
 import { Paperclip } from 'lucide-react';
 
 import { formatDistanceToNow } from 'date-fns';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import Image from "next/image";
 
 import { useSession } from "next-auth/react";
 
@@ -40,7 +41,7 @@ const Message: React.FC<MessageProps> = ({ message }) => {
   return (
     <div className={`flex items-start gap-3 ${isSender ? 'flex-row-reverse' : ''}`}>
        <Avatar className="w-8 h-8">
-        <AvatarImage src={message.sender.image || '/images/default-avatar.png'} />
+        <Image src={message.sender.image || '/images/default-avatar.png'} alt={message.sender.name || "User Avatar"} fill className="rounded-full object-cover" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII=" />
         <AvatarFallback>{message.sender.name?.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className={`flex flex-col gap-1 ${isSender ? 'items-end' : ''}`}>
@@ -58,7 +59,7 @@ const Message: React.FC<MessageProps> = ({ message }) => {
                   className="flex items-center text-sm bg-gray-100 dark:bg-gray-600 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500"
                 >
                   {attachment.type.startsWith('image/') ? (
-                    <img src={attachment.url} alt={attachment.name} className="w-10 h-10 object-cover rounded mr-2" />
+                    <Image src={attachment.url} alt={attachment.name} width={40} height={40} className="object-cover rounded mr-2" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII=" />
                   ) : (
                     <Paperclip className="w-4 h-4 mr-2" />
                   )}

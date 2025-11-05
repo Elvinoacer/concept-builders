@@ -246,6 +246,8 @@ const RelatedDesigns = ({
                           width={400}
                           height={300}
                           className="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-110"
+                          placeholder="blur"
+                          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                         />
                       ) : (
                         <div className="w-full h-64 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">

@@ -53,8 +53,10 @@ const PurchasedDesigns = ({ searchQuery }: { searchQuery: string }) => {
                 <Image
                   src={design.files[0]?.url || '/images/category-placeholder.png'}
                   alt={design.name}
-                  layout="fill"
+                  fill
                   objectFit="cover"
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 p-6">

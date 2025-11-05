@@ -154,6 +154,8 @@ export default function CategoryPage({
           alt={category.name}
           fill
           className="object-cover"
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                 <div className="relative z-10">

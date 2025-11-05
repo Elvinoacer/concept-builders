@@ -230,9 +230,11 @@ const WishlistPage = () => {
                 <Image
                   src={design.images?.[0]?.url || "/images/category-placeholder.png"}
                   alt={design.name}
-                  layout="fill"
+                  fill
                   objectFit="cover"
                   className="group-hover:scale-105 transition-transform duration-300"
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 />
                 <button
                   onClick={() => handleRemoveFromWishlist(design.id)}

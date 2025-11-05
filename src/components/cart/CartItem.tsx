@@ -66,6 +66,8 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
           }
           width={100}
           height={100}
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
         />
       </div>
       <div className="flex-1 flex flex-col sm:flex-row justify-between items-start sm:items-center w-full">

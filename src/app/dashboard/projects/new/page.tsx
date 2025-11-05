@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface PurchasedDesign {
   id: string;
@@ -119,10 +120,13 @@ const InitializeProjectPage = () => {
             onClick={() => setSelectedDesignId(design.id)}
           >
             {design.imageUrl && (
-              <img
+              <Image
                 src={design.imageUrl}
                 alt={design.name}
+                fill
                 className="w-full h-48 object-cover"
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
               />
             )}
             <div className="p-4">

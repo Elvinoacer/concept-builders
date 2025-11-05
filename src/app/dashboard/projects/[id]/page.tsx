@@ -12,6 +12,7 @@ import { Download, Info } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Toaster, toast } from "sonner"; // Import sonner
+import Image from "next/image";
 
 interface User {
   id: string;
@@ -204,11 +205,16 @@ const ProjectDetailPage = () => {
               {project.description}
             </p>
             {project.imageUrl && (
-              <img
-                src={project.imageUrl}
-                alt={project.name}
-                className="w-full h-64 object-cover rounded-md mb-4"
-              />
+              <div className="relative w-full h-64 mb-4">
+                <Image
+                  src={project.imageUrl}
+                  alt={project.name}
+                  fill
+                  className="object-cover rounded-md"
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+                />
+              </div>
             )}
             <div className="flex justify-between items-center mb-1">
               <span className="text-sm text-gray-500 dark:text-gray-400">

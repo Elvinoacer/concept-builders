@@ -30,7 +30,7 @@ const PurchaseListItem = ({ design }) => {
       className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col md:flex-row gap-4"
     >
       <div className="w-full md:w-48 flex-shrink-0 h-40 md:h-auto relative rounded-lg overflow-hidden">
-        <Image src={design.images[0].url} alt={design.name} layout="fill" objectFit="cover" />
+        <Image src={design.images[0].url} alt={design.name} fill objectFit="cover" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII=" />
       </div>
       <div className="flex-1 flex flex-col justify-between">
         <div>

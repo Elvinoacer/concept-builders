@@ -19,6 +19,8 @@ const OurValues = () => {
               width={800}
               height={600}
               className="w-full h-48 object-cover"
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
             />
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">{value.title}</h3>

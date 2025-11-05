@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/useCart"; // Keep cart for other potential uses, though total is now from prop
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface CheckoutLinkProps {
   cart: any[]; // Add cart to props
@@ -24,8 +25,15 @@ const PaymentMethodGallery = () => {
     <div className="flex items-center justify-center space-x-4 p-4 bg-gray-100 rounded-lg">
       {paymentMethods.map((method) => (
         <div key={method.name} className="flex flex-col items-center">
-          <div className="w-24 h-16 flex items-center justify-center rounded-md overflow-hidden border border-gray-200">
-            <img src={method.image} alt={method.name} className="object-contain w-full h-full" />
+          <div className="relative w-24 h-16 flex items-center justify-center rounded-md overflow-hidden border border-gray-200">
+            <Image
+              src={method.image}
+              alt={method.name}
+              fill
+              className="object-contain"
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+            />
           </div>
         </div>
       ))}

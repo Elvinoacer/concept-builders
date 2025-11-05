@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 const DesignGallery = ({
   images,
@@ -128,10 +129,13 @@ const DesignGallery = ({
             exit="exit"
             className="absolute inset-0 w-full h-full"
           >
-            <img
+            <Image
               src={selectedImage.url}
               alt="Design visualization"
+              fill
               className="w-full h-full object-cover"
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
             />
           </motion.div>
         </AnimatePresence>
@@ -220,10 +224,13 @@ const DesignGallery = ({
             }}
             whileTap={{ scale: 0.95 }}
           >
-            <img
+            <Image
               src={image.url}
               alt={`Thumbnail ${index + 1}`}
+              fill
               className="w-full h-full object-cover transition-transform duration-700 group-hover/thumb:scale-110"
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
             />
 
             {/* Selected Indicator */}

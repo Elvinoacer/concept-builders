@@ -17,6 +17,8 @@ export const BlogPostCard = ({ post }: { post: Post }) => {
             width={400}
             height={240}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
           />
         </div>
         <div className="flex flex-1 flex-col p-4 md:p-6">

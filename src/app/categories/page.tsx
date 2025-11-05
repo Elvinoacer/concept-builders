@@ -166,6 +166,8 @@ export default function CategoriesPage() {
           fill
           className="object-cover"
           priority
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="relative z-10">
@@ -315,6 +317,8 @@ export default function CategoriesPage() {
                           ? "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           : "96px"
                       }
+                      placeholder="blur"
+                      blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   </div>

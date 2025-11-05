@@ -1,6 +1,7 @@
 'use client';
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const paymentMethods = [
   {
@@ -44,8 +45,15 @@ const PaymentMethodSelector = ({ selectedMethod, onSelect }) => {
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
           >
-            <div className="w-12 h-8 flex items-center justify-center rounded-md overflow-hidden">
-              <img src={method.image} alt={method.name} className="object-contain w-full h-full" />
+            <div className="relative w-12 h-8 flex items-center justify-center rounded-md overflow-hidden">
+              <Image
+                src={method.image}
+                alt={method.name}
+                fill
+                className="object-contain"
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+              />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{method.name}</h3>

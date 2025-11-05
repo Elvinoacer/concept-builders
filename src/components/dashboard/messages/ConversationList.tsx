@@ -1,8 +1,9 @@
 "use client";
 
 import { useSocket } from "@/app/Providers"; // Import the useSocket hook
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Conversation, Message, User } from "@/generated/prisma";
+import Image from "next/image";
 
 interface ConversationWithMessagesAndUsers extends Conversation {
   messages: Message[];
@@ -142,8 +143,13 @@ const ConversationList: React.FC<ConversationListProps> = ({
                   <div className="flex items-center">
                     <div className="relative">
                       <Avatar className="w-12 h-12 mr-4">
-                        <AvatarImage
+                        <Image
                           src={otherUser?.image || "/images/default-avatar.png"}
+                          alt={otherUser?.name || "User Avatar"}
+                          fill
+                          className="rounded-full object-cover"
+                          placeholder="blur"
+                          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                         />
                         <AvatarFallback>
                           {otherUser?.name?.charAt(0)}

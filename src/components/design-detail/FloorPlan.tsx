@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Design } from "@/generated/prisma";
 import { designDetailPageData } from "@/lib/dummydata";
+import Image from "next/image";
 
 const FloorPlan = ({
   floorPlanUrl,
@@ -342,10 +343,13 @@ const FloorPlan = ({
               transition={{ type: "spring", damping: 25 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <img
+              <Image
                 src={floorPlanUrl}
                 alt="Floor plan zoomed view"
+                fill
                 className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl"
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
               />
               <motion.button
                 onClick={toggleZoom}

@@ -96,10 +96,13 @@ const OngoingProjectsPage = () => {
                 >
                   <div className="relative">
                     {project.featuredImage && (
-                      <img
+                      <Image
                         className="h-56 w-full object-cover"
                         src={project.featuredImage}
                         alt={project.title}
+                        fill
+                        placeholder="blur"
+                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                       />
                     )}
                     <div className="absolute top-4 right-4 px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full shadow-md">

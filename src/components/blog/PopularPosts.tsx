@@ -48,6 +48,8 @@ const PopularPosts = () => {
                 width={64}
                 height={64}
                 className="aspect-square rounded-md object-cover"
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
               />
               <div className="flex-1">
                 <p className="font-semibold leading-tight text-foreground group-hover:text-primary line-clamp-2">

@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import useProjectsStore from "@/lib/store/projects";
+import Image from "next/image";
 
 const ProjectsPage = () => {
   const { projects, fetchProjects, loading } = useProjectsStore();
@@ -73,10 +74,13 @@ const ProjectsPage = () => {
               className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden group"
             >
               <div className="relative h-48">
-                <img
+                <Image
                   src={project.imageUrl}
                   alt={project.name}
+                  fill
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 />
                 <div
                   className={`absolute top-2 right-2 px-2 py-1 text-xs font-bold text-white rounded-full bg-${project.statusColor}-500`}

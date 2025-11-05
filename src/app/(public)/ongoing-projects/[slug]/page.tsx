@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import Image from 'next/image';
 
 interface OngoingProject {
   id: string;
@@ -84,10 +85,13 @@ const OngoingProjectDetailsPage = ({ params }: { params: { slug: string } }) => 
                 onClick={() => setSelectedImage(project.featuredImage)}
                 whileHover={{ scale: 1.02 }}
               >
-                <img
+                <Image
                   className="w-full h-auto object-cover"
                   src={project.featuredImage}
                   alt={project.title}
+                  fill
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 />
               </motion.div>
             )}
@@ -99,10 +103,13 @@ const OngoingProjectDetailsPage = ({ params }: { params: { slug: string } }) => 
                   className="rounded-lg overflow-hidden shadow-lg cursor-pointer"
                   onClick={() => setSelectedImage(image.url)}
                 >
-                  <img
+                  <Image
                     className="w-full h-48 object-cover"
                     src={image.url}
                     alt={image.caption}
+                    fill
+                    placeholder="blur"
+                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                   />
                 </motion.div>
               ))}
@@ -144,14 +151,21 @@ const OngoingProjectDetailsPage = ({ params }: { params: { slug: string } }) => 
             className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4"
             onClick={() => setSelectedImage(null)}
           >
-            <motion.img
+            <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
-              src={selectedImage}
-              alt="Full screen view"
-              className="max-w-full max-h-full rounded-lg shadow-2xl"
-            />
+              className="relative max-w-full max-h-full rounded-lg shadow-2xl"
+            >
+              <Image
+                src={selectedImage}
+                alt="Full screen view"
+                fill
+                className="object-contain"
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+              />
+            </motion.div>
             <motion.button 
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}

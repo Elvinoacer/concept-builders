@@ -193,6 +193,8 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 />
 
                 {/* Overlay */}
@@ -384,6 +386,8 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
                 fill
                 className="object-contain"
                 sizes="(max-width: 1200px) 100vw, 1200px"
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
               />
             </motion.div>
 

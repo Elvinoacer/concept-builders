@@ -15,6 +15,7 @@ This document lists all the pages (routes) available in the Concept Builders web
 - /categories/[id]
 - /checkout
 - /contact
+- /cost-calculator
 - /currency-converter
 - /custom-design
 - /custom-design/[id]
@@ -23,6 +24,8 @@ This document lists all the pages (routes) available in the Concept Builders web
 - /designs/[id]
 - /faq
 - /maintenance
+- /ongoing-projects
+- /ongoing-projects/[slug]
 - /paypal-test
 - /privacy
 - /purchase-confirmation
@@ -70,6 +73,8 @@ This document lists all the pages (routes) available in the Concept Builders web
 - /admin/marketing
 - /admin/messages
 - /admin/notifications
+- /admin/ongoing-projects
+- /admin/ongoing-projects/[id]/edit
 - /admin/profile
 - /admin/projects
 - /admin/projects/new

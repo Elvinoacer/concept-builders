@@ -189,6 +189,8 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                   width={80}
                   height={80}
                   className="object-cover w-full h-full"
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 />
               </div>
               <div className="flex-grow">
