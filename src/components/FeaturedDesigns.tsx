@@ -25,67 +25,67 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
+        staggerChildren: 0.12,
+        delayChildren: 0.15,
       },
     },
   };
 
   const headerVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
+        duration: 0.5,
         ease: "easeOut",
       },
     },
   };
 
   return (
-    <section className="relative py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 overflow-hidden">
-      {/* Background Elements */}
+    <section className="relative py-10 xs:py-12 sm:py-14 md:py-16 lg:py-20 xl:py-24 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 overflow-hidden">
+      {/* Background Elements - Responsive scaling */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-10 -left-10 w-72 h-72 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 -right-10 w-72 h-72 bg-gradient-to-r from-cyan-400/10 to-blue-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/5 to-cyan-400/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-6 xs:top-8 sm:top-10 -left-4 xs:-left-6 sm:-left-8 w-40 h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-full blur-2xl xs:blur-3xl"></div>
+        <div className="absolute bottom-6 xs:bottom-8 sm:bottom-10 -right-4 xs:-right-6 sm:-right-8 w-40 h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 bg-gradient-to-r from-cyan-400/10 to-blue-500/10 rounded-full blur-2xl xs:blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 xs:w-56 xs:h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 xl:w-96 xl:h-96 bg-gradient-to-r from-blue-500/5 to-cyan-400/5 rounded-full blur-2xl xs:blur-3xl"></div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-3 xs:px-4 sm:px-5 md:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           variants={headerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.5 }}
-          className="text-center mb-16 md:mb-20 lg:mb-24"
+          viewport={{ once: true, amount: 0.2 }}
+          className="text-center mb-10 xs:mb-12 sm:mb-14 md:mb-16 lg:mb-20 xl:mb-24"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-4">
+          <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-3 xs:mb-4">
             Featured Designs
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm xs:text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-xs xs:max-w-sm sm:max-w-md md:max-w-2xl mx-auto leading-relaxed sm:leading-normal">
             Explore our handpicked selection of exceptional architectural
             designs that showcase innovation and excellence
           </p>
         </motion.div>
 
-        {/* Designs Grid */}
+        {/* Designs Grid - Responsive columns and gaps */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10 lg:gap-12"
+          className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 xs:gap-6 sm:gap-7 md:gap-8 lg:gap-10 xl:gap-12"
         >
           {featuredDesigns.map((design, index) => (
             <motion.div
               key={design.id}
               variants={{
                 hidden: {
-                  y: 50,
+                  y: 40,
                   opacity: 0,
-                  scale: 0.95,
+                  scale: 0.98,
                 },
                 visible: {
                   y: 0,
@@ -95,12 +95,12 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
                     type: "spring",
                     stiffness: 100,
                     damping: 15,
-                    duration: 0.7,
+                    duration: 0.6,
                   },
                 },
               }}
               whileHover={{
-                y: -8,
+                y: -6,
                 transition: {
                   type: "spring",
                   stiffness: 400,
@@ -109,20 +109,25 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
               }}
               className="group relative"
             >
-              {/* Featured Badge for First 2 Items */}
+              {/* Featured Badge for First 2 Items - Responsive positioning */}
               {index < 2 && (
-                <div className="absolute -top-2 -left-2 z-20">
-                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1.5 text-xs font-bold rounded-full shadow-lg flex items-center">
-                    <span className="material-symbols-outlined text-xs mr-1">
+                <div className="absolute -top-1.5 xs:-top-2 -left-1.5 xs:-left-2 z-20">
+                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 xs:px-2.5 sm:px-3 py-1 xs:py-1.5 text-xs font-bold rounded-lg xs:rounded-full shadow-md xs:shadow-lg flex items-center">
+                    <span className="material-symbols-outlined text-xs mr-0.5 xs:mr-1">
                       {index === 0 ? "star" : "favorite"}
                     </span>
-                    {index === 0 ? "Editor's Pick" : "Most Loved"}
+                    <span className="hidden xs:inline">
+                      {index === 0 ? "Editor's Pick" : "Most Loved"}
+                    </span>
+                    <span className="xs:hidden">
+                      {index === 0 ? "Top" : "Loved"}
+                    </span>
                   </div>
                 </div>
               )}
 
               {/* Design Card */}
-              <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-700/50 group-hover:border-blue-300/50 dark:group-hover:border-cyan-400/30">
+              <div className="relative bg-white dark:bg-gray-800 rounded-xl xs:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-700/50 group-hover:border-blue-300/50 dark:group-hover:border-cyan-400/30">
                 <DesignCard
                   key={design.id}
                   design={design}
@@ -138,21 +143,36 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
               </div>
 
               {/* Background Glow on Hover */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-10 blur-md transition-opacity duration-500 -z-10" />
+              <div className="absolute inset-0 rounded-xl xs:rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-10 blur-md transition-opacity duration-500 -z-10" />
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Stats Section */}
+        {/* Stats Section - Responsive grid and spacing */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="mt-16 md:mt-20"
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mt-10 xs:mt-12 sm:mt-14 md:mt-16 lg:mt-20"
         >
-          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-2xl p-8 md:p-10 border border-blue-200/50 dark:border-blue-700/30">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-xl xs:rounded-2xl p-5 xs:p-6 sm:p-7 md:p-8 lg:p-9 xl:p-10 border border-blue-200/50 dark:border-blue-700/30">
+            <div className="grid grid-cols-2 xs:grid-cols-2 md:grid-cols-4 gap-4 xs:gap-5 sm:gap-6 md:gap-7 lg:gap-8 text-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="group"
+              >
+                <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-1 xs:mb-2">
+                  {featuredDesigns.length}+
+                </div>
+                <div className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm sm:text-base font-medium">
+                  Featured Designs
+                </div>
+              </motion.div>
+
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -160,11 +180,11 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
                 transition={{ delay: 0.5 }}
                 className="group"
               >
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-2">
-                  {featuredDesigns.length}+
+                <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-1 xs:mb-2">
+                  100+
                 </div>
-                <div className="text-gray-600 dark:text-gray-300 text-sm md:text-base font-medium">
-                  Featured Designs
+                <div className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm sm:text-base font-medium">
+                  Happy Clients
                 </div>
               </motion.div>
 
@@ -175,11 +195,11 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
                 transition={{ delay: 0.6 }}
                 className="group"
               >
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-2">
-                  100+
+                <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-1 xs:mb-2">
+                  50+
                 </div>
-                <div className="text-gray-600 dark:text-gray-300 text-sm md:text-base font-medium">
-                  Happy Clients
+                <div className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm sm:text-base font-medium">
+                  Design Categories
                 </div>
               </motion.div>
 
@@ -190,25 +210,10 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
                 transition={{ delay: 0.7 }}
                 className="group"
               >
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-2">
-                  50+
-                </div>
-                <div className="text-gray-600 dark:text-gray-300 text-sm md:text-base font-medium">
-                  Design Categories
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.8 }}
-                className="group"
-              >
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-2">
+                <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-1 xs:mb-2">
                   4.9★
                 </div>
-                <div className="text-gray-600 dark:text-gray-300 text-sm md:text-base font-medium">
+                <div className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm sm:text-base font-medium">
                   Client Rating
                 </div>
               </motion.div>
@@ -216,31 +221,31 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
           </div>
         </motion.div>
 
-        {/* CTA Section */}
+        {/* CTA Section - Responsive layout */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.6, duration: 0.6 }}
-          className="text-center mt-16 md:mt-20"
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="text-center mt-10 xs:mt-12 sm:mt-14 md:mt-16 lg:mt-20"
         >
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-xl border border-gray-200/60 dark:border-gray-700/50">
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl xs:rounded-2xl p-5 xs:p-6 sm:p-7 md:p-8 lg:p-10 xl:p-12 shadow-xl border border-gray-200/60 dark:border-gray-700/50">
+            <h3 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 xs:mb-4">
               Ready to Find Your Perfect Design?
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6 max-w-2xl mx-auto">
+            <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base sm:text-lg mb-4 xs:mb-5 sm:mb-6 max-w-xs xs:max-w-sm sm:max-w-md md:max-w-2xl mx-auto leading-relaxed">
               Browse our complete collection of architectural designs or get a
               custom design tailored to your vision.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col xs:flex-row gap-3 xs:gap-4 justify-center">
               <button
                 onClick={() => {
                   router.push("/design-showcase");
                 }}
-                className="inline-flex items-center bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 text-lg font-semibold rounded-2xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/cta"
+                className="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-5 xs:px-6 sm:px-8 py-2.5 xs:py-3 sm:py-4 text-sm xs:text-base sm:text-lg font-semibold rounded-lg xs:rounded-xl sm:rounded-2xl hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 sm:hover:-translate-y-1 group/cta w-full xs:w-auto"
               >
                 Explore All Designs
-                <span className="material-symbols-outlined ml-3 text-xl group-hover/cta:translate-x-1 transition-transform duration-300">
+                <span className="material-symbols-outlined ml-2 xs:ml-3 text-lg xs:text-xl group-hover/cta:translate-x-0.5 xs:group-hover/cta:translate-x-1 transition-transform duration-300">
                   explore
                 </span>
               </button>
@@ -248,10 +253,10 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
                 onClick={() => {
                   router.push("/custom-design");
                 }}
-                className="inline-flex items-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-8 py-4 text-lg font-semibold rounded-2xl border border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-cyan-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/cta2"
+                className="inline-flex items-center justify-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-5 xs:px-6 sm:px-8 py-2.5 xs:py-3 sm:py-4 text-sm xs:text-base sm:text-lg font-semibold rounded-lg xs:rounded-xl sm:rounded-2xl border border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-cyan-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 sm:hover:-translate-y-1 group/cta2 w-full xs:w-auto"
               >
                 Get Custom Design
-                <span className="material-symbols-outlined ml-3 text-xl group-hover/cta2:translate-x-1 transition-transform duration-300">
+                <span className="material-symbols-outlined ml-2 xs:ml-3 text-lg xs:text-xl group-hover/cta2:translate-x-0.5 xs:group-hover/cta2:translate-x-1 transition-transform duration-300">
                   design_services
                 </span>
               </button>

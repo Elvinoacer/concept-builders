@@ -30,18 +30,18 @@ export default async function Home() {
         fontFamily: '"Work Sans", "Noto Sans", sans-serif',
       }}
     >
-      {/* Background Elements */}
+      {/* Background Elements - Responsive scaling */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        {/* Gradient Orbs */}
-        <div className="absolute -top-40 -right-28 w-72 h-72 bg-gradient-to-r from-blue-500/20 to-cyan-400/20 rounded-full blur-3xl dark:from-blue-600/10 dark:to-cyan-400/10"></div>
-        <div className="absolute -bottom-40 -left-28 w-72 h-72 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 rounded-full blur-3xl dark:from-cyan-400/10 dark:to-blue-600/10"></div>
+        {/* Gradient Orbs - Responsive positioning and sizing */}
+        <div className="absolute -top-20 -right-16 w-48 h-48 sm:-top-28 sm:-right-20 sm:w-56 sm:h-56 md:-top-32 md:-right-24 md:w-64 md:h-64 lg:-top-40 lg:-right-28 lg:w-72 lg:h-72 bg-gradient-to-r from-blue-500/20 to-cyan-400/20 rounded-full blur-2xl sm:blur-3xl dark:from-blue-600/10 dark:to-cyan-400/10"></div>
+        <div className="absolute -bottom-20 -left-16 w-48 h-48 sm:-bottom-28 sm:-left-20 sm:w-56 sm:h-56 md:-bottom-32 md:-left-24 md:w-64 md:h-64 lg:-bottom-40 lg:-left-28 lg:w-72 lg:h-72 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 rounded-full blur-2xl sm:blur-3xl dark:from-cyan-400/10 dark:to-blue-600/10"></div>
 
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)]"></div>
+        {/* Grid Pattern - Responsive sizing */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] sm:bg-[size:48px_48px] md:bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)]"></div>
       </div>
 
       <div className="layout-container flex h-full grow flex-col">
-        <main className="flex-1 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 md:py-10 lg:py-14 space-y-16 md:space-y-20 lg:space-y-24">
+        <main className="flex-1 px-3 xs:px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 sm:py-6 md:py-8 lg:py-10 xl:py-12 space-y-12 sm:space-y-14 md:space-y-16 lg:space-y-20 xl:space-y-24">
           {/* Hero Section */}
           <section className="relative">
             <Hero banners={banners} />
@@ -49,7 +49,7 @@ export default async function Home() {
 
           {/* Marquee Section */}
           <section className="relative">
-            <div className="relative bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-2xl p-4 md:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
+            <div className="relative bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-xs sm:shadow-sm">
               <Marquee marqueeItems={marqueeItems} />
             </div>
           </section>
@@ -61,7 +61,7 @@ export default async function Home() {
 
           {/* How It Works */}
           <section className="relative">
-            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-3xl p-6 md:p-8 lg:p-12 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 2xl:p-12 border border-gray-200/50 dark:border-gray-700/50 shadow-md sm:shadow-lg">
               <HowItWorks />
             </div>
           </section>
@@ -73,12 +73,12 @@ export default async function Home() {
 
           {/* Best Selling Plans */}
           <section className="relative">
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-3xl p-6 md:p-8 lg:p-12 border border-blue-200/50 dark:border-blue-700/30 shadow-lg">
-              <div className="text-center mb-10 md:mb-14">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-3">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 2xl:p-12 border border-blue-200/50 dark:border-blue-700/30 shadow-md sm:shadow-lg">
+              <div className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 xl:mb-14">
+                <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-2 sm:mb-3 md:mb-4">
                   Best Selling Plans
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg max-w-2xl mx-auto">
+                <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base sm:text-lg md:text-xl max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto leading-relaxed sm:leading-normal">
                   Join thousands of satisfied customers with our most popular
                   plans
                 </p>
@@ -94,27 +94,25 @@ export default async function Home() {
 
           {/* Testimonials */}
           <section className="relative">
-            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-3xl p-6 md:p-8 lg:p-12 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-              <div className="text-center mb-10 md:mb-14">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-3">
-                  What Our Clients Say
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg max-w-2xl mx-auto">
-                  Real stories from architects and designers who trust our
-                  solutions
-                </p>
-              </div>
-              <Testimonials testimonials={testimonials} />
+            <div className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 xl:mb-14">
+              <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-2 sm:mb-3 md:mb-4">
+                What Our Clients Say
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base sm:text-lg md:text-xl max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto leading-relaxed sm:leading-normal">
+                Real stories from architects and designers who trust our
+                solutions
+              </p>
             </div>
+            <Testimonials testimonials={testimonials} />
           </section>
 
           {/* Blog Section */}
           <section className="relative">
-            <div className="text-center mb-10 md:mb-14">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-3">
+            <div className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 xl:mb-14">
+              <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-2 sm:mb-3 md:mb-4">
                 Latest Insights
               </h2>
-              <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg max-w-2xl mx-auto">
+              <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base sm:text-lg md:text-xl max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto leading-relaxed sm:leading-normal">
                 Stay updated with the latest trends and tips in architectural
                 design
               </p>

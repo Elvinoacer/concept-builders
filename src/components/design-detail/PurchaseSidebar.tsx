@@ -44,15 +44,15 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
 
   useEffect(() => {
     if (cartItem) {
-      setSelectedFileTypes(cartItem.selectedFileTypes);
+      setSelectedFileTypes(cartItem.selectedFileTypes || []);
       setSelectedExtras(cartItem.selectedExtras || []);
     }
   }, [cartItem]);
 
   const totalPrice = useMemo(() => {
     let price = design.basePrice || 0;
-    selectedFileTypes.forEach((type) => {
-      switch (type) {
+    selectedFileTypes.forEach((fileType) => {
+      switch (fileType) {
         case "architecturalPdf":
           price += design.architecturalPdfPrice || 0;
           break;
@@ -67,6 +67,8 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
           break;
         case "billOfQuantities":
           price += design.billOfQuantitiesPrice || 0;
+          break;
+        default:
           break;
       }
     });
@@ -110,7 +112,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
   const handleFileTypeToggle = (fileType: string) => {
     setSelectedFileTypes((prev) =>
       prev.includes(fileType)
-        ? prev.filter((ft) => ft !== fileType)
+        ? prev.filter((type) => type !== fileType)
         : [...prev, fileType]
     );
   };

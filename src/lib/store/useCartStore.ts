@@ -85,7 +85,7 @@ const useCartStore = create<CartStore>()(
           const response = await fetch("/api/cart/items");
           if (response.ok) {
             const fullCart = await response.json();
-            setCart(fullCart);
+            get().setCart(fullCart);
           } else {
             const errorData = await response.json();
             set({ error: errorData.error || "Failed to fetch cart", cart: [] });
@@ -121,7 +121,6 @@ const useCartStore = create<CartStore>()(
     addToCart: (
       design,
       selectedFileTypes,
-      selectedPackage,
       selectedExtras,
       status
     ) => {
@@ -162,7 +161,6 @@ const useCartStore = create<CartStore>()(
               body: JSON.stringify({
                 designId: design.id,
                 selectedFileTypes,
-                selectedPackage,
                 selectedExtras,
               }),
             });
