@@ -35,30 +35,24 @@ const PurchaseListItem = ({ design }) => {
       <div className="flex-1 flex flex-col justify-between">
         <div>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">{design.name}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Purchased: {new Date(design.createdAt).toLocaleDateString()}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Purchased: {new Date(design.purchaseDate).toLocaleDateString()}</p>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 border-t border-gray-200 dark:border-gray-700 pt-3">
             <div>
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Package</p>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{design.selectedPackage || 'Digital Download'}</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{design.fileType}</p>
             </div>
             <div>
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">File Type</p>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{design.selectedFileType}</p>
-            </div>
-            {design.selectedExtras && (
-              <div>
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Add-ons</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {JSON.parse(design.selectedExtras).map(extra => (
-                    <span key={extra.name} className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
-                      <span className="material-symbols-outlined text-sm text-green-500">check</span>
-                      {extra.name}
-                    </span>
-                  ))}
-                </div>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Add-ons</p>
+              <div className="flex flex-wrap gap-1.5">
+                {design.addOns.map(addon => (
+                  <span key={addon} className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+                    <span className="material-symbols-outlined text-sm text-green-500">check</span>
+                    {addon}
+                  </span>
+                ))}
               </div>
-            )}
+            </div>
           </div>
         </div>
 
