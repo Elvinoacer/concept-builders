@@ -1,29 +1,38 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Heart, Search, XCircle, Eye } from "lucide-react";
-// Removed useCart hook as it's no longer needed for this component
+import {
+  Heart,
+  Search,
+  X,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+} from "lucide-react";
 
 interface WishlistItem {
   id: string;
   name: string;
   basePrice: number;
   images: { url: string }[];
+  category?: string;
+  createdAt?: string;
 }
 
 const WishlistSkeleton = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
     {[...Array(8)].map((_, index) => (
       <div
         key={index}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden animate-pulse"
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden animate-pulse"
       >
         <div className="relative h-48 bg-gray-300 dark:bg-gray-700"></div>
-        <div className="p-4">
+        <div className="p-4 sm:p-6">
           <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
           <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
           <div className="flex flex-col sm:flex-row gap-2 mt-4">
@@ -39,11 +48,14 @@ const WishlistSkeleton = () => (
 const WishlistPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  // Removed cart and addToCart from useCart hook
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<
+    "newest" | "oldest" | "price-low" | "price-high"
+  >("newest");
+  const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 8;
 
   const fetchWishlist = async () => {
@@ -77,6 +89,7 @@ const WishlistPage = () => {
 
     const originalWishlist = [...wishlist];
     setWishlist((prev) => prev.filter((item) => item.id !== designId));
+
     toast.promise(
       fetch("/api/wishlist", {
         method: "DELETE",
@@ -97,176 +110,370 @@ const WishlistPage = () => {
     );
   };
 
+  const filteredAndSortedWishlist = useMemo(() => {
+    let filtered = wishlist.filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
+    // Sort the filtered results
+    switch (sortBy) {
+      case "newest":
+        filtered.sort(
+          (a, b) =>
+            new Date(b.createdAt || 0).getTime() -
+            new Date(a.createdAt || 0).getTime()
+        );
+        break;
+      case "oldest":
+        filtered.sort(
+          (a, b) =>
+            new Date(a.createdAt || 0).getTime() -
+            new Date(b.createdAt || 0).getTime()
+        );
+        break;
+      case "price-low":
+        filtered.sort((a, b) => a.basePrice - b.basePrice);
+        break;
+      case "price-high":
+        filtered.sort((a, b) => b.basePrice - a.basePrice);
+        break;
+    }
 
-  const filteredWishlist = useMemo(
-    () =>
-      wishlist.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    [wishlist, searchTerm]
-  );
+    return filtered;
+  }, [wishlist, searchTerm, sortBy]);
 
-  const totalPages = Math.ceil(filteredWishlist.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedWishlist.length / itemsPerPage);
   const currentItems = useMemo(
     () =>
-      filteredWishlist.slice(
+      filteredAndSortedWishlist.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
       ),
-    [filteredWishlist, currentPage]
+    [filteredAndSortedWishlist, currentPage]
   );
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   if (loading) {
     return (
-      <div className="bg-gray-50 dark:bg-gray-900 min-h-screen p-4 sm:p-6 lg:p-8">
-        <header className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            My Wishlist
-          </h1>
-          <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
-            Your saved designs for future projects.
-          </p>
-        </header>
-        <WishlistSkeleton />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 min-[375px]:px-5 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto py-6 sm:py-8">
+          <header className="mb-6 sm:mb-8">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64 animate-pulse"></div>
+          </header>
+          <WishlistSkeleton />
+        </div>
       </div>
     );
   }
 
   if (wishlist.length === 0) {
     return (
-      <div className="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col items-center justify-center text-center p-8">
-        <Heart className="w-28 h-28 text-gray-300 dark:text-gray-700 mb-6" />
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-          Your Wishlist is Empty
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-lg">
-          You haven’t added any designs yet. Explore our collection and save
-          your favorites to build your dream home!
-        </p>
-        <motion.button
-          whileHover={{ scale: 1.05, y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => router.push("/designs")}
-          className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md mx-auto"
         >
-          Explore Designs
-        </motion.button>
+          <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Heart className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            Your Wishlist is Empty
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+            You haven't added any designs yet. Explore our collection and save
+            your favorites to build your dream home!
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => router.push("/designs")}
+            className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all"
+          >
+            Explore Designs
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen p-4 sm:p-6 lg:p-8">
-      <header className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-          My Wishlist
-        </h1>
-        <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
-          Your saved designs for future projects.
-        </p>
-      </header>
-
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <div className="relative w-full md:max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search your wishlist..."
-            className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
-        </div>
-        {totalPages > 1 && (
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-4 py-2 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Prev
-            </button>
-            <span className="text-gray-700 dark:text-gray-300">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Next
-            </button>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 min-[375px]:px-5 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto py-6 sm:py-8">
+        {/* Header */}
+        <motion.header
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 sm:mb-8"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+              <Heart className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+                My Wishlist
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-2 text-base sm:text-lg">
+                Your saved designs for future projects
+              </p>
+            </div>
           </div>
-        )}
-      </div>
 
-      {currentItems.length === 0 && searchTerm ? (
-        <div className="text-center py-16">
-          <Search className="w-20 h-20 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-          <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            No Results Found
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            No designs in your wishlist match "{searchTerm}".
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {currentItems.map((design, index) => (
-            <motion.div
-              key={design.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden group flex flex-col"
+          {/* Stats Summary */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 text-center">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {wishlist.length}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total Items
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 text-center">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                $
+                {wishlist
+                  .reduce((total, item) => total + item.basePrice, 0)
+                  .toFixed(2)}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total Value
+              </p>
+            </div>
+          </div>
+        </motion.header>
+
+        {/* Search and Filters */}
+        <div className="mb-6 sm:mb-8 space-y-4">
+          {/* Search Bar */}
+          <div className="relative max-w-2xl">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search your wishlist..."
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Filters Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* Mobile Filter Toggle */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="sm:hidden flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              <div className="relative h-48 w-full">
-                <Image
-                  src={design.images?.[0]?.url || "/images/category-placeholder.png"}
-                  alt={design.name}
-                  fill
-                  objectFit="cover"
-                  className="group-hover:scale-105 transition-transform duration-300"
-                  placeholder="blur"
-                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-                />
-                <button
-                  onClick={() => handleRemoveFromWishlist(design.id)}
-                  className="absolute top-3 right-3 bg-white/80 dark:bg-gray-900/80 p-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-500 scale-0 group-hover:scale-100 transition-transform duration-200"
-                  aria-label="Remove from wishlist"
-                >
-                  <XCircle className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="p-4 flex flex-col flex-grow">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
-                  {design.name}
-                </h3>
-                <p className="text-blue-600 dark:text-blue-400 font-semibold mt-1 mb-4">
-                  ${design.basePrice.toFixed(2)}
-                </p>
-                <div className="mt-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => router.push(`/designs/${design.id}`)}
-                    className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-bold shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-cyan-500 transition-all"
+              <Filter className="w-4 h-4" />
+              Filters
+            </button>
+
+            {/* Sort Options */}
+            <div
+              className={`flex flex-col sm:flex-row gap-4 ${showFilters ? "flex" : "hidden sm:flex"}`}
+            >
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </select>
+            </div>
+
+            {/* Results Count */}
+            <div
+              className={`text-sm text-gray-600 dark:text-gray-400 ${showFilters ? "block" : "hidden sm:block"}`}
+            >
+              Showing {currentItems.length} of{" "}
+              {filteredAndSortedWishlist.length} items
+            </div>
+          </div>
+        </div>
+
+        {/* Wishlist Grid */}
+        {currentItems.length === 0 && searchTerm ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-12 sm:py-16"
+          >
+            <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Search className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              No Results Found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              No designs in your wishlist match "{searchTerm}".
+            </p>
+            <button
+              onClick={() => setSearchTerm("")}
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+            >
+              Clear search
+            </button>
+          </motion.div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
+              <AnimatePresence>
+                {currentItems.map((design, index) => (
+                  <motion.div
+                    key={design.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20, height: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    layout
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden group hover:shadow-md transition-all duration-300 flex flex-col"
                   >
-                    <Eye className="w-5 h-5" />
-                    <span>View Details</span>
+                    {/* Image */}
+                    <div className="relative h-48 sm:h-56 w-full overflow-hidden">
+                      <Image
+                        src={
+                          design.images?.[0]?.url ||
+                          "/images/design-placeholder.jpg"
+                        }
+                        alt={design.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        placeholder="blur"
+                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+                        sizes="(max-width: 475px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      />
+                      {/* Remove Button */}
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleRemoveFromWishlist(design.id)}
+                        className="absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 p-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        aria-label="Remove from wishlist"
+                      >
+                        <X className="w-4 h-4" />
+                      </motion.button>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-4 sm:p-6 flex flex-col flex-grow">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight mb-2">
+                        {design.name}
+                      </h3>
+                      <p className="text-blue-600 dark:text-blue-400 font-semibold text-lg mb-4">
+                        ${design.basePrice.toFixed(2)}
+                      </p>
+
+                      {/* Actions */}
+                      <div className="mt-auto space-y-2">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => router.push(`/designs/${design.id}`)}
+                          className="w-full flex items-center justify-center gap-2 rounded-xl py-3 px-4 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span>View Details</span>
+                        </motion.button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                  {Math.min(
+                    currentPage * itemsPerPage,
+                    filteredAndSortedWishlist.length
+                  )}{" "}
+                  of {filteredAndSortedWishlist.length} items
+                </p>
+                <div className="flex items-center gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="hidden xs:block">Previous</span>
+                  </motion.button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const pageNumber = i + 1;
+                      if (
+                        totalPages <= 5 ||
+                        pageNumber === 1 ||
+                        pageNumber === totalPages ||
+                        (pageNumber >= currentPage - 1 &&
+                          pageNumber <= currentPage + 1)
+                      ) {
+                        return (
+                          <button
+                            key={pageNumber}
+                            onClick={() => paginate(pageNumber)}
+                            className={`w-10 h-10 rounded-xl text-sm font-medium transition-colors ${
+                              currentPage === pageNumber
+                                ? "bg-blue-600 text-white"
+                                : "bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                            }`}
+                          >
+                            {pageNumber}
+                          </button>
+                        );
+                      } else if (
+                        pageNumber === currentPage - 2 ||
+                        pageNumber === currentPage + 2
+                      ) {
+                        return (
+                          <span key={pageNumber} className="px-2 text-gray-500">
+                            ...
+                          </span>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <span className="hidden xs:block">Next</span>
+                    <ChevronRight className="w-4 h-4" />
                   </motion.button>
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
 import NotificationItem from "./NotificationItem";
-import { Notification } from "@/app/dashboard/notifications/page"; // Import the Notification type
+import { Notification } from "@/app/dashboard/notifications/page";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface NotificationListProps {
   notifications: Notification[];
@@ -15,16 +16,26 @@ const NotificationList: React.FC<NotificationListProps> = ({
   onDelete,
 }) => {
   return (
-    <div className="flex flex-col bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-      {notifications.map((notification) => (
-        <NotificationItem
-          key={notification.id}
-          notification={notification}
-          onMarkAsRead={onMarkAsRead}
-          onDelete={onDelete}
-        />
-      ))}
-    </div>
+    <motion.div layout className="space-y-3">
+      <AnimatePresence>
+        {notifications.map((notification, index) => (
+          <motion.div
+            key={notification.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20, height: 0 }}
+            transition={{ duration: 0.2, delay: index * 0.05 }}
+            layout
+          >
+            <NotificationItem
+              notification={notification}
+              onMarkAsRead={onMarkAsRead}
+              onDelete={onDelete}
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

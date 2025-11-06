@@ -1,42 +1,86 @@
-'use client';
-import React from 'react';
+"use client";
+import React from "react";
+import { motion } from "framer-motion";
+import { User, Shield, Users } from "lucide-react";
 
 interface SettingsTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
 
-const SettingsTabs: React.FC<SettingsTabsProps> = ({ activeTab, setActiveTab }) => {
+const SettingsTabs: React.FC<SettingsTabsProps> = ({
+  activeTab,
+  setActiveTab,
+}) => {
   const tabs = [
-    { id: 'profile', name: 'Profile' },
-    { id: 'password', name: 'Password' },
-    { id: 'referrals', name: 'Referrals' },
+    { id: "profile", name: "Profile", icon: User },
+    { id: "password", name: "Password", icon: Shield },
+    { id: "referrals", name: "Referrals", icon: Users },
   ];
 
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700">
-      <nav className="-mb-px flex space-x-4 md:space-x-8 overflow-x-auto whitespace-nowrap" role="tablist" aria-label="Settings Tabs">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            id={`tab-${tab.id}`} // Unique ID for each tab
-            role="tab" // ARIA role for tab
-            aria-selected={activeTab === tab.id} // ARIA selected state
-            aria-controls={`panel-${tab.id}`} // Link to tab panel
-            onClick={() => setActiveTab(tab.id)}
-            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === tab.id
-                ? 'border-transparent text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-600'
-            }`}
-          >
-            {tab.name}
-          </button>
-        ))}
+    <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+      <nav
+        className="flex space-x-1 p-2 overflow-x-auto whitespace-nowrap custom-scrollbar"
+        role="tablist"
+        aria-label="Settings Tabs"
+      >
+        {tabs.map((tab) => {
+          const IconComponent = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              id={`tab-${tab.id}`}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`panel-${tab.id}`}
+              onClick={() => setActiveTab(tab.id)}
+              className={`relative flex items-center gap-2 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 ${
+                activeTab === tab.id
+                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-700/50"
+              }`}
+            >
+              <IconComponent className="w-4 h-4 flex-shrink-0" />
+              <span>{tab.name}</span>
+
+              {/* Active indicator */}
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute inset-0 border-2 border-blue-500 rounded-xl"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+            </button>
+          );
+        })}
       </nav>
+
+      {/* Custom Scrollbar Styles */}
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e0;
+          border-radius: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #a0aec0;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #4a5568;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #718096;
+        }
+      `}</style>
     </div>
   );
 };
 
 export default SettingsTabs;
-

@@ -1,10 +1,19 @@
-'use client';
-import React, { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client";
+import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Download,
+  MoreHorizontal,
+  FileText,
+  HelpCircle,
+  Check,
+  ExternalLink,
+} from "lucide-react";
 
 const PurchaseListItem = ({ design }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const menuRef = useRef(null);
 
   // Close menu when clicking outside
@@ -20,6 +29,23 @@ const PurchaseListItem = ({ design }) => {
     };
   }, [menuRef]);
 
+  const handleDownload = () => {
+    // Download logic here
+    console.log("Downloading design:", design.name);
+  };
+
+  const handleViewInvoice = () => {
+    // Invoice logic here
+    console.log("Viewing invoice for:", design.name);
+    setIsMenuOpen(false);
+  };
+
+  const handleRequestSupport = () => {
+    // Support logic here
+    console.log("Requesting support for:", design.name);
+    setIsMenuOpen(false);
+  };
+
   return (
     <motion.div
       layout
@@ -27,63 +53,178 @@ const PurchaseListItem = ({ design }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col md:flex-row gap-4"
+      className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 flex flex-col lg:flex-row gap-4 sm:gap-6 hover:shadow-md transition-all duration-300"
     >
-      <div className="w-full md:w-48 flex-shrink-0 h-40 md:h-auto relative rounded-lg overflow-hidden">
-        <Image src={design.images[0].url} alt={design.name} fill objectFit="cover" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII=" />
+      {/* Image Section */}
+      <div className="w-full lg:w-48 xl:w-56 flex-shrink-0 h-48 sm:h-56 lg:h-40 relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
+        <Image
+          src={design.images[0]?.url || "/images/design-placeholder.jpg"}
+          alt={design.name}
+          fill
+          className={`object-cover transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+          sizes="(max-width: 1024px) 100vw, 224px"
+          onLoad={() => setImageLoaded(true)}
+        />
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 animate-pulse" />
+        )}
+
+        {/* File Type Badge */}
+        <div className="absolute top-3 left-3">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/70 text-white text-xs font-medium rounded-full backdrop-blur-sm">
+            <FileText className="w-3 h-3" />
+            {design.fileType}
+          </span>
+        </div>
       </div>
-      <div className="flex-1 flex flex-col justify-between">
-        <div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">{design.name}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Purchased: {new Date(design.purchaseDate).toLocaleDateString()}</p>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 border-t border-gray-200 dark:border-gray-700 pt-3">
-            <div>
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Package</p>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{design.fileType}</p>
+
+      {/* Content Section */}
+      <div className="flex-1 flex flex-col justify-between min-w-0">
+        {/* Header Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight flex-1 min-w-0">
+              {design.name}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap flex-shrink-0">
+              Purchased: {new Date(design.purchaseDate).toLocaleDateString()}
+            </p>
+          </div>
+
+          {/* Package and Add-ons */}
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                Package
+              </p>
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-500" />
+                <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">
+                  {design.fileType}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Add-ons</p>
+
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                Add-ons
+              </p>
               <div className="flex flex-wrap gap-1.5">
-                {design.addOns.map(addon => (
-                  <span key={addon} className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
-                    <span className="material-symbols-outlined text-sm text-green-500">check</span>
-                    {addon}
+                {design.addOns && design.addOns.length > 0 ? (
+                  design.addOns.map((addon, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center gap-1 text-xs bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2.5 py-1 rounded-full border border-green-200 dark:border-green-800"
+                    >
+                      <Check className="w-3 h-3" />
+                      {addon}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-xs text-gray-500 dark:text-gray-400 italic">
+                    No add-ons
                   </span>
-                ))}
+                )}
               </div>
             </div>
           </div>
+
+          {/* Additional Info - Price, Size, etc. */}
+          {(design.price || design.size) && (
+            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              {design.price && (
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    Price
+                  </p>
+                  <p className="font-bold text-lg text-gray-900 dark:text-white">
+                    $
+                    {typeof design.price === "number"
+                      ? design.price.toFixed(2)
+                      : design.price}
+                  </p>
+                </div>
+              )}
+              {design.size && (
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    File Size
+                  </p>
+                  <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">
+                    {design.size}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        <div className="flex justify-end gap-2 mt-4">
-          <button className="flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-bold hover:shadow-lg transition-shadow">
-            <span className="material-symbols-outlined text-base">download</span>
-            Download
-          </button>
-          <div className="relative" ref={menuRef}>
-            <button 
+        {/* Action Buttons */}
+        <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          {/* Download Button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleDownload}
+            className="flex items-center justify-center gap-2 rounded-xl h-12 px-6 bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold hover:shadow-lg transition-all shadow-sm hover:shadow-md flex-1 xs:flex-none min-w-0"
+          >
+            <Download className="w-4 h-4 flex-shrink-0" />
+            <span className="truncate">Download Files</span>
+          </motion.button>
+
+          {/* More Actions Menu */}
+          <div className="relative flex-shrink-0" ref={menuRef}>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center justify-center rounded-lg h-10 w-10 bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              className="flex items-center justify-center rounded-xl h-12 w-12 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600"
             >
-              <span className="material-symbols-outlined">more_horiz</span>
-            </button>
+              <MoreHorizontal className="w-5 h-5" />
+            </motion.button>
+
             <AnimatePresence>
               {isMenuOpen && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -10 }} 
-                  animate={{ opacity: 1, y: 0 }} 
-                  exit={{ opacity: 0, y: -10 }} 
-                  className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-xl z-10 border border-gray-200 dark:border-gray-600 overflow-hidden"
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-700 rounded-xl shadow-xl z-20 border border-gray-200 dark:border-gray-600 overflow-hidden"
                 >
-                  <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <span className="material-symbols-outlined text-base">receipt_long</span>
-                    View Invoice
+                  <button
+                    onClick={handleViewInvoice}
+                    className="w-full text-left flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors border-b border-gray-100 dark:border-gray-600"
+                  >
+                    <FileText className="w-4 h-4 text-blue-500" />
+                    <span>View Invoice</span>
+                    <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
                   </button>
-                  <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <span className="material-symbols-outlined text-base">support</span>
-                    Request Support
+                  <button
+                    onClick={handleRequestSupport}
+                    className="w-full text-left flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    <HelpCircle className="w-4 h-4 text-green-500" />
+                    <span>Request Support</span>
                   </button>
+
+                  {/* Additional actions can be added here */}
+                  {design.projectId && (
+                    <button
+                      onClick={() => {
+                        console.log("Navigate to project:", design.projectId);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full text-left flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors border-t border-gray-100 dark:border-gray-600"
+                    >
+                      <span className="material-symbols-outlined text-base text-purple-500">
+                        dashboard
+                      </span>
+                      <span>View Project</span>
+                    </button>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

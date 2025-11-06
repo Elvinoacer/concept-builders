@@ -1,63 +1,129 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import Link from 'next/link';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import {
+  Search,
+  Mail,
+  MessageCircle,
+  Users,
+  Video,
+  Rocket,
+  CreditCard,
+  Headphones,
+  ChevronDown,
+  ChevronUp,
+  Phone,
+  MessageSquare,
+  ArrowRight,
+  BookOpen,
+  HelpCircle,
+} from "lucide-react";
 
 const HelpPage = () => {
   const [activeCategory, setActiveCategory] = useState("getting-started");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   const categories = [
     {
       id: "getting-started",
       title: "Getting Started",
-      icon: "rocket_launch",
+      icon: Rocket,
       articles: [
         {
           id: 1,
           title: "Creating Your First Project",
-          content: "Learn how to create your first project from scratch.",
+          content:
+            "Learn how to create your first project from scratch with our step-by-step guide.",
           path: "/dashboard/help/articles/creating-first-project",
         },
         {
           id: 2,
           title: "Account Setup Guide",
-          content: "Complete guide to setting up your account.",
+          content:
+            "Complete guide to setting up your account and personalizing your workspace.",
           path: "/dashboard/help/articles/account-setup-guide",
+        },
+        {
+          id: 3,
+          title: "Navigation Basics",
+          content:
+            "Learn how to navigate the dashboard and access all features efficiently.",
+          path: "/dashboard/help/articles/navigation-basics",
         },
       ],
     },
     {
       id: "billing",
       title: "Billing & Payments",
-      icon: "payments",
+      icon: CreditCard,
       articles: [
         {
-          id: 3,
+          id: 4,
           title: "Payment Methods",
-          content: "How to add and manage payment methods.",
+          content:
+            "How to add and manage payment methods for seamless transactions.",
           path: "/dashboard/help/articles/payment-methods",
+        },
+        {
+          id: 5,
+          title: "Subscription Plans",
+          content:
+            "Compare features and choose the perfect plan for your needs.",
+          path: "/dashboard/help/articles/subscription-plans",
+        },
+        {
+          id: 6,
+          title: "Invoice Management",
+          content:
+            "How to view, download, and manage your invoices and receipts.",
+          path: "/dashboard/help/articles/invoice-management",
         },
       ],
     },
     {
       id: "technical",
       title: "Technical Support",
-      icon: "support_agent",
+      icon: Headphones,
       articles: [
         {
           id: 7,
           title: "System Requirements",
-          content: "Minimum system requirements for optimal performance.",
+          content:
+            "Minimum system requirements for optimal performance across devices.",
           path: "/dashboard/help/articles/system-requirements",
         },
         {
           id: 8,
-          title: "Troubleshooting",
-          content: "Common issues and their solutions.",
+          title: "Troubleshooting Guide",
+          content:
+            "Common issues and their solutions for quick problem resolution.",
           path: "/dashboard/help/articles/troubleshooting",
+        },
+        {
+          id: 9,
+          title: "Performance Optimization",
+          content:
+            "Tips and tricks to optimize your experience and loading times.",
+          path: "/dashboard/help/articles/performance-optimization",
         },
       ],
     },
@@ -68,62 +134,72 @@ const HelpPage = () => {
       id: 1,
       question: "How do I reset my password?",
       answer:
-        'You can reset your password by clicking "Forgot Password" on the login page. We\'ll send a reset link to your email address.',
+        "You can reset your password by clicking 'Forgot Password' on the login page. We'll send a secure reset link to your registered email address that expires in 1 hour for security.",
     },
     {
       id: 2,
       question: "Can I cancel my subscription anytime?",
       answer:
-        "Yes, you can cancel your subscription at any time from your account settings. Your access will continue until the end of your current billing period.",
+        "Yes, you can cancel your subscription at any time from your account settings. Your access will continue until the end of your current billing period, and you won't be charged again.",
     },
     {
       id: 3,
       question: "How many projects can I create?",
       answer:
-        "The number of projects depends on your subscription plan. Free users can create up to 3 projects, while paid plans offer unlimited projects.",
+        "The number of projects depends on your subscription plan. Free users can create up to 3 projects, while paid plans offer unlimited projects with additional collaboration features.",
     },
     {
       id: 4,
       question: "Is my data secure?",
       answer:
-        "Yes, we use industry-standard encryption and security measures to protect your data. All data is stored on secure servers with regular backups.",
+        "Yes, we use industry-standard encryption (AES-256) and security measures to protect your data. All data is stored on secure servers with regular backups and 99.9% uptime guarantee.",
     },
     {
       id: 5,
       question: "How do I export my designs?",
       answer:
-        "You can export designs in various formats (PNG, JPG, PDF) from the export menu in the design editor. Higher resolution exports are available for paid plans.",
+        "You can export designs in various formats (PNG, JPG, PDF, SVG) from the export menu in the design editor. Higher resolution exports and additional formats are available for paid plans.",
+    },
+    {
+      id: 6,
+      question: "Do you offer team collaboration?",
+      answer:
+        "Yes, our Professional and Enterprise plans include team collaboration features, allowing multiple users to work on projects simultaneously with role-based permissions.",
     },
   ];
 
   const contactMethods = [
     {
-      icon: "mail",
+      icon: Mail,
       title: "Email Support",
-      description: "Get help via email within 24 hours",
+      description: "Get detailed help via email with 24-hour response time",
       contact: "support@conceptbuilders.com",
       action: "mailto:support@conceptbuilders.com",
+      available: true,
     },
     {
-      icon: "chat",
+      icon: MessageCircle,
       title: "Live Chat",
-      description: "Instant help from our support team",
+      description: "Instant real-time help from our support team",
       contact: "Available 9AM-6PM EST",
-      action: "#chat",
+      action: "/dashboard/messages",
+      available: true,
     },
     {
-      icon: "forum",
+      icon: Users,
       title: "Community Forum",
-      description: "Get help from other users",
+      description: "Get help from our community of expert users",
       contact: "Join 10,000+ members",
       action: "#forum",
+      available: false,
     },
     {
-      icon: "video_library",
+      icon: Video,
       title: "Video Tutorials",
-      description: "Watch step-by-step guides",
+      description: "Watch comprehensive step-by-step guides",
       contact: "100+ tutorials available",
       action: "#tutorials",
+      available: false,
     },
   ];
 
@@ -131,242 +207,414 @@ const HelpPage = () => {
     setActiveFAQ(activeFAQ === id ? null : id);
   };
 
-  const activeCategoryData = categories.find((cat) => cat.id === activeCategory);
+  const activeCategoryData = categories.find(
+    (cat) => cat.id === activeCategory
+  );
 
-  const filteredArticles = activeCategoryData?.articles.filter(article =>
-    article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    article.content.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const filteredArticles =
+    activeCategoryData?.articles.filter(
+      (article) =>
+        article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        article.content.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
+
+  const filteredFAQs = faqs.filter(
+    (faq) =>
+      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: isMobile ? 0.05 : 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: isMobile ? 10 : 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: isMobile ? 0.4 : 0.6,
+        ease: [0.4, 0, 0.2, 1],
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut",
+      },
+    },
+    hover: {
+      y: -4,
+      scale: 1.02,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+  };
 
   return (
-    <div className="dark:bg-gray-900 min-h-screen py-3 sm:py-6 md:py-8">
-      <header className="mb-6 px-4 sm:px-6 md:px-8">
-        <h2 className="text-gray-900 text-2xl sm:text-3xl md:text-4xl font-bold leading-tight dark:text-white">
-          Help & Support
-        </h2>
-        <p className="text-gray-500 mt-1 text-sm sm:text-base dark:text-gray-400">
-          Find answers to common questions, browse documentation, or get in
-          touch with our support team.
-        </p>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
+      <div className="px-3 xs:px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-6xl mx-auto">
+        {/* Header */}
+        <motion.header
+          className="mb-6 sm:mb-8 lg:mb-12 text-center sm:text-left"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-4"
+            variants={itemVariants}
+          >
+            <HelpCircle className="w-4 h-4" />
+            Help & Support Center
+          </motion.div>
 
-      <div className="max-w-6xl mx-auto px-3 sm:px-6 md:px-8">
+          <motion.h1
+            variants={itemVariants}
+            className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-3"
+          >
+            How can we help you?
+          </motion.h1>
+
+          <motion.p
+            variants={itemVariants}
+            transition={{ delay: 0.1 }}
+            className="text-gray-600 dark:text-gray-400 text-base sm:text-lg lg:text-xl max-w-3xl mx-auto sm:mx-0 leading-relaxed"
+          >
+            Find answers to common questions, browse documentation, or get in
+            touch with our support team.
+          </motion.p>
+        </motion.header>
+
         {/* Search Bar */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="mb-6 md:mb-12"
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.2 }}
+          className="mb-8 sm:mb-12 lg:mb-16 max-w-2xl mx-auto"
         >
           <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-lg">
-              search
-            </span>
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
             <input
               type="text"
-              placeholder="Search help articles..."
+              placeholder="Search help articles, FAQs, and documentation..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-400"
+              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-sm sm:text-base"
             />
           </div>
         </motion.div>
 
         {/* Quick Help Cards */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 mb-8 md:mb-16"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 lg:mb-16"
         >
-          {contactMethods.map((method, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ y: -3 }}
-              className="bg-white rounded-lg sm:rounded-xl p-4 shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
-            >
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3 dark:bg-blue-900">
-                <span className="material-symbols-outlined text-blue-600 dark:text-blue-400 text-sm sm:text-base">
-                  {method.icon}
-                </span>
-              </div>
-              <h3 className="font-semibold text-sm sm:text-base text-gray-900 mb-1 sm:mb-2 dark:text-white">
-                {method.title}
-              </h3>
-              <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 dark:text-gray-400 leading-relaxed">
-                {method.description}
-              </p>
-              <p className="text-blue-600 text-xs sm:text-sm font-medium dark:text-blue-400">
-                {method.contact}
-              </p>
-              {method.title === "Email Support" ? (
-                <a
-                  href={`mailto:${method.contact}`}
-                  className="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition-colors dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 text-center flex items-center justify-center"
-                >
-                  Contact Now
-                </a>
-              ) : method.title === "Live Chat" ? (
-                <a
-                  href="/dashboard/messages"
-                  className="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition-colors dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 text-center flex items-center justify-center"
-                >
-                  Contact Now
-                </a>
-              ) : method.title === "Video Tutorials" ? (
-                <button
-                  className="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors dark:bg-blue-900 dark:text-blue-300 opacity-50 cursor-not-allowed"
-                  disabled
-                >
-                  Coming Soon
-                </button>
-              ) : (
-                <button className="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition-colors dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800">
-                  Contact Now
-                </button>
-              )}
-            </motion.div>
-          ))}
+          {contactMethods.map((method, index) => {
+            const IconComponent = method.icon;
+            return (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                whileHover="hover"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border-2 border-gray-200/50 dark:border-gray-700/50 p-4 sm:p-6 hover:border-blue-300/50 dark:hover:border-blue-600/30 transition-all duration-300 group"
+              >
+                <div className="flex items-start gap-4 mb-3 sm:mb-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base mb-1 leading-tight">
+                      {method.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">
+                      {method.description}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+                  {method.contact}
+                </p>
+
+                {method.available ? (
+                  <motion.a
+                    href={method.action}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors duration-200 flex items-center justify-center gap-2"
+                  >
+                    Contact Now
+                    <ArrowRight className="w-3 h-3" />
+                  </motion.a>
+                ) : (
+                  <button
+                    disabled
+                    className="w-full bg-gray-50 dark:bg-gray-700/50 text-gray-400 dark:text-gray-500 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    Coming Soon
+                  </button>
+                )}
+              </motion.div>
+            );
+          })}
         </motion.div>
 
         {/* Knowledge Base */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-8 md:mb-16"
+        <motion.section
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="mb-8 sm:mb-12 lg:mb-16"
         >
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8 dark:text-white">
-            Knowledge Base
-          </h2>
-
-          {/* Category Tabs - Mobile Scrollable */}
-          <div className="relative mb-6 sm:mb-8">
-            <div className="flex overflow-x-auto gap-2 pb-3 scrollbar-hide">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg whitespace-nowrap transition-colors text-xs sm:text-sm min-w-max ${
-                    activeCategory === category.id
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-sm sm:text-base">
-                    {category.icon}
-                  </span>
-                  <span className="hidden xs:inline">{category.title}</span>
-                  <span className="xs:hidden">
-                    {category.title.split(" ")[0]}
-                  </span>
-                </button>
-              ))}
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <div>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+                <BookOpen className="w-6 h-6 text-blue-500" />
+                Knowledge Base
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+                Browse articles by category to find detailed guides and
+                tutorials
+              </p>
             </div>
           </div>
 
+          {/* Category Tabs */}
+          <motion.div variants={itemVariants} className="relative mb-6 sm:mb-8">
+            <div className="flex overflow-x-auto gap-2 pb-4 scrollbar-hide -mx-2 px-2">
+              {categories.map((category) => {
+                const IconComponent = category.icon;
+                return (
+                  <motion.button
+                    key={category.id}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setActiveCategory(category.id)}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-xl whitespace-nowrap transition-all duration-200 border-2 min-w-max ${
+                      activeCategory === category.id
+                        ? "bg-blue-600 border-blue-600 text-white shadow-lg"
+                        : "bg-white/80 dark:bg-gray-800/80 border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 hover:border-blue-300/50 dark:hover:border-blue-600/30"
+                    }`}
+                  >
+                    <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-sm font-medium">
+                      {isMobile ? category.title.split(" ")[0] : category.title}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </motion.div>
+
           {/* Articles Grid */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-            {filteredArticles.map((article) => (
-                <motion.div
-                  key={article.id}
-                  whileHover={{ y: -2 }}
-                  className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700"
-                >
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-2 sm:mb-3 dark:text-white leading-tight">
-                    {article.title}
-                  </h3>
-                  <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 dark:text-gray-400 leading-relaxed">
-                    {article.content}
-                  </p>
-                  {article.path ? (
-                    <Link href={article.path} className="text-blue-600 text-xs sm:text-sm font-medium hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-                      Read Article →
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeCategory}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
+            >
+              {filteredArticles.length > 0 ? (
+                filteredArticles.map((article) => (
+                  <motion.div
+                    key={article.id}
+                    variants={cardVariants}
+                    whileHover="hover"
+                    className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border-2 border-gray-200/50 dark:border-gray-700/50 p-4 sm:p-6 hover:border-blue-300/50 dark:hover:border-blue-600/30 transition-all duration-300 group"
+                  >
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-base sm:text-lg mb-2 sm:mb-3 leading-tight line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 sm:mb-4 leading-relaxed line-clamp-3">
+                      {article.content}
+                    </p>
+                    <Link
+                      href={article.path}
+                      className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm font-medium hover:text-blue-700 dark:hover:text-blue-300 group-hover:gap-3 transition-all duration-200"
+                    >
+                      Read Article
+                      <ArrowRight className="w-4 h-4" />
                     </Link>
-                  ) : (
-                    <button className="text-blue-600 text-xs sm:text-sm font-medium hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-                      Read Article →
-                    </button>
-                  )}
-                </motion.div>
-              ))}
-          </div>
-        </motion.div>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8 sm:py-12">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    No articles found
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm max-w-sm mx-auto">
+                    {searchQuery
+                      ? `No articles match "${searchQuery}". Try different keywords.`
+                      : `No articles available in ${activeCategoryData?.title}.`}
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </motion.section>
 
         {/* FAQ Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mb-8 md:mb-16"
+        <motion.section
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.4 }}
+          className="mb-8 sm:mb-12 lg:mb-16"
         >
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8 dark:text-white">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-3 sm:space-y-4">
-            {faqs.map((faq) => (
-              <motion.div
-                key={faq.id}
-                className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden dark:bg-gray-800 dark:border-gray-700"
-              >
-                <button
-                  onClick={() => toggleFAQ(faq.id)}
-                  className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex items-center justify-between"
-                >
-                  <span className="font-medium text-gray-900 text-sm sm:text-base dark:text-white pr-2 text-left">
-                    {faq.question}
-                  </span>
-                  <span className="material-symbols-outlined text-gray-400 transform transition-transform flex-shrink-0 dark:text-gray-500 text-lg">
-                    {activeFAQ === faq.id ? "expand_less" : "expand_more"}
-                  </span>
-                </button>
-                {activeFAQ === faq.id && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="px-4 sm:px-6 pb-3 sm:pb-4"
-                  >
-                    <p className="text-gray-600 text-xs sm:text-sm dark:text-gray-400 leading-relaxed">
-                      {faq.answer}
-                    </p>
-                  </motion.div>
-                )}
-              </motion.div>
-            ))}
+          <div className="text-center sm:text-left mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+              Quick answers to common questions
+            </p>
           </div>
-        </motion.div>
 
-        {/* Still Need Help */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="bg-gradient-to-r from-blue-600 to-cyan-400 rounded-lg sm:rounded-xl p-6 sm:p-8 text-center text-white"
-        >
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4 md:mb-6">
-            Still need help?
-          </h2>
-          <p className="mb-4 sm:mb-6 opacity-90 text-sm sm:text-base">
-            Our support team is here to assist you
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <a
-              href="https://wa.me/254741360865"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white text-blue-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors text-sm sm:text-base flex items-center justify-center"
-            >
-              Contact Support
-            </a>
-            <a
-              href="tel:254741360865"
-              className="border border-white text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-white hover:text-blue-600 transition-colors text-sm sm:text-base flex items-center justify-center"
-            >
-              Call Now
-            </a>
+          <div className="space-y-3 sm:space-y-4 max-w-4xl mx-auto">
+            {filteredFAQs.length > 0 ? (
+              filteredFAQs.map((faq, index) => (
+                <motion.div
+                  key={faq.id}
+                  variants={itemVariants}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden hover:border-blue-300/50 dark:hover:border-blue-600/30 transition-all duration-300"
+                >
+                  <button
+                    onClick={() => toggleFAQ(faq.id)}
+                    className="w-full px-4 sm:px-6 py-4 sm:py-5 text-left flex items-center justify-between gap-4 group"
+                  >
+                    <span className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base text-left flex-1 leading-relaxed">
+                      {faq.question}
+                    </span>
+                    <motion.div
+                      animate={{ rotate: activeFAQ === faq.id ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex-shrink-0 w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400"
+                    >
+                      {activeFAQ === faq.id ? <ChevronUp /> : <ChevronDown />}
+                    </motion.div>
+                  </button>
+
+                  <AnimatePresence>
+                    {activeFAQ === faq.id && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-gray-200/50 dark:border-gray-700/50 pt-4"
+                      >
+                        <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base leading-relaxed">
+                          {faq.answer}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center py-8 sm:py-12">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <HelpCircle className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  No FAQs found
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  {searchQuery
+                    ? `No FAQs match "${searchQuery}". Try different keywords.`
+                    : "No FAQs available at the moment."}
+                </p>
+              </div>
+            )}
           </div>
-        </motion.div>
+        </motion.section>
+
+        {/* CTA Section */}
+        <motion.section
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
+          className="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 text-center text-white overflow-hidden relative"
+        >
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-white rounded-full"></div>
+            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-white rounded-full"></div>
+          </div>
+
+          <div className="relative z-10">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4">
+              Still need help?
+            </h2>
+            <p className="text-blue-100 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
+              Our dedicated support team is here to assist you with any
+              questions or issues you might have.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+              <motion.a
+                href="https://wa.me/254741360865"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-white text-blue-600 font-semibold rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base min-w-[140px]"
+              >
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+                WhatsApp
+              </motion.a>
+
+              <motion.a
+                href="tel:254741360865"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl sm:rounded-2xl hover:bg-white hover:text-blue-600 transition-all duration-200 text-sm sm:text-base min-w-[140px]"
+              >
+                <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+                Call Now
+              </motion.a>
+            </div>
+
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2 text-blue-100 text-xs sm:text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span>24/7 Email Support</span>
+              </div>
+              <span className="hidden sm:block">•</span>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span>Average response time: 2 hours</span>
+              </div>
+            </div>
+          </div>
+        </motion.section>
       </div>
     </div>
   );
