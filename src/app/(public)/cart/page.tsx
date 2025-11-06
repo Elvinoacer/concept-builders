@@ -7,29 +7,74 @@ import { useCart } from "@/hooks/useCart";
 import { useEffect } from "react";
 
 const CartPage = () => {
+  const { cart, fetchCart, removeItem, updateItem, loading, error } = useCart();
   const { data: session, status } = useSession();
-  const { cart, loading, error, fetchCart, removeItem, updateItem } = useCart();
-
   useEffect(() => {
-    if (status === "authenticated") {
-      fetchCart();
-    }
-  }, [status, fetchCart]);
+    fetchCart("authenticated");
+  }, [fetchCart]);
 
-  // Simple loading state
+  // Enhanced loading state
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/10">
-        <main className="container mx-auto px-4 py-12">
-          <div className="mb-8">
-            <div className="h-10 w-64 bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse"></div>
+        <main className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+          {/* Skeleton Header */}
+          <div className="mb-6 sm:mb-8 lg:mb-10 text-center">
+            <div className="h-8 xs:h-10 sm:h-12 bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse max-w-xs mx-auto mb-2"></div>
+            <div className="h-4 xs:h-5 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse max-w-sm mx-auto"></div>
           </div>
-          <div className="flex flex-col lg:flex-row gap-8">
+
+          {/* Skeleton Content */}
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
+            {/* Cart Items Skeleton */}
             <div className="lg:w-2/3">
-              <CartItemList items={[]} onRemove={() => {}} loading={true} />
+              <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+                {[...Array(2)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex gap-3 sm:gap-4 pb-4 sm:pb-6 mb-4 sm:mb-6 border-b border-gray-200 dark:border-gray-600 last:border-b-0 last:mb-0 last:pb-0"
+                  >
+                    {/* Image Skeleton */}
+                    <div className="w-20 xs:w-24 sm:w-28 h-20 xs:h-24 sm:h-28 bg-gray-200 dark:bg-gray-700 rounded-xl sm:rounded-2xl animate-pulse flex-shrink-0"></div>
+
+                    {/* Content Skeleton */}
+                    <div className="flex-1 space-y-2 sm:space-y-3">
+                      <div className="h-4 xs:h-5 sm:h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
+                      <div className="h-3 xs:h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2"></div>
+                      <div className="h-8 xs:h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse w-32"></div>
+                    </div>
+
+                    {/* Price Skeleton */}
+                    <div className="text-right space-y-2">
+                      <div className="h-5 xs:h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-16 xs:w-20"></div>
+                      <div className="h-8 xs:h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse w-20 xs:w-24"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {/* Order Summary Skeleton */}
             <div className="lg:w-1/3">
-              <OrderSummary items={[]} loading={true} />
+              <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-gray-100 dark:border-gray-700 sticky top-6">
+                <div className="h-6 xs:h-7 sm:h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4 sm:mb-6"></div>
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex justify-between items-center py-2 xs:py-3"
+                  >
+                    <div className="h-4 xs:h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/3"></div>
+                    <div className="h-4 xs:h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-16 xs:w-20"></div>
+                  </div>
+                ))}
+                <div className="border-t border-gray-200 dark:border-gray-600 mt-4 pt-4">
+                  <div className="flex justify-between items-center">
+                    <div className="h-5 xs:h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/4"></div>
+                    <div className="h-5 xs:h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-20 xs:w-24"></div>
+                  </div>
+                </div>
+                <div className="h-12 xs:h-14 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse mt-6"></div>
+              </div>
             </div>
           </div>
         </main>
@@ -39,18 +84,18 @@ const CartPage = () => {
 
   if (status === "unauthenticated") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/10 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/10 flex items-center justify-center px-3 xs:px-4 sm:px-6">
+        <div className="text-center w-full max-w-xs xs:max-w-sm sm:max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-6 xs:p-8 sm:p-10 shadow-xl border border-gray-100 dark:border-gray-700">
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3 xs:mb-4">
               Sign In Required
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base sm:text-lg mb-6 xs:mb-8 leading-relaxed">
               Please log in to view and manage your cart items.
             </p>
             <Link
               href="/auth"
-              className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="inline-flex items-center justify-center px-5 xs:px-6 sm:px-8 py-2.5 xs:py-3 sm:py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg xs:rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm xs:text-base sm:text-lg w-full"
             >
               Log In / Sign Up
             </Link>
@@ -62,15 +107,25 @@ const CartPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/10 flex items-center justify-center px-4">
-        <div className="text-center">
-          <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-red-200 dark:border-red-800">
-            <p className="text-red-600 dark:text-red-400 text-lg mb-4">
-              Error: {error}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/10 flex items-center justify-center px-3 xs:px-4 sm:px-6">
+        <div className="text-center w-full max-w-xs xs:max-w-sm sm:max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-6 xs:p-8 shadow-xl border border-red-200 dark:border-red-800">
+            <div className="w-12 h-12 xs:w-16 xs:h-16 mx-auto mb-4 text-red-500">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <p className="text-red-600 dark:text-red-400 text-base xs:text-lg sm:text-xl mb-4 xs:mb-6 font-medium">
+              {error}
             </p>
             <button
-              onClick={fetchCart}
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+              onClick={() => fetchCart("authenticated")}
+              className="px-5 xs:px-6 sm:px-8 py-2.5 xs:py-3 bg-blue-600 text-white rounded-lg xs:rounded-xl font-semibold hover:bg-blue-700 transition-colors text-sm xs:text-base sm:text-lg w-full"
             >
               Try Again
             </button>
@@ -82,41 +137,59 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/10">
-      <main className="container mx-auto px-4 py-12">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-blue-700 dark:from-white dark:to-blue-200 bg-clip-text text-transparent">
+      <main className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+        {/* Header */}
+        <div className="mb-6 sm:mb-8 lg:mb-10 text-center">
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-900 to-blue-700 dark:from-white dark:to-blue-200 bg-clip-text text-transparent leading-tight">
             Your Cart
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
+          <p className="text-gray-600 dark:text-gray-300 mt-2 xs:mt-3 text-sm xs:text-base sm:text-lg">
             Review your selected designs
           </p>
         </div>
 
         {cart && cart.length > 0 ? (
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="lg:w-2/3">
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
+            {/* Cart Items - Main Content */}
+            <div className="lg:w-2/3 xl:w-7/12 2xl:w-2/3">
               <CartItemList
+                loading={loading}
                 items={cart}
                 onRemove={removeItem}
                 onUpdate={updateItem}
               />
             </div>
-            <div className="lg:w-1/3">
-              <OrderSummary items={cart} loading={loading} />
+
+            {/* Order Summary - Sidebar */}
+            <div className="lg:w-1/3 xl:w-5/12 2xl:w-1/3">
+              <div className="sticky top-4 sm:top-6 lg:top-8">
+                <OrderSummary items={cart} loading={loading} />
+              </div>
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center">
-            <div className="bg-white dark:bg-gray-800 rounded-3xl p-12 text-center shadow-xl border border-gray-100 dark:border-gray-700 max-w-md">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+          // Empty Cart State
+          <div className="flex flex-col items-center justify-center px-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-6 xs:p-8 sm:p-10 lg:p-12 text-center shadow-xl border border-gray-100 dark:border-gray-700 w-full max-w-sm xs:max-w-md sm:max-w-lg">
+              <div className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 mx-auto mb-4 xs:mb-6 text-gray-400 dark:text-gray-500">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 xs:mb-3">
                 Your Cart is Empty
               </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
+              <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base sm:text-lg mb-6 xs:mb-8 leading-relaxed">
                 Discover amazing designs and start building your collection
               </p>
               <Link
                 href="/design-showcase"
-                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center justify-center px-5 xs:px-6 sm:px-8 py-2.5 xs:py-3 sm:py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg xs:rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm xs:text-base sm:text-lg w-full"
               >
                 Start Shopping
               </Link>

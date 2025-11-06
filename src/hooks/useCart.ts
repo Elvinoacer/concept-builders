@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import useCartStore from '@/lib/store/useCartStore';
+import useCartStore from "@/lib/store/useCartStore";
+import { useSession } from "next-auth/react";
 
 export const useCart = () => {
   const {
@@ -20,20 +19,6 @@ export const useCart = () => {
   } = useCartStore();
 
   const { data: session, status } = useSession();
-
-  useEffect(() => {
-    fetchCart(status);
-  }, [status, fetchCart]);
-
-  useEffect(() => {
-    const handleCartSync = () => {
-      fetchCart(status);
-    };
-    window.addEventListener('cart-synced', handleCartSync);
-    return () => {
-      window.removeEventListener('cart-synced', handleCartSync);
-    };
-  }, [status, fetchCart]);
 
   const addToCart = (design, selectedFileTypes, selectedExtras) => {
     return addToCartStore(design, selectedFileTypes, selectedExtras, status);

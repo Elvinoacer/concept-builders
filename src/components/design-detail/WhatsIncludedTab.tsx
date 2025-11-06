@@ -1,7 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface DocumentSection {
   title: string;
@@ -141,37 +141,37 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
         initial="hidden"
         animate="visible"
       >
-        {/* Header */}
-        <motion.div variants={itemVariants} className="text-center mb-12">
-          <h3 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">
+        <motion.div
+          variants={itemVariants}
+          className="text-center mb-8 sm:mb-10 md:mb-12"
+        >
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-3 sm:mb-4">
             What's Included in Your Purchase
           </h3>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed px-4">
             Complete professional documentation package with everything you need
             to bring your architectural vision to life
           </p>
         </motion.div>
 
-        {/* Document Sections */}
-        <div className="space-y-12">
+        <div className="space-y-6 sm:space-y-8 md:space-y-12">
           {documentSections.map(
             (section, index) =>
               section.document && (
                 <motion.div
                   key={index}
                   variants={itemVariants}
-                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 border-2 border-gray-200/50 dark:border-gray-700/50 shadow-2xl hover:shadow-3xl transition-all duration-500"
+                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 border-2 border-gray-200/50 dark:border-gray-700/50 shadow-lg sm:shadow-xl md:shadow-2xl hover:shadow-2xl sm:hover:shadow-3xl transition-all duration-500"
                   whileHover={{ y: -2 }}
                 >
-                  {/* Section Header */}
                   <motion.div
-                    className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200/50 dark:border-gray-700/50"
+                    className="flex items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-gray-200/50 dark:border-gray-700/50"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 + index * 0.1 }}
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center shadow-lg">
-                      <span className="material-symbols-outlined text-white text-2xl">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center shadow-lg flex-shrink-0">
+                      <span className="material-symbols-outlined text-white text-lg sm:text-xl md:text-2xl">
                         {index === 0
                           ? "architecture"
                           : index === 1
@@ -179,19 +179,18 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
                             : "inventory_2"}
                       </span>
                     </div>
-                    <div>
-                      <h4 className="text-2xl font-bold text-slate-800 dark:text-white">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 dark:text-white leading-tight">
                         {section.title}
                       </h4>
-                      <p className="text-gray-600 dark:text-gray-400 text-lg mt-1">
+                      <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
                         {section.document.description}
                       </p>
                     </div>
                   </motion.div>
 
-                  {/* File Types Grid */}
                   <motion.div
-                    className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6"
                     variants={containerVariants}
                   >
                     {section.files.map(
@@ -204,26 +203,24 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
                             whileHover="hover"
                             className="group cursor-pointer"
                           >
-                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-700/50 dark:to-gray-800/50 rounded-2xl p-6 border-2 border-gray-200/50 dark:border-gray-700/50 hover:border-primary/30 transition-all duration-500 h-full">
-                              <div className="flex items-start gap-4">
-                                {/* File Type Icon */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-700/50 dark:to-gray-800/50 rounded-lg sm:rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 border-2 border-gray-200/50 dark:border-gray-700/50 hover:border-primary/30 transition-all duration-500 h-full">
+                              <div className="flex items-start gap-3 sm:gap-4">
                                 <motion.div
-                                  className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${getFileTypeColor(fileType.type)} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                                  className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-br ${getFileTypeColor(fileType.type)} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 flex-shrink-0`}
                                   whileHover={{ scale: 1.1, rotate: 5 }}
                                 >
-                                  <span className="material-symbols-outlined text-white text-2xl">
+                                  <span className="material-symbols-outlined text-white text-lg sm:text-xl md:text-2xl">
                                     {getFileTypeIcon(fileType.type)}
                                   </span>
                                 </motion.div>
 
-                                {/* Content */}
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between mb-2">
-                                    <h5 className="font-bold text-xl text-slate-800 dark:text-white group-hover:text-primary transition-colors duration-300">
+                                  <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mb-2">
+                                    <h5 className="font-bold text-base sm:text-lg md:text-xl text-slate-800 dark:text-white group-hover:text-primary transition-colors duration-300 truncate">
                                       {fileType.type} Files
                                     </h5>
                                     <motion.span
-                                      className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium"
+                                      className="px-2 sm:px-3 py-1 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium w-fit"
                                       whileHover={{ scale: 1.05 }}
                                     >
                                       {fileType.files.length} file
@@ -231,13 +228,12 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
                                     </motion.span>
                                   </div>
 
-                                  <p className="text-gray-600 dark:text-gray-400 text-lg leading-relaxed mb-4">
+                                  <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed mb-3 sm:mb-4 line-clamp-2">
                                     {getFileTypeDescription(fileType.type)}
                                   </p>
 
-                                  {/* File List */}
                                   <motion.div
-                                    className="space-y-2"
+                                    className="space-y-1 sm:space-y-2"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{
@@ -250,17 +246,17 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
                                         (file: any, fileItemIndex: number) => (
                                           <motion.div
                                             key={fileItemIndex}
-                                            className="flex items-center gap-3 py-2 px-3 rounded-xl bg-white/50 dark:bg-gray-700/30 border border-gray-200/30 dark:border-gray-600/30 hover:bg-white dark:hover:bg-gray-700/50 transition-all duration-300 group/file"
-                                            whileHover={{ x: 4 }}
+                                            className="flex items-center gap-2 sm:gap-3 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl bg-white/50 dark:bg-gray-700/30 border border-gray-200/30 dark:border-gray-600/30 hover:bg-white dark:hover:bg-gray-700/50 transition-all duration-300 group/file"
+                                            whileHover={{ x: 2 }}
                                           >
-                                            <span className="material-symbols-outlined text-gray-400 group-hover/file:text-primary transition-colors duration-300">
+                                            <span className="material-symbols-outlined text-gray-400 text-sm sm:text-base group-hover/file:text-primary transition-colors duration-300 flex-shrink-0">
                                               description
                                             </span>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium truncate group-hover/file:text-slate-800 dark:group-hover/file:text-white transition-colors duration-300">
+                                            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium truncate group-hover/file:text-slate-800 dark:group-hover/file:text-white transition-colors duration-300">
                                               {file.name ||
                                                 `File ${fileItemIndex + 1}`}
                                             </span>
-                                            <span className="ml-auto text-xs text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded-full">
+                                            <span className="ml-auto text-xs text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-gray-600 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full flex-shrink-0">
                                               {file.size || "N/A"}
                                             </span>
                                           </motion.div>
@@ -268,7 +264,7 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
                                       )}
                                     {fileType.files.length > 3 && (
                                       <motion.div
-                                        className="text-center py-2 text-primary hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 font-medium"
+                                        className="text-center py-1.5 sm:py-2 text-primary hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 font-medium text-xs sm:text-sm"
                                         whileHover={{ scale: 1.05 }}
                                       >
                                         +{fileType.files.length - 3} more files
@@ -283,34 +279,33 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
                     )}
                   </motion.div>
 
-                  {/* Additional Features */}
                   {section.document.features &&
                     section.document.features.length > 0 && (
                       <motion.div
-                        className="mt-6 pt-6 border-t border-gray-200/50 dark:border-gray-700/50"
+                        className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200/50 dark:border-gray-700/50"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.6 }}
                       >
-                        <h5 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                          <span className="material-symbols-outlined text-primary">
+                        <h5 className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
+                          <span className="material-symbols-outlined text-primary text-base sm:text-lg">
                             featured_seasonal_and_gifts
                           </span>
                           Additional Features
                         </h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
                           {section.document.features.map(
                             (feature: string, featureIndex: number) => (
                               <motion.div
                                 key={featureIndex}
-                                className="flex items-center gap-3 py-2 px-4 rounded-xl bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-all duration-300"
-                                whileHover={{ x: 4 }}
+                                className="flex items-center gap-2 sm:gap-3 py-1.5 sm:py-2 px-3 sm:px-4 rounded-lg sm:rounded-xl bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-all duration-300"
+                                whileHover={{ x: 2 }}
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.7 + featureIndex * 0.1 }}
                               >
-                                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full flex-shrink-0"></div>
+                                <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium truncate">
                                   {feature}
                                 </span>
                               </motion.div>
@@ -324,22 +319,24 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
           )}
         </div>
 
-        {/* Call to Action */}
-        <motion.div variants={itemVariants} className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-3xl p-8 border-2 border-primary/20">
-            <h4 className="text-2xl font-bold text-slate-800 dark:text-white mb-3">
+        <motion.div
+          variants={itemVariants}
+          className="mt-8 sm:mt-10 md:mt-12 text-center"
+        >
+          <div className="bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 border-2 border-primary/20">
+            <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 dark:text-white mb-2 sm:mb-3">
               Ready to Get Started?
             </h4>
-            <p className="text-gray-600 dark:text-gray-400 text-lg mb-6 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 mb-4 sm:mb-6 max-w-2xl mx-auto">
               Purchase this complete design package and receive immediate access
               to all professional documentation files.
             </p>
             <motion.button
-              className="px-8 py-4 bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-white rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-white rounded-lg sm:rounded-xl md:rounded-2xl font-semibold text-sm sm:text-base md:text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center mx-auto"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="material-symbols-outlined mr-2">
+              <span className="material-symbols-outlined mr-1 sm:mr-2 text-base sm:text-lg">
                 shopping_cart
               </span>
               Purchase Design Package

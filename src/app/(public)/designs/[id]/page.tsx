@@ -50,7 +50,6 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
     if (id) {
       fetchDesign();
 
-      // Track design view
       const trackView = async () => {
         try {
           await fetch(`/api/designs/${id}/view`, {
@@ -117,12 +116,11 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
           initial="hidden"
           animate={isVisible ? "visible" : "hidden"}
           exit="exit"
-          className="flex-1 px-4 lg:px-8 xl:px-16 py-8 md:py-12 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 min-h-screen"
+          className="flex-1 px-3 xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8 md:py-12 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 min-h-screen"
         >
-          <div className="max-w-8xl mx-auto">
-            {/* Breadcrumbs */}
+          <div className="w-full max-w-full mx-auto">
             <motion.div
-              className="mb-8"
+              className="mb-6 sm:mb-8"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
@@ -130,17 +128,14 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
               <Breadcrumbs designName={design.name} />
             </motion.div>
 
-            {/* Main Content Grid */}
             <motion.div
-              className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12"
               variants={containerVariants}
             >
-              {/* Left Column - Content */}
               <motion.div
-                className="lg:col-span-2 space-y-8 lg:space-y-12"
+                className="lg:col-span-2 space-y-6 sm:space-y-8 lg:space-y-12"
                 variants={containerVariants}
               >
-                {/* Header */}
                 <motion.div variants={containerVariants}>
                   <DesignHeader
                     name={design.name}
@@ -148,7 +143,6 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
                   />
                 </motion.div>
 
-                {/* Gallery */}
                 <motion.div
                   variants={containerVariants}
                   whileInView="visible"
@@ -157,7 +151,6 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
                   <DesignGallery images={images} />
                 </motion.div>
 
-                {/* Renderings */}
                 {renderings.length > 0 && (
                   <motion.div
                     variants={containerVariants}
@@ -168,13 +161,12 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
                   </motion.div>
                 )}
 
-                {/* Floor Plans */}
                 {floorPlans.length > 0 && (
                   <motion.div
                     variants={containerVariants}
                     whileInView="visible"
                     viewport={{ once: true }}
-                    className="space-y-8"
+                    className="space-y-6 sm:space-y-8"
                   >
                     {floorPlans.map((fp, index) => (
                       <motion.div
@@ -195,46 +187,44 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
                   </motion.div>
                 )}
 
-                {/* Design Tabs */}
                 <motion.div
                   variants={containerVariants}
                   whileInView="visible"
                   viewport={{ once: true }}
                 >
-                  {design && <DesignTabs design={design} onFaqSubmitted={fetchDesign} />}
+                  {design && (
+                    <DesignTabs design={design} onFaqSubmitted={fetchDesign} />
+                  )}
                 </motion.div>
               </motion.div>
 
-              {/* Right Column - Purchase Sidebar */}
               <motion.div
                 className="lg:col-span-1"
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                <div className="sticky top-24">
+                <div className="sticky top-20 sm:top-24">
                   <PurchaseSidebar design={design} />
                 </div>
               </motion.div>
             </motion.div>
 
-            {/* Cost to Build */}
             <motion.div
               variants={containerVariants}
               whileInView="visible"
               viewport={{ once: true }}
-              className="mt-20 lg:mt-24"
+              className="mt-16 sm:mt-20 lg:mt-24"
             >
               {design && <CostToBuildTab design={design} />}
             </motion.div>
 
-            {/* Related Designs */}
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
-              className="mt-20 lg:mt-24"
+              className="mt-16 sm:mt-20 lg:mt-24"
             >
               <RelatedDesigns
                 categoryId={design.categoryId}

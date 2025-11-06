@@ -47,13 +47,13 @@ const FaqForm: React.FC<FaqFormProps> = ({ designId, onFaqSubmitted }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="mt-8"
+      className="mt-6 sm:mt-8"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div>
           <label
             htmlFor="question"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             Ask a Question
           </label>
@@ -61,8 +61,8 @@ const FaqForm: React.FC<FaqFormProps> = ({ designId, onFaqSubmitted }) => {
             <textarea
               id="question"
               name="question"
-              rows={4}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white sm:text-sm"
+              rows={3}
+              className="block w-full rounded-lg sm:rounded-md border border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white text-xs sm:text-sm p-2 sm:p-3 resize-y min-h-[80px] sm:min-h-[100px]"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Type your question here..."
@@ -70,13 +70,26 @@ const FaqForm: React.FC<FaqFormProps> = ({ designId, onFaqSubmitted }) => {
           </div>
         </div>
         <div>
-          <button
+          <motion.button
             type="submit"
-            className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="inline-flex justify-center rounded-lg sm:rounded-md border border-transparent bg-indigo-600 py-2 px-3 sm:py-2 sm:px-4 text-xs sm:text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed min-h-[36px] sm:min-h-[40px]"
             disabled={isSubmitting}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            {isSubmitting ? "Submitting..." : "Submit Question"}
-          </button>
+            {isSubmitting ? (
+              <span className="flex items-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-3 h-3 border-2 border-white border-t-transparent rounded-full mr-2"
+                />
+                Submitting...
+              </span>
+            ) : (
+              "Submit Question"
+            )}
+          </motion.button>
         </div>
       </form>
     </motion.div>

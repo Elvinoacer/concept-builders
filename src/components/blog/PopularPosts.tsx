@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Post } from "@/generated/prisma";
 import Image from "next/image";
@@ -34,36 +34,49 @@ const PopularPosts = () => {
   }
 
   return (
-    <div className="rounded-lg border bg-card p-4 shadow-sm md:p-6">
-      <h3 className="font-heading mb-4 text-lg font-bold tracking-tight text-foreground">
+    <div className="rounded-lg border bg-card p-3 sm:p-4 lg:p-6 shadow-sm w-full">
+      <h3 className="font-heading mb-3 sm:mb-4 lg:mb-6 text-base sm:text-lg lg:text-xl font-bold tracking-tight text-foreground leading-tight">
         Popular Posts
       </h3>
       {popularPosts.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4 lg:space-y-6">
           {popularPosts.map((post) => (
-            <Link key={post.id} href={`/blog/${post.id}`} className="group flex items-start gap-4">
-              <Image
-                src={post.image || ''}
-                alt={post.title}
-                width={64}
-                height={64}
-                className="aspect-square rounded-md object-cover"
-                placeholder="blur"
-                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-              />
-              <div className="flex-1">
-                <p className="font-semibold leading-tight text-foreground group-hover:text-primary line-clamp-2">
+            <Link
+              key={post.id}
+              href={`/blog/${post.id}`}
+              className="group flex items-start gap-3 sm:gap-4 lg:gap-5 w-full p-2 sm:p-3 rounded-lg hover:bg-accent/50 transition-all duration-200"
+            >
+              <div className="flex-shrink-0 relative">
+                <Image
+                  src={post.image || ""}
+                  alt={post.title}
+                  width={56}
+                  height={56}
+                  className="aspect-square rounded-md object-cover min-w-[56px] sm:min-w-[64px] lg:min-w-[72px]"
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+                  sizes="(max-width: 640px) 56px, (max-width: 1024px) 64px, 72px"
+                />
+              </div>
+              <div className="flex-1 min-w-0 space-y-1">
+                <p className="font-semibold leading-tight text-foreground group-hover:text-primary line-clamp-2 text-sm sm:text-base lg:text-[15px]">
                   {post.title}
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                <p className="text-xs sm:text-sm text-muted-foreground leading-none">
+                  {new Date(post.createdAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
                 </p>
               </div>
             </Link>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">No popular posts found.</p>
+        <p className="text-sm sm:text-base text-muted-foreground text-center py-4 sm:py-6">
+          No popular posts found.
+        </p>
       )}
     </div>
   );
@@ -71,24 +84,38 @@ const PopularPosts = () => {
 
 export const PopularPostsSkeleton = () => {
   return (
-    <div className="rounded-lg border bg-card p-4 shadow-sm md:p-6">
-      <div className="mb-4 h-6 w-3/4 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
+    <div className="rounded-lg border bg-card p-3 sm:p-4 lg:p-6 shadow-sm w-full">
+      {/* Skeleton Title */}
+      <div className="mb-3 sm:mb-4 lg:mb-6 h-5 sm:h-6 lg:h-7 w-2/3 sm:w-1/2 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
         <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
       </div>
-      <div className="space-y-4">
+
+      {/* Skeleton Posts */}
+      <div className="space-y-3 sm:space-y-4 lg:space-y-6">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex items-start gap-4">
-            <div className="h-16 w-16 flex-shrink-0 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
+          <div
+            key={i}
+            className="flex items-start gap-3 sm:gap-4 lg:gap-5 w-full p-2 sm:p-3"
+          >
+            {/* Skeleton Image */}
+            <div className="h-14 w-14 sm:h-16 sm:w-16 lg:h-18 lg:w-18 flex-shrink-0 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
               <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
             </div>
-            <div className="flex-1 space-y-2 py-1">
-              <div className="h-4 w-full relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mb-1">
+
+            {/* Skeleton Text Content */}
+            <div className="flex-1 min-w-0 space-y-2 py-1">
+              {/* Title Line 1 */}
+              <div className="h-3 sm:h-4 w-full relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
                 <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
               </div>
-              <div className="h-4 w-5/6 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mb-1">
+
+              {/* Title Line 2 */}
+              <div className="h-3 sm:h-4 w-4/5 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
                 <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
               </div>
-              <div className="mt-1 h-3 w-1/3 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
+
+              {/* Date */}
+              <div className="h-3 w-1/3 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mt-2">
                 <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
               </div>
             </div>
@@ -100,4 +127,3 @@ export const PopularPostsSkeleton = () => {
 };
 
 export default PopularPosts;
-

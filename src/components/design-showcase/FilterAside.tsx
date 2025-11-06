@@ -124,22 +124,21 @@ const FilterAside: React.FC<FilterAsideProps> = ({
   return (
     <>
       <motion.aside
-        className="w-full md:pr-6"
+        className="w-full md:pr-4 lg:pr-6"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
-        <div className="space-y-8 p-1">
-          {/* Header */}
+        <div className="space-y-6 sm:space-y-8 p-1">
           <motion.div
             className="flex items-center justify-between pb-4 border-b border-gray-200/60 dark:border-gray-700/60"
             variants={itemVariants}
           >
             <div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                 Filters
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Refine your design search
               </p>
             </div>
@@ -149,19 +148,20 @@ const FilterAside: React.FC<FilterAsideProps> = ({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="material-symbols-outlined text-xl">close</span>
+              <span className="material-symbols-outlined text-lg sm:text-xl">
+                close
+              </span>
             </motion.button>
           </motion.div>
 
-          {/* Price Type */}
           <motion.div variants={itemVariants}>
-            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white flex items-center gap-2">
-              <span className="material-symbols-outlined text-xl text-primary">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg sm:text-xl text-primary">
                 attach_money
               </span>
               Price Type
             </h3>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {[
                 {
                   value: "design",
@@ -176,7 +176,7 @@ const FilterAside: React.FC<FilterAsideProps> = ({
               ].map((option) => (
                 <motion.label
                   key={option.value}
-                  className={`relative flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                  className={`relative flex flex-col items-center p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-300 ${
                     priceType === option.value
                       ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
                       : "border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 hover:border-primary/50"
@@ -192,10 +192,10 @@ const FilterAside: React.FC<FilterAsideProps> = ({
                     onChange={handlePriceTypeChange}
                     className="sr-only"
                   />
-                  <span className="material-symbols-outlined text-2xl mb-2">
+                  <span className="material-symbols-outlined text-xl sm:text-2xl mb-1 sm:mb-2">
                     {option.icon}
                   </span>
-                  <span className="text-sm font-medium text-center">
+                  <span className="text-xs sm:text-sm font-medium text-center">
                     {option.label}
                   </span>
                 </motion.label>
@@ -203,22 +203,21 @@ const FilterAside: React.FC<FilterAsideProps> = ({
             </div>
           </motion.div>
 
-          {/* Price Range */}
           <motion.div variants={itemVariants}>
-            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white flex items-center gap-2">
-              <span className="material-symbols-outlined text-xl text-primary">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg sm:text-xl text-primary">
                 payments
               </span>
               Price Range
             </h3>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="relative flex-1">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex flex-col xs:flex-row items-center gap-2 sm:gap-3">
+                <div className="relative w-full">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs sm:text-sm">
                     trending_down
                   </span>
                   <input
-                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3 pl-10 pr-4 text-sm text-slate-800 dark:text-gray-100 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                    className="w-full rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-2.5 sm:py-3 pl-9 sm:pl-10 pr-3 sm:pr-4 text-xs sm:text-sm text-slate-800 dark:text-gray-100 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
                     placeholder="Min Price"
                     type="number"
                     value={minPrice}
@@ -228,12 +227,12 @@ const FilterAside: React.FC<FilterAsideProps> = ({
                     }}
                   />
                 </div>
-                <div className="relative flex-1">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                <div className="relative w-full">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs sm:text-sm">
                     trending_up
                   </span>
                   <input
-                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3 pl-10 pr-4 text-sm text-slate-800 dark:text-gray-100 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                    className="w-full rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-2.5 sm:py-3 pl-9 sm:pl-10 pr-3 sm:pr-4 text-xs sm:text-sm text-slate-800 dark:text-gray-100 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
                     placeholder="Max Price"
                     type="number"
                     value={maxPrice}
@@ -247,15 +246,14 @@ const FilterAside: React.FC<FilterAsideProps> = ({
             </div>
           </motion.div>
 
-          {/* Bedrooms */}
           <motion.div variants={itemVariants}>
-            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white flex items-center gap-2">
-              <span className="material-symbols-outlined text-xl text-primary">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg sm:text-xl text-primary">
                 bed
               </span>
               Bedrooms
             </h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1 sm:gap-2">
               {["Any", "1", "2", "3", "4+"].map((option) => (
                 <motion.button
                   key={option}
@@ -263,7 +261,7 @@ const FilterAside: React.FC<FilterAsideProps> = ({
                     setBedrooms(option);
                     setLocalChanges(true);
                   }}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
+                  className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${
                     bedrooms === option
                       ? "bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg shadow-primary/25"
                       : "bg-white/80 dark:bg-gray-800/80 text-slate-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:shadow-md"
@@ -277,11 +275,10 @@ const FilterAside: React.FC<FilterAsideProps> = ({
             </div>
           </motion.div>
 
-          {/* Architectural Style */}
           <motion.div variants={itemVariants}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
-                <span className="material-symbols-outlined text-xl text-primary">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-lg sm:text-xl text-primary">
                   styles
                 </span>
                 Architectural Style
@@ -290,11 +287,11 @@ const FilterAside: React.FC<FilterAsideProps> = ({
                 {styles.length} selected
               </span>
             </div>
-            <div className="space-y-3 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
+            <div className="space-y-2 sm:space-y-3 max-h-32 sm:max-h-48 overflow-y-auto pr-2 scrollbar-thin">
               {architecturalStyles.slice(0, 6).map((style) => (
                 <motion.label
                   key={style}
-                  className="flex items-center gap-3 p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 hover:border-primary/30 cursor-pointer transition-all duration-300 group"
+                  className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg sm:rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 hover:border-primary/30 cursor-pointer transition-all duration-300 group"
                   whileHover={{ x: 4 }}
                 >
                   <div className="relative">
@@ -307,20 +304,20 @@ const FilterAside: React.FC<FilterAsideProps> = ({
                       }
                     />
                     <div
-                      className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300 ${
+                      className={`w-4 h-4 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all duration-300 ${
                         styles.includes(style)
                           ? "bg-primary border-primary"
                           : "border-gray-300 dark:border-gray-600 group-hover:border-primary"
                       }`}
                     >
                       {styles.includes(style) && (
-                        <span className="material-symbols-outlined text-white text-sm">
+                        <span className="material-symbols-outlined text-white text-xs sm:text-sm">
                           check
                         </span>
                       )}
                     </div>
                   </div>
-                  <span className="text-sm text-slate-800 dark:text-gray-200 font-medium">
+                  <span className="text-xs sm:text-sm text-slate-800 dark:text-gray-200 font-medium">
                     {style}
                   </span>
                 </motion.label>
@@ -328,31 +325,32 @@ const FilterAside: React.FC<FilterAsideProps> = ({
             </div>
             <motion.button
               onClick={() => setIsCategoryModalOpen(true)}
-              className="w-full mt-3 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-primary hover:text-primary transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full mt-2 sm:mt-3 py-2 sm:py-2.5 rounded-lg sm:rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-primary hover:text-primary transition-all duration-300 flex items-center justify-center gap-2"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="material-symbols-outlined text-lg">add</span>
-              More Categories
+              <span className="material-symbols-outlined text-base sm:text-lg">
+                add
+              </span>
+              <span className="text-xs sm:text-sm">More Categories</span>
             </motion.button>
           </motion.div>
 
-          {/* Size Range */}
           <motion.div variants={itemVariants}>
-            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white flex items-center gap-2">
-              <span className="material-symbols-outlined text-xl text-primary">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg sm:text-xl text-primary">
                 square_foot
               </span>
               Size Range
-              <span className="text-sm font-normal text-primary ml-auto">
+              <span className="text-xs sm:text-sm font-normal text-primary ml-auto">
                 {minSize} - {maxSize} sq ft
               </span>
             </h3>
-            <div className="space-y-6">
-              <div className="relative py-4">
-                <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="relative py-3 sm:py-4">
+                <div className="relative h-1.5 sm:h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
                   <motion.div
-                    className="absolute h-2 bg-gradient-to-r from-primary to-blue-500 rounded-full"
+                    className="absolute h-1.5 sm:h-2 bg-gradient-to-r from-primary to-blue-500 rounded-full"
                     initial={false}
                     animate={{
                       left: `${(parseInt(minSize) / 5000) * 100}%`,
@@ -361,14 +359,14 @@ const FilterAside: React.FC<FilterAsideProps> = ({
                     transition={{ duration: 0.3 }}
                   />
                 </div>
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-4">
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-3 sm:mt-4">
                   <span>500 sq ft</span>
                   <span>5000 sq ft</span>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block">
+                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 sm:mb-2 block">
                     Min Size
                   </label>
                   <input
@@ -380,11 +378,11 @@ const FilterAside: React.FC<FilterAsideProps> = ({
                       setMinSize(e.target.value);
                       setLocalChanges(true);
                     }}
-                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 py-2.5 px-3 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                    className="w-full rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 py-2 sm:py-2.5 px-3 text-xs sm:text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block">
+                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 sm:mb-2 block">
                     Max Size
                   </label>
                   <input
@@ -396,31 +394,32 @@ const FilterAside: React.FC<FilterAsideProps> = ({
                       setMaxSize(e.target.value);
                       setLocalChanges(true);
                     }}
-                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 py-2.5 px-3 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                    className="w-full rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 py-2 sm:py-2.5 px-3 text-xs sm:text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
                   />
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Action Buttons */}
           <motion.div
-            className="flex gap-3 pt-4 border-t border-gray-200/60 dark:border-gray-700/60"
+            className="flex gap-2 sm:gap-3 pt-4 border-t border-gray-200/60 dark:border-gray-700/60"
             variants={itemVariants}
           >
             <motion.button
               onClick={handleClear}
-              className="flex-1 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-600 font-semibold text-slate-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-600 font-semibold text-slate-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="material-symbols-outlined text-lg">refresh</span>
-              Clear
+              <span className="material-symbols-outlined text-base sm:text-lg">
+                refresh
+              </span>
+              <span className="text-xs sm:text-sm">Clear</span>
             </motion.button>
             <motion.button
               onClick={handleApplyFilters}
               disabled={!localChanges}
-              className={`flex-1 py-3.5 rounded-xl font-semibold text-white transition-all duration-300 flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl font-semibold text-white transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 ${
                 localChanges
                   ? "bg-gradient-to-r from-primary to-blue-600 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 cursor-pointer"
                   : "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
@@ -428,14 +427,15 @@ const FilterAside: React.FC<FilterAsideProps> = ({
               whileHover={localChanges ? { scale: 1.02 } : {}}
               whileTap={localChanges ? { scale: 0.98 } : {}}
             >
-              <span className="material-symbols-outlined text-lg">check</span>
-              Apply
+              <span className="material-symbols-outlined text-base sm:text-lg">
+                check
+              </span>
+              <span className="text-xs sm:text-sm">Apply</span>
             </motion.button>
           </motion.div>
         </div>
       </motion.aside>
 
-      {/* Category Modal */}
       <CategoryModal
         isOpen={isCategoryModalOpen}
         onClose={() => setIsCategoryModalOpen(false)}

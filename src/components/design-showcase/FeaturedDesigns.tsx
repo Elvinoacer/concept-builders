@@ -1,4 +1,3 @@
-// FeaturedDesigns.tsx - Enhanced with smooth interactions
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -55,25 +54,25 @@ const FeaturedDesigns = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="mb-16 md:mb-20"
+      className="mb-12 sm:mb-16 md:mb-20"
     >
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+      <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between mb-6 sm:mb-8 gap-4">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
             Featured Designs
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base md:text-lg">
             Curated selection of exceptional architectural designs
           </p>
         </div>
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden sm:flex items-center gap-2">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => scroll(-400)}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all duration-300 shadow-lg hover:shadow-xl"
           >
-            <span className="material-symbols-outlined text-2xl">
+            <span className="material-symbols-outlined text-xl sm:text-2xl">
               chevron_left
             </span>
           </motion.button>
@@ -81,9 +80,9 @@ const FeaturedDesigns = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => scroll(400)}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all duration-300 shadow-lg hover:shadow-xl"
           >
-            <span className="material-symbols-outlined text-2xl">
+            <span className="material-symbols-outlined text-xl sm:text-2xl">
               chevron_right
             </span>
           </motion.button>
@@ -93,7 +92,7 @@ const FeaturedDesigns = () => {
       <div className="relative">
         <motion.div
           ref={scrollContainerRef}
-          className="flex snap-x snap-mandatory overflow-x-auto pb-8 -mx-4 px-4 gap-8 scrollbar-hide touch-pan-x"
+          className="flex snap-x snap-mandatory overflow-x-auto pb-6 -mx-3 xs:-mx-4 px-3 xs:px-4 gap-4 sm:gap-6 md:gap-8 scrollbar-hide touch-pan-x"
           whileInView="visible"
           initial="hidden"
           variants={containerVariants}
@@ -103,7 +102,7 @@ const FeaturedDesigns = () => {
               ? [...Array(5)].map((_, index) => (
                   <motion.div
                     key={index}
-                    className="w-[85%] sm:w-[48%] md:w-[32%] lg:w-[24%] flex-shrink-0 snap-start"
+                    className="w-[85%] xs:w-[75%] sm:w-[48%] md:w-[32%] lg:w-[24%] xl:w-[20%] flex-shrink-0 snap-start"
                     variants={containerVariants}
                   >
                     <DesignCardSkeleton index={index} />
@@ -112,7 +111,7 @@ const FeaturedDesigns = () => {
               : featuredDesigns.map((design: any, index) => (
                   <motion.div
                     key={design.id}
-                    className="w-[85%] sm:w-[48%] md:w-[32%] lg:w-[24%] flex-shrink-0 snap-start"
+                    className="w-[85%] xs:w-[75%] sm:w-[48%] md:w-[32%] lg:w-[24%] xl:w-[20%] flex-shrink-0 snap-start"
                     whileHover={{ y: -5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
@@ -126,8 +125,7 @@ const FeaturedDesigns = () => {
           </AnimatePresence>
         </motion.div>
 
-        {/* Scroll progress indicator */}
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-24 sm:w-32 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-primary"
             animate={{

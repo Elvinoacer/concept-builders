@@ -110,31 +110,28 @@ const DesignHeader = ({
 
   return (
     <motion.div
-      className="mb-8 md:mb-12 relative"
+      className="mb-6 sm:mb-8 md:mb-12 relative"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      {/* Background Decorative Elements */}
       <motion.div
-        className="absolute -top-8 -left-8 w-24 h-24 bg-primary/5 rounded-full blur-xl"
+        className="absolute -top-6 -left-6 sm:-top-8 sm:-left-8 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-primary/5 rounded-full blur-xl"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5, duration: 1 }}
       />
 
       <motion.div
-        className="absolute -bottom-4 -right-6 w-16 h-16 bg-blue-500/5 rounded-full blur-lg"
+        className="absolute -bottom-3 -right-4 sm:-bottom-4 sm:-right-6 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-blue-500/5 rounded-full blur-lg"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.7, duration: 1 }}
       />
 
-      {/* Main Content */}
       <div className="relative">
-        {/* Title */}
         <motion.h1
-          className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-4 sm:mb-6 leading-tight"
           variants={itemVariants}
         >
           <span className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 dark:from-white dark:via-gray-200 dark:to-gray-300 bg-clip-text text-transparent">
@@ -142,7 +139,6 @@ const DesignHeader = ({
           </span>
         </motion.h1>
 
-        {/* Description Container */}
         <motion.div className="relative" variants={itemVariants}>
           <motion.div
             className={`overflow-hidden relative ${
@@ -157,14 +153,13 @@ const DesignHeader = ({
                 : "expanded"
             }
           >
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed font-light">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed font-light">
               {description}
             </p>
 
-            {/* Gradient fade for truncated text */}
             {shouldTruncate && !isExpanded && (
               <motion.div
-                className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-gray-900 dark:via-gray-900/90"
+                className="absolute bottom-0 left-0 right-0 h-10 sm:h-12 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-gray-900 dark:via-gray-900/90"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
@@ -172,19 +167,18 @@ const DesignHeader = ({
             )}
           </motion.div>
 
-          {/* Expand/Collapse Button */}
           {shouldTruncate && (
             <motion.button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-2 mt-4 text-primary hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 group"
+              className="flex items-center gap-1 sm:gap-2 mt-3 sm:mt-4 text-primary hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 group"
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="text-sm font-medium">
+              <span className="text-xs sm:text-sm font-medium">
                 {isExpanded ? "Show less" : "Read more"}
               </span>
               <motion.span
-                className="material-symbols-outlined text-lg"
+                className="material-symbols-outlined text-base sm:text-lg"
                 animate={{ rotate: isExpanded ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
               >
@@ -194,31 +188,33 @@ const DesignHeader = ({
           )}
         </motion.div>
 
-        {/* Decorative Line */}
         <motion.div
-          className="w-20 h-1 bg-gradient-to-r from-primary to-blue-500 rounded-full mt-8"
+          className="w-12 sm:w-16 md:w-20 h-0.5 sm:h-1 bg-gradient-to-r from-primary to-blue-500 rounded-full mt-4 sm:mt-6 md:mt-8"
           initial={{ width: 0 }}
-          animate={{ width: "5rem" }}
+          animate={{ width: "3rem" }}
           transition={{ delay: 0.9, duration: 0.8, ease: "easeOut" }}
         />
       </div>
 
-      {/* Additional Info Badges */}
       <motion.div
-        className="flex flex-wrap gap-3 mt-6"
+        className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.1, duration: 0.6 }}
       >
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
-          <span className="material-symbols-outlined text-base">
+        <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium">
+          <span className="material-symbols-outlined text-sm sm:text-base">
             architecture
           </span>
-          Architectural Design
+          <span className="hidden xs:inline">Architectural Design</span>
+          <span className="xs:hidden">Arch Design</span>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium">
-          <span className="material-symbols-outlined text-base">draw</span>
-          Detailed Plans
+        <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs sm:text-sm font-medium">
+          <span className="material-symbols-outlined text-sm sm:text-base">
+            draw
+          </span>
+          <span className="hidden xs:inline">Detailed Plans</span>
+          <span className="xs:hidden">Plans</span>
         </div>
       </motion.div>
     </motion.div>
