@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 import { calculateItemTotal } from "@/lib/calculate-total";
 import { toast } from "sonner";
 import { Design, PackageOption } from "@/generated/prisma";
@@ -54,244 +54,266 @@ interface CartStore {
 }
 
 const useCartStore = create<CartStore>()(
-  devtools((set, get) => ({
-    cart: [],
-    cartId: null,
-    loading: true,
-    error: null,
-    appliedDiscountAmount: 0,
-    appliedDiscountId: null,
-    appliedDiscountCode: null,
+  devtools(
+    persist(
+      (set, get) => ({
+        cart: [],
+        cartId: null,
+        loading: true,
+        error: null,
+        appliedDiscountAmount: 0,
+        appliedDiscountId: null,
+        appliedDiscountCode: null,
 
-    setCart: (cart) => {
-      if (cart && cart.items) {
-        const newCartItems = cart.items.map((item) => {
-          if (item.id && !item.cartItemId) {
-            // Item from DB, map id to cartItemId
-            return { ...item, cartItemId: item.id };
-          }
-          return item; // Item already has cartItemId (from local state)
-        });
-        set({ cart: newCartItems, cartId: cart.id });
-      } else {
-        // Handle cases where cart is cleared or local storage is empty
-        set({ cart: cart ? cart.items : [], cartId: cart ? cart.id : null });
-      }
-    },
-    setLoading: (loading) => set({ loading }),
-    setError: (error) => set({ error }),
-    setAppliedDiscount: (amount, id, code) =>
-      set({
-        appliedDiscountAmount: amount,
-        appliedDiscountId: id,
-        appliedDiscountCode: code,
-      }),
-
-    cartCount: () => get().cart.length,
-    cartTotal: () =>
-      get().cart.reduce((total, item) => total + calculateItemTotal(item), 0),
-
-    fetchCart: async (status) => {
-      set({ loading: true, error: null });
-      if (status === "authenticated") {
-        try {
-          const response = await fetch("/api/cart/items");
-          if (response.ok) {
-            const fullCart = await response.json();
-            get().setCart(fullCart);
-          } else {
-            const errorData = await response.json();
-            set({ error: errorData.error || "Failed to fetch cart", cart: [] });
-          }
-        } catch (err: any) {
-          set({
-            error:
-              err.message ||
-              "An unexpected error occurred while fetching cart.",
-            cart: [],
-          });
-        } finally {
-          set({ loading: false });
-        }
-      } else {
-        try {
-          const cartFromStorage = JSON.parse(
-            localStorage.getItem("cart") || "[]"
-          );
-          if (Array.isArray(cartFromStorage)) {
-            set({ cart: cartFromStorage });
-          } else {
-            set({ cart: [] });
-          }
-        } catch (err) {
-          set({ cart: [] });
-        } finally {
-          set({ loading: false });
-        }
-      }
-    },
-
-    addToCart: (
-      design,
-      selectedFileTypes,
-      selectedExtras,
-      status
-    ) => {
-      const { cart, setCart } = get();
-
-      const newItem: CartItem = {
-        cartItemId:
-          status === "authenticated"
-            ? `temp-${Date.now()}`
-            : `local-${Date.now()}`,
-        design: design as any,
-        quantity: 1,
-        selectedFileTypes,
-        selectedExtras,
-      };
-
-      const existingItemIndex = cart.findIndex(
-        (item) =>
-          item.design.id === design.id &&
-          JSON.stringify(item.selectedFileTypes.sort()) ===
-            JSON.stringify(selectedFileTypes.sort()) &&
-          JSON.stringify(item.selectedExtras?.map((e) => e.id).sort() || []) ===
-            JSON.stringify(selectedExtras.map((e) => e.id).sort())
-      );
-
-      if (existingItemIndex > -1) {
-        toast.info("This item is already in your cart.");
-        return false;
-      }
-
-      if (status === "authenticated") {
-        // API call to add to cart
-        (async () => {
-          try {
-            const response = await fetch("/api/cart/items", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                designId: design.id,
-                selectedFileTypes,
-                selectedExtras,
-              }),
+        setCart: (cart) => {
+          if (cart && cart.items) {
+            const newCartItems = cart.items.map((item) => {
+              if (item.id && !item.cartItemId) {
+                // Item from DB, map id to cartItemId
+                return { ...item, cartItemId: item.id };
+              }
+              return item; // Item already has cartItemId (from local state)
             });
-
-            if (response.ok) {
-              const updatedCart = await response.json();
-              setCart(updatedCart);
-              toast.success("Added to cart!");
-            } else {
-              const errorData = await response.json();
-              toast.error(errorData.error || "Failed to add to cart.");
-            }
-          } catch (err) {
-            toast.error("An error occurred while adding to cart.");
-          }
-        })();
-      } else {
-        const newCart = [...cart, newItem];
-        setCart({ items: newCart, id: null });
-        localStorage.setItem("cart", JSON.stringify(newCart));
-        toast.success("Added to cart!");
-      }
-
-      return true;
-    },
-
-    removeItem: async (cartItemId, status) => {
-      const { cart, setCart, fetchCart } = get();
-
-      if (status === "authenticated") {
-        try {
-          const response = await fetch(`/api/cart/items/${cartItemId}`, {
-            method: "DELETE",
-          });
-
-          if (response.ok) {
-            const updatedCart = await response.json();
-            setCart(updatedCart);
-            toast.success("Removed from cart.");
+            set({ cart: newCartItems, cartId: cart.id });
           } else {
-            const errorData = await response.json();
-            toast.error(errorData.error || "Failed to remove item from cart.");
+            // Handle cases where cart is cleared or local storage is empty
+            set({ cart: cart ? cart.items : [], cartId: cart ? cart.id : null });
           }
-        } catch (err) {
-          toast.error("An error occurred while removing item from cart.");
-        }
-      } else {
-        const newCart = cart.filter((item) => item.cartItemId !== cartItemId);
-        setCart({ items: newCart, id: null });
-        localStorage.setItem("cart", JSON.stringify(newCart));
-        toast.success("Removed from cart.");
-      }
-    },
+        },
+        setLoading: (loading) => set({ loading }),
+        setError: (error) => set({ error }),
+        setAppliedDiscount: (amount, id, code) =>
+          set({
+            appliedDiscountAmount: amount,
+            appliedDiscountId: id,
+            appliedDiscountCode: code,
+          }),
 
-    updateItem: async (cartItemId, updates, status) => {
-      const { cart, setCart } = get();
+        cartCount: () => get().cart.length,
+        cartTotal: () =>
+          get().cart.reduce(
+            (total, item) => total + calculateItemTotal(item),
+            0
+          ),
 
-      if (status === "authenticated") {
-        try {
-          const response = await fetch(`/api/cart/items/${cartItemId}`,
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(updates),
+        fetchCart: async (status) => {
+          set({ loading: true, error: null });
+          if (status === "authenticated") {
+            try {
+              const response = await fetch("/api/cart/items");
+              if (response.ok) {
+                const fullCart = await response.json();
+                get().setCart(fullCart);
+              } else {
+                const errorData = await response.json();
+                set({
+                  error: errorData.error || "Failed to fetch cart",
+                  cart: [],
+                });
+              }
+            } catch (err: any) {
+              set({
+                error:
+                  err.message ||
+                  "An unexpected error occurred while fetching cart.",
+                cart: [],
+              });
+            } finally {
+              set({ loading: false });
             }
+          } else {
+            try {
+              const cartFromStorage = JSON.parse(
+                localStorage.getItem("cart") || "[]"
+              );
+              if (Array.isArray(cartFromStorage)) {
+                set({ cart: cartFromStorage });
+              } else {
+                set({ cart: [] });
+              }
+            } catch (err) {
+              set({ cart: [] });
+            } finally {
+              set({ loading: false });
+            }
+          }
+        },
+
+        addToCart: (
+          design,
+          selectedFileTypes,
+          selectedExtras,
+          status
+        ) => {
+          const { cart, setCart } = get();
+
+          const newItem: CartItem = {
+            cartItemId:
+              status === "authenticated"
+                ? `temp-${Date.now()}`
+                : `local-${Date.now()}`,
+            design: design as any,
+            quantity: 1,
+            selectedFileTypes,
+            selectedExtras,
+          };
+
+          const existingItemIndex = cart.findIndex(
+            (item) =>
+              item.design.id === design.id &&
+              JSON.stringify(item.selectedFileTypes.sort()) ===
+                JSON.stringify(selectedFileTypes.sort()) &&
+              JSON.stringify(
+                item.selectedExtras?.map((e) => e.id).sort() || []
+              ) === JSON.stringify(selectedExtras.map((e) => e.id).sort())
           );
 
-          if (response.ok) {
-            const updatedCart = await response.json();
-            setCart(updatedCart);
+          if (existingItemIndex > -1) {
+            toast.info("This item is already in your cart.");
+            return false;
+          }
+
+          if (status === "authenticated") {
+            // API call to add to cart
+            (async () => {
+              try {
+                const response = await fetch("/api/cart/items", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    designId: design.id,
+                    selectedFileTypes,
+                    selectedExtras,
+                  }),
+                });
+
+                if (response.ok) {
+                  const updatedCart = await response.json();
+                  setCart(updatedCart);
+                  toast.success("Added to cart!");
+                } else {
+                  const errorData = await response.json();
+                  toast.error(errorData.error || "Failed to add to cart.");
+                }
+              } catch (err) {
+                toast.error("An error occurred while adding to cart.");
+              }
+            })();
+          } else {
+            const newCart = [...cart, newItem];
+            setCart({ items: newCart, id: null });
+            localStorage.setItem("cart", JSON.stringify(newCart));
+            toast.success("Added to cart!");
+          }
+
+          return true;
+        },
+
+        removeItem: async (cartItemId, status) => {
+          const { cart, setCart, fetchCart } = get();
+
+          if (status === "authenticated") {
+            try {
+              const response = await fetch(`/api/cart/items/${cartItemId}`, {
+                method: "DELETE",
+              });
+
+              if (response.ok) {
+                const updatedCart = await response.json();
+                setCart(updatedCart);
+                toast.success("Removed from cart.");
+              } else {
+                const errorData = await response.json();
+                toast.error(
+                  errorData.error || "Failed to remove item from cart."
+                );
+              }
+            } catch (err) {
+              toast.error("An error occurred while removing item from cart.");
+            }
+          } else {
+            const newCart = cart.filter(
+              (item) => item.cartItemId !== cartItemId
+            );
+            setCart({ items: newCart, id: null });
+            localStorage.setItem("cart", JSON.stringify(newCart));
+            toast.success("Removed from cart.");
+          }
+        },
+
+        updateItem: async (cartItemId, updates, status) => {
+          const { cart, setCart } = get();
+
+          if (status === "authenticated") {
+            try {
+              const response = await fetch(
+                `/api/cart/items/${cartItemId}`,
+                {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(updates),
+                }
+              );
+
+              if (response.ok) {
+                const updatedCart = await response.json();
+                setCart(updatedCart);
+                toast.success("Cart updated.");
+              } else {
+                const errorData = await response.json();
+                toast.error(errorData.error || "Failed to update cart.");
+              }
+            } catch (err) {
+              toast.error("An error occurred while updating cart.");
+            }
+          } else {
+            const newCart = cart.map((item) =>
+              item.cartItemId === cartItemId ? { ...item, ...updates } : item
+            );
+            setCart({ items: newCart, id: null });
+            localStorage.setItem("cart", JSON.stringify(newCart));
             toast.success("Cart updated.");
-          } else {
-            const errorData = await response.json();
-            toast.error(errorData.error || "Failed to update cart.");
           }
-        } catch (err) {
-          toast.error("An error occurred while updating cart.");
-        }
-      } else {
-        const newCart = cart.map((item) =>
-          item.cartItemId === cartItemId ? { ...item, ...updates } : item
-        );
-        setCart({ items: newCart, id: null });
-        localStorage.setItem("cart", JSON.stringify(newCart));
-        toast.success("Cart updated.");
-      }
-    },
+        },
 
-    clearCart: (status) => {
-      set({ cart: [] });
-      if (status === "unauthenticated") {
-        localStorage.removeItem("cart");
-      }
-      toast.success("Cart cleared.");
-    },
-
-    syncCart: async () => {
-      const { cart } = get();
-      if (cart.length > 0) {
-        try {
-          const response = await fetch("/api/cart/sync", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(cart),
-          });
-
-          if (response.ok) {
+        clearCart: (status) => {
+          set({ cart: [] });
+          if (status === "unauthenticated") {
             localStorage.removeItem("cart");
-            window.dispatchEvent(new CustomEvent("cart-synced"));
-          } else {
-            console.error("Failed to sync guest cart:", await response.text());
           }
-        } catch (error) {
-          console.error("Error syncing guest cart:", error);
-        }
+          toast.success("Cart cleared.");
+        },
+
+        syncCart: async () => {
+          const { cart } = get();
+          if (cart.length > 0) {
+            try {
+              const response = await fetch("/api/cart/sync", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(cart),
+              });
+
+              if (response.ok) {
+                localStorage.removeItem("cart");
+                window.dispatchEvent(new CustomEvent("cart-synced"));
+              } else {
+                console.error(
+                  "Failed to sync guest cart:",
+                  await response.text()
+                );
+              }
+            } catch (error) {
+              console.error("Error syncing guest cart:", error);
+            }
+          }
+        },
+      }),
+      {
+        name: "cart-storage", // name of the item in the storage (must be unique)
       }
-    },
-  }))
+    )
+  )
 );
 
 export default useCartStore;
