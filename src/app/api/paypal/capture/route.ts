@@ -76,7 +76,12 @@ export async function POST(request: Request) {
         itemTotal += item.design.pdfAndCadPrice || 0;
       }
       if (item.selectedExtras) {
-        const extras = JSON.parse(item.selectedExtras as string);
+        let extras;
+        if (typeof item.selectedExtras === 'string') {
+          extras = JSON.parse(item.selectedExtras);
+        } else {
+          extras = item.selectedExtras;
+        }
         extras.forEach((extra: any) => {
           itemTotal += extra.price;
         });
