@@ -48,6 +48,8 @@ export async function GET(request: NextRequest) {
         where.status = {
           in: ["REFUND_REQUESTED", "REFUNDED"],
         };
+      } else if (status === "Completed") {
+        where.status = "PAID";
       } else {
         where.status = status.toUpperCase();
       }

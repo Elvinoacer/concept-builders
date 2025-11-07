@@ -8,7 +8,7 @@ const ProfileSettings = () => {
   const [userProfile, setUserProfile] = useState({
     fullName: "",
     email: "",
-    phoneNumber: "",
+    phone: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -22,7 +22,7 @@ const ProfileSettings = () => {
           setUserProfile({
             fullName: data.name || "",
             email: data.email || "",
-            phoneNumber: data.phoneNumber || "",
+            phone: data.phone || "",
           });
         } else {
           throw new Error("Failed to fetch profile");
@@ -163,9 +163,9 @@ const ProfileSettings = () => {
             <input
               className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-base h-12 px-4"
               id="phone-number"
-              name="phoneNumber"
+              name="phone"
               type="tel"
-              value={userProfile.phoneNumber}
+              value={userProfile.phone}
               onChange={handleChange}
               placeholder="Enter your phone number"
             />

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { RequirementStatus } from "@/generated/prisma";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, ArrowLeft, Loader2 } from "lucide-react";
 
 const CreateRequirementPage = () => {
   const router = useRouter();
@@ -54,80 +54,193 @@ const CreateRequirementPage = () => {
   };
 
   return (
-    <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8">
-      <header className="mb-8">
-        <h2 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight dark:text-white">
-          Create New Requirement
-        </h2>
-        <p className="text-gray-500 mt-1 dark:text-gray-400">
-          Add a new requirement for this project.
-        </p>
-      </header>
-
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto"
-      >
-        <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            rows={3}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          ></textarea>
-        </div>
-
-        <div className="mb-6">
-          <label
-            htmlFor="status"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Status
-          </label>
-          <select
-            id="status"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as RequirementStatus)}
-            required
-          >
-            {Object.values(RequirementStatus).map((s) => (
-              <option key={s} value={s}>
-                {s.replace(/_/g, " ")}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <motion.button
-          type="submit"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors flex items-center justify-center space-x-2"
-          disabled={loading}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 xs:p-4 sm:p-6 lg:p-8">
+      {/* Main Container */}
+      <div className="max-w-4xl mx-auto">
+        {/* Back Navigation */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-6 sm:mb-8 transition-colors group"
         >
-          {loading ? (
-            "Creating..."
-          ) : (
-            <>
-              <PlusCircle className="w-5 h-5" />
-              <span>Create Requirement</span>
-            </>
-          )}
-        </motion.button>
+          <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-translate-x-1" />
+          <span className="text-sm sm:text-base font-medium">
+            Back to Project
+          </span>
+        </button>
 
-        {error && (
-          <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
-        )}
-      </form>
+        {/* Header Section */}
+        <header className="mb-6 sm:mb-8 lg:mb-10">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-gray-900 dark:text-white font-bold leading-tight"
+          >
+            <span className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl block mb-2">
+              Create New Requirement
+            </span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-gray-600 dark:text-gray-400 mt-3 text-sm xs:text-base sm:text-lg max-w-3xl"
+          >
+            Define a new project requirement with a clear description and
+            initial status. Requirements help track project deliverables and
+            specifications.
+          </motion.p>
+        </header>
+
+        {/* Form Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+        >
+          <form onSubmit={handleSubmit} className="p-4 xs:p-6 sm:p-8">
+            <div className="space-y-6 sm:space-y-8">
+              {/* Description Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-semibold text-gray-900 dark:text-white sm:text-base"
+                >
+                  Requirement Description{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="description"
+                  rows={4}
+                  className="w-full px-4 py-3 sm:py-3.5 text-base sm:text-lg rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-vertical min-h-[140px] sm:min-h-[160px]"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                  placeholder="Describe the project requirement in detail. Be specific about deliverables, specifications, and acceptance criteria..."
+                />
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Provide a clear and detailed description of what needs to be
+                  delivered.
+                </p>
+              </div>
+
+              {/* Status Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="status"
+                  className="block text-sm font-semibold text-gray-900 dark:text-white sm:text-base"
+                >
+                  Initial Status <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="status"
+                  className="w-full px-4 py-3 sm:py-3.5 text-base sm:text-lg rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[48px] sm:min-h-[52px] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M2%200L0%202h4zm0%205L0%203h4z%22/%3E%3C/svg%3E')] bg-no-repeat bg-right-4 bg-center dark:bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M2%200L0%202h4zm0%205L0%203h4z%22/%3E%3C/svg%3E')]"
+                  value={status}
+                  onChange={(e) =>
+                    setStatus(e.target.value as RequirementStatus)
+                  }
+                  required
+                >
+                  {Object.values(RequirementStatus).map((s) => (
+                    <option key={s} value={s} className="text-base py-2">
+                      {s.replace(/_/g, " ")}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Set the initial status for this requirement.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+                {/* Cancel Button */}
+                <motion.button
+                  type="button"
+                  onClick={() => router.back()}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold py-3 sm:py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 min-h-[52px] sm:min-h-[56px] hover:bg-gray-300 dark:hover:bg-gray-600 order-2 sm:order-1"
+                >
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-base sm:text-lg">Cancel</span>
+                </motion.button>
+
+                {/* Submit Button */}
+                <motion.button
+                  type="submit"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold py-3 sm:py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 min-h-[52px] sm:min-h-[56px] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none order-1 sm:order-2"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                      <span className="text-base sm:text-lg">
+                        Creating Requirement...
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-base sm:text-lg">
+                        Create Requirement
+                      </span>
+                    </>
+                  )}
+                </motion.button>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"
+                >
+                  <p className="text-red-700 dark:text-red-400 text-center text-sm sm:text-base font-medium">
+                    {error}
+                  </p>
+                </motion.div>
+              )}
+            </div>
+          </form>
+        </motion.div>
+
+        {/* Additional Information Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6 sm:mt-8 p-4 xs:p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl"
+        >
+          <h3 className="text-lg sm:text-xl font-semibold text-blue-900 dark:text-blue-100 mb-2">
+            💡 Requirement Best Practices
+          </h3>
+          <ul className="text-sm sm:text-base text-blue-800 dark:text-blue-200 space-y-1">
+            <li className="flex items-start">
+              <span className="mr-2">•</span>
+              <span>Be specific and measurable in your description</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">•</span>
+              <span>Include acceptance criteria when possible</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">•</span>
+              <span>Consider dependencies and constraints</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">•</span>
+              <span>Set realistic status based on current progress</span>
+            </li>
+          </ul>
+        </motion.div>
+
+        {/* Bottom Spacing */}
+        <div className="h-6 sm:h-8 lg:h-12"></div>
+      </div>
     </div>
   );
 };

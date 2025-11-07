@@ -1,21 +1,20 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { ProjectStatus } from "@/generated/prisma";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  PlusCircle,
+  AlertCircle,
   ArrowLeft,
-  Upload,
-  User,
-  Image as ImageIcon,
-  FileText,
   BarChart3,
+  FileText,
+  Image as ImageIcon,
+  PlusCircle,
   Settings,
   Sparkles,
-  CheckCircle2,
-  AlertCircle,
+  Upload,
+  User,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 interface User {
   id: string;
@@ -69,8 +68,8 @@ const CreateProjectPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setLoading(true); // Indicate loading
-    setError(null); // Clear previous errors
+    setLoading(true);
+    setError(null);
 
     try {
       const formData = new FormData();
@@ -83,17 +82,19 @@ const CreateProjectPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
 
       const data = await response.json();
-      setImageUrl(data.url); // Set the uploaded URL
-      setImagePreview(data.url); // Update preview with the uploaded URL
+      setImageUrl(data.url);
+      setImagePreview(data.url);
     } catch (err: any) {
       console.error("Error uploading image:", err);
       setError(err.message || "Failed to upload image.");
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 
@@ -125,7 +126,6 @@ const CreateProjectPage = () => {
         );
       }
 
-      // Success animation before redirect
       await new Promise((resolve) => setTimeout(resolve, 1000));
       router.push("/admin/projects");
     } catch (err: any) {
@@ -154,42 +154,47 @@ const CreateProjectPage = () => {
 
   if (usersLoading) {
     return (
-      <div className="dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-950 min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center">
+      <div className="dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-950 min-h-screen p-3 xs:p-4 sm:p-6 md:p-8 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="text-center"
         >
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-500 dark:text-gray-400">Loading users...</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
+            Loading users...
+          </p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-950 min-h-screen p-4 sm:p-6 md:p-8">
+    <div className="dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-950 min-h-screen p-3 xs:p-4 sm:p-6 md:p-8">
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-6 sm:mb-8"
       >
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex flex-col xs:flex-row xs:items-center gap-3 xs:gap-4 mb-4">
           <button
             onClick={() => router.back()}
-            className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 group"
+            className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 group self-start"
+            aria-label="Go back"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-500 transition-colors" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-500 transition-colors" />
           </button>
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-600 to-cyan-500 dark:from-white dark:via-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-600 to-cyan-500 dark:from-white dark:via-blue-400 dark:to-cyan-400 bg-clip-text text-transparent break-words">
               Create New Project
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              Fill in the project details to get started with an amazing new
-              venture
+            <p className="text-gray-500 dark:text-gray-400 mt-1 sm:mt-2 flex items-center gap-2 text-sm sm:text-base">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="break-words">
+                Fill in the project details to get started with an amazing new
+                venture
+              </span>
             </p>
           </div>
         </div>
@@ -201,33 +206,33 @@ const CreateProjectPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
         >
           {/* Main Form Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Project Card */}
             <motion.div
               whileHover={{ scale: 1.005 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+              className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
             >
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                  <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Project Information
                 </h2>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    <FileText className="w-4 h-4" />
-                    Project Name *
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                    <FileText className="w-4 h-4 flex-shrink-0" />
+                    <span>Project Name *</span>
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter project name..."
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -236,13 +241,13 @@ const CreateProjectPage = () => {
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    <FileText className="w-4 h-4" />
-                    Description
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                    <FileText className="w-4 h-4 flex-shrink-0" />
+                    <span>Description</span>
                   </label>
                   <textarea
                     rows={4}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                     placeholder="Describe the project goals and objectives..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -254,13 +259,13 @@ const CreateProjectPage = () => {
             {/* Image Upload Card */}
             <motion.div
               whileHover={{ scale: 1.005 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+              className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
             >
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                  <ImageIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                  <ImageIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Project Image
                 </h2>
               </div>
@@ -271,21 +276,21 @@ const CreateProjectPage = () => {
                     <img
                       src={imagePreview}
                       alt="Project preview"
-                      className="w-full h-48 object-cover rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600"
+                      className="w-full h-32 xs:h-40 sm:h-48 object-cover rounded-lg sm:rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600"
                     />
                     <button
                       type="button"
                       onClick={() => setImagePreview("")}
-                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 p-1 sm:p-2 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity text-xs sm:text-sm"
                     >
-                      <Upload className="w-4 h-4" />
+                      <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-colors duration-200 group">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-8 h-8 mb-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                  <label className="flex flex-col items-center justify-center w-full h-32 xs:h-40 sm:h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-colors duration-200 group">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
+                      <Upload className="w-6 h-6 sm:w-8 sm:h-8 mb-2 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                      <p className="mb-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                         <span className="font-semibold">Click to upload</span>{" "}
                         or drag and drop
                       </p>
@@ -303,13 +308,13 @@ const CreateProjectPage = () => {
                 )}
 
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    <ImageIcon className="w-4 h-4" />
-                    Or enter image URL
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                    <ImageIcon className="w-4 h-4 flex-shrink-0" />
+                    <span>Or enter image URL</span>
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="https://example.com/image.jpg"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
@@ -320,27 +325,27 @@ const CreateProjectPage = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Client Assignment Card */}
             <motion.div
               whileHover={{ scale: 1.02 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+              className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
             >
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                  <User className="w-6 h-6 text-green-600 dark:text-green-400" />
+                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Assign Client
                 </h2>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                   Select Client *
                 </label>
                 <select
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,<svg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%205%22><path%20fill%3D%22%236B7280%22%20d%3D%22M2%200L0%202h4zm0%205L0%203h4z%22%2F><%2Fsvg>')] bg-no-repeat bg-right-4 bg-center bg-size-4"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,<svg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%205%22><path%20fill%3D%22%236B7280%22%20d%3D%22M2%200L0%202h4zm0%205L0%203h4z%22%2F><%2Fsvg>')] bg-no-repeat bg-right-3 bg-center bg-size-3 sm:bg-right-4 sm:bg-size-4"
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
                   required
@@ -357,25 +362,25 @@ const CreateProjectPage = () => {
             {/* Project Settings Card */}
             <motion.div
               whileHover={{ scale: 1.02 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+              className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
             >
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
-                  <Settings className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                  <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 dark:text-orange-400" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Project Settings
                 </h2>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    <BarChart3 className="w-4 h-4" />
-                    Status *
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                    <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                    <span>Status *</span>
                   </label>
                   <select
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     value={status}
                     onChange={(e) => setStatus(e.target.value as ProjectStatus)}
                     required
@@ -388,7 +393,7 @@ const CreateProjectPage = () => {
                   </select>
                   <div className="mt-2">
                     <span
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}
+                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}
                     >
                       {status.replace(/_/g, " ")}
                     </span>
@@ -396,18 +401,18 @@ const CreateProjectPage = () => {
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    <BarChart3 className="w-4 h-4" />
-                    Progress: {progress}%
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                    <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                    <span>Progress: {progress}%</span>
                   </label>
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     <input
                       type="range"
                       min="0"
                       max="100"
                       value={progress}
                       onChange={(e) => setProgress(parseInt(e.target.value))}
-                      className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500"
+                      className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 sm:[&::-webkit-slider-thumb]:h-4 sm:[&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500"
                     />
                     <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                       <span>0%</span>
@@ -425,18 +430,18 @@ const CreateProjectPage = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 hover:from-blue-700 hover:via-purple-700 hover:to-cyan-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden"
+              className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 hover:from-blue-700 hover:via-purple-700 hover:to-cyan-600 text-white py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 group relative overflow-hidden text-sm sm:text-base"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
 
               {loading ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
                   <span>Creating Project...</span>
                 </>
               ) : (
                 <>
-                  <PlusCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
                   <span>Create Project</span>
                 </>
               )}
@@ -448,10 +453,10 @@ const CreateProjectPage = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-400"
+                  className="flex items-start gap-3 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-400"
                 >
-                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  <p className="text-sm">{error}</p>
+                  <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm break-words">{error}</p>
                 </motion.div>
               )}
             </AnimatePresence>

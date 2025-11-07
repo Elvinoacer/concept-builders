@@ -1,7 +1,7 @@
 "use client";
 import AdminSidebar from "@/components/admin/dashboard/AdminSidebar";
 import AdminHeader from "@/components/admin/dashboard/AdminHeader";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function AdminLayout({
   children,
@@ -10,18 +10,63 @@ export default function AdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile devices and auto-manage sidebar states
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+
+      if (mobile) {
+        // On mobile, close desktop sidebar and ensure mobile sidebar is closed initially
+        setIsDesktopSidebarOpen(false);
+      } else {
+        // On desktop, ensure mobile sidebar is closed
+        setSidebarOpen(false);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Close mobile sidebar when clicking on main content
+  const handleMainContentClick = () => {
+    if (isMobile && sidebarOpen) {
+      setSidebarOpen(false);
+    }
+  };
 
   return (
-    <div className={`flex h-screen w-full bg-gray-50 dark:bg-gray-900 group/design-root overflow-hidden transition-all duration-300 ease-linear ${isDesktopSidebarOpen ? '' : ''}`}>
-      <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isDesktopSidebarOpen={isDesktopSidebarOpen} setIsDesktopSidebarOpen={setIsDesktopSidebarOpen} />
-      <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+    <div
+      className={`flex h-screen w-full bg-gray-50 dark:bg-gray-900 group/design-root overflow-hidden transition-all duration-300 ease-linear ${
+        isDesktopSidebarOpen && !isMobile ? "pl-0" : "pl-0"
+      }`}
+      onClick={handleMainContentClick}
+    >
+      <AdminSidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        isDesktopSidebarOpen={isDesktopSidebarOpen}
+        setIsDesktopSidebarOpen={setIsDesktopSidebarOpen}
+        isMobile={isMobile}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex flex-1 flex-col min-w-0 transition-all duration-300">
         <AdminHeader
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           isDesktopSidebarOpen={isDesktopSidebarOpen}
           setIsDesktopSidebarOpen={setIsDesktopSidebarOpen}
+          isMobile={isMobile}
         />
-        <main className="flex-1 p-4">{children}</main>
+
+        <main className="flex-1 overflow-y-auto p-3 min-[375px]:p-4 sm:p-5 md:p-6 lg:p-8 w-full">
+          <div className="w-full max-w-full mx-auto">{children}</div>
+        </main>
       </div>
     </div>
   );

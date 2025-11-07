@@ -3,13 +3,19 @@ import { SearchProvider } from "@/lib/SearchContext";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <SearchProvider>
-      <Header />
-      <main>{children}</main>
-      <Toaster />
-      <Footer />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 w-full">{children}</main>
+        <Toaster />
+        <Footer />
+      </div>
     </SearchProvider>
   );
 }

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import PhoneNumberModal from "@/components/dashboard/PhoneNumberModal";
 
 const DashboardPage = () => {
   const { data: session } = useSession();
@@ -27,6 +28,45 @@ const DashboardPage = () => {
   const [activeView, setActiveView] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showPhoneNumberModal, setShowPhoneNumberModal] = useState(false);
+
+  useEffect(() => {
+    const checkPhoneNumber = async () => {
+      if (session?.user) {
+        // @ts-ignore
+        if (!session.user.phone) {
+          const hasDismissed = localStorage.getItem("hasDismissedPhoneModal");
+          if (!hasDismissed) {
+            setShowPhoneNumberModal(true);
+          }
+        }
+      }
+    };
+
+    checkPhoneNumber();
+  }, [session]);
+
+  const handlePhoneNumberSubmit = async (phoneNumber: string) => {
+    try {
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phoneNumber }),
+      });
+      if (response.ok) {
+        setShowPhoneNumberModal(false);
+        // Optionally, you can update the session data here to reflect the change immediately
+      } else {
+        console.error("Failed to update phone number");
+      }
+    } catch (error) {
+      console.error("Error updating phone number:", error);
+    }
+  };
+
+  const handleModalClose = () => {
+    setShowPhoneNumberModal(false);
+  };
 
   // Detect screen size
   useEffect(() => {
@@ -378,6 +418,11 @@ const DashboardPage = () => {
           )}
         </AnimatePresence>
       </div>
+      <PhoneNumberModal
+        isOpen={showPhoneNumberModal}
+        onClose={handleModalClose}
+        onSubmit={handlePhoneNumberSubmit}
+      />
     </div>
   );
 };

@@ -129,3 +129,93 @@
     animation-duration: 60s;
   }
 }
+
+/* Phone Input Custom Styles */
+.phone-input-custom {
+  width: 100%;
+}
+
+.phone-input-custom .PhoneInputInput {
+  width: 100%;
+  height: 56px;
+  padding: 0 16px;
+  font-size: 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  background: #f9fafb;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.phone-input-custom .PhoneInputInput:focus {
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.phone-input-custom .PhoneInputInput:disabled {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.phone-input-custom .PhoneInputCountry {
+  margin-right: 12px;
+  padding: 0 12px;
+  border-right: 2px solid #e5e7eb;
+}
+
+.phone-input-custom .PhoneInputCountrySelect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.phone-input-custom .PhoneInputCountryIcon {
+  width: 24px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.phone-input-custom .PhoneInputCountrySelectArrow {
+  display: inline-block;
+  margin-left: 8px;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #6b7280;
+}
+
+/* Dark mode styles */
+.dark .phone-input-custom .PhoneInputInput {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+.dark .phone-input-custom .PhoneInputInput:focus {
+  background: #1f2937;
+  border-color: #3b82f6;
+}
+
+.dark .phone-input-custom .PhoneInputInput:disabled {
+  background: #4b5563;
+  border-color: #6b7280;
+  color: #9ca3af;
+}
+
+.dark .phone-input-custom .PhoneInputCountry {
+  border-right-color: #4b5563;
+}
+
+.dark .phone-input-custom .PhoneInputCountrySelectArrow {
+  border-top-color: #9ca3af;
+}

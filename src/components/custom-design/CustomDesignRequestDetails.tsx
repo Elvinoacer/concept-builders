@@ -17,12 +17,23 @@ import {
   CustomDesignRequest,
   CustomDesignRequestStatus,
 } from "@/generated/prisma";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText,
   Image as ImageIcon,
   Trash2,
   UploadCloud,
+  Edit3,
+  X,
+  Save,
+  Loader2,
+  User,
+  Mail,
+  Phone,
+  Building,
+  FileEdit,
+  DollarSign,
+  Calendar,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -186,18 +197,18 @@ const CustomDesignRequestDetails: React.FC<CustomDesignRequestDetailsProps> = ({
     const extension = fileName.split(".").pop()?.toLowerCase();
     switch (extension) {
       case "pdf":
-        return <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />;
+        return <FileText className="h-4 w-4 text-red-500" />;
       case "doc":
       case "docx":
-        return <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />;
+        return <FileText className="h-4 w-4 text-blue-500" />;
       case "jpg":
       case "jpeg":
       case "png":
       case "gif":
       case "webp":
-        return <ImageIcon className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />;
+        return <ImageIcon className="h-4 w-4 text-green-500" />;
       default:
-        return <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />;
+        return <FileText className="h-4 w-4 text-gray-500" />;
     }
   };
 
@@ -231,278 +242,333 @@ const CustomDesignRequestDetails: React.FC<CustomDesignRequestDetailsProps> = ({
     }
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getStatusColor = (status: CustomDesignRequestStatus) => {
+    switch (status) {
+      case "COMPLETED":
+        return "bg-green-500 hover:bg-green-600";
+      case "IN_PROGRESS":
+        return "bg-blue-500 hover:bg-blue-600";
+      case "PENDING":
+        return "bg-yellow-500 hover:bg-yellow-600";
+      case "CANCELLED":
+        return "bg-red-500 hover:bg-red-600";
+      default:
+        return "bg-gray-500 hover:bg-gray-600";
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-full mx-auto py-4 sm:py-6 md:py-8 lg:py-12 px-3 sm:px-4 md:px-6"
+      className="w-full max-w-full mx-auto py-3 sm:py-4 md:py-6 px-3 sm:px-4 md:px-6"
     >
-      <Card className="bg-white dark:bg-gray-800 shadow-lg sm:shadow-xl md:shadow-2xl rounded-xl sm:rounded-2xl md:rounded-3xl border-gray-200 dark:border-gray-700">
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 md:p-8 border-b border-gray-200 dark:border-gray-700 space-y-4 sm:space-y-0">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="bg-gradient-to-br from-blue-500 to-cyan-400 p-2 sm:p-3 rounded-full">
-              <span className="material-symbols-outlined text-white text-2xl sm:text-3xl md:text-4xl">
-                edit_document
-              </span>
+      <Card className="bg-white dark:bg-gray-800 shadow-sm sm:shadow-md md:shadow-lg rounded-xl border border-gray-200 dark:border-gray-700">
+        {/* Header */}
+        <CardHeader className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col xs:flex-row xs:items-start xs:justify-between gap-4">
+            <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+              <div className="bg-gradient-to-br from-blue-500 to-cyan-400 p-2 sm:p-3 rounded-xl flex-shrink-0">
+                <FileEdit className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight truncate">
+                  Design Request
+                </CardTitle>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
+                  <Badge variant="outline" className="text-xs">
+                    #{request.id.substring(0, 8)}
+                  </Badge>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Calendar className="w-3 h-3" />
+                    <span>{formatDate(request.createdAt)}</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <CardTitle className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold sm:font-extrabold text-gray-900 dark:text-white leading-tight">
-                Custom Design Request
-              </CardTitle>
-              <p className="text-sm sm:text-base md:text-lg text-gray-500 dark:text-gray-400 mt-1">
-                #{request.id.substring(0, 8)}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col xs:flex-row items-start xs:items-center gap-3 sm:gap-4 w-full xs:w-auto">
-            <Badge
-              className={`text-xs sm:text-sm md:text-base px-3 py-1.5 sm:px-4 sm:py-2 ${currentStatus === "COMPLETED" ? "bg-green-500" : "bg-yellow-500"} w-fit`}
-            >
-              {currentStatus.replace(/_/g, " ")}
-            </Badge>
-            {isAdmin ? (
-              <Select
-                value={currentStatus}
-                onValueChange={handleStatusChange}
-                disabled={loading}
+
+            <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 sm:gap-3 w-full xs:w-auto">
+              <Badge
+                className={`text-xs px-3 py-1.5 ${getStatusColor(currentStatus)}`}
               >
-                <SelectTrigger className="w-full xs:w-[140px] sm:w-[160px] md:w-[180px] h-9 sm:h-10 md:h-12 text-sm sm:text-base">
-                  <SelectValue placeholder="Update Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(CustomDesignRequestStatus).map(
-                    (statusOption) => (
-                      <SelectItem
-                        key={statusOption}
-                        value={statusOption}
-                        className="text-sm sm:text-base"
-                      >
-                        {statusOption.replace(/_/g, " ")}
-                      </SelectItem>
-                    )
+                {currentStatus.replace(/_/g, " ")}
+              </Badge>
+
+              {isAdmin ? (
+                <Select
+                  value={currentStatus}
+                  onValueChange={handleStatusChange}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="w-full xs:w-[140px] h-9 text-sm">
+                    <SelectValue placeholder="Update Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(CustomDesignRequestStatus).map(
+                      (statusOption) => (
+                        <SelectItem
+                          key={statusOption}
+                          value={statusOption}
+                          className="text-sm"
+                        >
+                          {statusOption.replace(/_/g, " ")}
+                        </SelectItem>
+                      )
+                    )}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Button
+                  onClick={() => setIsEditing(!isEditing)}
+                  variant={isEditing ? "outline" : "default"}
+                  size="sm"
+                  className="w-full xs:w-auto h-9 text-sm"
+                >
+                  {isEditing ? (
+                    <>
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </>
+                  ) : (
+                    <>
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Edit
+                    </>
                   )}
-                </SelectContent>
-              </Select>
-            ) : (
-              <Button
-                onClick={() => setIsEditing(!isEditing)}
-                variant="outline"
-                className="h-9 sm:h-10 md:h-12 px-3 sm:px-4 md:px-6 text-sm sm:text-base w-full xs:w-auto"
-              >
-                {isEditing ? "Cancel" : "Edit Request"}
-              </Button>
-            )}
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
 
-        <CardContent className="p-4 sm:p-6 md:p-8">
+        <CardContent className="p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label
-                  htmlFor="name"
-                  className="text-sm sm:text-base md:text-lg font-semibold"
-                >
-                  Full Name
-                </Label>
-                <Input
-                  id="name"
-                  value={request.name}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                  required
-                  className="h-9 sm:h-10 md:h-12 text-sm sm:text-base md:text-lg"
-                />
-              </div>
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label
-                  htmlFor="email"
-                  className="text-sm sm:text-base md:text-lg font-semibold"
-                >
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  value={request.email}
-                  readOnly
-                  required
-                  className="h-9 sm:h-10 md:h-12 text-sm sm:text-base md:text-lg"
-                />
-              </div>
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label
-                  htmlFor="phone"
-                  className="text-sm sm:text-base md:text-lg font-semibold"
-                >
-                  Phone Number
-                </Label>
-                <Input
-                  id="phone"
-                  value={request.phone || ""}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                  className="h-9 sm:h-10 md:h-12 text-sm sm:text-base md:text-lg"
-                />
-              </div>
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label
-                  htmlFor="designType"
-                  className="text-sm sm:text-base md:text-lg font-semibold"
-                >
-                  Type of Design
-                </Label>
-                {isEditing ? (
-                  <Select
-                    value={request.designType}
-                    onValueChange={handleSelectChange}
-                    required
+            {/* Basic Information Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              {/* Left Column - Personal Info */}
+              <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="name"
+                    className="text-sm font-semibold flex items-center gap-2"
                   >
-                    <SelectTrigger className="h-9 sm:h-10 md:h-12 text-sm sm:text-base md:text-lg">
-                      <SelectValue placeholder="Select design type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem
-                        value="Residential"
-                        className="text-sm sm:text-base"
-                      >
-                        Residential
-                      </SelectItem>
-                      <SelectItem
-                        value="Commercial"
-                        className="text-sm sm:text-base"
-                      >
-                        Commercial
-                      </SelectItem>
-                      <SelectItem
-                        value="Renovation"
-                        className="text-sm sm:text-base"
-                      >
-                        Renovation
-                      </SelectItem>
-                      <SelectItem
-                        value="Other"
-                        className="text-sm sm:text-base"
-                      >
-                        Other
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
+                    <User className="w-4 h-4" />
+                    Full Name
+                  </Label>
                   <Input
-                    id="designType"
-                    value={request.designType}
-                    readOnly
-                    className="h-9 sm:h-10 md:h-12 text-sm sm:text-base md:text-lg"
+                    id="name"
+                    value={request.name}
+                    onChange={handleInputChange}
+                    readOnly={!isEditing}
+                    required
+                    className="h-10 text-sm"
                   />
-                )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="email"
+                    className="text-sm font-semibold flex items-center gap-2"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    value={request.email}
+                    readOnly
+                    required
+                    className="h-10 text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="phone"
+                    className="text-sm font-semibold flex items-center gap-2"
+                  >
+                    <Phone className="w-4 h-4" />
+                    Phone Number
+                  </Label>
+                  <Input
+                    id="phone"
+                    value={request.phone || ""}
+                    onChange={handleInputChange}
+                    readOnly={!isEditing}
+                    className="h-10 text-sm"
+                  />
+                </div>
               </div>
-              <div className="md:col-span-2 space-y-1.5 sm:space-y-2">
-                <Label
-                  htmlFor="description"
-                  className="text-sm sm:text-base md:text-lg font-semibold"
-                >
-                  Project Description
-                </Label>
-                <Textarea
-                  id="description"
-                  value={request.description}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                  rows={4}
-                  className="text-sm sm:text-base md:text-lg min-h-[100px] sm:min-h-[120px] md:min-h-[140px]"
-                  required
-                />
-              </div>
-              <div className="md:col-span-2 space-y-1.5 sm:space-y-2">
-                <Label
-                  htmlFor="budget"
-                  className="text-sm sm:text-base md:text-lg font-semibold"
-                >
-                  Estimated Budget
-                </Label>
-                <Input
-                  id="budget"
-                  value={request.budget || ""}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                  className="h-9 sm:h-10 md:h-12 text-sm sm:text-base md:text-lg"
-                />
+
+              {/* Right Column - Project Info */}
+              <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="designType"
+                    className="text-sm font-semibold flex items-center gap-2"
+                  >
+                    <Building className="w-4 h-4" />
+                    Type of Design
+                  </Label>
+                  {isEditing ? (
+                    <Select
+                      value={request.designType}
+                      onValueChange={handleSelectChange}
+                      required
+                    >
+                      <SelectTrigger className="h-10 text-sm">
+                        <SelectValue placeholder="Select design type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Residential">Residential</SelectItem>
+                        <SelectItem value="Commercial">Commercial</SelectItem>
+                        <SelectItem value="Renovation">Renovation</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      id="designType"
+                      value={request.designType}
+                      readOnly
+                      className="h-10 text-sm"
+                    />
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="budget"
+                    className="text-sm font-semibold flex items-center gap-2"
+                  >
+                    <DollarSign className="w-4 h-4" />
+                    Estimated Budget
+                  </Label>
+                  <Input
+                    id="budget"
+                    value={request.budget || ""}
+                    onChange={handleInputChange}
+                    readOnly={!isEditing}
+                    className="h-10 text-sm"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="space-y-3 sm:space-y-4">
-              <Label className="text-sm sm:text-base md:text-lg font-semibold">
-                Attachments
+            {/* Project Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm font-semibold">
+                Project Description
               </Label>
-              {request.attachments.length === 0 && newFiles.length === 0 && (
-                <div className="text-center py-8 sm:py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl">
-                  <span className="material-symbols-outlined text-4xl sm:text-5xl md:text-6xl text-gray-400 dark:text-gray-500">
-                    cloud_off
-                  </span>
-                  <p className="text-gray-500 dark:text-gray-400 mt-2 sm:mt-4 text-sm sm:text-base md:text-lg">
-                    No attachments provided.
-                  </p>
-                </div>
-              )}
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-                {request.attachments.map((url, index) => (
-                  <div
-                    key={index}
-                    className="relative group flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 md:p-4 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex-shrink-0">{getFileIcon(url)}</div>
-                    <a
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 text-xs sm:text-sm md:text-base text-blue-600 hover:underline truncate"
-                    >
-                      {getFileNameFromUrl(url)}
-                    </a>
-                    {!isAdmin && isEditing && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleExistingFileRemove(url)}
-                        className="absolute top-1 right-1 sm:top-2 sm:right-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                        disabled={loading}
-                      >
-                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-                {newFiles.map((file, index) => (
-                  <div
-                    key={file.name + index}
-                    className="relative group flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 md:p-4 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl bg-gray-50 dark:bg-gray-700/50"
-                  >
-                    <div className="flex-shrink-0">
-                      {getFileIcon(file.name)}
-                    </div>
-                    <span className="flex-1 text-xs sm:text-sm md:text-base truncate">
-                      {file.name}
-                    </span>
-                    {!isAdmin && isEditing && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleNewFileRemove(file)}
-                        className="absolute top-1 right-1 sm:top-2 sm:right-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <Textarea
+                id="description"
+                value={request.description}
+                onChange={handleInputChange}
+                readOnly={!isEditing}
+                rows={4}
+                className="text-sm min-h-[120px] resize-none"
+                required
+                placeholder="Describe your project requirements, preferences, and any specific details..."
+              />
+            </div>
 
+            {/* Attachments Section */}
+            <div className="space-y-4">
+              <Label className="text-sm font-semibold">
+                Attachments ({request.attachments.length + newFiles.length})
+              </Label>
+
+              <AnimatePresence>
+                {request.attachments.length === 0 && newFiles.length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
+                  >
+                    <UploadCloud className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                      No attachments provided
+                    </p>
+                  </motion.div>
+                ) : (
+                  <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {request.attachments.map((url, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="relative group flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-sm transition-shadow"
+                      >
+                        {getFileIcon(url)}
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 text-sm text-blue-600 hover:underline truncate"
+                        >
+                          {getFileNameFromUrl(url)}
+                        </a>
+                        {!isAdmin && isEditing && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleExistingFileRemove(url)}
+                            className="h-6 w-6 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                            disabled={loading}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </motion.div>
+                    ))}
+                    {newFiles.map((file, index) => (
+                      <motion.div
+                        key={file.name + index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="relative group flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/50"
+                      >
+                        {getFileIcon(file.name)}
+                        <span className="flex-1 text-sm truncate">
+                          {file.name}
+                        </span>
+                        {!isAdmin && isEditing && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleNewFileRemove(file)}
+                            className="h-6 w-6 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </AnimatePresence>
+
+              {/* File Upload Area */}
               {!isAdmin && isEditing && (
-                <div
-                  className={`mt-4 sm:mt-6 flex justify-center px-4 sm:px-6 py-6 sm:py-8 md:py-10 border-2 sm:border-4 border-dashed rounded-lg sm:rounded-xl md:rounded-2xl transition-colors ${
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className={`mt-4 flex justify-center px-4 py-6 border-2 border-dashed rounded-lg transition-colors ${
                     isDragOver
                       ? "border-blue-500 bg-blue-500/10"
                       : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
@@ -511,44 +577,60 @@ const CustomDesignRequestDetails: React.FC<CustomDesignRequestDetailsProps> = ({
                   onDragLeave={onDragLeave}
                   onDrop={onDrop}
                 >
-                  <div className="space-y-1 sm:space-y-2 text-center">
+                  <div className="text-center">
                     <UploadCloud
-                      className={`mx-auto h-8 w-8 sm:h-12 sm:w-12 md:h-16 md:w-16 ${isDragOver ? "text-blue-500" : "text-gray-400"}`}
+                      className={`mx-auto h-8 w-8 mb-2 ${isDragOver ? "text-blue-500" : "text-gray-400"}`}
                     />
-                    <div className="flex flex-col xs:flex-row items-center justify-center text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 space-y-1 xs:space-y-0">
+                    <div className="flex flex-col xs:flex-row items-center justify-center text-sm text-gray-600 dark:text-gray-400 space-y-1 xs:space-y-0">
                       <label
                         htmlFor="file-upload"
-                        className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                        className="cursor-pointer font-medium text-blue-600 hover:text-blue-700"
                       >
-                        <span>Upload more files</span>
-                        <Input
-                          id="file-upload"
-                          type="file"
-                          className="sr-only"
-                          onChange={handleFileChange}
-                          multiple
-                        />
+                        Upload files
                       </label>
-                      <p className="xs:pl-1">or drag and drop</p>
+                      <Input
+                        id="file-upload"
+                        type="file"
+                        className="sr-only"
+                        onChange={handleFileChange}
+                        multiple
+                      />
+                      <span className="xs:pl-1">or drag and drop</span>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                      PNG, JPG, GIF, PDF, DOCX up to 10MB
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Supports images, PDFs, and documents up to 10MB
                     </p>
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>
 
+            {/* Submit Button */}
             {!isAdmin && isEditing && (
-              <div className="flex justify-end pt-4 sm:pt-6">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700"
+              >
                 <Button
                   type="submit"
-                  className="h-10 sm:h-12 md:h-14 px-4 sm:px-6 md:px-8 text-sm sm:text-base md:text-lg w-full sm:w-auto"
+                  size="lg"
+                  className="w-full sm:w-auto"
                   disabled={loading}
                 >
-                  {loading ? "Saving..." : "Save Changes"}
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
                 </Button>
-              </div>
+              </motion.div>
             )}
           </form>
         </CardContent>

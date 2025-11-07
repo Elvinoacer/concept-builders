@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { MilestoneStatus } from "@/generated/prisma";
-import { Edit } from "lucide-react";
+import { Edit, ArrowLeft, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 
 interface Milestone {
@@ -104,146 +104,221 @@ const EditMilestonePage = () => {
 
   if (milestoneLoading) {
     return (
-      <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center">
-        <p className="text-gray-500 dark:text-gray-400">
-          Loading milestone data...
-        </p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 xs:p-4 sm:p-6 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+          <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg text-center">
+            Loading milestone data...
+          </p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center">
-        <p className="text-red-500 dark:text-red-400">Error: {error}</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 xs:p-4 sm:p-6 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+          <p className="text-red-500 dark:text-red-400 text-lg sm:text-xl font-medium mb-4">
+            Error Loading Milestone
+          </p>
+          <p className="text-gray-600 dark:text-gray-400 text-base mb-6">
+            {error}
+          </p>
+          <button
+            onClick={() => router.back()}
+            className="w-full bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Go Back</span>
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="dark:bg-gray-900 min-h-screen p-4 sm:p-6 md:p-8">
-      <header className="mb-8">
-        <h2 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight dark:text-white">
-          Edit Milestone: {name}
-        </h2>
-        <p className="text-gray-500 mt-1 dark:text-gray-400">
-          Modify the details of this milestone.
-        </p>
-      </header>
-
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm max-w-2xl mx-auto"
-      >
-        <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Milestone Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            rows={3}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          ></textarea>
-        </div>
-
-        <div className="mb-4">
-          <label
-            htmlFor="dueDate"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Due Date
-          </label>
-          <input
-            type="date"
-            id="dueDate"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label
-            htmlFor="completedDate"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Completed Date
-          </label>
-          <input
-            type="date"
-            id="completedDate"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            value={completedDate || ""}
-            onChange={(e) => setCompletedDate(e.target.value)}
-          />
-        </div>
-
-        <div className="mb-6">
-          <label
-            htmlFor="status"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Status
-          </label>
-          <select
-            id="status"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as MilestoneStatus)}
-            required
-          >
-            {Object.values(MilestoneStatus).map((s) => (
-              <option key={s} value={s}>
-                {s.replace(/_/g, " ")}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <motion.button
-          type="submit"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-500 transition-colors flex items-center justify-center space-x-2"
-          disabled={loading}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 xs:p-4 sm:p-6 lg:p-8">
+      {/* Back Button - Mobile First */}
+      <div className="max-w-6xl mx-auto">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-6 sm:mb-8 transition-colors group"
         >
-          {loading ? (
-            "Updating..."
-          ) : (
-            <>
-              <Edit className="w-5 h-5" />
-              <span>Update Milestone</span>
-            </>
-          )}
-        </motion.button>
+          <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-translate-x-1" />
+          <span className="text-sm sm:text-base font-medium">
+            Back to Project
+          </span>
+        </button>
 
-        {error && (
-          <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
-        )}
-      </form>
+        {/* Header Section */}
+        <header className="mb-6 sm:mb-8 lg:mb-10">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-gray-900 dark:text-white font-bold leading-tight break-words"
+          >
+            <span className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl block mb-2">
+              Edit Milestone
+            </span>
+            <span className="text-lg xs:text-xl sm:text-2xl text-blue-600 dark:text-cyan-400 block font-semibold">
+              {name}
+            </span>
+          </motion.h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm xs:text-base sm:text-lg max-w-3xl">
+            Modify the details and status of this project milestone. All changes
+            are saved immediately upon submission.
+          </p>
+        </header>
+
+        {/* Form Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+        >
+          <form onSubmit={handleSubmit} className="p-4 xs:p-6 sm:p-8">
+            {/* Form Grid Layout */}
+            <div className="space-y-6 sm:space-y-8">
+              {/* Name Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-semibold text-gray-900 dark:text-white sm:text-base"
+                >
+                  Milestone Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  className="w-full px-4 py-3 sm:py-3.5 text-base sm:text-lg rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[48px] sm:min-h-[52px]"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  placeholder="Enter milestone name"
+                />
+              </div>
+
+              {/* Description Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-semibold text-gray-900 dark:text-white sm:text-base"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  rows={4}
+                  className="w-full px-4 py-3 sm:py-3.5 text-base sm:text-lg rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-vertical min-h-[120px] sm:min-h-[140px]"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe the milestone objectives and deliverables..."
+                />
+              </div>
+
+              {/* Date Fields Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                {/* Due Date */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="dueDate"
+                    className="block text-sm font-semibold text-gray-900 dark:text-white sm:text-base"
+                  >
+                    Due Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    id="dueDate"
+                    className="w-full px-4 py-3 sm:py-3.5 text-base sm:text-lg rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[48px] sm:min-h-[52px]"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    required
+                  />
+                </div>
+
+                {/* Completed Date */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="completedDate"
+                    className="block text-sm font-semibold text-gray-900 dark:text-white sm:text-base"
+                  >
+                    Completed Date
+                  </label>
+                  <input
+                    type="date"
+                    id="completedDate"
+                    className="w-full px-4 py-3 sm:py-3.5 text-base sm:text-lg rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[48px] sm:min-h-[52px]"
+                    value={completedDate || ""}
+                    onChange={(e) => setCompletedDate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Status Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="status"
+                  className="block text-sm font-semibold text-gray-900 dark:text-white sm:text-base"
+                >
+                  Status <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="status"
+                  className="w-full px-4 py-3 sm:py-3.5 text-base sm:text-lg rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[48px] sm:min-h-[52px] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M2%200L0%202h4zm0%205L0%203h4z%22/%3E%3C/svg%3E')] bg-no-repeat bg-right-4 bg-center dark:bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M2%200L0%202h4zm0%205L0%203h4z%22/%3E%3C/svg%3E')]"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as MilestoneStatus)}
+                  required
+                >
+                  {Object.values(MilestoneStatus).map((s) => (
+                    <option key={s} value={s} className="text-base">
+                      {s.replace(/_/g, " ")}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Submit Button */}
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-3 min-h-[56px] sm:min-h-[60px] text-lg sm:text-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
+                    <span>Updating Milestone...</span>
+                  </>
+                ) : (
+                  <>
+                    <Edit className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <span>Update Milestone</span>
+                  </>
+                )}
+              </motion.button>
+
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"
+                >
+                  <p className="text-red-700 dark:text-red-400 text-center text-sm sm:text-base font-medium">
+                    {error}
+                  </p>
+                </motion.div>
+              )}
+            </div>
+          </form>
+        </motion.div>
+
+        {/* Responsive Spacing */}
+        <div className="h-6 sm:h-8 lg:h-12"></div>
+      </div>
     </div>
   );
 };

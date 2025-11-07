@@ -6,7 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session || !session.user) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
@@ -45,18 +45,21 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session || !session.user) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = session?.user?.id;
 
   try {
     const body = await request.json();
     const { refereeCode } = body; // The code of the user who referred this user
 
     if (!refereeCode) {
-      return new NextResponse("Missing refereeCode", { status: 400 });
+      return NextResponse.json(
+        { message: "Missing refereeCode", success: false },
+        { status: 400 }
+      );
     }
 
     // Check if the refereeCode exists and belongs to another user
@@ -67,11 +70,17 @@ export async function PUT(request: NextRequest) {
     });
 
     if (!refereeUser) {
-      return new NextResponse("Invalid referral code", { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid referral code", success: false },
+        { status: 400 }
+      );
     }
 
     if (refereeUser.id === userId) {
-      return new NextResponse("Cannot refer yourself", { status: 400 });
+      return NextResponse.json(
+        { message: "Cannot refer yourself", success: false },
+        { status: 400 }
+      );
     }
 
     // Check if the user has already been referred
@@ -81,7 +90,10 @@ export async function PUT(request: NextRequest) {
     });
 
     if (currentUser?.referredByCode) {
-      return new NextResponse("You have already used a referral code", { status: 400 });
+      return NextResponse.json(
+        { message: "You have already used a referral code", success: false },
+        { status: 400 }
+      );
     }
 
     // Update the current user with the referee's code
@@ -93,7 +105,9 @@ export async function PUT(request: NextRequest) {
     // Optionally, add initial bonus to the referee or referred user here
     // This logic depends on your business rules.
 
-    return new NextResponse("Referral code applied successfully", { status: 200 });
+    return new NextResponse("Referral code applied successfully", {
+      status: 200,
+    });
   } catch (error) {
     console.error("Error applying referral code:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

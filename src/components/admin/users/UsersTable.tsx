@@ -12,7 +12,12 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import Pagination from "@/components/ui/CustomPagination";
 
 const UsersTable = ({ users, refetch, loading, searchTerm }) => {
@@ -30,13 +35,13 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
     switch (status) {
       case "ACTIVE":
         return (
-          <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800 dark:bg-green-900 dark:text-green-200">
+          <span className="inline-flex rounded-full bg-green-100 px-2 xs:px-3 py-1 text-xs font-semibold leading-4 xs:leading-5 text-green-800 dark:bg-green-900 dark:text-green-200">
             {status}
           </span>
         );
       case "BLOCKED":
         return (
-          <span className="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800 dark:bg-red-900 dark:text-red-200">
+          <span className="inline-flex rounded-full bg-red-100 px-2 xs:px-3 py-1 text-xs font-semibold leading-4 xs:leading-5 text-red-800 dark:bg-red-900 dark:text-red-200">
             {status}
           </span>
         );
@@ -53,7 +58,12 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
       onConfirm: async () => {
         await fetch(`/api/users/${id}/block`, { method: "POST" });
         refetch();
-        setConfirmationModal({ isOpen: false, title: "", message: "", onConfirm: () => {} });
+        setConfirmationModal({
+          isOpen: false,
+          title: "",
+          message: "",
+          onConfirm: () => {},
+        });
       },
     });
   };
@@ -66,7 +76,12 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
       onConfirm: async () => {
         await fetch(`/api/users/${id}/unblock`, { method: "POST" });
         refetch();
-        setConfirmationModal({ isOpen: false, title: "", message: "", onConfirm: () => {} });
+        setConfirmationModal({
+          isOpen: false,
+          title: "",
+          message: "",
+          onConfirm: () => {},
+        });
       },
     });
   };
@@ -79,7 +94,12 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
       onConfirm: async () => {
         await fetch(`/api/users/${id}/reset-password`, { method: "POST" });
         refetch();
-        setConfirmationModal({ isOpen: false, title: "", message: "", onConfirm: () => {} });
+        setConfirmationModal({
+          isOpen: false,
+          title: "",
+          message: "",
+          onConfirm: () => {},
+        });
       },
     });
   };
@@ -102,9 +122,11 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
   };
 
   const handleImpersonate = async (id: string) => {
-    const response = await fetch(`/api/users/${id}/impersonate`, { method: "POST" });
+    const response = await fetch(`/api/users/${id}/impersonate`, {
+      method: "POST",
+    });
     if (response.ok) {
-      router.push('/admin/users');
+      router.push("/admin/users");
     }
   };
 
@@ -141,9 +163,12 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
     handleCloseEmailModal();
   };
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = users.filter((user) => {
     if (!searchTerm) return true;
-    return user.name.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    return (
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -158,31 +183,210 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700"
+      className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 mx-2 xs:mx-4 sm:mx-0"
     >
-      <div className="overflow-visible">
+      {/* Mobile Card View */}
+      <div className="sm:hidden space-y-3 p-3">
+        {loading ? (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            Loading users...
+          </div>
+        ) : currentItems.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            No users found.
+          </div>
+        ) : (
+          currentItems.map((user, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              {/* User Info */}
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="flex-shrink-0">
+                    <Image
+                      className="h-12 w-12 rounded-full"
+                      src={user.image || "/images/default-avatar.png"}
+                      alt={user.name}
+                      width={48}
+                      height={48}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      {user.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {user.email}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {user.role}
+                      </span>
+                      <span className="text-gray-300 dark:text-gray-600">
+                        •
+                      </span>
+                      {getStatusChip(user.status)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between gap-2 pt-3 border-t border-gray-200 dark:border-gray-600">
+                <div className="flex items-center gap-2">
+                  {user.status === "BLOCKED" ? (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => handleUnblock(user.id)}
+                            className="p-2 text-gray-400 hover:text-green-600 focus:outline-none dark:hover:text-green-500 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20"
+                          >
+                            <span className="material-symbols-outlined text-lg">
+                              how_to_reg
+                            </span>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Unblock User</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => handleBlock(user.id)}
+                            className="p-2 text-gray-400 hover:text-red-600 focus:outline-none dark:hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <span className="material-symbols-outlined text-lg">
+                              block
+                            </span>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Block User</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => handleResetLock(user.id)}
+                          className="p-2 text-gray-400 hover:text-blue-600 focus:outline-none dark:hover:text-blue-500 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                        >
+                          <span className="material-symbols-outlined text-lg">
+                            lock_reset
+                          </span>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Reset Password</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+
+                <Menubar>
+                  <MenubarMenu>
+                    <MenubarTrigger className="p-2 text-gray-400 hover:text-gray-600 focus:outline-none dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+                      <span className="material-symbols-outlined text-lg">
+                        more_vert
+                      </span>
+                    </MenubarTrigger>
+                    <MenubarContent align="end" className="min-w-[180px]">
+                      <MenubarItem
+                        onClick={() => handleView(user)}
+                        className="text-sm py-2"
+                      >
+                        View Profile
+                      </MenubarItem>
+                      <MenubarItem
+                        onClick={() => handleEdit(user.id)}
+                        className="text-sm py-2"
+                      >
+                        Edit User
+                      </MenubarItem>
+                      <MenubarItem
+                        onClick={() => handleViewAnalytics(user.id)}
+                        className="text-sm py-2"
+                      >
+                        View Analytics
+                      </MenubarItem>
+                      <MenubarItem
+                        onClick={() => handleImpersonate(user.id)}
+                        className="text-sm py-2"
+                      >
+                        Impersonate
+                      </MenubarItem>
+                      <MenubarItem
+                        onClick={() => handleLoginHistory(user.id)}
+                        className="text-sm py-2"
+                      >
+                        Login History
+                      </MenubarItem>
+                      {user.role === "CLIENT" && (
+                        <MenubarItem
+                          onClick={() => handlePurchaseHistory(user.id)}
+                          className="text-sm py-2"
+                        >
+                          Purchase History
+                        </MenubarItem>
+                      )}
+                      <MenubarItem
+                        onClick={() => handleSendEmail(user)}
+                        className="text-sm py-2"
+                      >
+                        Send Email
+                      </MenubarItem>
+                      <MenubarItem
+                        onClick={() => handleDelete(user.id)}
+                        className="text-sm py-2 text-red-600 dark:text-red-400 focus:text-red-600"
+                      >
+                        Delete User
+                      </MenubarItem>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
+              </div>
+            </motion.div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th
                 scope="col"
-                className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                className="px-3 py-3 md:px-6 md:py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
               >
                 Name
               </th>
               <th
                 scope="col"
-                className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                className="px-3 py-3 md:px-6 md:py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
               >
                 Role
               </th>
               <th
                 scope="col"
-                className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                className="px-3 py-3 md:px-6 md:py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
               >
                 Status
               </th>
-              <th scope="col" className="relative px-3 py-2 md:px-6 md:py-3">
+              <th scope="col" className="relative px-3 py-3 md:px-6 md:py-4">
                 <span className="sr-only">Actions</span>
               </th>
             </tr>
@@ -190,13 +394,19 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
           <tbody className="divide-y divide-gray-200 bg-white dark:bg-gray-800 dark:divide-gray-700">
             {loading ? (
               <tr>
-                <td colSpan={4} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                <td
+                  colSpan={4}
+                  className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+                >
                   Loading users...
                 </td>
               </tr>
             ) : currentItems.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                <td
+                  colSpan={4}
+                  className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+                >
                   No users found.
                 </td>
               </tr>
@@ -209,41 +419,46 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <td className="whitespace-nowrap px-3 py-2 md:px-6 md:py-4">
+                  <td className="whitespace-nowrap px-3 py-4 md:px-6 md:py-4">
                     <div className="flex items-center">
                       <div className="h-10 w-10 flex-shrink-0">
                         <Image
                           className="h-10 w-10 rounded-full"
-                          src={user.image || '/images/default-avatar.png'}
-                          alt=""
+                          src={user.image || "/images/default-avatar.png"}
+                          alt={user.name}
                           width={40}
                           height={40}
                         />
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      <div className="ml-4 min-w-0">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
                           {user.name}
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[150px]">
                           {user.email}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2 md:px-6 md:py-4 text-sm text-gray-500 dark:text-gray-400">
+                  <td className="whitespace-nowrap px-3 py-4 md:px-6 md:py-4 text-sm text-gray-500 dark:text-gray-400">
                     {user.role}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2 md:px-6 md:py-4">
+                  <td className="whitespace-nowrap px-3 py-4 md:px-6 md:py-4">
                     {getStatusChip(user.status)}
                   </td>
-                  <td className="relative whitespace-nowrap px-3 py-2 md:px-6 md:py-4 text-right text-sm font-medium">
+                  <td className="relative whitespace-nowrap px-3 py-4 md:px-6 md:py-4 text-right text-sm font-medium">
                     <TooltipProvider>
-                      <div className="relative flex items-center justify-end gap-2 sm:gap-4">
-                        {user.status === 'BLOCKED' ? (
+                      <div className="flex items-center justify-end gap-2 sm:gap-3">
+                        {user.status === "BLOCKED" ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <button onClick={() => handleUnblock(user.id)} className="text-gray-400 hover:text-green-600 focus:outline-none dark:hover:text-green-500">
-                                <span className="material-symbols-outlined">how_to_reg</span>
+                              <button
+                                onClick={() => handleUnblock(user.id)}
+                                className="p-2 text-gray-400 hover:text-green-600 focus:outline-none dark:hover:text-green-500 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-lg">
+                                  how_to_reg
+                                </span>
                               </button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -253,8 +468,13 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
                         ) : (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <button onClick={() => handleBlock(user.id)} className="text-gray-400 hover:text-red-600 focus:outline-none dark:hover:text-red-500">
-                                <span className="material-symbols-outlined">block</span>
+                              <button
+                                onClick={() => handleBlock(user.id)}
+                                className="p-2 text-gray-400 hover:text-red-600 focus:outline-none dark:hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-lg">
+                                  block
+                                </span>
                               </button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -264,8 +484,11 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
                         )}
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button onClick={() => handleResetLock(user.id)} className="text-gray-400 hover:text-blue-600 focus:outline-none dark:hover:text-blue-500">
-                              <span className="material-symbols-outlined">
+                            <button
+                              onClick={() => handleResetLock(user.id)}
+                              className="p-2 text-gray-400 hover:text-blue-600 focus:outline-none dark:hover:text-blue-500 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-lg">
                                 lock_reset
                               </span>
                             </button>
@@ -276,35 +499,64 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
                         </Tooltip>
                         <Menubar>
                           <MenubarMenu>
-                            <MenubarTrigger className="text-gray-400 hover:text-gray-600 focus:outline-none dark:hover:text-gray-300">
-                              <span className="material-symbols-outlined">more_vert</span>
+                            <MenubarTrigger className="p-2 text-gray-400 hover:text-gray-600 focus:outline-none dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                              <span className="material-symbols-outlined text-lg">
+                                more_vert
+                              </span>
                             </MenubarTrigger>
-                            <MenubarContent>
-                              <MenubarItem onClick={() => handleView(user)}>
-                                View
+                            <MenubarContent
+                              align="end"
+                              className="min-w-[180px]"
+                            >
+                              <MenubarItem
+                                onClick={() => handleView(user)}
+                                className="text-sm py-2"
+                              >
+                                View Profile
                               </MenubarItem>
-                              <MenubarItem onClick={() => handleEdit(user.id)}>
-                                Edit
+                              <MenubarItem
+                                onClick={() => handleEdit(user.id)}
+                                className="text-sm py-2"
+                              >
+                                Edit User
                               </MenubarItem>
-                              <MenubarItem onClick={() => handleDelete(user.id)}>
-                                Delete
-                              </MenubarItem>
-                              <MenubarItem onClick={() => handleViewAnalytics(user.id)}>
+                              <MenubarItem
+                                onClick={() => handleViewAnalytics(user.id)}
+                                className="text-sm py-2"
+                              >
                                 View Analytics
                               </MenubarItem>
-                              <MenubarItem onClick={() => handleImpersonate(user.id)}>
+                              <MenubarItem
+                                onClick={() => handleImpersonate(user.id)}
+                                className="text-sm py-2"
+                              >
                                 Impersonate
                               </MenubarItem>
-                              <MenubarItem onClick={() => handleLoginHistory(user.id)}>
+                              <MenubarItem
+                                onClick={() => handleLoginHistory(user.id)}
+                                className="text-sm py-2"
+                              >
                                 Login History
                               </MenubarItem>
-                              {user.role === 'CLIENT' && (
-                                <MenubarItem onClick={() => handlePurchaseHistory(user.id)}>
+                              {user.role === "CLIENT" && (
+                                <MenubarItem
+                                  onClick={() => handlePurchaseHistory(user.id)}
+                                  className="text-sm py-2"
+                                >
                                   Purchase History
                                 </MenubarItem>
                               )}
-                              <MenubarItem onClick={() => handleSendEmail(user)}>
+                              <MenubarItem
+                                onClick={() => handleSendEmail(user)}
+                                className="text-sm py-2"
+                              >
                                 Send Email
+                              </MenubarItem>
+                              <MenubarItem
+                                onClick={() => handleDelete(user.id)}
+                                className="text-sm py-2 text-red-600 dark:text-red-400 focus:text-red-600"
+                              >
+                                Delete User
                               </MenubarItem>
                             </MenubarContent>
                           </MenubarMenu>
@@ -318,60 +570,78 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
           </tbody>
         </table>
       </div>
-      <Pagination
-        totalItems={filteredUsers.length}
-        itemsPerPage={itemsPerPage}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-      />
-      
+
+      {/* Pagination */}
+      <div className="px-3 py-4 sm:px-6 border-t border-gray-200 dark:border-gray-700">
+        <Pagination
+          totalItems={filteredUsers.length}
+          itemsPerPage={itemsPerPage}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
+      </div>
+
+      {/* Email Modal */}
       {emailModal && (
-        <div className="fixed inset-0 z-10 overflow-y-auto bg-black/30 backdrop-blur-sm">
-          <div className="flex min-h-screen items-center justify-center">
-            <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/30 backdrop-blur-sm">
+          <div className="flex min-h-screen items-center justify-center p-3 xs:p-4">
+            <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-4 xs:p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800 mx-auto">
               <div className="flex items-start justify-between">
                 <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                  Send Email to {selectedUser.name}
+                  Send Email to {selectedUser?.name}
                 </h3>
-                <button onClick={handleCloseEmailModal} className="text-gray-400 hover:text-gray-500 focus:outline-none">
-                  <span className="material-symbols-outlined">close</span>
+                <button
+                  onClick={handleCloseEmailModal}
+                  className="text-gray-400 hover:text-gray-500 focus:outline-none p-1"
+                >
+                  <span className="material-symbols-outlined text-xl">
+                    close
+                  </span>
                 </button>
               </div>
               <div className="mt-4">
                 <form onSubmit={handleSendEmailSubmit}>
                   <div className="mb-4">
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label
+                      htmlFor="subject"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
                       Subject
                     </label>
                     <input
                       type="text"
                       id="subject"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                      required
+                      className="block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:focus:border-blue-400 transition-colors"
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
                       Message
                     </label>
                     <textarea
                       id="message"
                       rows={4}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                      required
+                      className="block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:focus:border-blue-400 transition-colors resize-vertical"
                     ></textarea>
                   </div>
-                  <div className="flex justify-end">
+                  <div className="flex flex-col xs:flex-row gap-2 xs:gap-0 xs:justify-end">
                     <button
                       type="button"
                       onClick={handleCloseEmailModal}
-                      className="mr-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+                      className="order-2 xs:order-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      className="order-1 xs:order-2 rounded-lg border border-transparent bg-primary px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
                     >
-                      Send
+                      Send Email
                     </button>
                   </div>
                 </form>
@@ -380,16 +650,30 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal */}
       {confirmationModal.isOpen && (
-        <div className="fixed inset-0 z-10 overflow-y-auto bg-black/30 backdrop-blur-sm">
-          <div className="flex min-h-screen items-center justify-center">
-            <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/30 backdrop-blur-sm">
+          <div className="flex min-h-screen items-center justify-center p-3 xs:p-4">
+            <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-4 xs:p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800 mx-auto">
               <div className="flex items-start justify-between">
                 <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
                   {confirmationModal.title}
                 </h3>
-                <button onClick={() => setConfirmationModal({ isOpen: false, title: '', message: '', onConfirm: () => {} })} className="text-gray-400 hover:text-gray-500 focus:outline-none">
-                  <span className="material-symbols-outlined">close</span>
+                <button
+                  onClick={() =>
+                    setConfirmationModal({
+                      isOpen: false,
+                      title: "",
+                      message: "",
+                      onConfirm: () => {},
+                    })
+                  }
+                  className="text-gray-400 hover:text-gray-500 focus:outline-none p-1"
+                >
+                  <span className="material-symbols-outlined text-xl">
+                    close
+                  </span>
                 </button>
               </div>
               <div className="mt-4">
@@ -397,18 +681,25 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
                   {confirmationModal.message}
                 </p>
               </div>
-              <div className="mt-4 flex justify-end gap-2">
+              <div className="mt-6 flex flex-col xs:flex-row gap-2 xs:gap-0 xs:justify-end">
                 <button
                   type="button"
-                  onClick={() => setConfirmationModal({ isOpen: false, title: '', message: '', onConfirm: () => {} })}
-                  className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+                  onClick={() =>
+                    setConfirmationModal({
+                      isOpen: false,
+                      title: "",
+                      message: "",
+                      onConfirm: () => {},
+                    })
+                  }
+                  className="order-2 xs:order-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={confirmationModal.onConfirm}
-                  className="rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className="order-1 xs:order-2 rounded-lg border border-transparent bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
                 >
                   Confirm
                 </button>

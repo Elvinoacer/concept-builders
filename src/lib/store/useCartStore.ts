@@ -63,7 +63,21 @@ const useCartStore = create<CartStore>()(
     appliedDiscountId: null,
     appliedDiscountCode: null,
 
-    setCart: (cart) => set({ cart: cart.items, cartId: cart.id }),
+    setCart: (cart) => {
+      if (cart && cart.items) {
+        const newCartItems = cart.items.map((item) => {
+          if (item.id && !item.cartItemId) {
+            // Item from DB, map id to cartItemId
+            return { ...item, cartItemId: item.id };
+          }
+          return item; // Item already has cartItemId (from local state)
+        });
+        set({ cart: newCartItems, cartId: cart.id });
+      } else {
+        // Handle cases where cart is cleared or local storage is empty
+        set({ cart: cart ? cart.items : [], cartId: cart ? cart.id : null });
+      }
+    },
     setLoading: (loading) => set({ loading }),
     setError: (error) => set({ error }),
     setAppliedDiscount: (amount, id, code) =>

@@ -3,6 +3,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import NotificationsHeader from "@/components/dashboard/notifications/NotificationsHeader";
 import NotificationList from "@/components/dashboard/notifications/NotificationList";
 import { motion, AnimatePresence } from "framer-motion";
+import { AlertTriangle, Bell } from "lucide-react";
 
 export type Notification = {
   id: string;
