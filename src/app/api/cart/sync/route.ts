@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         const existingItem = await tx.cartItem.findFirst({
           where: {
             cartId: userCart.id,
-            designId: item.id,
+            designId: item.design.id,
             selectedFileTypes: {
               equals: normalizedSelectedFileTypes,
             },
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
           await tx.cartItem.create({
             data: {
               cartId: userCart.id,
-              designId: item.id,
+              designId: item.design.id,
               quantity: item.quantity,
               selectedFileTypes: normalizedSelectedFileTypes,
               selectedExtras: normalizedSelectedExtras,
