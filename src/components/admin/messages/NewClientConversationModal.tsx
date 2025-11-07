@@ -104,8 +104,8 @@ const NewClientConversationModal: React.FC<NewClientConversationModalProps> = ({
     const existingConv = existingConversations.find(
       (conv) =>
         conv.users &&
-        conv.users.some((user) => user.id === selectedClient.id) &&
-        conv.users.some((user) => user.id === session.user.id)
+        conv.users.some((user) => user && user.id === selectedClient.id) &&
+        conv.users.some((user) => user && user.id === session.user.id)
     );
 
     if (existingConv) {
@@ -154,7 +154,9 @@ const NewClientConversationModal: React.FC<NewClientConversationModalProps> = ({
 
   const hasExistingConversation = (client: User) => {
     return existingConversations.some(
-      (conv) => conv.users && conv.users.some((user) => user.id === client.id)
+      (conv) =>
+        conv.users &&
+        conv.users.some((user) => user && user.id && user.id === client.id)
     );
   };
 
@@ -354,7 +356,7 @@ const NewClientConversationModal: React.FC<NewClientConversationModalProps> = ({
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
                   Starting...
                 </>
-              ) : hasExistingConversation(selectedClient!) ? (
+              ) : selectedClient && hasExistingConversation(selectedClient) ? (
                 "Switch to Chat"
               ) : (
                 "Start Conversation"
