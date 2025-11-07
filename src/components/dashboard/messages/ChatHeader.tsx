@@ -24,6 +24,10 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   const { data: session } = useSession();
   const router = useRouter();
 
+  if (!conversation) {
+    return null;
+  }
+
   const otherUser = conversation.users.find(
     (user) => user.email !== session?.user?.email
   );

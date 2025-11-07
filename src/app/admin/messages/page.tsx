@@ -281,7 +281,8 @@ const AdminMessagesPage = () => {
                     const lastMessage = conversation.messages[0];
                     const isOnline =
                       displayAvatarUser &&
-                      onlineUsers.includes(displayAvatarUser?.id);
+                      session?.user &&
+                      onlineUsers.includes(displayAvatarUser.id);
 
                     return (
                       <div
@@ -465,7 +466,8 @@ const AdminMessagesPage = () => {
                 const lastMessage = conversation.messages[0];
                 const isOnline =
                   displayAvatarUser &&
-                  onlineUsers.includes(displayAvatarUser?.id);
+                  session?.user &&
+                  onlineUsers.includes(displayAvatarUser.id);
 
                 return (
                   <div
