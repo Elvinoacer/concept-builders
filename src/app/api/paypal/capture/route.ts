@@ -138,6 +138,7 @@ export async function POST(request: Request) {
         },
       });
 
+      await tx.cartItem.deleteMany({ where: { cartId: userCart.id } });
       await tx.cart.delete({ where: { id: userCart.id } });
 
       return order;
