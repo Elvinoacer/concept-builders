@@ -332,12 +332,14 @@ model Order {
 }
 
 model OrderItem {
-  id       String @id @default(cuid())
-  orderId  String
-  order    Order  @relation(fields: [orderId], references: [id])
-  designId String
-  design   Design @relation(fields: [designId], references: [id], onDelete: Cascade)
-  quantity Int
+  id                String   @id @default(cuid())
+  orderId           String
+  order             Order    @relation(fields: [orderId], references: [id])
+  designId          String
+  design            Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
+  quantity          Int
+  selectedFileTypes String[]
+  selectedExtras    Json?
 }
 
 model Project {

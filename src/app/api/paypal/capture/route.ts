@@ -68,13 +68,6 @@ export async function POST(request: Request) {
 
     const totalAmount = userCart.items.reduce((acc, item) => {
       let itemTotal = item.design.basePrice * item.quantity;
-      if (item.selectedFileType === 'pdf') {
-        itemTotal += item.design.pdfPrice || 0;
-      } else if (item.selectedFileType === 'cad') {
-        itemTotal += item.design.cadPrice || 0;
-      } else if (item.selectedFileType === 'pdf-and-cad') {
-        itemTotal += item.design.pdfAndCadPrice || 0;
-      }
       if (item.selectedExtras) {
         let extras;
         if (typeof item.selectedExtras === 'string') {
@@ -104,13 +97,25 @@ export async function POST(request: Request) {
       });
 
       await tx.orderItem.createMany({
-        data: userCart.items.map((item) => ({
-          orderId: order.id,
-          designId: item.designId,
-          quantity: item.quantity,
-          selectedFileTypes: item.selectedFileTypes,
-          selectedExtras: item.selectedExtras,
-        })),
+        data: userCart.items.map((item) => {
+          let selectedExtras = item.selectedExtras;
+          if (typeof selectedExtras === 'string') {
+            try {
+              selectedExtras = JSON.parse(selectedExtras);
+            } catch (error) {
+              console.error("Error parsing selectedExtras:", error);
+              // Handle the error appropriately, maybe default to null or an empty object
+              selectedExtras = null;
+            }
+          }
+          return {
+            orderId: order.id,
+            designId: item.designId,
+            quantity: item.quantity,
+            selectedFileTypes: item.selectedFileTypes,
+            selectedExtras: selectedExtras,
+          };
+        }),
       });
 
       if (discountId) {
