@@ -41,9 +41,7 @@ const ItemsPurchased = ({ items }) => {
           const imageUrl = imageFile
             ? imageFile.url
             : "/images/category-placeholder.png";
-          const selectedExtras = item.selectedExtras
-            ? JSON.parse(item.selectedExtras)
-            : [];
+          const selectedExtras = item.selectedExtras || [];
 
           return (
             <motion.div
