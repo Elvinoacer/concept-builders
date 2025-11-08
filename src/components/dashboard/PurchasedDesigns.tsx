@@ -403,7 +403,11 @@ const PurchasedDesigns = ({
                         </h4>
 
                         <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                          {design.selectedPackage || "Digital Download"}
+                          <div className="flex items-center gap-2">
+                            <Package className="w-4 h-4 text-blue-500" />
+                            <span className="font-medium">
+                              {design.selectedPackage || "Digital Download"}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4 text-green-500" />
