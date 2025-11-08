@@ -378,7 +378,7 @@ const NewDesignForm = ({
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -50, opacity: 0 }}
-        className="bg-card rounded-2xl shadow-2xl w-full max-w-3xl mx-auto flex flex-col max-h-[95dvh] sm:max-h-[90vh]"
+        className="bg-card rounded-2xl shadow-2xl w-full max-w-3xl mx-auto flex flex-col h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit} className="flex flex-col h-full">

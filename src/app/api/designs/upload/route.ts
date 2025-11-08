@@ -52,15 +52,16 @@ export async function POST(request: Request) {
         "application/octet-stream",
       ],
       PDF: ["application/pdf"],
-      IMAGE: ["image/jpeg", "image/png", "image/gif", "image/webp"],
+      IMAGE: ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"],
       FLOOR_PLAN: [
         "image/jpeg",
         "image/png",
         "image/gif",
         "image/webp",
         "application/pdf",
+        "image/avif",
       ],
-      FILE: ["application/pdf", "image/jpeg", "image/png", "image/gif", "image/webp", ".doc", ".docx", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+      FILE: ["application/pdf", "image/jpeg", "image/png", "image/gif", "image/webp", ".doc", ".docx", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain", "application/zip", "application/x-zip-compressed", "application/octet-stream"],
       EXCEL: ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
     };
 
