@@ -34,7 +34,47 @@ export async function GET(request: NextRequest) {
     });
 
     let purchasedDesigns = orders.flatMap(order => 
-      order.items.map(item => ({...item.design, createdAt: order.createdAt, selectedFileTypes: item.selectedFileTypes, selectedExtras: item.selectedExtras}))
+      order.items.map(item => {
+        const purchasedFiles = [];
+
+        if (item.selectedFileTypes.includes('architecturalPdf')) {
+          const architecturalPdf = item.design.files.find(f => f.type === 'PDF' && f.name.toLowerCase().includes('architectural'));
+          if (architecturalPdf) purchasedFiles.push(architecturalPdf);
+        }
+        if (item.selectedFileTypes.includes('architecturalCad')) {
+          const architecturalCad = item.design.files.find(f => f.type === 'CAD' && f.name.toLowerCase().includes('architectural'));
+          if (architecturalCad) purchasedFiles.push(architecturalCad);
+        }
+        if (item.selectedFileTypes.includes('structuralPdf')) {
+          const structuralPdf = item.design.files.find(f => f.type === 'PDF' && f.name.toLowerCase().includes('structural'));
+          if (structuralPdf) purchasedFiles.push(structuralPdf);
+        }
+        if (item.selectedFileTypes.includes('structuralCad')) {
+          const structuralCad = item.design.files.find(f => f.type === 'CAD' && f.name.toLowerCase().includes('structural'));
+          if (structuralCad) purchasedFiles.push(structuralCad);
+        }
+        if (item.selectedFileTypes.includes('billOfQuantities')) {
+          const billOfQuantities = item.design.files.find(f => f.type === 'EXCEL');
+          if (billOfQuantities) purchasedFiles.push(billOfQuantities);
+        }
+
+        if (item.selectedExtras) {
+          const extras = typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras;
+          extras.forEach(extra => {
+            if (extra.file) {
+              purchasedFiles.push(extra.file);
+            }
+          });
+        }
+
+        return {
+          ...item.design, 
+          createdAt: order.createdAt, 
+          selectedFileTypes: item.selectedFileTypes, 
+          selectedExtras: item.selectedExtras,
+          purchasedFiles,
+        }
+      })
     );
 
     // Apply filtering

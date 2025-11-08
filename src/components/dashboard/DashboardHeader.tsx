@@ -79,57 +79,39 @@ const DashboardHeader = ({
     }
   };
 
-  useEffect(() => {
-    const fetchUnreadCount = async () => {
-      if (session?.user?.id) {
-        try {
-          const response = await fetch("/api/notifications/unread-count");
-          if (response.ok) {
-            const data = await response.json();
-            setUnreadNotificationCount(data.unreadCount);
-          }
-        } catch (error) {
-          console.error("Failed to fetch unread notification count:", error);
-        }
-      }
-    };
+  const [notifications, setNotifications] = useState([]);
 
-    fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000);
+  const fetchNotifications = async () => {
+    if (session?.user?.id) {
+      try {
+        const response = await fetch("/api/notifications");
+        if (response.ok) {
+          const data = await response.json();
+          setNotifications(data);
+          setUnreadNotificationCount(data.filter(n => !n.read).length);
+        }
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
   }, [session]);
 
-  // Mock notifications data
-  const notifications = [
-    {
-      id: 1,
-      title: "New design template available",
-      time: "5 min ago",
-      unread: true,
-      type: "info",
-    },
-    {
-      id: 2,
-      title: "Project approved by client",
-      time: "1 hour ago",
-      unread: true,
-      type: "success",
-    },
-    {
-      id: 3,
-      title: "Weekly design inspiration",
-      time: "2 hours ago",
-      unread: false,
-      type: "update",
-    },
-    {
-      id: 4,
-      title: "New message from Sarah",
-      time: "1 day ago",
-      unread: false,
-      type: "message",
-    },
-  ];
+  const handleNotificationClick = async (notificationId: string) => {
+    try {
+      await fetch(`/api/notifications/${notificationId}/read`, {
+        method: 'PUT',
+      });
+      fetchNotifications();
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    }
+  };
 
   const quickActions = [
     { label: "New Project", icon: Sparkles, href: "/dashboard/projects/new" },
@@ -290,8 +272,9 @@ const DashboardHeader = ({
                     {notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`p-4 border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-                          notification.unread
+                        onClick={() => handleNotificationClick(notification.id)}
+                        className={`p-4 border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer ${
+                          !notification.read
                             ? "bg-blue-50/50 dark:bg-blue-900/10"
                             : ""
                         }`}
@@ -299,7 +282,7 @@ const DashboardHeader = ({
                         <div className="flex items-start gap-3">
                           <div
                             className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                              notification.unread
+                              !notification.read
                                 ? "bg-blue-500"
                                 : "bg-gray-300 dark:bg-gray-600"
                             }`}
@@ -309,7 +292,7 @@ const DashboardHeader = ({
                               {notification.title}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {notification.time}
+                              {new Date(notification.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                         </div>

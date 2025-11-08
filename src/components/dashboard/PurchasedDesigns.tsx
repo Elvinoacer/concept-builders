@@ -271,7 +271,7 @@ const PurchasedDesigns = ({
                 <div className="relative h-48 sm:h-56 bg-gray-100 dark:bg-gray-900 overflow-hidden">
                   <Image
                     src={
-                      design.files.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.png"
+                      design.purchasedFiles.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.png"
                     }
                     alt={design.name}
                     fill
@@ -322,7 +322,7 @@ const PurchasedDesigns = ({
                         {design.selectedPackage || "Digital Download"}
                       </p>
                       <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                        <p>Format: {design.selectedFileType}</p>
+                        <p>Format: {design.selectedFileTypes.join(', ')}</p>
                         {design.selectedExtras && (
                           <div className="flex items-center gap-1">
                             <Zap className="w-3 h-3 text-amber-500" />
@@ -335,6 +335,24 @@ const PurchasedDesigns = ({
                           </div>
                         )}
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Purchased Files */}
+                  <div className="mb-4 sm:mb-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <FileText className="w-4 h-4 text-green-500" />
+                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                        Purchased Files
+                      </span>
+                    </div>
+                    <div className="bg-gray-50/50 dark:bg-gray-700/50 p-3 sm:p-4 rounded-xl space-y-2">
+                      {design.purchasedFiles.map((file) => (
+                        <div key={file.id} className="flex items-center justify-between">
+                          <p className="text-sm text-gray-900 dark:text-white">{file.name}</p>
+                          <button onClick={() => window.open(file.url, '_blank')} className="text-sm text-blue-600 hover:underline">Download</button>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -382,7 +400,7 @@ const PurchasedDesigns = ({
                   <div className="relative w-full sm:w-48 h-40 sm:h-auto bg-gray-100 dark:bg-gray-900 flex-shrink-0">
                     <Image
                       src={
-                        design.files.find(file => file.type === 'IMAGE')?.url ||
+                        design.purchasedFiles.find(file => file.type === 'IMAGE')?.url ||
                         "/images/category-placeholder.png"
                       }
                       alt={design.name}
@@ -411,7 +429,7 @@ const PurchasedDesigns = ({
                           </div>
                           <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4 text-green-500" />
-                            <span>Format: {design.selectedFileType}</span>
+                            <span>Format: {design.selectedFileTypes.join(', ')}</span>
                           </div>
                           {design.selectedExtras && (
                             <div className="flex items-center gap-2">
@@ -427,6 +445,24 @@ const PurchasedDesigns = ({
                           <div className="text-xs text-gray-500 dark:text-gray-500">
                             Purchased:{" "}
                             {new Date(design.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+
+                        {/* Purchased Files */}
+                        <div className="mt-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <FileText className="w-4 h-4 text-green-500" />
+                            <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                              Purchased Files
+                            </span>
+                          </div>
+                          <div className="bg-gray-50/50 dark:bg-gray-700/50 p-3 rounded-xl space-y-2">
+                            {design.purchasedFiles.map((file) => (
+                              <div key={file.id} className="flex items-center justify-between">
+                                <p className="text-sm text-gray-900 dark:text-white">{file.name}</p>
+                                <button onClick={() => window.open(file.url, '_blank')} className="text-sm text-blue-600 hover:underline">Download</button>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>

@@ -35,13 +35,10 @@ const ItemsPurchased = ({ items }) => {
 
       <div className="space-y-3 sm:space-y-4">
         {items.map((item, index) => {
-          const imageFile = item.design.files.find(
-            (file) => file.type === "IMAGE"
-          );
-          const imageUrl = imageFile
-            ? imageFile.url
-            : "/images/category-placeholder.png";
-          const selectedExtras = item.selectedExtras || [];
+          const imageUrl = item.design.purchasedFiles.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.png";
+          const selectedExtras = item.selectedExtras
+            ? JSON.parse(item.selectedExtras)
+            : [];
 
           return (
             <motion.div
@@ -80,23 +77,12 @@ const ItemsPurchased = ({ items }) => {
                   {/* Details Grid */}
                   <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
                     {/* File Type */}
-                    {item.selectedFileType && (
+                    {item.selectedFileTypes && (
                       <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                         <span className="font-medium">Format:</span>
                         <span className="text-gray-700 dark:text-gray-300">
-                          {item.selectedFileType}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Package */}
-                    {item.selectedPackage && (
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Package className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
-                        <span className="font-medium">Package:</span>
-                        <span className="text-gray-700 dark:text-gray-300">
-                          {item.selectedPackage}
+                          {item.selectedFileTypes.join(', ')}
                         </span>
                       </div>
                     )}
@@ -118,6 +104,24 @@ const ItemsPurchased = ({ items }) => {
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* Purchased Files */}
+                  <div className="mt-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FileText className="w-4 h-4 text-green-500" />
+                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                        Purchased Files
+                      </span>
+                    </div>
+                    <div className="bg-gray-50/50 dark:bg-gray-700/50 p-3 rounded-xl space-y-2">
+                      {item.design.purchasedFiles.map((file) => (
+                        <div key={file.id} className="flex items-center justify-between">
+                          <p className="text-sm text-gray-900 dark:text-white">{file.name}</p>
+                          <button onClick={() => window.open(file.url, '_blank')} className="text-sm text-blue-600 hover:underline">Download</button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
