@@ -328,7 +328,7 @@ const PurchasedDesigns = ({
                             <Zap className="w-3 h-3 text-amber-500" />
                             <span>
                               Extras:{" "}
-                              {JSON.parse(design.selectedExtras)
+                              {design.selectedExtras
                                 .map((extra: any) => extra.name)
                                 .join(", ")}
                             </span>
@@ -403,11 +403,7 @@ const PurchasedDesigns = ({
                         </h4>
 
                         <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                          <div className="flex items-center gap-2">
-                            <Package className="w-4 h-4 text-blue-500" />
-                            <span className="font-medium">
-                              {design.selectedPackage || "Digital Download"}
-                            </span>
+                          {design.selectedPackage || "Digital Download"}
                           </div>
                           <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4 text-green-500" />
@@ -418,7 +414,7 @@ const PurchasedDesigns = ({
                               <Zap className="w-4 h-4 text-amber-500" />
                               <span>
                                 Extras:{" "}
-                                {JSON.parse(design.selectedExtras)
+                                {design.selectedExtras
                                   .map((extra: any) => extra.name)
                                   .join(", ")}
                               </span>
