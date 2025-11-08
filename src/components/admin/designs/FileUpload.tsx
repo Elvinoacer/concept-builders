@@ -74,50 +74,20 @@ const FileUpload = ({
       const newFilesData = await Promise.all(
         acceptedFiles.map(async (file) => {
           try {
-            const response = await fetch("/api/designs/upload", {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("fileTypeCategory", fileTypeCategory);
+
+            const response = await fetch("/api/designs/upload-proxy", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                fileName: file.name,
-                fileType: file.type,
-                fileTypeCategory: fileTypeCategory,
-              }),
+              body: formData,
             });
 
             if (!response.ok) {
-              throw new Error("Failed to get presigned URL");
+              throw new Error("Upload failed");
             }
 
-            const { presignedUrl, url, originalFileName } =
-              await response.json();
-
-            const xhr = new XMLHttpRequest();
-            xhr.open("PUT", presignedUrl, true);
-            xhr.setRequestHeader("Content-Type", file.type);
-            xhr.setRequestHeader("x-amz-acl", "public-read");
-
-            xhr.upload.onprogress = (event) => {
-              if (event.lengthComputable) {
-                const progress = Math.round((event.loaded / event.total) * 100);
-                setUploadingFiles((prev) =>
-                  prev.map((f) =>
-                    f.file.name === file.name ? { ...f, progress } : f
-                  )
-                );
-              }
-            };
-
-            await new Promise((resolve, reject) => {
-              xhr.onload = () => {
-                if (xhr.status === 200) {
-                  resolve({ url, type: fileTypeCategory, originalFileName });
-                } else {
-                  reject(new Error("Upload failed"));
-                }
-              };
-              xhr.onerror = () => reject(new Error("Upload failed"));
-              xhr.send(file);
-            });
+            const { url, originalFileName } = await response.json();
 
             setUploadingFiles((prev) =>
               prev.filter((f) => f.file.name !== file.name)
