@@ -13,7 +13,11 @@ export async function GET(
       include: {
         items: {
           include: {
-            design: true,
+            design: {
+              include: {
+                files: true,
+              },
+            },
           },
         },
       },

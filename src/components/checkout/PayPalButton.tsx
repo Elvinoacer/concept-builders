@@ -93,6 +93,7 @@ export default function PayPalButton({
       });
 
       const result = await response.json();
+      console.log("PayPal capture result:", result);
 
       if (!response.ok) {
         throw new Error(result.error || "Failed to capture order");
