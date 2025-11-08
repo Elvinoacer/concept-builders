@@ -271,7 +271,7 @@ const PurchasedDesigns = ({
                 <div className="relative h-48 sm:h-56 bg-gray-100 dark:bg-gray-900 overflow-hidden">
                   <Image
                     src={
-                      design.files[0]?.url || "/images/category-placeholder.png"
+                      design.files.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.png"
                     }
                     alt={design.name}
                     fill
@@ -382,7 +382,7 @@ const PurchasedDesigns = ({
                   <div className="relative w-full sm:w-48 h-40 sm:h-auto bg-gray-100 dark:bg-gray-900 flex-shrink-0">
                     <Image
                       src={
-                        design.files[0]?.url ||
+                        design.files.find(file => file.type === 'IMAGE')?.url ||
                         "/images/category-placeholder.png"
                       }
                       alt={design.name}

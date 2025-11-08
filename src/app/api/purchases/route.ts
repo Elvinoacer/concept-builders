@@ -34,18 +34,20 @@ export async function GET(request: NextRequest) {
     });
 
     let purchasedDesigns = orders.flatMap(order => 
-      order.items.map(item => ({...item.design, createdAt: order.createdAt, selectedFileType: item.selectedFileType, selectedPackage: item.selectedPackage, selectedExtras: item.selectedExtras}))
+      order.items.map(item => ({...item.design, createdAt: order.createdAt, selectedFileTypes: item.selectedFileTypes, selectedExtras: item.selectedExtras}))
     );
 
     // Apply filtering
     if (filterFileType && filterFileType !== 'all') {
       purchasedDesigns = purchasedDesigns.filter(design => {
-        if (filterFileType === 'PDF') {
-          return design.files.some(file => file.fileType === 'PDF');
-        } else if (filterFileType === 'PDF & CAD') {
-          return design.files.some(file => file.fileType === 'PDF') && design.files.some(file => file.fileType === 'CAD');
+        if (Array.isArray(design.selectedFileTypes)) {
+          if (filterFileType === 'PDF') {
+            return design.selectedFileTypes.includes('architecturalPdf');
+          } else if (filterFileType === 'PDF & CAD') {
+            return design.selectedFileTypes.includes('architecturalPdf') && design.selectedFileTypes.includes('architecturalCad');
+          }
         }
-        return true;
+        return false;
       });
     }
 
