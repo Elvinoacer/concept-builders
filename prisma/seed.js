@@ -1,5 +1,5 @@
 const { PrismaClient } = require("../src/generated/prisma");
-const { categoriesData, designsData } = require("./seed-data");
+const { categoriesData, designsData } = require("./design-data");
 const { v4: uuidv4 } = require('uuid');
 
 const prisma = new PrismaClient();
@@ -9,6 +9,7 @@ async function main() {
   await prisma.design.deleteMany({});
   await prisma.category.deleteMany({});
   await prisma.testimonial.deleteMany({}); // Clear existing testimonials
+  await prisma.packageOption.deleteMany({}); // Clear existing package options
 
   for (const category of categoriesData) {
     await prisma.category.create({
@@ -21,7 +22,7 @@ async function main() {
   for (const design of designsData) {
     const category = categories.find((c) => c.name === design.category);
     if (category) {
-      await prisma.design.create({
+      const createdDesign = await prisma.design.create({
         data: {
           name: design.name,
           description: design.description,
@@ -33,11 +34,23 @@ async function main() {
           area: design.area,
           floors: design.floors,
           planDetails: design.planDetails,
-          files: {
-            create: design.files.map((file) => ({ ...file, type: file.type })),
-          },
+          // Files are created separately or linked via DesignDocuments
+          // For now, we'll assume files are handled by DesignDocuments or not directly linked here
         },
       });
+
+      // Create PackageOptions for the design
+      if (design.packageOptions && design.packageOptions.length > 0) {
+        for (const option of design.packageOptions) {
+          await prisma.packageOption.create({
+            data: {
+              name: option.name,
+              price: option.price,
+              designId: createdDesign.id,
+            },
+          });
+        }
+      }
     }
   }
 

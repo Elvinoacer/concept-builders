@@ -1,4 +1,3 @@
-
 const { PrismaClient } = require('../src/generated/prisma');
 const prisma = new PrismaClient();
 
@@ -39,7 +38,23 @@ async function main() {
     },
     include: {
       packageOptions: true,
-      files: true, // Include the files
+      architecturalDesign: {
+        include: {
+          pdfFiles: true,
+          cadFiles: true,
+        },
+      },
+      structuralDesign: {
+        include: {
+          pdfFiles: true,
+          cadFiles: true,
+        },
+      },
+      billOfQuantities: {
+        include: {
+          excelFiles: true,
+        },
+      },
     },
   });
 
@@ -88,7 +103,23 @@ async function main() {
         include: {
           design: {
             include: {
-              files: true,
+              architecturalDesign: {
+                include: {
+                  pdfFiles: true,
+                  cadFiles: true,
+                },
+              },
+              structuralDesign: {
+                include: {
+                  pdfFiles: true,
+                  cadFiles: true,
+                },
+              },
+              billOfQuantities: {
+                include: {
+                  excelFiles: true,
+                },
+              },
             },
           },
         },
