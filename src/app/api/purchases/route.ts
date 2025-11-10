@@ -78,13 +78,13 @@ export async function GET(request: NextRequest) {
         }
 
         return {
-          ...item.design, 
-          createdAt: order.createdAt, 
-          selectedFileTypes: item.selectedFileTypes, 
-          selectedExtras: item.selectedExtras,
-          purchasedFiles,
-        }
-      })
+                  ...item.design,
+                  orderId: order.id,
+                  createdAt: order.createdAt,
+                  selectedFileTypes: item.selectedFileTypes,
+                  selectedExtras: item.selectedExtras,
+                  purchasedFiles,
+                }      })
     );
 
     // Apply filtering

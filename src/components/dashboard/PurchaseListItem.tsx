@@ -35,8 +35,7 @@ const PurchaseListItem = ({ design }) => {
   };
 
   const handleViewInvoice = () => {
-    // Invoice logic here
-    console.log("Viewing invoice for:", design.name);
+    window.location.href = `/dashboard/invoice/${design.orderId}`;
     setIsMenuOpen(false);
   };
 
