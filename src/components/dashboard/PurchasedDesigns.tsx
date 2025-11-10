@@ -130,13 +130,17 @@ const PurchasedDesigns = ({
     } else {
       const filtered = purchasedDesigns.filter(
         (design) =>
-          design.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          design.selectedPackage
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          design.selectedFileTypes?.some((type) =>
-            type.toLowerCase().includes(searchQuery.toLowerCase())
-          )
+          (design.name &&
+            design.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (design.selectedPackage &&
+            design.selectedPackage
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())) ||
+          (design.selectedFileTypes &&
+            design.selectedFileTypes.some(
+              (type) =>
+                type && type.toLowerCase().includes(searchQuery.toLowerCase())
+            ))
       );
       setFilteredDesigns(filtered);
     }
