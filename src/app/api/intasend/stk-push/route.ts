@@ -91,26 +91,17 @@ export async function POST(req: NextRequest) {
         ? `254${phone_number.substring(1)}`
         : phone_number, // Ensure correct format
       api_ref: userCart.id, // Use 'api_ref' for consistency
-      callback_url: `${host}/api/intasend/webhook`,
+      // callback_url: `${host}/api/intasend/webhook`,
     });
 
     return NextResponse.json(resp);
   } catch (error: any) {
     let errorMessage = "Failed to initiate M-Pesa STK Push";
-    if (error.response?.data) {
-      try {
-        const errorData = JSON.parse(error.response.data.toString());
-        errorMessage = errorData.detail || errorMessage;
-        console.error("IntaSend STK Push Error:", errorData);
-      } catch (e) {
-        console.error(
-          "IntaSend STK Push Error (raw buffer):",
-          error.response.data
-        );
-      }
-    } else {
-      console.error("IntaSend STK Push Error:", error.message || error);
-    }
+    console.error("IntaSend STK Push Error:", {
+      message: error.message,
+      stack: error.stack,
+      response: error.response?.data,
+    });
 
     return NextResponse.json(
       {
