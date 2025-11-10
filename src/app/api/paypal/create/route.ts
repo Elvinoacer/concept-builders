@@ -4,12 +4,16 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { amount, cart } = body;
+  const { cart } = body;
+
+  const totalAmount = cart.reduce((total: number, item: any) => {
+    return total + (item.design?.basePrice || 0) * item.quantity;
+  }, 0);
 
   // Enhanced validation
-  if (!amount || isNaN(amount) || amount <= 0) {
+  if (isNaN(totalAmount) || totalAmount <= 0) {
     return NextResponse.json(
-      { error: "Valid amount is required and must be greater than 0" },
+      { error: "Valid total amount is required and must be greater than 0" },
       { status: 400 }
     );
   }
@@ -21,9 +25,9 @@ export async function POST(request: Request) {
     );
   }
 
-  if (amount < 0.01) {
+  if (totalAmount < 0.01) {
     return NextResponse.json(
-      { error: "Amount must be at least $0.01" },
+      { error: "Total amount must be at least $0.01" },
       { status: 400 }
     );
   }
@@ -34,7 +38,7 @@ export async function POST(request: Request) {
     req.headers["Prefer"] = "return=representation";
 
     // Enhanced order creation with better item details
-    const itemTotal = cart.reduce((total, item) => {
+    const itemTotal = cart.reduce((total: number, item: any) => {
       return total + (item.design?.basePrice || 0) * item.quantity;
     }, 0);
 
@@ -44,7 +48,7 @@ export async function POST(request: Request) {
         {
           amount: {
             currency_code: "USD",
-            value: itemTotal.toFixed(2),
+            value: totalAmount.toFixed(2),
             breakdown: {
               item_total: {
                 currency_code: "USD",
@@ -52,7 +56,7 @@ export async function POST(request: Request) {
               },
             },
           },
-          items: cart.map((item, index) => ({
+          items: cart.map((item: any, index: number) => ({
             name: item.design?.title || `Design Item ${index + 1}`,
             description: item.design?.description || "Digital design product",
             quantity: item.quantity.toString(),
