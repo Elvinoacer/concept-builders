@@ -97,7 +97,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
 
                 {/* Content - Scrollable */}
                 <div
-                  className="overflow-y-auto pr-1 -mr-1"
+                  className="overflow-y-auto pr-1 -mr-1 pb-24" // Added pb-24 for padding at the bottom
                   style={{ maxHeight: "calc(90vh - 120px)" }}
                 >
                   <div className="grid grid-cols-1 gap-4 xs:gap-5 sm:gap-6">
@@ -201,15 +201,17 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                {/* Search Button */}
-                <motion.button
-                  onClick={handleSearch}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full rounded-lg xs:rounded-xl bg-gradient-to-r from-blue-600 to-cyan-400 py-2.5 xs:py-3 sm:py-3.5 text-sm xs:text-base font-bold text-white transition-all duration-300 hover:from-blue-700 hover:to-cyan-500 shadow-lg hover:shadow-xl mt-4 xs:mt-5 sm:mt-6 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                >
-                  Search Designs
-                </motion.button>
+                {/* Search Button - Sticky Footer */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 xs:p-5 sm:p-6 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+                  <motion.button
+                    onClick={handleSearch}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full rounded-lg xs:rounded-xl bg-gradient-to-r from-blue-600 to-cyan-400 py-2.5 xs:py-3 sm:py-3.5 text-sm xs:text-base font-bold text-white transition-all duration-300 hover:from-blue-700 hover:to-cyan-500 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  >
+                    Search Designs
+                  </motion.button>
+                </div>
               </motion.div>
             </div>
           </div>

@@ -40,7 +40,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
   const filteredConversations = conversations.filter((conversation) => {
     if (!searchQuery.trim()) return true;
 
-    const otherUser = conversation.users.find(
+    const otherUser = conversation.users?.find(
       (user) => user.email !== session?.user?.email
     );
 
@@ -160,6 +160,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
   const getLastMessagePreview = (
     conversation: ConversationWithMessagesAndUsers
   ) => {
+    if (!conversation.messages || conversation.messages.length === 0) {
+      return "No messages yet";
+    }
     const lastMessage = conversation.messages[0];
     if (!lastMessage?.content) return "No messages yet";
 
@@ -227,7 +230,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
           <div className="overflow-y-auto h-full custom-scrollbar">
             <AnimatePresence>
               {filteredConversations.map((conversation, index) => {
-                const otherUser = conversation.users.find(
+                const otherUser = conversation.users?.find(
                   (user) => user.email !== session?.user?.email
                 );
 
@@ -275,7 +278,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                           <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base truncate">
                             {otherUser?.name || "Unknown User"}
                           </h3>
-                          {conversation.messages[0]?.createdAt && (
+                          {conversation.messages && conversation.messages[0]?.createdAt && (
                             <p className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 whitespace-nowrap">
                               {formatTime(conversation.messages[0].createdAt)}
                             </p>

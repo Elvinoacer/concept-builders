@@ -175,7 +175,7 @@ io.on("connection", (socket) => {
         { recipientId, content: initialMessage, senderId: userId },
         { headers: { "X-API-Key": SOCKET_TO_NEXT_API_KEY } }
       );
-      const newConversation = response.data;
+      const newConversation = response.data.conversation; // Extract the conversation object
       socket.emit("conversationCreated", newConversation);
       // Optionally, notify the recipient if they are online
       const recipientSocketId = activeUsers.get(recipientId);
