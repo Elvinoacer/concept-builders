@@ -31,29 +31,32 @@ export async function POST(request: Request) {
 
     const response = await PaypalClient.execute(req);
 
-    if (response.result.status !== "COMPLETED") {
+    const capture = response.result.purchase_units[0].payments.captures[0];
+
+    if (capture.status !== "COMPLETED") {
       await prisma.notification.create({
         data: {
           userId: userId,
           title: "Payment Failed",
-          description: `Your payment for order ${orderID} failed. Reason: ${response.result.status}`,
+          description: `Your payment for order ${orderID} could not be completed. Status: ${capture.status}`,
           icon: "AlertTriangle",
         },
       });
       return NextResponse.json(
-        { error: `Failed to capture payment. Status: ${response.result.status}` },
-        { status: 500 }
+        { error: `Failed to capture payment. Status: ${capture.status}` },
+        { status: 400 }
       );
     }
 
     const existingOrder = await prisma.order.findUnique({
-      where: { paymentId: response.result.id },
+      where: { paymentId: capture.id },
     });
 
     if (existingOrder) {
       return NextResponse.json({
         success: true,
         orderId: existingOrder.id,
+        redirect_url: `/purchase-confirmation?purchaseId=${existingOrder.id}`,
       });
     }
 
@@ -89,7 +92,7 @@ export async function POST(request: Request) {
           amount: totalAmount,
           status: "PAID",
           paymentGateway: "PAYPAL",
-          paymentId: response.result.id,
+          paymentId: capture.id,
           discountCode: discountCode || null,
           discountAmount: discountAmount || null,
           discountId: discountId || null,
