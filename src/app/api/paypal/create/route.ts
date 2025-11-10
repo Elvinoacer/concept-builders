@@ -34,17 +34,21 @@ export async function POST(request: Request) {
     req.headers["Prefer"] = "return=representation";
 
     // Enhanced order creation with better item details
+    const itemTotal = cart.reduce((total, item) => {
+      return total + (item.design?.basePrice || 0) * item.quantity;
+    }, 0);
+
     req.requestBody({
       intent: "CAPTURE",
       purchase_units: [
         {
           amount: {
             currency_code: "USD",
-            value: amount.toFixed(2),
+            value: itemTotal.toFixed(2),
             breakdown: {
               item_total: {
                 currency_code: "USD",
-                value: amount.toFixed(2),
+                value: itemTotal.toFixed(2),
               },
             },
           },
