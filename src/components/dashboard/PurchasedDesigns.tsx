@@ -271,7 +271,7 @@ const PurchasedDesigns = ({
                 <div className="relative h-48 sm:h-56 bg-gray-100 dark:bg-gray-900 overflow-hidden">
                   <Image
                     src={
-                      design.architecturalDesign?.pdfFiles[0]?.url || design.structuralDesign?.pdfFiles[0]?.url || design.billOfQuantities?.excelFiles[0]?.url || "/images/category-placeholder.png"
+                      design.images[0]?.url || design.architecturalDesign?.pdfFiles[0]?.url || design.structuralDesign?.pdfFiles[0]?.url || design.billOfQuantities?.excelFiles[0]?.url || "/images/category-placeholder.png"
                     }
                     alt={design.name}
                     fill

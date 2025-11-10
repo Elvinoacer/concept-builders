@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
           include: {
             design: {
               include: {
+                images: true, // Include images
                 architecturalDesign: {
                   include: {
                     pdfFiles: true,
