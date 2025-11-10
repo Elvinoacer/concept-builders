@@ -176,7 +176,6 @@ export async function POST(request: Request) {
           discountCode: discountCode || null,
           discountAmount: discountAmount || null,
           discountId: discountId || null,
-          paypalOrderId: orderID,
         },
       });
 
@@ -198,7 +197,6 @@ export async function POST(request: Request) {
             quantity: item.quantity,
             selectedFileTypes: item.selectedFileTypes,
             selectedExtras: selectedExtras,
-            unitPrice: item.design.basePrice,
           };
         }),
       });

@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
     if (data.state === "COMPLETE") {
       const cartId = data.api_ref;
       const paymentId = data.invoice_id;
+      const amountPaidKES = data.value;
 
       const existingOrder = await prisma.order.findUnique({
         where: { paymentId },
@@ -38,40 +39,36 @@ export async function POST(req: NextRequest) {
 
       const userCart = await prisma.cart.findUnique({
         where: { id: cartId },
-        include: { items: { include: { design: true } }, discount: true }, // Include discount details
+        include: { items: { include: { design: true } }, discount: true },
       });
 
       if (!userCart) {
         return NextResponse.json({ error: "Cart not found" }, { status: 404 });
       }
 
-      const totalAmount = userCart.items.reduce((acc, item) => {
-        let itemTotal = item.design.basePrice * item.quantity;
-        if (item.selectedFileType === 'pdf') {
-          itemTotal += item.design.pdfPrice || 0;
-        } else if (item.selectedFileType === 'cad') {
-          itemTotal += item.design.cadPrice || 0;
-        } else if (item.selectedFileType === 'pdf-and-cad') {
-          itemTotal += item.design.pdfAndCadPrice || 0;
-        }
-        if (item.selectedExtras) {
-          const extras = JSON.parse(item.selectedExtras as string);
-          extras.forEach((extra: any) => {
-            itemTotal += extra.price;
-          });
-        }
-        return acc + itemTotal;
-      }, 0);
+      // Fetch USD to KES exchange rate to convert amount back to USD
+      const exchangeRateRes = await fetch(`${req.nextUrl.origin}/api/exchange-rate`);
+      if (!exchangeRateRes.ok) {
+        throw new Error('Failed to fetch exchange rate for order creation');
+      }
+      const exchangeRateData = await exchangeRateRes.json();
+      const usdToKesRate = exchangeRateData.usdToKesRate;
+
+      if (!usdToKesRate) {
+        throw new Error('USD to KES exchange rate not available.');
+      }
+
+      const amountPaidUSD = parseFloat(amountPaidKES) / usdToKesRate;
 
       await prisma.$transaction(async (tx) => {
         const order = await tx.order.create({
           data: {
             userId: userCart.userId,
-            amount: totalAmount,
+            amount: amountPaidUSD, // Use 'amount' as per existing schema
             status: "PAID",
             paymentGateway: "INTASEND",
             paymentId: paymentId,
-            cartId: userCart.id, // Store cartId in the order
+            cartId: userCart.id,
             discountCode: userCart.discountCode || null,
             discountAmount: userCart.discountAmount || null,
             discountId: userCart.discountId || null,
@@ -83,9 +80,8 @@ export async function POST(req: NextRequest) {
             orderId: order.id,
             designId: item.designId,
             quantity: item.quantity,
-            selectedFileType: item.selectedFileType,
-            selectedPackage: item.selectedPackage,
-            selectedExtras: item.selectedExtras,
+            selectedFileTypes: item.selectedFileTypes,
+            selectedExtras: item.selectedExtras, // Pass directly as Json
           })),
         });
 
@@ -106,16 +102,6 @@ export async function POST(req: NextRequest) {
             title: "Order Created",
             description: `Your order #${order.id} has been created successfully.`,
             icon: "ShoppingCart",
-          },
-        });
-
-        // Clear discount fields from the cart after successful order
-        await tx.cart.update({
-          where: { id: userCart.id },
-          data: {
-            discountCode: null,
-            discountAmount: null,
-            discountId: null,
           },
         });
 
