@@ -1,4 +1,4 @@
-import * as paypal from "@paypal/checkout-server-sdk";
+const paypal = require("@paypal/checkout-server-sdk");
 
 function environment() {
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
