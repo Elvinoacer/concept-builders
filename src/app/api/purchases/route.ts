@@ -25,7 +25,23 @@ export async function GET(request: NextRequest) {
           include: {
             design: {
               include: {
-                files: true,
+                architecturalDesign: {
+                  include: {
+                    pdfFiles: true,
+                    cadFiles: true,
+                  },
+                },
+                structuralDesign: {
+                  include: {
+                    pdfFiles: true,
+                    cadFiles: true,
+                  },
+                },
+                billOfQuantities: {
+                  include: {
+                    excelFiles: true,
+                  },
+                },
               },
             },
           },
@@ -35,7 +51,23 @@ export async function GET(request: NextRequest) {
 
     let purchasedDesigns = orders.flatMap(order => 
       order.items.map(item => {
-        const purchasedFiles = item.design.files.filter(file => item.selectedFileTypes.includes(file.name));
+        const purchasedFiles = [];
+
+        if (item.selectedFileTypes.includes('architecturalPdf') && item.design.architecturalDesign) {
+          purchasedFiles.push(...item.design.architecturalDesign.pdfFiles);
+        }
+        if (item.selectedFileTypes.includes('architecturalCad') && item.design.architecturalDesign) {
+          purchasedFiles.push(...item.design.architecturalDesign.cadFiles);
+        }
+        if (item.selectedFileTypes.includes('structuralPdf') && item.design.structuralDesign) {
+          purchasedFiles.push(...item.design.structuralDesign.pdfFiles);
+        }
+        if (item.selectedFileTypes.includes('structuralCad') && item.design.structuralDesign) {
+          purchasedFiles.push(...item.design.structuralDesign.cadFiles);
+        }
+        if (item.selectedFileTypes.includes('billOfQuantities') && item.design.billOfQuantities) {
+          purchasedFiles.push(...item.design.billOfQuantities.excelFiles);
+        }
 
         if (item.selectedExtras) {
           const extras = typeof item.selectedExtras === 'string' ? JSON.parse(item.selectedExtras) : item.selectedExtras;
