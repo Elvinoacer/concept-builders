@@ -97,7 +97,7 @@ export async function POST(request: Request) {
 
     console.log("PayPal Order Created Successfully:", {
       orderID: response.result.id,
-      amount: amount,
+      amount: totalAmount.toFixed(2),
       status: response.result.status,
     });
 
