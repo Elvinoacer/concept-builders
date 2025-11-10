@@ -7,7 +7,31 @@ export async function POST(request: Request) {
   const { cart } = body;
 
   const totalAmount = cart.reduce((total: number, item: any) => {
-    return total + (item.design?.basePrice || 0) * item.quantity;
+    let itemTotal = item.design.basePrice * item.quantity;
+
+    if (item.selectedFileTypes) {
+      if (item.selectedFileTypes.includes('architecturalPdf')) {
+        itemTotal += item.design.architecturalPdfPrice || 0;
+      }
+      if (item.selectedFileTypes.includes('architecturalCad')) {
+        itemTotal += item.design.architecturalCadPrice || 0;
+      }
+      if (item.selectedFileTypes.includes('structuralPdf')) {
+        itemTotal += item.design.structuralPdfPrice || 0;
+      }
+      if (item.selectedFileTypes.includes('structuralCad')) {
+        itemTotal += item.design.structuralCadPrice || 0;
+      }
+      if (item.selectedFileTypes.includes('billOfQuantities')) {
+        itemTotal += item.design.billOfQuantitiesPrice || 0;
+      }
+    }
+
+    if (item.selectedExtras) {
+      itemTotal += item.selectedExtras.reduce((sum: number, extra: any) => sum + extra.price, 0);
+    }
+
+    return total + itemTotal;
   }, 0);
 
   // Enhanced validation
@@ -38,9 +62,7 @@ export async function POST(request: Request) {
     req.headers["Prefer"] = "return=representation";
 
     // Enhanced order creation with better item details
-    const itemTotal = cart.reduce((total: number, item: any) => {
-      return total + (item.design?.basePrice || 0) * item.quantity;
-    }, 0);
+    const itemTotal = totalAmount; // The total amount is the item total
 
     req.requestBody({
       intent: "CAPTURE",
@@ -56,15 +78,41 @@ export async function POST(request: Request) {
               },
             },
           },
-          items: cart.map((item: any, index: number) => ({
-            name: item.design?.title || `Design Item ${index + 1}`,
-            description: item.design?.description || "Digital design product",
-            quantity: item.quantity.toString(),
-            unit_amount: {
-              currency_code: "USD",
-              value: (item.design?.basePrice || 0).toFixed(2),
-            },
-          })),
+          items: cart.map((item: any, index: number) => {
+            let itemTotal = item.design.basePrice;
+
+            if (item.selectedFileTypes) {
+              if (item.selectedFileTypes.includes('architecturalPdf')) {
+                itemTotal += item.design.architecturalPdfPrice || 0;
+              }
+              if (item.selectedFileTypes.includes('architecturalCad')) {
+                itemTotal += item.design.architecturalCadPrice || 0;
+              }
+              if (item.selectedFileTypes.includes('structuralPdf')) {
+                itemTotal += item.design.structuralPdfPrice || 0;
+              }
+              if (item.selectedFileTypes.includes('structuralCad')) {
+                itemTotal += item.design.structuralCadPrice || 0;
+              }
+              if (item.selectedFileTypes.includes('billOfQuantities')) {
+                itemTotal += item.design.billOfQuantitiesPrice || 0;
+              }
+            }
+
+            if (item.selectedExtras) {
+              itemTotal += item.selectedExtras.reduce((sum: number, extra: any) => sum + extra.price, 0);
+            }
+
+            return {
+              name: item.design?.title || `Design Item ${index + 1}`,
+              description: item.design?.description || "Digital design product",
+              quantity: item.quantity.toString(),
+              unit_amount: {
+                currency_code: "USD",
+                value: itemTotal.toFixed(2),
+              },
+            };
+          }),
         },
       ],
       application_context: {
