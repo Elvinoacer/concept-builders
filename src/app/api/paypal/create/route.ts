@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { cart } = body;
+  const { cart, discountAmount } = body;
 
-  const totalAmount = cart.reduce((total: number, item: any) => {
+  const subTotal = cart.reduce((total: number, item: any) => {
     let itemTotal = item.design.basePrice * item.quantity;
 
     if (item.selectedFileTypes) {
@@ -33,6 +33,8 @@ export async function POST(request: Request) {
 
     return total + itemTotal;
   }, 0);
+
+  const totalAmount = subTotal - (discountAmount || 0);
 
   // Enhanced validation
   if (isNaN(totalAmount) || totalAmount <= 0) {
@@ -62,7 +64,7 @@ export async function POST(request: Request) {
     req.headers["Prefer"] = "return=representation";
 
     // Enhanced order creation with better item details
-    const itemTotal = totalAmount; // The total amount is the item total
+    const itemTotal = subTotal; // The sub total is the item total
 
     req.requestBody({
       intent: "CAPTURE",
@@ -75,6 +77,10 @@ export async function POST(request: Request) {
               item_total: {
                 currency_code: "USD",
                 value: itemTotal.toFixed(2),
+              },
+              discount: {
+                currency_code: "USD",
+                value: (discountAmount || 0).toFixed(2),
               },
             },
           },
