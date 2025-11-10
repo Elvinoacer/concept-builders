@@ -271,7 +271,7 @@ const PurchasedDesigns = ({
                 <div className="relative h-48 sm:h-56 bg-gray-100 dark:bg-gray-900 overflow-hidden">
                   <Image
                     src={
-                      design.purchasedFiles.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.png"
+                      design.architecturalDesign?.pdfFiles[0]?.url || design.structuralDesign?.pdfFiles[0]?.url || design.billOfQuantities?.excelFiles[0]?.url || "/images/category-placeholder.png"
                     }
                     alt={design.name}
                     fill
@@ -347,7 +347,31 @@ const PurchasedDesigns = ({
                       </span>
                     </div>
                     <div className="bg-gray-50/50 dark:bg-gray-700/50 p-3 sm:p-4 rounded-xl space-y-2">
-                      {design.purchasedFiles.map((file) => (
+                      {design.architecturalDesign?.pdfFiles.map((file) => (
+                        <div key={file.id} className="flex items-center justify-between">
+                          <p className="text-sm text-gray-900 dark:text-white">{file.name}</p>
+                          <button onClick={() => window.open(file.url, '_blank')} className="text-sm text-blue-600 hover:underline">Download</button>
+                        </div>
+                      ))}
+                      {design.architecturalDesign?.cadFiles.map((file) => (
+                        <div key={file.id} className="flex items-center justify-between">
+                          <p className="text-sm text-gray-900 dark:text-white">{file.name}</p>
+                          <button onClick={() => window.open(file.url, '_blank')} className="text-sm text-blue-600 hover:underline">Download</button>
+                        </div>
+                      ))}
+                      {design.structuralDesign?.pdfFiles.map((file) => (
+                        <div key={file.id} className="flex items-center justify-between">
+                          <p className="text-sm text-gray-900 dark:text-white">{file.name}</p>
+                          <button onClick={() => window.open(file.url, '_blank')} className="text-sm text-blue-600 hover:underline">Download</button>
+                        </div>
+                      ))}
+                      {design.structuralDesign?.cadFiles.map((file) => (
+                        <div key={file.id} className="flex items-center justify-between">
+                          <p className="text-sm text-gray-900 dark:text-white">{file.name}</p>
+                          <button onClick={() => window.open(file.url, '_blank')} className="text-sm text-blue-600 hover:underline">Download</button>
+                        </div>
+                      ))}
+                      {design.billOfQuantities?.excelFiles.map((file) => (
                         <div key={file.id} className="flex items-center justify-between">
                           <p className="text-sm text-gray-900 dark:text-white">{file.name}</p>
                           <button onClick={() => window.open(file.url, '_blank')} className="text-sm text-blue-600 hover:underline">Download</button>
