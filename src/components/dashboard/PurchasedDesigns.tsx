@@ -3,25 +3,26 @@ import { useSearch } from "@/lib/SearchContext";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
+  CheckCircle2,
   Download,
+  ExternalLink,
   Eye,
+  FileDown,
   FileText,
+  FolderOpen,
   Grid3X3,
   List,
+  Loader2,
   Package,
   Receipt,
   Zap,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
-  ExternalLink,
-  FileDown,
-  FolderOpen,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 interface DesignFile {
   id: string;
@@ -122,7 +123,6 @@ const PurchasedDesigns = ({
     }
   }, [session]);
 
-  // Filter designs based on search query
   useEffect(() => {
     if (!searchQuery) {
       setFilteredDesigns(purchasedDesigns);
@@ -221,7 +221,12 @@ const PurchasedDesigns = ({
     }
   };
 
-  // Download all files for a design
+  import JSZip from "jszip";
+import { saveAs } from "file-saver";
+
+// ... (rest of the component)
+
+// Download all files for a design as a zip
   const handleDownloadAll = async (design: PurchasedDesign) => {
     try {
       setDownloadStates((prev) => ({
@@ -234,27 +239,40 @@ const PurchasedDesigns = ({
       }));
 
       toast.info(
-        `Preparing ${design.purchasedFiles.length} files for download...`
+        `Zipping ${design.purchasedFiles.length} files... This may take a moment.`
       );
 
-      // Download files sequentially with progress
+      const zip = new JSZip();
+
+      // Fetch and add each file to the zip
       for (let i = 0; i < design.purchasedFiles.length; i++) {
         const file = design.purchasedFiles[i];
         const progress = ((i + 1) / design.purchasedFiles.length) * 100;
 
-        setDownloadStates((prev) => ({
-          ...prev,
-          [design.id]: {
-            ...prev[design.id],
-            progress,
-          },
-        }));
+        try {
+          const response = await fetch(file.url);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch ${file.name}`);
+          }
+          const blob = await response.blob();
+          zip.file(file.name, blob);
 
-        await handleDownloadFile(design.id, file);
-
-        // Small delay between downloads
-        await new Promise((resolve) => setTimeout(resolve, 500));
+          setDownloadStates((prev) => ({
+            ...prev,
+            [design.id]: {
+              ...prev[design.id],
+              progress,
+            },
+          }));
+        } catch (error) {
+          console.error(`Error fetching file ${file.name}:`, error);
+          toast.error(`Skipping ${file.name} due to an error.`);
+        }
       }
+
+      // Generate and download the zip file
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      saveAs(zipBlob, `${design.name.replace(/\s+/g, "_")}_files.zip`);
 
       setDownloadStates((prev) => ({
         ...prev,
@@ -265,9 +283,9 @@ const PurchasedDesigns = ({
         },
       }));
 
-      toast.success(`All files downloaded successfully!`);
+      toast.success(`All files downloaded successfully as a zip!`);
     } catch (error) {
-      console.error("Error downloading all files:", error);
+      console.error("Error creating zip file:", error);
       setDownloadStates((prev) => ({
         ...prev,
         [design.id]: {
@@ -276,7 +294,7 @@ const PurchasedDesigns = ({
           progress: 0,
         },
       }));
-      toast.error("Failed to download files");
+      toast.error("Failed to create zip file.");
     }
   };
 
@@ -287,7 +305,7 @@ const PurchasedDesigns = ({
   };
 
   const handleViewInvoice = (designId: string) => {
-    window.open(`/invoice/${designId}`, "_blank");
+    window.location.href = `/invoice/${designId}`;
     toast.info("Opening invoice...");
   };
 
@@ -459,7 +477,7 @@ const PurchasedDesigns = ({
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8"
           >
             {filteredDesigns.map((design) => (
               <motion.div

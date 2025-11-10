@@ -54,18 +54,16 @@ export async function GET(request: NextRequest) {
       order.items.map(item => {
         const purchasedFiles = [];
 
-        for (const selectedType of item.selectedFileTypes) {
-          if (selectedType === 'architecturalPdf' && item.design.architecturalDesign) {
-            purchasedFiles.push(...item.design.architecturalDesign.pdfFiles);
-          } else if (selectedType === 'architecturalCad' && item.design.architecturalDesign) {
-            purchasedFiles.push(...item.design.architecturalDesign.cadFiles);
-          } else if (selectedType === 'structuralPdf' && item.design.structuralDesign) {
-            purchasedFiles.push(...item.design.structuralDesign.pdfFiles);
-          } else if (selectedType === 'structuralCad' && item.design.structuralDesign) {
-            purchasedFiles.push(...item.design.structuralDesign.cadFiles);
-          } else if (selectedType === 'billOfQuantities' && item.design.billOfQuantities) {
-            purchasedFiles.push(...item.design.billOfQuantities.excelFiles);
-          }
+        if (item.design.architecturalDesign) {
+          purchasedFiles.push(...item.design.architecturalDesign.pdfFiles);
+          purchasedFiles.push(...item.design.architecturalDesign.cadFiles);
+        }
+        if (item.design.structuralDesign) {
+          purchasedFiles.push(...item.design.structuralDesign.pdfFiles);
+          purchasedFiles.push(...item.design.structuralDesign.cadFiles);
+        }
+        if (item.design.billOfQuantities) {
+          purchasedFiles.push(...item.design.billOfQuantities.excelFiles);
         }
 
         if (item.selectedExtras) {
