@@ -21,6 +21,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -221,12 +222,6 @@ const PurchasedDesigns = ({
     }
   };
 
-  import JSZip from "jszip";
-import { saveAs } from "file-saver";
-
-// ... (rest of the component)
-
-// Download all files for a design as a zip
   const handleDownloadAll = async (design: PurchasedDesign) => {
     try {
       setDownloadStates((prev) => ({
