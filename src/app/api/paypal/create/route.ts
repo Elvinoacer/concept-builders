@@ -109,7 +109,7 @@ export async function POST(request: Request) {
     console.error("PayPal Order Creation Error:", {
       message: error.message,
       stack: error.stack,
-      amount: amount,
+      amount: totalAmount,
     });
 
     let errorMessage = "Internal server error during order creation";
