@@ -47,14 +47,10 @@ export async function GET() {
       }
     });
 
-    // Convert map to array and sort by date to ensure correct order
-    const sortedMonthlySales = Array.from(monthlySalesMap.values()).sort((a, b) => {
-      const dateA = new Date(`1 ${a.month} 2000`); // Use a dummy year for comparison
-      const dateB = new Date(`1 ${b.month} 2000`);
-      return dateA.getMonth() - dateB.getMonth();
-    });
+    // Convert map to array and reverse to get chronological order
+    const monthlySales = Array.from(monthlySalesMap.values()).reverse();
 
-    return NextResponse.json(sortedMonthlySales);
+    return NextResponse.json(monthlySales);
   } catch (error) {
     console.error('Error fetching monthly sales:', error);
     return new NextResponse('Internal Server Error', { status: 500 });

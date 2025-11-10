@@ -24,7 +24,7 @@ import {
   FiFolderPlus,
 } from "react-icons/fi";
 
-const FoldersPage = ({ folders, loading, onRefresh }) => {
+const FoldersPage = ({ folders, loading, onRefresh, onRename }) => {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Header Section */}
@@ -52,13 +52,14 @@ const FoldersPage = ({ folders, loading, onRefresh }) => {
         folders={folders}
         loading={loading}
         onRefresh={onRefresh}
+        onRename={onRename}
       />
     </div>
   );
 };
 
 // Folder Structure Component
-const FolderStructure = ({ folders, loading, onRefresh }) => {
+const FolderStructure = ({ folders, loading, onRefresh, onRename }) => {
   const formatDate = (dateString: string) => {
     const now = new Date();
     const date = new Date(dateString);
@@ -82,11 +83,9 @@ const FolderStructure = ({ folders, loading, onRefresh }) => {
   };
 
   const getFolderSize = (folder) => {
-    const size = folder.size || 0;
+    const size = folder._count?.designs || 0;
     if (size === 0) return "Empty";
-    if (size < 1024) return `${size} files`;
-    if (size < 1048576) return `${Math.round(size / 1024)}K files`;
-    return `${Math.round(size / 1048576)}M files`;
+    return `${size} items`;
   };
 
   // Loading Skeleton
@@ -133,7 +132,7 @@ const FolderStructure = ({ folders, loading, onRefresh }) => {
   );
 
   // Mobile Folder Card
-  const MobileFolderCard = ({ folder, index }) => (
+  const MobileFolderCard = ({ folder, index, onRename }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -186,7 +185,10 @@ const FolderStructure = ({ folders, loading, onRefresh }) => {
                     View Folder
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2">
+                <DropdownMenuItem
+                  onClick={() => onRename(folder)}
+                  className="flex items-center gap-2"
+                >
                   <FiEdit className="w-4 h-4" />
                   Rename
                 </DropdownMenuItem>
@@ -219,7 +221,7 @@ const FolderStructure = ({ folders, loading, onRefresh }) => {
   );
 
   // Desktop Table Row
-  const DesktopTableRow = ({ folder, index }) => (
+  const DesktopTableRow = ({ folder, index, onRename }) => (
     <motion.tr
       key={folder.id}
       initial={{ opacity: 0, y: 20 }}
@@ -260,7 +262,7 @@ const FolderStructure = ({ folders, loading, onRefresh }) => {
       {/* File Count - Hidden on smaller screens */}
       <td className="hidden md:table-cell px-4 py-4">
         <div className="text-sm text-muted-foreground">
-          {folder.fileCount || 0} items
+          {folder._count?.designs || 0} items
         </div>
       </td>
 
@@ -300,11 +302,13 @@ const FolderStructure = ({ folders, loading, onRefresh }) => {
                   View Folder
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <FiEdit className="w-4 h-4" />
-                Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2 text-red-600">
+                            <DropdownMenuItem
+                                onClick={() => onRename(folder)}
+                                className="flex items-center gap-2"
+                              >
+                                <FiEdit className="w-4 h-4" />
+                                Rename
+                              </DropdownMenuItem>              <DropdownMenuItem className="flex items-center gap-2 text-red-600">
                 <FiTrash2 className="w-4 h-4" />
                 Delete
               </DropdownMenuItem>
@@ -339,8 +343,11 @@ const FolderStructure = ({ folders, loading, onRefresh }) => {
           </h2>
           <p className="text-muted-foreground text-sm mt-1">
             {folders.length} folder{folders.length !== 1 ? "s" : ""} •{" "}
-            {folders.reduce((acc, folder) => acc + (folder.fileCount || 0), 0)}{" "}
-            total files
+            {folders.reduce(
+              (acc, folder) => acc + (folder._count?.designs || 0),
+              0
+            )}{" "}
+            total items
           </p>
         </div>
       </div>
@@ -379,6 +386,7 @@ const FolderStructure = ({ folders, loading, onRefresh }) => {
                   key={folder.id}
                   folder={folder}
                   index={index}
+                  onRename={onRename}
                 />
               ))}
             </div>
@@ -417,6 +425,7 @@ const FolderStructure = ({ folders, loading, onRefresh }) => {
                       key={folder.id}
                       folder={folder}
                       index={index}
+                      onRename={onRename}
                     />
                   ))}
                 </tbody>

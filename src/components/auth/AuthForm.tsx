@@ -44,26 +44,6 @@ const AuthForm = () => {
 
   return (
     <div className="flex w-full max-w-xs xs:max-w-sm sm:max-w-md md:max-w-4xl rounded-lg xs:rounded-xl md:rounded-2xl bg-white shadow-md xs:shadow-lg md:shadow-xl overflow-hidden dark:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50">
-      {/* Mobile Logo Header - Only shown on mobile */}
-      <div className="md:hidden w-full bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 p-4 xs:p-5 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50">
-        <div className="flex flex-col items-center text-center">
-          <Image
-            src="/images/concept-builders-logo-free-bg.png"
-            alt="Concept Builders Logo"
-            width={80}
-            height={80}
-            className="mb-2 xs:mb-3 sm:mb-4 w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16"
-            priority
-          />
-          <h1 className="text-lg xs:text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400">
-            Concept Builders
-          </h1>
-          <p className="mt-1 xs:mt-2 text-xs xs:text-sm text-gray-600 dark:text-gray-400 max-w-xs">
-            From blueprint to reality. Your dream home, simplified.
-          </p>
-        </div>
-      </div>
-
       {/* Desktop Sidebar - Hidden on mobile */}
       <div className="hidden md:flex w-1/2 items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 p-8 lg:p-10 xl:p-12">
         <div className="flex flex-col items-center text-center">

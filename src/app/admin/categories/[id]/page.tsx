@@ -25,13 +25,14 @@ interface Design {
   description: string;
   basePrice: number;
   isFeatured: boolean;
-  files: { url: string; type: string }[];
+  images: { url: string }[];
+  floorPlans: { url: string }[];
   architecturalDesign?: {
     pdfFiles: { url: string }[];
     cadFiles: { url: string }[];
   } | null;
   structuralDesign?: {
-    pdfFiles: { url: string }[];
+    pdfFiles: { url:string }[];
     cadFiles: { url: string }[];
   } | null;
   billOfQuantities?: {
@@ -265,7 +266,7 @@ const CategoryPage = ({ params }: { params: { id: string } }) => {
                 <div className="relative h-48 sm:h-56 lg:h-64 overflow-hidden">
                   <Image
                     src={
-                      design.files.find((file) => file.type === "IMAGE")?.url ||
+                      design.images?.[0]?.url ||
                       "/images/placeholder.png"
                     }
                     alt={design.name}

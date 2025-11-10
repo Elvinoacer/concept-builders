@@ -8,6 +8,7 @@ import {
   Eye,
   Mail,
   User,
+  Phone,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -210,6 +211,12 @@ const PurchasesTable = ({ purchases }: { purchases: any[] }) => {
                   <span className="truncate">{purchase.user.email}</span>
                 </div>
               )}
+              {purchase.user?.phone && (
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <Phone className="w-4 h-4" />
+                  <span className="truncate">{purchase.user.phone}</span>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
@@ -237,6 +244,7 @@ const PurchasesTable = ({ purchases }: { purchases: any[] }) => {
             {[
               { key: "id", label: "Purchase ID" },
               { key: "user", label: "Client" },
+              { key: "phone", label: "Phone" },
               { key: "items", label: "Design Name" },
               { key: "quantity", label: "Quantity" },
               { key: "createdAt", label: "Date" },
@@ -293,6 +301,11 @@ const PurchasesTable = ({ purchases }: { purchases: any[] }) => {
                       </span>
                     )}
                   </div>
+                </td>
+                <td className="px-4 py-4">
+                  <span className="text-gray-900 dark:text-white">
+                    {purchase.user?.phone || "N/A"}
+                  </span>
                 </td>
                 <td className="px-4 py-4">
                   <div className="max-w-[200px]">

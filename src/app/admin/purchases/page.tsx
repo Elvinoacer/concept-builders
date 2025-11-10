@@ -15,6 +15,10 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+import { convertToCSV } from "@/lib/csv";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const PurchasesPage = () => {
   const [activeTab, setActiveTab] = useState("All");
@@ -28,7 +32,70 @@ const PurchasesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
+  const [statusCounts, setStatusCounts] = useState({});
   const limit = 10;
+
+  const handleExportToPdf = () => {
+    if (purchases.length === 0) {
+      toast.warning("No data to export to PDF.");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const tableColumn = ["ID", "Created At", "Status", "Amount", "User", "Email"];
+    const tableRows = [];
+
+    purchases.forEach((purchase) => {
+      const purchaseData = [
+        purchase.id,
+        new Date(purchase.createdAt).toLocaleDateString(),
+        purchase.status,
+        `$${purchase.amount}`,
+        purchase.user.name,
+        purchase.user.email,
+      ];
+      tableRows.push(purchaseData);
+    });
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+    });
+    doc.text("Purchases", 14, 15);
+    doc.save("purchases.pdf");
+  };
+
+  const handleExportToCsv = () => {
+    if (purchases.length === 0) {
+      toast.warning("No data to export to CSV.");
+      return;
+    }
+
+    const csv = convertToCSV(purchases);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "purchases.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const fetchStatusCounts = async () => {
+    try {
+      const res = await fetch("/api/admin/orders/status-counts");
+      if (!res.ok) {
+        throw new Error("Failed to fetch status counts");
+      }
+      const data = await res.json();
+      setStatusCounts(data);
+    } catch (err) {
+      console.error("Error fetching status counts:", err);
+    }
+  };
 
   const fetchPurchases = useCallback(async () => {
     setLoading(true);
@@ -63,6 +130,7 @@ const PurchasesPage = () => {
 
   useEffect(() => {
     fetchPurchases();
+    fetchStatusCounts();
   }, [fetchPurchases]);
 
   const handleRefresh = () => {
@@ -230,6 +298,8 @@ const PurchasesPage = () => {
             handleStartDateChange={handleStartDateChange}
             handleEndDateChange={handleEndDateChange}
             applyFilters={fetchPurchases}
+            handleExportToPdf={handleExportToPdf}
+            handleExportToCsv={handleExportToCsv}
           />
         </div>
 
@@ -240,6 +310,7 @@ const PurchasesPage = () => {
             <PurchasesTabs
               activeTab={activeTab}
               setActiveTab={handleTabChange}
+              statusCounts={statusCounts}
             />
           </div>
 

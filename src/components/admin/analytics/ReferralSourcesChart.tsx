@@ -79,10 +79,6 @@ const ReferralSourcesChart = ({ data }: { data: ReferralSource[] }) => {
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      whileHover={{
-        y: -2,
-        transition: { type: "spring", stiffness: 400, damping: 17 },
-      }}
       transition={{
         duration: 0.5,
         delay: 0.3,
@@ -90,7 +86,7 @@ const ReferralSourcesChart = ({ data }: { data: ReferralSource[] }) => {
         stiffness: 300,
         damping: 25,
       }}
-      className="group flex flex-col gap-3 xs:gap-4 rounded-xl border border-gray-200/80 bg-white dark:bg-gray-800 dark:border-gray-700/80 shadow-xs hover:shadow-md p-4 xs:p-5 sm:p-6 transition-all duration-300"
+      className="relative group flex flex-col gap-3 xs:gap-4 rounded-xl border border-gray-200/80 bg-white dark:bg-gray-800 dark:border-gray-700/80 shadow-xs hover:shadow-md p-4 xs:p-5 sm:p-6 transition-all duration-300"
     >
       {/* Header Section */}
       <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 xs:gap-4">

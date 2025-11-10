@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       skip,
       take: limit,
       include: {
-        user: { select: { id: true, name: true, email: true } },
+        user: { select: { id: true, name: true, email: true, phone: true } },
         items: {
           include: {
             design: { select: { id: true, name: true } },

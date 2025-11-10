@@ -1,12 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { useCart } from "@/hooks/useCart";
+import { useSession } from "next-auth/react";
 
 export default function CheckoutClientPage() {
-  const { cart, isLoading } = useCart();
+  const { cart, isLoading, fetchCart } = useCart();
+  const { status } = useSession();
+
+  useEffect(() => {
+    if (status !== "loading") {
+      fetchCart(status);
+    }
+  }, [status, fetchCart]);
 
   return (
     <div

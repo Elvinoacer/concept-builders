@@ -44,10 +44,10 @@ import { Badge } from "@/components/ui/badge";
 const AdminCategoriesPage = () => {
   interface Category {
     id: string;
-    name: string;
+    name:string;
     isFeatured: boolean;
     _count: { designs: number };
-    designs?: { files?: { url: string }[] }[];
+    designs?: { images?: { url: string }[] }[];
     image?: string;
   }
 
@@ -347,7 +347,7 @@ const AdminCategoriesPage = () => {
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
                           <Image
                             src={
-                              category.designs?.[0]?.files?.[0]?.url ||
+                              category.designs?.[0]?.images?.[0]?.url ||
                               category.image ||
                               "/images/category-placeholder.png"
                             }
@@ -431,7 +431,7 @@ const AdminCategoriesPage = () => {
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
                     <Image
                       src={
-                        category.designs?.[0]?.files?.[0]?.url ||
+                        category.designs?.[0]?.images?.[0]?.url ||
                         category.image ||
                         "/images/category-placeholder.png"
                       }

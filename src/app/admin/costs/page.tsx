@@ -151,6 +151,29 @@ const CostsPage = () => {
     toast.success("Costs data refreshed");
   };
 
+  const handleCalculateCosts = async () => {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch("/api/admin/costs/calculate", {
+          method: "POST",
+        });
+        if (!response.ok) {
+          throw new Error("Failed to calculate costs");
+        }
+        await handleRefresh();
+        resolve("Costs calculated successfully.");
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "Calculating monthly costs...",
+      success: (message) => `${message}`,
+      error: (err) => `Error: ${err.message}`,
+    });
+  };
+
   const allCostsData = [];
 
   if (currentMonthCosts) {
@@ -191,7 +214,7 @@ const CostsPage = () => {
         trend: resendEmailsChange,
       },
       {
-        service: "Hosting (Vercel)",
+        service: "Hosting & Domains",
         cost: formatCurrency(currentMonthCosts.hosting),
         change: `${hostingChange >= 0 ? "+" : ""}${hostingChange.toFixed(1)}%`,
         changeType: getChangeType(hostingChange),
@@ -312,18 +335,28 @@ const CostsPage = () => {
         {/* Header with Refresh Button */}
         <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-4">
           <CostsHeader />
-          <Button
-            onClick={handleRefresh}
-            variant="outline"
-            size="sm"
-            disabled={refreshing}
-            className="flex items-center gap-2 w-full xs:w-auto"
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
-            />
-            {refreshing ? "Refreshing..." : "Refresh"}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleCalculateCosts}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 w-full xs:w-auto"
+            >
+              Calculate Costs
+            </Button>
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              size="sm"
+              disabled={refreshing}
+              className="flex items-center gap-2 w-full xs:w-auto"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+              />
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </Button>
+          </div>
         </div>
 
         {/* Error Alert (if any) */}

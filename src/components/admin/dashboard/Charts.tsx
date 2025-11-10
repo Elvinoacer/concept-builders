@@ -2,6 +2,16 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Users, BarChart3, AlertCircle } from "lucide-react";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 
 const ChartsSkeleton = () => {
   return (
@@ -44,29 +54,6 @@ const Charts = ({ stats, monthlySales, clientAcquisition }) => {
     return <ChartsSkeleton />;
   }
 
-  const hasSalesData = monthlySales.length > 0;
-  const maxSales = hasSalesData
-    ? Math.max(...monthlySales.map((s) => s.sales))
-    : 0;
-
-  // Prepare chart data with responsive scaling
-  const chartData = hasSalesData
-    ? monthlySales.map((sale, index) => {
-        const y = 280 - (sale.sales / maxSales) * 260;
-        const x = 60 + index * 70;
-        return { x, y, ...sale };
-      })
-    : [];
-
-  const pathData = hasSalesData
-    ? chartData.reduce((acc, point, index) => {
-        if (index === 0) {
-          return `M ${point.x} ${point.y}`;
-        }
-        return `${acc} L ${point.x} ${point.y}`;
-      }, "")
-    : "";
-
   const totalClients = clientAcquisition.reduce(
     (acc, curr) => acc + curr.count,
     0
@@ -107,120 +94,22 @@ const Charts = ({ stats, monthlySales, clientAcquisition }) => {
           </div>
         </div>
 
-        <div className="h-48 sm:h-64 lg:h-80 overflow-x-auto custom-scrollbar">
-          {hasSalesData ? (
-            <div className="min-w-[500px] lg:min-w-full">
-              <svg
-                fill="none"
-                height="100%"
-                preserveAspectRatio="none"
-                viewBox="0 0 500 300"
-                width="100%"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Grid Lines */}
-                <path
-                  d="M40 280 H460"
-                  className="stroke-gray-200 dark:stroke-gray-700"
-                  strokeWidth="2"
-                ></path>
-                <path
-                  d="M40 20 V280"
-                  className="stroke-gray-200 dark:stroke-gray-700"
-                  strokeWidth="2"
-                ></path>
-
-                {/* Sales Line */}
-                <path
-                  d={pathData}
-                  fill="none"
-                  stroke="url(#salesGradient)"
-                  strokeLinecap="round"
-                  strokeWidth="3"
-                ></path>
-
-                {/* Gradient Definition */}
-                <defs>
-                  <linearGradient
-                    id="salesGradient"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="0%"
-                  >
-                    <stop offset="0%" stopColor="#0ea5e9" />
-                    <stop offset="100%" stopColor="#22d3ee" />
-                  </linearGradient>
-                </defs>
-
-                {/* Area Fill */}
-                <g fill="rgba(17, 147, 212, 0.1)">
-                  <path
-                    d={`${pathData} L ${chartData[chartData.length - 1].x} 280 L ${chartData[0].x} 280 Z`}
-                  />
-                </g>
-
-                {/* X-axis Labels */}
-                <g className="text-xs sm:text-sm fill-gray-500 dark:fill-gray-400">
-                  {monthlySales.map((d, i) => (
-                    <text
-                      key={i}
-                      x={60 + i * 70}
-                      y="295"
-                      textAnchor="middle"
-                      className="font-medium"
-                    >
-                      {d.month.substring(0, 3)}
-                    </text>
-                  ))}
-                </g>
-
-                {/* Y-axis Labels */}
-                <g className="text-xs sm:text-sm fill-gray-500 dark:fill-gray-400">
-                  <text x="5" y="280" textAnchor="start">
-                    0
-                  </text>
-                  <text x="5" y="205" textAnchor="start">
-                    {Math.round(maxSales / 2).toLocaleString()}
-                  </text>
-                  <text x="5" y="130" textAnchor="start">
-                    {maxSales.toLocaleString()}
-                  </text>
-                  <text x="5" y="55" textAnchor="start">
-                    {(maxSales * 1.5).toLocaleString()}
-                  </text>
-                </g>
-
-                {/* Data Points */}
-                {chartData
-                  .filter((point) => !isNaN(point.y))
-                  .map((point, index) => (
-                  <g key={index}>
-                    <circle
-                      cx={point.x}
-                      cy={point.y}
-                      r="4"
-                      fill="#0ea5e9"
-                      className="hover:r-6 transition-all duration-200"
-                    />
-                    <title>
-                      {point.month}: ${point.sales.toLocaleString()}
-                    </title>
-                  </g>
-                ))}
-              </svg>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <BarChart3 className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-3" />
-              <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
-                No sales data available for this period.
-              </p>
-              <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
-                Sales data will appear here once transactions occur.
-              </p>
-            </div>
-          )}
+        <div className="h-48 sm:h-64 lg:h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={monthlySales}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="sales"
+                stroke="#8884d8"
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
@@ -336,33 +225,6 @@ const Charts = ({ stats, monthlySales, clientAcquisition }) => {
           )}
         </div>
       </div>
-
-      {/* Custom Scrollbar Styles */}
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f5f9;
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-track {
-          background: #374151;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #4b5563;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #6b7280;
-        }
-      `}</style>
     </motion.section>
   );
 };

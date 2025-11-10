@@ -29,10 +29,7 @@ export async function GET(request: NextRequest) {
             createdAt: "desc", // Order by creation date to get the latest
           },
           select: {
-            files: {
-              where: {
-                type: "IMAGE", // Only consider image files
-              },
+            images: {
               take: 1, // Take only one image file
               orderBy: {
                 createdAt: "desc", // Get the latest image if multiple

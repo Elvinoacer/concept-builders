@@ -29,7 +29,8 @@ export async function GET(
         designs: {
           where: designWhere,
           include: {
-            files: true,
+            images: true,
+            floorPlans: true,
             architecturalDesign: {
               include: {
                 pdfFiles: true,

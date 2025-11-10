@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDistanceToNow } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
@@ -32,39 +33,34 @@ const DesignsList = ({ designs }) => {
   };
 
   const formatDate = (dateString: string) => {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 1) {
-      return "Yesterday";
-    } else if (diffDays < 7) {
-      return `${diffDays} days ago`;
-    } else if (diffDays < 30) {
-      const weeks = Math.floor(diffDays / 7);
-      return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
-    } else {
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: now.getFullYear() !== date.getFullYear() ? "numeric" : undefined,
-      });
+    try {
+      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+    } catch (error) {
+      return "Invalid date";
     }
   };
 
   const getDesignImage = (design) => {
-    // Get first image file from design files
-    const imageFile = design.files?.find((file) => file.type === "IMAGE");
-    return imageFile?.url || "/images/design-placeholder.png";
+    return design.images?.[0]?.url || "/images/design-placeholder.png";
   };
 
-  const getFileTypeIcon = (design) => {
-    const hasImages = design.files?.some((file) => file.type === "IMAGE");
-    const hasDocuments = design.files?.some((file) => file.type === "DOCUMENT");
+  const getTotalFileCount = (design) => {
+    const architecturalFiles =
+      (design.architecturalDesign?.pdfFiles?.length || 0) +
+      (design.architecturalDesign?.cadFiles?.length || 0);
+    const structuralFiles =
+      (design.structuralDesign?.pdfFiles?.length || 0) +
+      (design.structuralDesign?.cadFiles?.length || 0);
+    const boqFiles =
+      design.billOfQuantities?.excelFiles?.length || 0;
+    return architecturalFiles + structuralFiles + boqFiles;
+  };
 
-    if (hasImages && hasDocuments) return <FiFileText className="w-4 h-4" />;
-    if (hasImages) return <FiImage className="w-4 h-4" />;
+  const getImageCount = (design) => {
+    return (design.images?.length || 0) + (design.floorPlans?.length || 0);
+  };
+
+  const getFileTypeIcon = () => {
     return <FiFileText className="w-4 h-4" />;
   };
 
@@ -160,8 +156,12 @@ const DesignsList = ({ designs }) => {
                 <span>{formatDate(design.updatedAt)}</span>
               </div>
               <div className="flex items-center gap-1">
-                {getFileTypeIcon(design)}
-                <span>{design.files?.length || 0} files</span>
+                <FiImage className="w-3 h-3" />
+                <span>{getImageCount(design)} images</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <FiFileText className="w-3 h-3" />
+                <span>{getTotalFileCount(design)} files</span>
               </div>
             </div>
 
@@ -243,11 +243,19 @@ const DesignsList = ({ designs }) => {
         </div>
       </td>
 
+      {/* Image Count - Hidden on smaller screens */}
+      <td className="hidden xl:table-cell px-4 py-4">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <FiImage className="w-4 h-4" />
+          <span>{getImageCount(design)} images</span>
+        </div>
+      </td>
+
       {/* File Count - Hidden on mobile */}
       <td className="hidden md:table-cell px-4 py-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {getFileTypeIcon(design)}
-          <span>{design.files?.length || 0} files</span>
+          {getFileTypeIcon()}
+          <span>{getTotalFileCount(design)} files</span>
         </div>
       </td>
 
@@ -343,6 +351,12 @@ const DesignsList = ({ designs }) => {
                 className="hidden xl:table-cell px-4 py-3 font-medium"
               >
                 Updated
+              </th>
+              <th
+                scope="col"
+                className="hidden xl:table-cell px-4 py-3 font-medium"
+              >
+                Images
               </th>
               <th
                 scope="col"

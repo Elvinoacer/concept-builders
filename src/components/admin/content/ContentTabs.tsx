@@ -4,31 +4,45 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { FiFileText, FiGlobe, FiShield, FiChevronDown } from "react-icons/fi";
 
-// Local tabs data to avoid dependency
-const contentTabsData = [
-  {
-    name: "Blog Posts",
-    icon: FiFileText,
-    count: 12,
-    color: "text-blue-600",
-  },
-  {
-    name: "Static Pages",
-    icon: FiGlobe,
-    count: 5,
-    color: "text-green-600",
-  },
-  {
-    name: "Policies",
-    icon: FiShield,
-    count: 3,
-    color: "text-purple-600",
-  },
-];
+interface ContentTabsProps {
+  activeTab: string;
+  onTabClick: (tabName: string) => void;
+  blogPostCount: number;
+  staticPageCount: number;
+  policyCount: number;
+}
 
-const ContentTabs = ({ activeTab, onTabClick }) => {
+const ContentTabs = ({
+  activeTab,
+  onTabClick,
+  blogPostCount,
+  staticPageCount,
+  policyCount,
+}: ContentTabsProps) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Local tabs data to avoid dependency
+  const contentTabsData = [
+    {
+      name: "Blog Posts",
+      icon: FiFileText,
+      count: blogPostCount,
+      color: "text-blue-600",
+    },
+    {
+      name: "Static Pages",
+      icon: FiGlobe,
+      count: staticPageCount,
+      color: "text-green-600",
+    },
+    {
+      name: "Policies",
+      icon: FiShield,
+      count: policyCount,
+      color: "text-purple-600",
+    },
+  ];
 
   useEffect(() => {
     const checkMobile = () => {

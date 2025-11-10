@@ -8,6 +8,7 @@ import FoldersPage from "@/components/admin/designs/FoldersPage";
 import NewDesignForm from "@/components/admin/designs/NewDesignForm";
 import CreateFolderModal from "@/components/admin/designs/CreateFolderModal";
 import CategoriesModal from "@/components/admin/designs/CategoriesModal";
+import RenameFolderModal from "@/components/admin/designs/RenameFolderModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -19,10 +20,17 @@ const DesignsPage = () => {
   const [isFormOpen, setFormOpen] = useState(false);
   const [isFolderModalOpen, setFolderModalOpen] = useState(false);
   const [isCategoriesModalOpen, setCategoriesModalOpen] = useState(false);
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [renamingFolder, setRenamingFolder] = useState(null);
   const [folders, setFolders] = useState([]);
   const [loadingFolders, setLoadingFolders] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  const handleOpenRenameModal = (folder) => {
+    setRenamingFolder(folder);
+    setIsRenameModalOpen(true);
+  };
 
   const fetchFolders = async () => {
     try {
@@ -75,6 +83,35 @@ const DesignsPage = () => {
       console.error("Error creating folder:", error);
       toast.error(
         error instanceof Error ? error.message : "Failed to create folder"
+      );
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const handleRenameFolder = async (folderId, newName) => {
+    try {
+      setRefreshing(true);
+      const response = await fetch(`/api/designs/folders/${folderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newName }),
+      });
+
+      if (response.ok) {
+        toast.success("Folder renamed successfully");
+        await fetchFolders(); // Refresh the folder list
+        setIsRenameModalOpen(false);
+      } else {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to rename folder");
+      }
+    } catch (error) {
+      console.error("Error renaming folder:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to rename folder"
       );
     } finally {
       setRefreshing(false);
@@ -163,9 +200,8 @@ const DesignsPage = () => {
 
         {/* Content Section */}
         <div className="min-h-[400px]">
-          {activeTab === "all" ? (
-            <DesignsTable />
-          ) : (
+          {activeTab === "all" && <DesignsTable />}
+          {activeTab === "folders" && (
             <div className="space-y-4">
               {/* Folders Header with Refresh */}
               <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3">
@@ -201,13 +237,14 @@ const DesignsPage = () => {
                   folders={folders}
                   loading={loadingFolders}
                   onRefresh={handleRefresh}
+                  onRename={handleOpenRenameModal}
                 />
               )}
 
               {/* Empty State for Folders */}
               {!loadingFolders && !error && folders.length === 0 && (
                 <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
-                  <div className="text-4xl mb-4">📂</div>
+                  <div className="text-4xl mb-4">📁</div>
                   <h3 className="text-lg font-semibold mb-2">No Folders Yet</h3>
                   <p className="text-muted-foreground text-sm mb-4 max-w-sm mx-auto">
                     Get started by creating your first folder to organize your
@@ -264,6 +301,14 @@ const DesignsPage = () => {
       <CategoriesModal
         isOpen={isCategoriesModalOpen}
         onClose={() => setCategoriesModalOpen(false)}
+      />
+
+      <RenameFolderModal
+        isOpen={isRenameModalOpen}
+        onClose={() => setIsRenameModalOpen(false)}
+        onRenameFolder={handleRenameFolder}
+        folder={renamingFolder}
+        loading={refreshing}
       />
     </div>
   );

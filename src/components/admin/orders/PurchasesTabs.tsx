@@ -7,9 +7,11 @@ import { useState, useRef, useEffect } from "react";
 const PurchasesTabs = ({
   activeTab,
   setActiveTab,
+  statusCounts,
 }: {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  statusCounts: Record<string, number>;
 }) => {
   const [showScrollButtons, setShowScrollButtons] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -90,10 +92,10 @@ const PurchasesTabs = ({
     }
   };
 
-  // Enhanced tab data with counts (you can replace with real data)
+  // Enhanced tab data with counts
   const enhancedTabsData = ordersTabsData.map((tab) => ({
     ...tab,
-    count: Math.floor(Math.random() * 99) + 1, // Random count for demonstration
+    count: statusCounts[tab.name] || 0,
   }));
 
   return (

@@ -27,8 +27,10 @@ const PurchasesHeader = ({
   handleExportToCsv,
 }: any) => {
   const [showFilters, setShowFilters] = useState(false);
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -51,14 +53,20 @@ const PurchasesHeader = ({
       ) {
         setShowFilters(false);
       }
+      if (
+        exportRef.current &&
+        !exportRef.current.contains(event.target as Node)
+      ) {
+        setShowExportDropdown(false);
+      }
     };
 
-    if (showFilters) {
+    if (showFilters || showExportDropdown) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showFilters]);
+  }, [showFilters, showExportDropdown]);
 
   const statusOptions = [
     { value: "All", label: "All Status" },
@@ -256,42 +264,21 @@ const PurchasesHeader = ({
                 </AnimatePresence>
               </div>
 
-              {/* Export Buttons - Hidden on mobile, shown on xs and up */}
-              <div className="hidden xs:flex gap-2">
+              {/* Export Dropdown */}
+              <div className="relative" ref={exportRef}>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleExportToPdf}
-                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-all duration-200 min-h-[44px]"
-                >
-                  <FileText className="w-4 h-4" />
-                  <span className="hidden sm:inline">PDF</span>
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleExportToCsv}
+                  onClick={() => setShowExportDropdown(!showExportDropdown)}
                   className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-all duration-200 min-h-[44px]"
                 >
                   <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">CSV</span>
-                </motion.button>
-              </div>
-
-              {/* Mobile Export Dropdown */}
-              <div className="xs:hidden relative">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowFilters(false)}
-                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-all duration-200 min-h-[44px]"
-                >
-                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Export</span>
                   <ChevronDown className="w-4 h-4" />
                 </motion.button>
 
                 <AnimatePresence>
-                  {showFilters && (
+                  {showExportDropdown && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95, y: -10 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}

@@ -33,7 +33,7 @@ const AdminDashboardPage = () => {
     try {
       const [statsRes, monthlySalesRes, clientAcquisitionRes] =
         await Promise.all([
-          fetch("/api/admin/stats"),
+          fetch("/api/admin/dashboard/kpis"),
           fetch("/api/admin/monthly-sales"),
           fetch("/api/admin/client-acquisition"),
         ]);
@@ -226,7 +226,7 @@ const AdminDashboardPage = () => {
           transition={{ delay: 0.1 }}
           className="mb-6 sm:mb-8"
         >
-          <KPIs stats={stats} />
+          <KPIs stats={stats?.kpis} />
         </motion.section>
 
         {/* Charts Section */}

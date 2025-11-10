@@ -16,18 +16,37 @@ interface DesignsTabsProps {
   setActiveTab: (tab: string) => void;
 }
 
-// Local tabs data to avoid external dependency
-const designTabs = [
-  { id: "all", label: "All Designs", icon: FiGrid, count: 24 },
-  { id: "folders", label: "Folders", icon: FiFolder, count: 8 },
-  { id: "featured", label: "Featured", icon: FiStar, count: 6 },
-  { id: "archived", label: "Archived", icon: FiArchive, count: 12 },
-  { id: "trending", label: "Trending", icon: FiTrendingUp, count: 4 },
+const initialTabs = [
+  { id: "all", label: "All Designs", icon: FiGrid, count: 0 },
+  { id: "folders", label: "Folders", icon: FiFolder, count: 0 },
+  { id: "featured", label: "Featured", icon: FiStar, count: 0 },
+  { id: "archived", label: "Archived", icon: FiArchive, count: 0 },
+  { id: "trending", label: "Trending", icon: FiTrendingUp, count: 0 },
 ];
 
 const DesignsTabs = ({ activeTab, setActiveTab }: DesignsTabsProps) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [designTabs, setDesignTabs] = useState(initialTabs);
+
+  useEffect(() => {
+    const fetchTabCounts = async () => {
+      try {
+        const response = await fetch("/api/designs/tabs-count");
+        const counts = await response.json();
+        setDesignTabs((prevTabs) =>
+          prevTabs.map((tab) => ({
+            ...tab,
+            count: counts[tab.id] ?? tab.count,
+          }))
+        );
+      } catch (error) {
+        console.error("Failed to fetch tab counts:", error);
+      }
+    };
+
+    fetchTabCounts();
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -132,7 +151,7 @@ const DesignsTabs = ({ activeTab, setActiveTab }: DesignsTabsProps) => {
       transition={{ duration: 0.5, delay: 0.1 }}
       className="relative border-b border-gray-200 dark:border-gray-700"
     >
-      <nav className="flex gap-2 lg:gap-6 overflow-x-auto scrollbar-hide">
+      <nav className="flex gap-2 lg:gap-6 overflow-x-auto">
         {designTabs.map((tab, index) => (
           <motion.button
             key={tab.id}

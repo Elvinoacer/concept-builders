@@ -4,12 +4,18 @@ import { useState, useEffect } from "react";
 import ContentHeader from "@/components/admin/content/ContentHeader";
 import ContentTable from "@/components/admin/content/ContentTable";
 import ContentTabs from "@/components/admin/content/ContentTabs";
+import StaticPagesTable from "@/components/admin/content/StaticPagesTable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 
 const ContentPage = () => {
   const [blogPosts, setBlogPosts] = useState([]);
+  const [staticPages, setStaticPages] = useState([]);
+  const [policyPages, setPolicyPages] = useState([]);
+  const [blogCount, setBlogCount] = useState(0);
+  const [staticPageCount, setStaticPageCount] = useState(0);
+  const [policyCount, setPolicyCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("Blog Posts");
@@ -37,8 +43,38 @@ const ContentPage = () => {
     }
   };
 
+  const fetchContentData = async () => {
+    try {
+      const [blogCountRes, staticContentRes] = await Promise.all([
+        fetch("/api/admin/content/blog-count"),
+        fetch("/api/admin/content/static-content"),
+      ]);
+
+      if (!blogCountRes.ok) {
+        throw new Error(`Failed to fetch blog count: ${blogCountRes.status}`);
+      }
+      if (!staticContentRes.ok) {
+        throw new Error(
+          `Failed to fetch static content: ${staticContentRes.status}`
+        );
+      }
+
+      const blogCountData = await blogCountRes.json();
+      const staticContentData = await staticContentRes.json();
+
+      setBlogCount(blogCountData.blogPostCount);
+      setStaticPageCount(staticContentData.staticPageCount);
+      setPolicyCount(staticContentData.policyCount);
+      setStaticPages(staticContentData.staticPages);
+      setPolicyPages(staticContentData.policyPages);
+    } catch (err) {
+      console.error("Error fetching content data:", err);
+    }
+  };
+
   useEffect(() => {
     fetchPosts();
+    fetchContentData();
   }, [retryCount]);
 
   const handleTabClick = (tabName: string) => {
@@ -138,16 +174,16 @@ const ContentPage = () => {
           <ContentTable blogPostsData={blogPosts} />
         );
       case "Static Pages":
-        return (
-          <div className="text-center py-12">
-            Static Pages Content - Coming Soon
-          </div>
+        return staticPages.length === 0 && !loading ? (
+          renderEmptyState()
+        ) : (
+          <StaticPagesTable pages={staticPages} />
         );
       case "Policies":
-        return (
-          <div className="text-center py-12">
-            Policies Content - Coming Soon
-          </div>
+        return policyPages.length === 0 && !loading ? (
+          renderEmptyState()
+        ) : (
+          <StaticPagesTable pages={policyPages} />
         );
       default:
         return null;
@@ -161,7 +197,13 @@ const ContentPage = () => {
 
       {/* Tabs Section */}
       <div className="mt-6 sm:mt-8">
-        <ContentTabs activeTab={activeTab} onTabClick={handleTabClick} />
+        <ContentTabs
+          activeTab={activeTab}
+          onTabClick={handleTabClick}
+          blogPostCount={blogCount}
+          staticPageCount={staticPageCount}
+          policyCount={policyCount}
+        />
       </div>
 
       {/* Content Area */}

@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function PaymentForm({ designId }: { designId: string }) {
-    const [error, setError] = useState(null);
+    const router = useRouter();
+    const [{ isPending }] = usePayPalScriptReducer();
 
     const createOrder = async (data: any, actions: any) => {
         try {
@@ -14,7 +17,7 @@ export default function PaymentForm({ designId }: { designId: string }) {
             const { orderID } = await res.json();
             return orderID;
         } catch (err) {
-            setError(err.message);
+            toast.error(err.message);
         }
     };
 
@@ -26,21 +29,20 @@ export default function PaymentForm({ designId }: { designId: string }) {
                 body: JSON.stringify({ orderID: data.orderID })
             });
             const captureData = await res.json();
-            if (captureData.status === 'COMPLETED') {
-                alert('Payment successful! Capture ID: ' + captureData.captureID);
+            if (captureData.success) {
+                toast.success('Payment successful!');
+                router.push(captureData.redirect_url);
             } else {
-                throw new Error('Payment not completed');
+                throw new Error(captureData.error || 'Payment not completed');
             }
         } catch (err) {
-            setError(err.message);
+            toast.error(err.message);
         }
     };
 
     const onError = (err) => {
-        setError(err.message);
+        toast.error(err.message);
     };
-
-    const [{ isPending }] = usePayPalScriptReducer();
 
     if (isPending) {
         return (
@@ -54,7 +56,6 @@ export default function PaymentForm({ designId }: { designId: string }) {
     return (
         <div>
             <h1>Pay $100 Securely</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
             <PayPalButtons createOrder={createOrder} onApprove={onApprove} onError={onError} />
         </div>
     );

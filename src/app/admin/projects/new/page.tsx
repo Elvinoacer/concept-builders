@@ -65,6 +65,7 @@ const CreateProjectPage = () => {
   }, [imageUrl]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     const file = e.target.files?.[0];
     if (!file) return;
 

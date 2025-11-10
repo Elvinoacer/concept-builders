@@ -1,41 +1,6 @@
 "use client";
 import React from "react";
 
-const kpis = [
-  {
-    title: "Total Revenue",
-    key: "totalSales",
-    prefix: "$",
-    change: "+12.5%",
-    icon: "monetization_on",
-    positive: true,
-  },
-  {
-    title: "Total Visitors",
-    key: "totalVisitors",
-    prefix: "",
-    change: "+8.2%",
-    icon: "people",
-    positive: true,
-  },
-  {
-    title: "Conversion Rate",
-    key: "conversionRate",
-    suffix: "%",
-    change: "-1.8%",
-    icon: "touch_app",
-    positive: false,
-  },
-  {
-    title: "Total Orders",
-    key: "totalOrders",
-    prefix: "",
-    change: "+5.3%",
-    icon: "shopping_cart",
-    positive: true,
-  },
-];
-
 const KPISkeleton = () => {
   return (
     <section className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6">
@@ -65,8 +30,8 @@ const KPIs = ({ stats }) => {
 
   return (
     <section className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6">
-      {kpis.map((kpi) => {
-        const value = stats[kpi.key];
+      {stats.map((kpi) => {
+        const value = kpi.value;
         const formattedValue =
           typeof value === "number" ? value.toLocaleString() : value;
         const changeIsPositive = kpi.positive;

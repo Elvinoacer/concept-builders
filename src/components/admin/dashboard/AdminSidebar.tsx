@@ -216,7 +216,7 @@ const AdminSidebar = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 min-[375px]:p-5 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <Link
-            href="/admin"
+            href="/"
             className="flex items-center gap-3 min-[375px]:gap-4"
           >
             <h1

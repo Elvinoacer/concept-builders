@@ -36,12 +36,12 @@ export async function POST(request: Request) {
         data: {
           userId: userId,
           title: "Payment Failed",
-          description: `Your payment for order ${orderID} failed.`,
+          description: `Your payment for order ${orderID} failed. Reason: ${response.result.status}`,
           icon: "AlertTriangle",
         },
       });
       return NextResponse.json(
-        { error: "Failed to capture payment." },
+        { error: `Failed to capture payment. Status: ${response.result.status}` },
         { status: 500 }
       );
     }
