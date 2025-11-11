@@ -212,16 +212,62 @@ const NewDesignForm = ({
 
     setIsSubmitting(true);
 
-    const payload = {
+    // Common payload processing helpers
+    const fileListPayload = (files: any[], type: string) =>
+      files.map((file: any) => ({
+        name: file.originalFileName || file.name || file.url.split("/").pop(),
+        url: file.url,
+        type,
+      }));
+
+    const costEstimatesData = Object.entries(buildingCostEstimates)
+      .map(([tier, data]: [string, any]) => ({
+        tier,
+        description: data.description,
+        costBreakdown: data.costBreakdown
+          .filter((item: any) => item.item.trim() && item.cost)
+          .map((item: any) => ({
+            ...item,
+            cost: parseFloat(item.cost) || 0,
+          })),
+      }))
+      .filter(
+        (estimate: any) =>
+          estimate.description || estimate.costBreakdown.length > 0
+      );
+
+    const architecturalDesignData = {
+      description: architecturalDesign.description,
+      overview: architecturalDesign.overview,
+      pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
+      cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
+    };
+
+    const structuralDesignData = {
+      description: structuralDesign.description,
+      overview: structuralDesign.overview,
+      pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
+      cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
+    };
+
+    const billOfQuantitiesData = {
+      description: billOfQuantities.description,
+      overview: billOfQuantities.overview,
+      excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
+    };
+
+    const commonData = {
       name,
       description,
       basePrice: parseFloat(basePrice),
       priceRange,
-      bedrooms: parseInt(bedrooms),
-      bathrooms: parseInt(bathrooms),
-      area: parseFloat(area),
-      floors: parseInt(floors),
-      planDetails: planDetails.split("\n"),
+      bedrooms: bedrooms ? parseInt(bedrooms) : null,
+      bathrooms: bathrooms ? parseInt(bathrooms) : null,
+      area: area ? parseFloat(area) : null,
+      floors: floors ? parseInt(floors) : null,
+      planDetails: planDetails
+        ? planDetails.split("\n").filter((line) => line.trim())
+        : [],
       folderId: isEditMode ? designToEdit.folderId : folderId,
       categoryId,
       minBuildingCost: parseFloat(minBuildingCost) || null,
@@ -231,110 +277,83 @@ const NewDesignForm = ({
       structuralPdfPrice: parseFloat(structuralPdfPrice) || null,
       structuralCadPrice: parseFloat(structuralCadPrice) || null,
       billOfQuantitiesPrice: parseFloat(billOfQuantitiesPrice) || null,
-      packageOptions: {
-        create: packageOptions.map((option) => ({
-          name: option.name,
-          price: parseFloat(option.price) || 0,
-          file: option.file?.[0]
-            ? {
-                create: {
-                  name: option.file[0].originalFileName,
-                  url: option.file[0].url,
-                  type: "FILE",
-                },
-              }
-            : undefined,
-        })),
-      },
-
-      buildingCostEstimates: Object.entries(buildingCostEstimates).map(
-        ([tier, data]) => ({
-          tier,
-          description: data.description,
-          costBreakdown: data.costBreakdown.map((item) => ({
-            ...item,
-            cost: parseFloat(item.cost) || 0,
-          })),
-        })
-      ),
-      architecturalDesign: {
-        create: {
-          type: "ARCHITECTURAL",
-          description: architecturalDesign.description,
-          overview: architecturalDesign.overview,
-          pdfFiles: {
-            create: architecturalDesign.pdfFiles.map((file: any) => ({
-              name: file.originalFileName,
-              url: file.url,
-              type: "PDF",
-            })),
-          },
-          cadFiles: {
-            create: architecturalDesign.cadFiles.map((file: any) => ({
-              name: file.originalFileName,
-              url: file.url,
-              type: "CAD",
-            })),
-          },
-        },
-      },
-      structuralDesign: {
-        create: {
-          type: "STRUCTURAL",
-          description: structuralDesign.description,
-          overview: structuralDesign.overview,
-          pdfFiles: {
-            create: structuralDesign.pdfFiles.map((file: any) => ({
-              name: file.originalFileName,
-              url: file.url,
-              type: "PDF",
-            })),
-          },
-          cadFiles: {
-            create: structuralDesign.cadFiles.map((file: any) => ({
-              name: file.originalFileName,
-              url: file.url,
-              type: "CAD",
-            })),
-          },
-        },
-      },
-      billOfQuantities: {
-        create: {
-          type: "BILL_OF_QUANTITIES",
-          description: billOfQuantities.description,
-          overview: billOfQuantities.overview,
-          excelFiles: {
-            create: billOfQuantities.excelFiles.map((file: any) => ({
-              name: file.originalFileName,
-              url: file.url,
-              type: "EXCEL",
-            })),
-          },
-        },
-      },
-      images: {
-        create: images.map((file: any) => ({
-          name: file.originalFileName,
-          url: file.url,
-          type: "IMAGE",
-        })),
-      },
-      floorPlans: {
-        create: floorPlans.map((file: any) => ({
-          name: file.originalFileName,
-          url: file.url,
-          type: "FLOOR_PLAN",
-        })),
-      },
     };
 
-    try {
-      const url = isEditMode
-        ? `/api/designs/${designToEdit.id}`
-        : "/api/designs";
-      const method = isEditMode ? "PUT" : "POST";
+    let payload;
+    const url = isEditMode
+      ? `/api/designs/${designToEdit.id}`
+      : "/api/designs";
+    const method = isEditMode ? "PUT" : "POST";
 
+    const packageOptionsCreatePayload = packageOptions
+      .filter((opt) => opt.name.trim() && opt.price.trim())
+      .map((option) => {
+        const file = option.file?.[0];
+        let fileCreate = undefined;
+        if (file) {
+          fileCreate = {
+            create: {
+              name:
+                file.originalFileName || file.name || file.url.split("/").pop(),
+              url: file.url,
+              type: "FILE",
+            },
+          };
+        }
+        return {
+          name: option.name,
+          price: parseFloat(option.price) || 0,
+          file: fileCreate,
+        };
+      });
+
+    if (isEditMode) {
+      // UPDATE PAYLOAD
+      payload = {
+        ...commonData,
+        // --- Fields with custom backend logic (expect flat object) ---
+        architecturalDesign: architecturalDesignData,
+        structuralDesign: structuralDesignData,
+        billOfQuantities: billOfQuantitiesData,
+        // --- JSON field (expects plain array) ---
+        buildingCostEstimates: costEstimatesData,
+        // --- True relational fields (expect Prisma update object) ---
+        images: {
+          deleteMany: {},
+          create: fileListPayload(images, "IMAGE"),
+        },
+        floorPlans: {
+          deleteMany: {},
+          create: fileListPayload(floorPlans, "FLOOR_PLAN"),
+        },
+        packageOptions: {
+          deleteMany: {},
+          create: packageOptionsCreatePayload,
+        },
+      };
+    } else {
+      // CREATE PAYLOAD
+      payload = {
+        ...commonData,
+        images: { create: fileListPayload(images, "IMAGE") },
+        floorPlans: { create: fileListPayload(floorPlans, "FLOOR_PLAN") },
+        buildingCostEstimates: { create: costEstimatesData },
+        packageOptions: {
+          create: packageOptionsCreatePayload,
+        },
+        architecturalDesign: {
+          create: { type: "ARCHITECTURAL", ...architecturalDesignData },
+        },
+        structuralDesign: {
+          create: { type: "STRUCTURAL", ...structuralDesignData },
+        },
+        billOfQuantities: {
+          create: { type: "BILL_OF_QUANTITIES", ...billOfQuantitiesData },
+        },
+      };
+    }
+
+    try {
       const response = await fetch(url, {
         method,
         headers: {
@@ -353,7 +372,9 @@ const NewDesignForm = ({
         onClose();
       } else {
         const errorData = await response.json();
-        toast.error(`Error: ${errorData.error}`);
+        toast.error(
+          `Error: ${errorData.error || "Failed to save design"}`
+        );
       }
     } catch (error) {
       toast.error(`An unexpected error occurred.`);
@@ -779,7 +800,7 @@ const NewDesignForm = ({
                     {
                       label: "CADs",
                       key: "cadFiles",
-                      accept: ".dwg, .dxf",
+                      accept: ".dwg, .dxf, .pln",
                       category: "CAD",
                     },
                   ],
@@ -798,7 +819,7 @@ const NewDesignForm = ({
                     {
                       label: "CADs",
                       key: "cadFiles",
-                      accept: ".dwg, .dxf",
+                      accept: ".dwg, .dxf, .pln",
                       category: "CAD",
                     },
                   ],
