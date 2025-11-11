@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const { to, subject, message } = await req.json();
 
     await resend.emails.send({
-      from: process.env.EMAIL_FROM,
+      from: process.env.ADMIN_EMAIL as string,
       to,
       subject,
       html: message,

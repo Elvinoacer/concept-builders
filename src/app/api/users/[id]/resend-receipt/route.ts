@@ -11,21 +11,24 @@ export async function POST(
     const { id } = params;
     const { purchaseId } = await req.json();
 
-    const purchase = await prisma.purchase.findUnique({
+    const purchase = await prisma.order.findUnique({
       where: { id: purchaseId },
       include: { user: true },
     });
 
     if (!purchase) {
-      return NextResponse.json({ error: "Purchase not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Purchase not found" },
+        { status: 404 }
+      );
     }
 
     // Logic to resend the receipt email
     await resend.emails.send({
-      from: process.env.EMAIL_FROM,
-      to: purchase.user.email,
+      from: process.env.ADMIN_EMAIL as string,
+      to: purchase.user.email as string,
       subject: "Receipt for your purchase",
-      html: `<h1>Receipt</h1><p>Thank you for your purchase of ${purchase.designId}</p>`,
+      html: `<h1>Receipt</h1><p>Thank you for your purchase of ${purchase.paymentId}</p>`,
     });
 
     return NextResponse.json({ message: "Receipt resent successfully" });

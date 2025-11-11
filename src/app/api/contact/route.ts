@@ -8,13 +8,16 @@ export async function POST(req: Request) {
     const { name, email, phone, subject, message } = await req.json();
 
     if (!name || !email || !subject || !message) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
-    const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com"; // Replace with actual admin email
+    const adminEmail = process.env.ADMIN_EMAIL || "onboarding@resend.dev"; // Replace with actual admin email
 
     const data = await resend.emails.send({
-      from: "Contact Form <onboarding@resend.dev>", // Replace with your verified Resend domain
+      from: `Contact Form <${adminEmail}>`, // Replace with your verified Resend domain
       to: [adminEmail],
       subject: `New Contact Form Submission: ${subject}`,
       html: `
@@ -22,7 +25,7 @@ export async function POST(req: Request) {
           <h2 style="color: #0056b3;">New Contact Form Submission</h2>
           <p><strong>Name:</strong> ${name}</p>
           <p><strong>Email:</strong> <a href="mailto:${email}" style="color: #0056b3; text-decoration: none;">${email}</a></p>
-          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+          <p><strong>Phone:</strong> ${phone || "N/A"}</p>
           <p><strong>Subject:</strong> ${subject}</p>
           <p style="margin-top: 15px;"><strong>Message:</strong></p>
           <p style="border-left: 4px solid #0056b3; padding-left: 10px; margin-left: 5px; background-color: #f9f9f9;">${message}</p>
@@ -36,9 +39,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: data.error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ message: "Email sent successfully!" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Email sent successfully!" },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("Contact form submission error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
