@@ -291,25 +291,31 @@ const DesignsPage = () => {
         />
       )}
 
-      <CreateFolderModal
-        isOpen={isFolderModalOpen}
-        onClose={() => setFolderModalOpen(false)}
-        onCreateFolder={handleCreateFolder}
-        loading={refreshing}
-      />
+      {isFolderModalOpen && (
+        <CreateFolderModal
+          isOpen={isFolderModalOpen}
+          onClose={() => setFolderModalOpen(false)}
+          onCreateFolder={handleCreateFolder}
+          loading={refreshing}
+        />
+      )}
 
-      <CategoriesModal
-        isOpen={isCategoriesModalOpen}
-        onClose={() => setCategoriesModalOpen(false)}
-      />
+      {isCategoriesModalOpen && (
+        <CategoriesModal
+          isOpen={isCategoriesModalOpen}
+          onClose={() => setCategoriesModalOpen(false)}
+        />
+      )}
 
-      <RenameFolderModal
-        isOpen={isRenameModalOpen}
-        onClose={() => setIsRenameModalOpen(false)}
-        onRenameFolder={handleRenameFolder}
-        folder={renamingFolder}
-        loading={refreshing}
-      />
+      {isRenameModalOpen && (
+        <RenameFolderModal
+          isOpen={isRenameModalOpen}
+          onClose={() => setIsRenameModalOpen(false)}
+          onRenameFolder={handleRenameFolder}
+          folder={renamingFolder}
+          loading={refreshing}
+        />
+      )}
     </div>
   );
 };

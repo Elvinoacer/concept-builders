@@ -46,6 +46,27 @@ export const getSignedUrlForFiles = async (keys: string[]) => {
   return signedUrls;
 };
 
+
+export const uploadFile = async (
+  fileBuffer: Buffer,
+  fileName: string,
+  contentType: string
+) => {
+  const key = `designs/${Date.now()}-${fileName}`;
+  const command = new PutObjectCommand({
+    Bucket: process.env.DO_SPACES_BUCKET!,
+    Key: key,
+    Body: fileBuffer,
+    ContentType: contentType,
+    ACL: "public-read",
+  });
+
+  await s3Client.send(command);
+
+  const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.sfo3.digitaloceanspaces.com/${key}`;
+  return { publicUrl, key };
+};
+
 export const deleteFile = async (key: string) => {
   try {
     await s3Client.send(

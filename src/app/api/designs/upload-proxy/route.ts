@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { getSignedUrlForUpload } from "@/lib/do-spaces";
-import { FileType } from "@/generated/prisma"; // Import the Prisma enum
+import { uploadFile } from "@/lib/do-spaces";
 
-// The robust file type validation from your snippet
 const allowedFileTypesByCategory = {
   CAD: [
     "application/acad",
@@ -60,145 +57,61 @@ const allowedFileTypesByCategory = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { designId, documentType, fileType, fileName, contentType } =
-      await req.json();
+    const formData = await req.formData();
+    const file = formData.get("file") as File | null;
+    const fileTypeCategory = formData.get("fileTypeCategory") as string | null;
 
-    // 1. Validate all required fields are present
-    if (!designId || !documentType || !fileType || !fileName || !contentType) {
+    if (!file) {
+      return new NextResponse(JSON.stringify({ error: "No file provided" }), {
+        status: 400,
+      });
+    }
+
+    if (!fileTypeCategory) {
       return new NextResponse(
-        JSON.stringify({ error: "Missing required fields" }),
+        JSON.stringify({ error: "No fileTypeCategory provided" }),
         {
           status: 400,
         }
       );
     }
 
-    // 2. Perform the strict file type validation
     const allowedTypes =
       allowedFileTypesByCategory[
-        fileType as keyof typeof allowedFileTypesByCategory
+        fileTypeCategory as keyof typeof allowedFileTypesByCategory
       ];
 
     if (!allowedTypes) {
       return new NextResponse(
-        JSON.stringify({ error: `Invalid file type category: ${fileType}` }),
-        { status: 400 }
-      );
-    }
-
-    if (!allowedTypes.includes(contentType)) {
-      return new NextResponse(
         JSON.stringify({
-          error: `Unsupported content type (${contentType}) for category ${fileType}`,
+          error: `Invalid file type category: ${fileTypeCategory}`,
         }),
         { status: 400 }
       );
     }
 
-    // 3. Map the string 'fileType' to the Prisma FileType enum
-    let prismaFileType: FileType;
-    if (fileType === "PDF") {
-      prismaFileType = FileType.PDF;
-    } else if (fileType === "CAD") {
-      prismaFileType = FileType.CAD;
-    } else if (fileType === "EXCEL") {
-      prismaFileType = FileType.EXCEL;
-    } else {
-      // Handle other types or throw an error if needed
+    if (!allowedTypes.includes(file.type)) {
       return new NextResponse(
-        JSON.stringify({ error: `Invalid file type: ${fileType}` }),
+        JSON.stringify({
+          error: `Unsupported content type (${file.type}) for category ${fileTypeCategory}`,
+        }),
         { status: 400 }
       );
     }
 
-    // 4. Get signed URL from our helper (this generates the unique key)
-    const { signedUrl, publicUrl, key } = await getSignedUrlForUpload(
-      fileName,
-      contentType
-    );
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const { publicUrl } = await uploadFile(buffer, file.name, file.type);
 
-    // 5. Find or create the parent DesignDocument
-    let designDocument;
-    if (documentType === "ARCHITECTURAL") {
-      designDocument = await prisma.designDocuments.findFirst({
-        where: { architecturalDesignId: designId },
-      });
-    } else if (documentType === "STRUCTURAL") {
-      designDocument = await prisma.designDocuments.findFirst({
-        where: { structuralDesignId: designId },
-      });
-    } else if (documentType === "BILL_OF_QUANTITIES") {
-      designDocument = await prisma.designDocuments.findFirst({
-        where: { billOfQuantitiesId: designId },
-      });
-    }
-
-    if (!designDocument) {
-      const data: any = { type: documentType };
-      if (documentType === "ARCHITECTURAL") {
-        data.architecturalDesign = { connect: { id: designId } };
-      } else if (documentType === "STRUCTURAL") {
-        data.structuralDesign = { connect: { id: designId } };
-      } else if (documentType === "BILL_OF_QUANTITIES") {
-        data.billOfQuantities = { connect: { id: designId } };
-      }
-      designDocument = await prisma.designDocuments.create({ data });
-    }
-
-    // 6. Handle file versioning
-    const existingFile = await prisma.file.findFirst({
-      where: {
-        name: fileName, // Use 'name' for original filename comparison
-        OR: [
-          { pdfDocumentId: designDocument.id },
-          { cadDocumentId: designDocument.id },
-          { excelDocumentId: designDocument.id },
-        ],
-      },
-      orderBy: {
-        version: "desc",
-      },
-    });
-
-    let newVersion = 1;
-    if (existingFile) {
-      newVersion = existingFile.version + 1;
-      // Set the previous version to not be the latest
-      await prisma.file.update({
-        where: { id: existingFile.id },
-        data: { isLatest: false },
-      });
-    }
-
-    // 7. Create the new File record in the database
-    const fileData: any = {
-      name: fileName,
+    return NextResponse.json({
       url: publicUrl,
-      key: key, // CRITICAL: Store the S3 key for future deletion
-      type: prismaFileType,
-      version: newVersion,
-      isLatest: true,
-      fileIdentifier: fileName, // Or you could use 'key' here
-    };
-
-    // Connect the file to its parent
-    if (fileType === "PDF") {
-      fileData.pdfDocument = { connect: { id: designDocument.id } };
-    } else if (fileType === "CAD") {
-      fileData.cadDocument = { connect: { id: designDocument.id } };
-    } else if (fileType === "EXCEL") {
-      fileData.excelDocument = { connect: { id: designDocument.id } };
-    }
-
-    await prisma.file.create({ data: fileData });
-
-    // 8. Return the signed URL to the frontend
-    return NextResponse.json({ signedUrl, publicUrl });
+      originalFileName: file.name,
+    });
   } catch (error) {
-    console.error("Error preparing upload:", error);
+    console.error("Error uploading file:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
     return new NextResponse(JSON.stringify({ error: message }), {
       status: 500,
     });
   }
 }
+
