@@ -47,7 +47,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://conceptbuilders.com"), // Updated to production URL
+  metadataBase: new URL("https://conceptbuilders.co.ke"), // Updated to production URL
   title: {
     default: "Concept Builders - Build Your Dream Home",
     template: "%s | Concept Builders",
@@ -85,14 +85,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://conceptbuilders.com",
+    url: "https://conceptbuilders.co.ke",
     siteName: "Concept Builders",
     title: "Concept Builders - Build Your Dream Home",
     description:
       "Transform your vision into reality with Concept Builders. Expert home construction, renovation, and design services.",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "/images/concept-builders-logo-free-bg.png",
         width: 1200,
         height: 630,
         alt: "Concept Builders - Professional Construction Services",
@@ -103,7 +103,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Concept Builders - Build Your Dream Home",
     description: "Transform your vision into reality with Concept Builders.",
-    images: ["/images/twitter-image.jpg"],
+    images: ["/images/concept-builders-logo-free-bg.png"],
     creator: "@conceptbuilders",
   },
   icons: {
@@ -180,28 +180,31 @@ export default function RootLayout({
               "@type": "Organization",
               name: "Concept Builders",
               alternateName: "Concept Builders Construction",
-              url: "https://conceptbuilders.com",
-              logo: "https://conceptbuilders.com/images/concept-builders-logo-free-bg.png",
+              url: "https://conceptbuilders.co.ke",
+              logo: "https://conceptbuilders.co.ke/images/concept-builders-logo-free-bg.png",
               description:
                 "Professional home construction and renovation services",
               address: {
-                "@type": "PostalAddress",
-                addressLocality: "Your City",
-                addressRegion: "Your State",
-                postalCode: "Your ZIP",
-                addressCountry: "US",
+                "@type": "20100",
+                addressLocality: "Nakuru",
+                addressRegion: "20100",
+                postalCode: "20100",
+                addressCountry: "KE",
               },
               contactPoint: {
                 "@type": "ContactPoint",
-                telephone: "+1-555-123-4567",
+                telephone: "+254741360865",
                 contactType: "customer service",
-                areaServed: "US",
+                areaServed: "KE",
                 availableLanguage: ["en"],
               },
               sameAs: [
+                "https://www.tiktok.com/@wilsonwarainy?is_from_webapp=1&sender_device=pc",
                 "https://www.facebook.com/conceptbuilders",
-                "https://www.instagram.com/conceptbuilders",
-                "https://www.linkedin.com/company/conceptbuilders",
+                "https://www.instagram.com/conceptbuilderske?igsh=YzljYTk1ODg3Zg==",
+                "https://linkedin.com/company/conceptbuilders",
+                "https://elvin-juma-portfolio.vercel.app/",
+                "https://www.google.com/maps/dir/?api=1&destination=-0.285245,36.0683192",
               ],
             }),
           }}

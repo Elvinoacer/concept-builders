@@ -208,7 +208,7 @@ export const contactInfo = [
   {
     icon: "email",
     title: "Email",
-    value: "support@conceptbuilders.com",
+    value: "support@conceptbuilders.co.ke",
   },
   {
     icon: "chat",
