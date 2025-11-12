@@ -29,7 +29,7 @@ export async function sendPasswordResetEmail(
   try {
     console.log(`Attempting to send password reset email to ${to}`);
     const { data, error } = await resend.emails.send({
-      from: `Concept Builders Accounts <${process.env.ADMIN_EMAIL}>`,
+      from: `Concept Builders Accounts <support@conceptbuilders.co.ke>`,
       to: to,
       subject: `Password Reset Request for Concept Builders`,
       html: `<h1>Hello ${name},</h1><p>You have requested to reset your password for your Concept Builders account. Please click the link below to reset your password:</p><p><a href="${resetLink}">Reset Password</a></p><p>If you did not request a password reset, please ignore this email.</p>`,
