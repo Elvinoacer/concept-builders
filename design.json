@@ -1,0 +1,148 @@
+{
+  "name": "Modern Beach House",
+  "description": "A stunning modern beach house with breathtaking ocean views. This two-story home features an open-concept living space, large windows, and a spacious deck perfect for entertaining.",
+  "categoryId": "clx1j2x0z0000l8x0x0x0x0x0",
+  "planDetails": [
+    "4 Bedrooms",
+    "3 Bathrooms",
+    "Open-plan kitchen and living area",
+    "Rooftop terrace",
+    "2-car garage"
+  ],
+  "bedrooms": 4,
+  "bathrooms": 3,
+  "area": 250,
+  "floors": 2,
+  "basePrice": 750,
+  "priceRange": "$750 - $1200",
+  "architecturalPdfPrice": 150,
+  "architecturalCadPrice": 300,
+  "structuralPdfPrice": 100,
+  "structuralCadPrice": 200,
+  "billOfQuantitiesPrice": 50,
+  "images": [
+    {
+      "name": "beach-house-exterior.jpg",
+      "url": "https://example.com/images/beach-house-exterior.jpg",
+      "type": "IMAGE"
+    },
+    {
+      "name": "living-room.jpg",
+      "url": "https://example.com/images/living-room.jpg",
+      "type": "IMAGE"
+    }
+  ],
+  "floorPlans": [
+    {
+      "name": "ground-floor-plan.pdf",
+      "url": "https://example.com/files/ground-floor-plan.pdf",
+      "type": "FLOOR_PLAN"
+    },
+    {
+      "name": "first-floor-plan.pdf",
+      "url": "https://example.com/files/first-floor-plan.pdf",
+      "type": "FLOOR_PLAN"
+    }
+  ],
+  "architecturalDesign": {
+    "description": "Detailed architectural plans including elevations, sections, and site plan.",
+    "overview": "Complete set of architectural drawings for construction.",
+    "pdfFiles": [
+      {
+        "name": "architectural-plans.pdf",
+        "url": "https://example.com/files/architectural-plans.pdf",
+        "type": "PDF"
+      }
+    ],
+    "cadFiles": [
+      {
+        "name": "architectural-plans.dwg",
+        "url": "https://example.com/files/architectural-plans.dwg",
+        "type": "CAD"
+      }
+    ]
+  },
+  "structuralDesign": {
+    "description": "Structural drawings and calculations for the foundation, framing, and roof.",
+    "overview": "Ensures the structural integrity of the building.",
+    "pdfFiles": [
+      {
+        "name": "structural-plans.pdf",
+        "url": "https://example.com/files/structural-plans.pdf",
+        "type": "PDF"
+      }
+    ],
+    "cadFiles": [
+      {
+        "name": "structural-plans.dwg",
+        "url": "https://example.com/files/structural-plans.dwg",
+        "type": "CAD"
+      }
+    ]
+  },
+  "billOfQuantities": {
+    "description": "A detailed list of all materials and labor required for the project.",
+    "overview": "Used for cost estimation and procurement.",
+    "excelFiles": [
+      {
+        "name": "bill-of-quantities.xlsx",
+        "url": "https://example.com/files/bill-of-quantities.xlsx",
+        "type": "EXCEL"
+      }
+    ]
+  },
+  "minBuildingCost": 150000,
+  "maxBuildingCost": 250000,
+  "buildingCostEstimates": {
+    "basic": {
+      "description": "Basic quality finishes and standard fittings.",
+      "costBreakdown": [
+        {
+          "item": "Foundation",
+          "cost": 20000
+        },
+        {
+          "item": "Framing",
+          "cost": 30000
+        },
+        {
+          "item": "Finishes",
+          "cost": 50000
+        }
+      ]
+    },
+    "luxury": {
+      "description": "High-end finishes, premium appliances, and custom cabinetry.",
+      "costBreakdown": [
+        {
+          "item": "Foundation",
+          "cost": 25000
+        },
+        {
+          "item": "Framing",
+          "cost": 40000
+        },
+        {
+          "item": "Luxury Finishes",
+          "cost": 100000
+        }
+      ]
+    }
+  },
+  "packageOptions": [
+    {
+      "name": "3D Visualization",
+      "price": 250,
+      "file": {
+        "name": "3d-visualization-package.zip",
+        "url": "https://example.com/files/3d-visualization-package.zip",
+        "type": "FILE"
+      }
+    },
+    {
+      "name": "Interior Design Consultation",
+      "price": 500,
+      "file": null
+    }
+  ]
+}

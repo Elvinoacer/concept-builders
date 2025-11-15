@@ -1,6 +1,4 @@
-"use client";
 import { Design } from "@/generated/prisma";
-import { useEffect, useState, use } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Breadcrumbs from "@/components/design-detail/Breadcrumbs";
 import DesignGallery from "@/components/design-detail/DesignGallery";
@@ -15,84 +13,65 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Loading from "./loading";
 import ErrorState from "@/components/design-detail/ErrorState";
 import NotFoundState from "@/components/design-detail/NotFoundState";
+import { DesignViewTracker } from "@/components/design-detail/DesignViewTracker";
+import { Metadata, ResolvingMetadata } from "next";
+import prisma from "@/lib/prisma";
 
-const DesignDetailPage = ({ params }: { params: { id: string } }) => {
-  const { id } = use(params);
-  const [design, setDesign] = useState<Design | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+type Props = {
+  params: { id: string };
+};
 
-  const fetchDesign = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/designs/${id}`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          setDesign(null);
-        } else {
-          throw new Error("Failed to fetch design");
-        }
-      } else {
-        const data = await response.json();
-        setDesign(data);
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-      setIsVisible(true);
-    }
-  };
-
-  useEffect(() => {
-    if (id) {
-      fetchDesign();
-
-      const trackView = async () => {
-        try {
-          await fetch(`/api/designs/${id}/view`, {
-            method: "POST",
-          });
-        } catch (error) {
-          console.error("Error tracking design view:", error);
-        }
-      };
-      trackView();
-    }
-  }, [id]);
-
-  const pageVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        staggerChildren: 0.2,
+async function getDesign(id: string) {
+  const design = await prisma.design.findUnique({
+    where: { id },
+    include: {
+      images: true,
+      floorPlans: true,
+      reviews: {
+        include: {
+          author: true,
+        },
       },
+      category: true,
     },
-    exit: { opacity: 0, y: -20 },
-  };
+  });
+  return design;
+}
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const id = params.id;
+  const design = await getDesign(id);
 
-  if (loading) {
-    return <Loading />;
+  if (!design) {
+    return {
+      title: "Design Not Found",
+    };
   }
 
-  if (error) {
-    return <ErrorState message={error} onRetry={fetchDesign} />;
-  }
+  const previousImages = (await parent).openGraph?.images || [];
+  const newImages = design.images.map((image) => ({
+    url: image.url,
+    width: 1200,
+    height: 630,
+    alt: design.name,
+  }));
+
+  return {
+    title: design.name,
+    description: design.description,
+    openGraph: {
+      title: design.name,
+      description: design.description || "Check out this amazing design!",
+      images: [...newImages, ...previousImages],
+    },
+  };
+}
+
+const DesignDetailPage = async ({ params }: { params: { id: string } }) => {
+  const design = await getDesign(params.id);
 
   if (!design) {
     return <NotFoundState />;
@@ -109,13 +88,14 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
       enableSystem
       disableTransitionOnChange
     >
+      <DesignViewTracker designId={design.id} />
       <AnimatePresence mode="wait">
         <motion.main
           key={design.id}
-          variants={pageVariants}
-          initial="hidden"
-          animate={isVisible ? "visible" : "hidden"}
-          exit="exit"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.8, staggerChildren: 0.2 }}
           className="flex-1 px-3 xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8 md:py-12 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 min-h-screen"
         >
           <div className="w-full max-w-full mx-auto">
@@ -130,13 +110,11 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
 
             <motion.div
               className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12"
-              variants={containerVariants}
             >
               <motion.div
                 className="lg:col-span-2 space-y-6 sm:space-y-8 lg:space-y-12"
-                variants={containerVariants}
               >
-                <motion.div variants={containerVariants}>
+                <motion.div>
                   <DesignHeader
                     name={design.name}
                     description={design.description}
@@ -144,7 +122,6 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
                 </motion.div>
 
                 <motion.div
-                  variants={containerVariants}
                   whileInView="visible"
                   viewport={{ once: true }}
                 >
@@ -153,7 +130,6 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
 
                 {renderings.length > 0 && (
                   <motion.div
-                    variants={containerVariants}
                     whileInView="visible"
                     viewport={{ once: true }}
                   >
@@ -163,7 +139,6 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
 
                 {floorPlans.length > 0 && (
                   <motion.div
-                    variants={containerVariants}
                     whileInView="visible"
                     viewport={{ once: true }}
                     className="space-y-6 sm:space-y-8"
@@ -188,12 +163,11 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
                 )}
 
                 <motion.div
-                  variants={containerVariants}
                   whileInView="visible"
                   viewport={{ once: true }}
                 >
                   {design && (
-                    <DesignTabs design={design} onFaqSubmitted={fetchDesign} />
+                    <DesignTabs design={design} onFaqSubmitted={() => {}} />
                   )}
                 </motion.div>
               </motion.div>
@@ -211,7 +185,6 @@ const DesignDetailPage = ({ params }: { params: { id: string } }) => {
             </motion.div>
 
             <motion.div
-              variants={containerVariants}
               whileInView="visible"
               viewport={{ once: true }}
               className="mt-16 sm:mt-20 lg:mt-24"

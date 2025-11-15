@@ -10,6 +10,7 @@
     "lint": "next lint",
     "test": "jest",
     "seed": "node prisma/seed.js",
+    "seed:designs": "tsx prisma/seed-designs.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
