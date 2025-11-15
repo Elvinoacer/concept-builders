@@ -21,15 +21,6 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const id = params.id;
   const design = await getDesign(id);
-  console.log('design from generateMetadata', design);
-
-  if (!design) {
-    return {
-      title: "Design Not Found",
-    };
-  }
-
-  const previousImages = (await parent).openGraph?.images || [];
   const newImages = design.images.map((image) => ({
     url: image.url,
     width: 1200,
@@ -43,7 +34,7 @@ export async function generateMetadata(
     openGraph: {
       title: design.name,
       description: design.description || "Check out this amazing design!",
-      images: [...newImages, ...previousImages],
+      images: newImages,
     },
   };
 }
