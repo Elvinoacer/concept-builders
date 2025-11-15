@@ -1,3 +1,4 @@
+"use client";
 import { Design } from "@/generated/prisma";
 import { motion, AnimatePresence } from "framer-motion";
 import Breadcrumbs from "@/components/design-detail/Breadcrumbs";
@@ -14,64 +15,45 @@ import Loading from "./loading";
 import ErrorState from "@/components/design-detail/ErrorState";
 import NotFoundState from "@/components/design-detail/NotFoundState";
 import { DesignViewTracker } from "@/components/design-detail/DesignViewTracker";
-import { Metadata, ResolvingMetadata } from "next";
-import prisma from "@/lib/prisma";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-type Props = {
-  params: { id: string };
-};
+const DesignDetailPage = () => {
+  const [design, setDesign] = useState<Design | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const params = useParams();
+  const { id } = params;
 
-async function getDesign(id: string) {
-  const design = await prisma.design.findUnique({
-    where: { id },
-    include: {
-      images: true,
-      floorPlans: true,
-      reviews: {
-        include: {
-          author: true,
-        },
-      },
-      category: true,
-    },
-  });
-  return design;
-}
-
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const id = params.id;
-  const design = await getDesign(id);
-
-  if (!design) {
-    return {
-      title: "Design Not Found",
+  useEffect(() => {
+    const fetchDesign = async () => {
+      if (id) {
+        try {
+          setLoading(true);
+          const response = await fetch(`/api/designs/${id}`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch design");
+          }
+          const data = await response.json();
+          setDesign(data);
+        } catch (error: any) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      }
     };
+
+    fetchDesign();
+  }, [id]);
+
+  if (loading) {
+    return <Loading />;
   }
 
-  const previousImages = (await parent).openGraph?.images || [];
-  const newImages = design.images.map((image) => ({
-    url: image.url,
-    width: 1200,
-    height: 630,
-    alt: design.name,
-  }));
-
-  return {
-    title: design.name,
-    description: design.description,
-    openGraph: {
-      title: design.name,
-      description: design.description || "Check out this amazing design!",
-      images: [...newImages, ...previousImages],
-    },
-  };
-}
-
-const DesignDetailPage = async ({ params }: { params: { id: string } }) => {
-  const design = await getDesign(params.id);
+  if (error) {
+    return <ErrorState message={error} />;
+  }
 
   if (!design) {
     return <NotFoundState />;
