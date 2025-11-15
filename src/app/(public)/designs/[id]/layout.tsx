@@ -21,6 +21,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const id = params.id;
   const design = await getDesign(id);
+  console.log('design from generateMetadata', design);
 
   if (!design) {
     return {
@@ -29,9 +30,8 @@ export async function generateMetadata(
   }
 
   const previousImages = (await parent).openGraph?.images || [];
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
   const newImages = design.images.map((image) => ({
-    url: `${baseUrl}${image.url}`,
+    url: image.url,
     width: 1200,
     height: 630,
     alt: design.name,
