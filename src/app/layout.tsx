@@ -92,7 +92,7 @@ export const metadata: Metadata = {
       "Transform your vision into reality with Concept Builders. Expert home construction, renovation, and design services.",
     images: [
       {
-        url: "/images/concept-builders-logo-free-bg.png",
+        url: "https://conceptbuilders.co.ke/images/concept-builders-logo-free-bg.png",
         width: 1200,
         height: 630,
         alt: "Concept Builders - Professional Construction Services",
@@ -103,7 +103,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Concept Builders - Build Your Dream Home",
     description: "Transform your vision into reality with Concept Builders.",
-    images: ["/images/concept-builders-logo-free-bg.png"],
+    images: ["https://conceptbuilders.co.ke/images/concept-builders-logo-free-bg.png"],
     creator: "@conceptbuilders",
   },
   icons: {
@@ -111,6 +111,8 @@ export const metadata: Metadata = {
       { url: "/favicon.ico" },
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },

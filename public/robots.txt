@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://conceptbuilders.co.ke/sitemap.xml

@@ -29,8 +29,9 @@ export async function generateMetadata(
   }
 
   const previousImages = (await parent).openGraph?.images || [];
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
   const newImages = design.images.map((image) => ({
-    url: image.url,
+    url: `${baseUrl}${image.url}`,
     width: 1200,
     height: 630,
     alt: design.name,
