@@ -91,6 +91,7 @@ export async function PUT(
       architecturalDesign,
       structuralDesign,
       billOfQuantities,
+      folderId,
     } = body;
 
     const updateData: any = {
@@ -109,6 +110,7 @@ export async function PUT(
       structuralCadPrice,
       billOfQuantitiesPrice,
       billOfQuantitiesPdfPrice,
+      folderId,
     };
 
     if (images) {
