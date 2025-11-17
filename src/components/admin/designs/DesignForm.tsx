@@ -1,34 +1,31 @@
 "use client";
 
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { CgSpinner } from "react-icons/cg";
 import {
+  FiAlertCircle,
   FiArrowLeft,
+  FiCheck,
   FiChevronLeft,
   FiChevronRight,
-  FiCheck,
   FiDollarSign,
   FiFileText,
   FiHome,
   FiImage,
+  FiInfo,
   FiLayers,
   FiPackage,
   FiPlus,
   FiSave,
-  FiUpload,
-  FiAlertCircle,
-  FiInfo,
   FiTrash,
+  FiUpload,
   FiX,
 } from "react-icons/fi";
 import { toast } from "sonner";
@@ -112,6 +109,52 @@ interface DesignFormProps {
   design?: any;
 }
 
+const steps = [
+  {
+    id: "basic",
+    label: "Basic Information",
+    icon: FiHome,
+    description: "Design name, description, and category",
+    required: true,
+  },
+  {
+    id: "specifications",
+    label: "Specifications",
+    icon: FiLayers,
+    description: "Dimensions and layout details",
+    required: false,
+  },
+  {
+    id: "pricing",
+    label: "Pricing",
+    icon: FiDollarSign,
+    description: "Pricing and document costs",
+    required: true,
+  },
+  {
+    id: "files",
+    label: "Files & Documents",
+    icon: FiUpload,
+    description: "Images, plans, and design files",
+    required: true,
+  },
+
+  {
+    id: "packages",
+    label: "Package Options",
+    icon: FiPackage,
+    description: "Additional services and packages",
+    required: false,
+  },
+  {
+    id: "review",
+    label: "Review & Submit",
+    icon: FiCheck,
+    description: "Final check before creating the design",
+    required: true,
+  },
+];
+
 const DesignForm = ({ design }: DesignFormProps) => {
   const router = useRouter();
   const [name, setName] = useState(design?.name || "");
@@ -160,17 +203,11 @@ const DesignForm = ({ design }: DesignFormProps) => {
           pdfFiles: [],
         }
       );
-      setArchitecturalPdfPrice(
-        design.architecturalPdfPrice?.toString() || ""
-      );
-      setArchitecturalCadPrice(
-        design.architecturalCadPrice?.toString() || ""
-      );
+      setArchitecturalPdfPrice(design.architecturalPdfPrice?.toString() || "");
+      setArchitecturalCadPrice(design.architecturalCadPrice?.toString() || "");
       setStructuralPdfPrice(design.structuralPdfPrice?.toString() || "");
       setStructuralCadPrice(design.structuralCadPrice?.toString() || "");
-      setBillOfQuantitiesPrice(
-        design.billOfQuantitiesPrice?.toString() || ""
-      );
+      setBillOfQuantitiesPrice(design.billOfQuantitiesPrice?.toString() || "");
       setBillOfQuantitiesPdfPrice(
         design.billOfQuantitiesPdfPrice?.toString() || ""
       );
@@ -190,8 +227,6 @@ const DesignForm = ({ design }: DesignFormProps) => {
       }
     }
   }, [design]);
-
-
 
   const [packageOptions, setPackageOptions] = useState<any[]>([]);
 
@@ -294,6 +329,13 @@ const DesignForm = ({ design }: DesignFormProps) => {
       description: "Additional services and packages",
       required: false,
     },
+    {
+      id: "review",
+      label: "Review & Submit",
+      icon: FiCheck,
+      description: "Final check before creating the design",
+      required: true,
+    },
   ];
 
   useEffect(() => {
@@ -335,14 +377,21 @@ const DesignForm = ({ design }: DesignFormProps) => {
       newCompleted.add(3);
     }
 
-
-
     // Step 4: Packages (Optional)
     if (
       packageOptions.length > 0 &&
       (packageOptions[0]?.name.trim() || packageOptions[0]?.price.trim())
     ) {
       newCompleted.add(4);
+    }
+
+    const requiredStepIndices = steps
+      .map((step, index) => ({ ...step, index }))
+      .filter((step) => step.required && step.id !== "review")
+      .map((step) => step.index);
+
+    if (requiredStepIndices.every((stepIndex) => newCompleted.has(stepIndex))) {
+      newCompleted.add(5);
     }
 
     setCompletedSteps(newCompleted);
@@ -404,8 +453,6 @@ const DesignForm = ({ design }: DesignFormProps) => {
       completedSteps.has(stepIndex)
     );
   };
-
-
 
   // --- Package Option Handlers ---
   const addPackageOption = () => {
@@ -497,8 +544,6 @@ const DesignForm = ({ design }: DesignFormProps) => {
         };
       });
 
-
-
     const commonData = {
       name,
       description,
@@ -573,9 +618,8 @@ const DesignForm = ({ design }: DesignFormProps) => {
         },
         packageOptions: {
           deleteMany: {},
-create: packageOptionsPayload,
+          create: packageOptionsPayload,
         },
-
       };
     } else {
       // CREATE PAYLOAD
@@ -589,12 +633,8 @@ create: packageOptionsPayload,
         architecturalDesign: {
           create: {
             type: "ARCHITECTURAL",
-            pdfFiles: {
-              create: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
-            },
-            cadFiles: {
-              create: fileListPayload(architecturalDesign.cadFiles, "CAD"),
-            },
+            pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
+            cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
           },
         },
         ...(structuralDesign.pdfFiles.length > 0 ||
@@ -603,18 +643,8 @@ create: packageOptionsPayload,
               structuralDesign: {
                 create: {
                   type: "STRUCTURAL",
-                  pdfFiles: {
-                    create: fileListPayload(
-                      structuralDesign.pdfFiles,
-                      "PDF"
-                    ),
-                  },
-                  cadFiles: {
-                    create: fileListPayload(
-                      structuralDesign.cadFiles,
-                      "CAD"
-                    ),
-                  },
+                  pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
+                  cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
                 },
               },
             }
@@ -622,12 +652,8 @@ create: packageOptionsPayload,
         billOfQuantities: {
           create: {
             type: "BILL_OF_QUANTITIES",
-            excelFiles: {
-              create: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
-            },
-            pdfFiles: {
-              create: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
-            },
+            excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
+            pdfFiles: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
           },
         },
       };
@@ -668,7 +694,10 @@ create: packageOptionsPayload,
     <form
       onSubmit={handleSubmit}
       onKeyDown={(e) => {
-        if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
+        if (
+          e.key === "Enter" &&
+          (e.target as HTMLElement).tagName === "INPUT"
+        ) {
           e.preventDefault();
         }
       }}
@@ -850,6 +879,18 @@ create: packageOptionsPayload,
                       handlePackageFile={handlePackageFile}
                     />
                   )}
+
+                  {currentStep === 5 && (
+                    <ReviewStep
+                      designData={{
+                        name,
+                        description,
+                        basePrice,
+                        images,
+                        floorPlans,
+                      }}
+                    />
+                  )}
                 </motion.div>
               </AnimatePresence>
             </CardContent>
@@ -899,147 +940,328 @@ create: packageOptionsPayload,
   );
 };
 
-const BasicInfoStep = React.memo(
-  ({
-    name,
-    setName,
-    description,
-    setDescription,
-    categoryId,
-    setCategoryId,
-    categories,
-    fieldErrors,
-    setFieldErrors,
-  }: any) => (
-    <div className="space-y-8">
-      <SectionHeader
-        icon={FiHome}
-        title="Basic Information"
-        description="Provide essential details about your design. All fields marked with * are required."
-        required
-      />
+interface Category {
+  id: string;
+  name: string;
+}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <FormField
-          label="Design Name"
-          htmlFor="name"
-          required
-          error={fieldErrors.name}
-          description="Choose a descriptive name that represents your design"
-        >
-          <Input
-            id="name"
-            name="name"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              setFieldErrors((prev: any) => ({ ...prev, name: "" }));
-            }}
-            placeholder="e.g., Modern Villa, Contemporary Apartment..."
-            className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
-            required
-          />
-        </FormField>
+interface BasicInfoStepProps {
+  name: string;
+  setName: (value: string) => void;
+  description: string;
+  setDescription: (value: string) => void;
+  categoryId: string;
+  setCategoryId: (value: string) => void;
+  categories: Category[];
+  fieldErrors: Record<string, string>;
+  setFieldErrors: (errors: Record<string, string>) => void;
+}
 
-        <FormField
-          label="Category"
-          htmlFor="category"
-          required
-          error={fieldErrors.categoryId}
-          description="Select the most appropriate category for your design"
-        >
-          <select
-            id="category"
-            value={categoryId}
-            onChange={(e) => {
-              setCategoryId(e.target.value);
-              setFieldErrors((prev: any) => ({ ...prev, categoryId: "" }));
-            }}
-            className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-12 text-base transition-colors"
-            required
-          >
-            <option value="">Select a category</option>
-            {categories.map((category: any) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </FormField>
-      </div>
+const BasicInfoStepComponent: React.FC<BasicInfoStepProps> = ({
+  name,
+  setName,
+  description,
+  setDescription,
+  categoryId,
+  setCategoryId,
+  categories,
+  fieldErrors,
+  setFieldErrors,
+}) => (
+  <div className="space-y-8">
+    <SectionHeader
+      icon={FiHome}
+      title="Basic Information"
+      description="Provide essential details about your design. All fields marked with * are required."
+      required
+    />
 
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <FormField
-        label="Description"
-        htmlFor="description"
+        label="Design Name"
+        htmlFor="name"
         required
-        error={fieldErrors.description}
-        description="Describe the design features, architectural style, and key characteristics"
+        error={fieldErrors.name}
+        description="Choose a descriptive name that represents your design"
       >
-        <Textarea
-          id="description"
-          name="description"
-          value={description}
+        <Input
+          id="name"
+          name="name"
+          value={name}
           onChange={(e) => {
-            setDescription(e.target.value);
-            setFieldErrors((prev: any) => ({ ...prev, description: "" }));
+            setName(e.target.value);
+            setFieldErrors((prev) => ({ ...prev, name: "" }));
           }}
-          placeholder="Describe the design features, architectural style, key characteristics, and unique selling points..."
-          className="rounded-xl min-h-[180px] text-base border-2 focus:border-blue-500 resize-vertical transition-colors"
+          placeholder="e.g., Modern Villa, Contemporary Apartment..."
+          className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
           required
         />
       </FormField>
 
-
+      <FormField
+        label="Category"
+        htmlFor="category"
+        required
+        error={fieldErrors.categoryId}
+        description="Select the most appropriate category for your design"
+      >
+        <select
+          id="category"
+          value={categoryId}
+          onChange={(e) => {
+            setCategoryId(e.target.value);
+            setFieldErrors((prev) => ({ ...prev, categoryId: "" }));
+          }}
+          className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-12 text-base transition-colors"
+          required
+        >
+          <option value="">Select a category</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </FormField>
     </div>
-  )
+
+    <FormField
+      label="Description"
+      htmlFor="description"
+      required
+      error={fieldErrors.description}
+      description="Describe the design features, architectural style, and key characteristics"
+    >
+      <Textarea
+        id="description"
+        name="description"
+        value={description}
+        onChange={(e) => {
+          setDescription(e.target.value);
+          setFieldErrors((prev) => ({ ...prev, description: "" }));
+        }}
+        placeholder="Describe the design features, architectural style, key characteristics, and unique selling points..."
+        className="rounded-xl min-h-[180px] text-base border-2 focus:border-blue-500 resize-vertical transition-colors"
+        required
+      />
+    </FormField>
+  </div>
 );
 
-const SpecificationsStep = React.memo(
-  ({
-    bedrooms,
-    setBedrooms,
-    bathrooms,
-    setBathrooms,
-    area,
-    setArea,
-    floors,
-    setFloors,
-  }: any) => (
-    <div className="space-y-8">
-      <SectionHeader
-        icon={FiLayers}
-        title="Specifications"
-        description="Provide detailed dimensions and layout information for your design"
-      />
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+const BasicInfoStep = React.memo(BasicInfoStepComponent);
+BasicInfoStep.displayName = "BasicInfoStep";
+
+interface SpecificationsStepProps {
+  bedrooms: string;
+  setBedrooms: (value: string) => void;
+  bathrooms: string;
+  setBathrooms: (value: string) => void;
+  area: string;
+  setArea: (value: string) => void;
+  floors: string;
+  setFloors: (value: string) => void;
+}
+
+const SpecificationsStepComponent: React.FC<SpecificationsStepProps> = ({
+  bedrooms,
+  setBedrooms,
+  bathrooms,
+  setBathrooms,
+  area,
+  setArea,
+  floors,
+  setFloors,
+}) => (
+  <div className="space-y-8">
+    <SectionHeader
+      icon={FiLayers}
+      title="Specifications"
+      description="Provide detailed dimensions and layout information for your design"
+    />
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      {[
+        {
+          id: "bedrooms",
+          label: "Bedrooms",
+          value: bedrooms,
+          setter: setBedrooms,
+          placeholder: "0",
+        },
+        {
+          id: "bathrooms",
+          label: "Bathrooms",
+          value: bathrooms,
+          setter: setBathrooms,
+          placeholder: "0",
+        },
+        {
+          id: "area",
+          label: "Area (sq mt)",
+          value: area,
+          setter: setArea,
+          placeholder: "0",
+        },
+        {
+          id: "floors",
+          label: "Floors",
+          value: floors,
+          setter: setFloors,
+          placeholder: "0",
+        },
+      ].map((field) => (
+        <FormField key={field.id} label={field.label} htmlFor={field.id}>
+          <Input
+            id={field.id}
+            name={field.id}
+            type="number"
+            min="0"
+            value={field.value}
+            onChange={(e) => field.setter(e.target.value)}
+            placeholder={field.placeholder}
+            className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
+          />
+        </FormField>
+      ))}
+    </div>
+  </div>
+);
+
+const SpecificationsStep = React.memo(SpecificationsStepComponent);
+SpecificationsStep.displayName = "SpecificationsStep";
+
+interface PricingStepProps {
+  basePrice: string;
+  setBasePrice: (value: string) => void;
+  priceRange: string;
+  setPriceRange: (value: string) => void;
+  architecturalPdfPrice: string;
+  setArchitecturalPdfPrice: (value: string) => void;
+  architecturalCadPrice: string;
+  setArchitecturalCadPrice: (value: string) => void;
+  structuralPdfPrice: string;
+  setStructuralPdfPrice: (value: string) => void;
+  structuralCadPrice: string;
+  setStructuralCadPrice: (value: string) => void;
+  billOfQuantitiesPrice: string;
+  setBillOfQuantitiesPrice: (value: string) => void;
+  billOfQuantitiesPdfPrice: string;
+  setBillOfQuantitiesPdfPrice: (value: string) => void;
+  fieldErrors: Record<string, string>;
+  setFieldErrors: (errors: Record<string, string>) => void;
+}
+
+// Define the component separately with a named function
+const PricingStepComponent: React.FC<PricingStepProps> = ({
+  basePrice,
+  setBasePrice,
+  priceRange,
+  setPriceRange,
+  architecturalPdfPrice,
+  setArchitecturalPdfPrice,
+  architecturalCadPrice,
+  setArchitecturalCadPrice,
+  structuralPdfPrice,
+  setStructuralPdfPrice,
+  structuralCadPrice,
+  setStructuralCadPrice,
+  billOfQuantitiesPrice,
+  setBillOfQuantitiesPrice,
+  billOfQuantitiesPdfPrice,
+  setBillOfQuantitiesPdfPrice,
+  fieldErrors,
+  setFieldErrors,
+}) => (
+  <div className="space-y-8">
+    <SectionHeader
+      icon={FiDollarSign}
+      title="Pricing Information"
+      description="Set pricing for the design and associated documents"
+      required
+    />
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <FormField
+        label="Base Price ($)"
+        htmlFor="basePrice"
+        required
+        error={fieldErrors.basePrice}
+        description="The starting price for this design"
+      >
+        <Input
+          id="basePrice"
+          name="basePrice"
+          type="number"
+          min="0"
+          step="0.01"
+          value={basePrice}
+          onChange={(e) => {
+            setBasePrice(e.target.value);
+            setFieldErrors((prev) => ({ ...prev, basePrice: "" }));
+          }}
+          placeholder="0.00"
+          className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
+          required
+        />
+      </FormField>
+
+      <FormField
+        label="Price Range"
+        htmlFor="priceRange"
+        description="Displayed price range for customers (e.g., $50k - $70k)"
+      >
+        <Input
+          id="priceRange"
+          name="priceRange"
+          value={priceRange}
+          onChange={(e) => setPriceRange(e.target.value)}
+          placeholder="e.g., $50k - $70k"
+          className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
+        />
+      </FormField>
+    </div>
+
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-3">
+        <FiFileText className="w-6 h-6 text-blue-500" />
+        Document Pricing
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {[
           {
-            id: "bedrooms",
-            label: "Bedrooms",
-            value: bedrooms,
-            setter: setBedrooms,
-            placeholder: "0",
+            id: "architecturalPdfPrice",
+            label: "Architectural PDF",
+            value: architecturalPdfPrice,
+            setter: setArchitecturalPdfPrice,
           },
           {
-            id: "bathrooms",
-            label: "Bathrooms",
-            value: bathrooms,
-            setter: setBathrooms,
-            placeholder: "0",
+            id: "architecturalCadPrice",
+            label: "Architectural CAD",
+            value: architecturalCadPrice,
+            setter: setArchitecturalCadPrice,
           },
           {
-            id: "area",
-            label: "Area (sq mt)",
-            value: area,
-            setter: setArea,
-            placeholder: "0",
+            id: "structuralPdfPrice",
+            label: "Structural PDF",
+            value: structuralPdfPrice,
+            setter: setStructuralPdfPrice,
           },
           {
-            id: "floors",
-            label: "Floors",
-            value: floors,
-            setter: setFloors,
-            placeholder: "0",
+            id: "structuralCadPrice",
+            label: "Structural CAD",
+            value: structuralCadPrice,
+            setter: setStructuralCadPrice,
+          },
+          {
+            id: "billOfQuantitiesPrice",
+            label: "Bill of Quantities (Excel)",
+            value: billOfQuantitiesPrice,
+            setter: setBillOfQuantitiesPrice,
+          },
+          {
+            id: "billOfQuantitiesPdfPrice",
+            label: "Bill of Quantities (PDF)",
+            value: billOfQuantitiesPdfPrice,
+            setter: setBillOfQuantitiesPdfPrice,
           },
         ].map((field) => (
           <FormField key={field.id} label={field.label} htmlFor={field.id}>
@@ -1048,644 +1270,450 @@ const SpecificationsStep = React.memo(
               name={field.id}
               type="number"
               min="0"
+              step="0.01"
               value={field.value}
               onChange={(e) => field.setter(e.target.value)}
-              placeholder={field.placeholder}
+              placeholder="0.00"
               className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
             />
           </FormField>
         ))}
       </div>
     </div>
-  )
+  </div>
 );
 
-const PricingStep = React.memo(
-  ({
-    basePrice,
-    setBasePrice,
-    priceRange,
-    setPriceRange,
-    architecturalPdfPrice,
-    setArchitecturalPdfPrice,
-    architecturalCadPrice,
-    setArchitecturalCadPrice,
-    structuralPdfPrice,
-    setStructuralPdfPrice,
-    structuralCadPrice,
-    setStructuralCadPrice,
-    billOfQuantitiesPrice,
-    setBillOfQuantitiesPrice,
-    fieldErrors,
-    setFieldErrors,
-  }: any) => (
+// Apply React.memo to the named component
+const PricingStep = React.memo(PricingStepComponent);
+PricingStep.displayName = "PricingStep";
+
+interface FileType {
+  url: string;
+  name: string;
+  type: string;
+  size: number;
+}
+
+interface DocumentState {
+  pdfFiles: FileType[];
+  cadFiles: FileType[];
+  excelFiles: FileType[];
+}
+
+interface FilesStepProps {
+  images: FileType[];
+  setImages: (files: FileType[]) => void;
+  floorPlans: FileType[];
+  setFloorPlans: (files: FileType[]) => void;
+  files: FileType[];
+  setFiles: (files: FileType[]) => void;
+  architecturalDesign: DocumentState;
+  setArchitecturalDesign: (doc: DocumentState) => void;
+  structuralDesign: DocumentState;
+  setStructuralDesign: (doc: DocumentState) => void;
+  billOfQuantities: DocumentState;
+  setBillOfQuantities: (doc: DocumentState) => void;
+  fieldErrors: Record<string, string>;
+  setFieldErrors: (errors: Record<string, string>) => void;
+}
+
+const FilesStepComponent: React.FC<FilesStepProps> = ({
+  images,
+  setImages,
+  floorPlans,
+  setFloorPlans,
+  files,
+  setFiles,
+  architecturalDesign,
+  setArchitecturalDesign,
+  structuralDesign,
+  setStructuralDesign,
+  billOfQuantities,
+  setBillOfQuantities,
+  fieldErrors,
+  setFieldErrors,
+}) => {
+  const categoryMap: { [key: string]: string } = {
+    pdfFiles: "PDF",
+    cadFiles: "CAD",
+    excelFiles: "EXCEL",
+  };
+
+  return (
     <div className="space-y-8">
       <SectionHeader
-        icon={FiDollarSign}
-        title="Pricing Information"
-        description="Set pricing for the design and associated documents"
+        icon={FiUpload}
+        title="Files & Documents"
+        description="Upload design documents, images, and supporting files"
         required
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <FormField
-          label="Base Price ($)"
-          htmlFor="basePrice"
-          required
-          error={fieldErrors.basePrice}
-          description="The starting price for this design"
-        >
-          <Input
-            id="basePrice"
-            name="basePrice"
-            type="number"
-            min="0"
-            step="0.01"
-            value={basePrice}
-            onChange={(e) => {
-              setBasePrice(e.target.value);
-              setFieldErrors((prev: any) => ({ ...prev, basePrice: "" }));
-            }}
-            placeholder="0.00"
-            className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
-            required
-          />
-        </FormField>
-
-        <FormField
-          label="Price Range"
-          htmlFor="priceRange"
-          description="Displayed price range for customers (e.g., $50k - $70k)"
-        >
-          <Input
-            id="priceRange"
-            name="priceRange"
-            value={priceRange}
-            onChange={(e) => setPriceRange(e.target.value)}
-            placeholder="e.g., $50k - $70k"
-            className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
-          />
-        </FormField>
-      </div>
-
-      <div className="space-y-6">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-3">
-          <FiFileText className="w-6 h-6 text-blue-500" />
-          Document Pricing
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[
-            {
-              id: "architecturalPdfPrice",
-              label: "Architectural PDF",
-              value: architecturalPdfPrice,
-              setter: setArchitecturalPdfPrice,
-            },
-            {
-              id: "architecturalCadPrice",
-              label: "Architectural CAD",
-              value: architecturalCadPrice,
-              setter: setArchitecturalCadPrice,
-            },
-            {
-              id: "structuralPdfPrice",
-              label: "Structural PDF",
-              value: structuralPdfPrice,
-              setter: setStructuralPdfPrice,
-            },
-            {
-              id: "structuralCadPrice",
-              label: "Structural CAD",
-              value: structuralCadPrice,
-              setter: setStructuralCadPrice,
-            },
-            {
-              id: "billOfQuantitiesPrice",
-              label: "Bill of Quantities (Excel)",
-              value: billOfQuantitiesPrice,
-              setter: setBillOfQuantitiesPrice,
-            },
-            {
-              id: "billOfQuantitiesPdfPrice",
-              label: "Bill of Quantities (PDF)",
-              value: billOfQuantitiesPdfPrice,
-              setter: setBillOfQuantitiesPdfPrice,
-            },
-          ].map((field) => (
-            <FormField key={field.id} label={field.label} htmlFor={field.id}>
-              <Input
-                id={field.id}
-                name={field.id}
-                type="number"
-                min="0"
-                step="0.01"
-                value={field.value}
-                onChange={(e) => field.setter(e.target.value)}
-                placeholder="0.00"
-                className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
-              />
-            </FormField>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-);
-
-const FilesStep = React.memo(
-  ({
-    images,
-    setImages,
-    floorPlans,
-    setFloorPlans,
-    files,
-    setFiles,
-    architecturalDesign,
-    setArchitecturalDesign,
-    structuralDesign,
-    setStructuralDesign,
-    billOfQuantities,
-    setBillOfQuantities,
-    fieldErrors,
-    setFieldErrors,
-  }: any) => {
-    const categoryMap: { [key: string]: string } = {
-      pdfFiles: "PDF",
-      cadFiles: "CAD",
-      excelFiles: "EXCEL",
-    };
-
-    return (
       <div className="space-y-8">
-        <SectionHeader
-          icon={FiUpload}
-          title="Files & Documents"
-          description="Upload design documents, images, and supporting files"
-          required
-        />
-
-        <div className="space-y-8">
-          {/* General Images */}
-          <Card className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-3 text-lg">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <FiImage className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <span className="font-bold text-gray-900 dark:text-white">
-                    General Images *
-                  </span>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Upload high-quality images of your design. At least one
-                    image is required.
-                  </p>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FileUpload
-                onUploadSuccess={(files) => {
-                  setImages((prev: any) => [...prev, ...files]);
-                  setFieldErrors((prev: any) => ({ ...prev, images: "" }));
-                }}
-                onFileRemove={(fileUrl) =>
-                  setImages((prev: any) =>
-                    prev.filter((f) => f.url !== fileUrl)
-                  )
-                }
-                initialFiles={images}
-                fileTypeCategory="IMAGE"
-                multiple
-                accept="image/jpeg, image/png, image/gif, image/webp"
-              />
-              {fieldErrors.images && (
-                <div className="flex items-center gap-1 text-red-600 dark:text-red-400 text-sm mt-2">
-                  <FiAlertCircle className="w-4 h-4" />
-                  <span>{fieldErrors.images}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Floor Plans */}
-          <Card className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-3 text-lg">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <FiLayers className="w-5 h-5 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <span className="font-bold text-gray-900 dark:text-white">
-                    Floor Plans
-                  </span>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Upload floor plans as images or PDF documents
-                  </p>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FileUpload
-                onUploadSuccess={(files) =>
-                  setFloorPlans((prev: any) => [...prev, ...files])
-                }
-                onFileRemove={(fileUrl) =>
-                  setFloorPlans((prev: any) =>
-                    prev.filter((f) => f.url !== fileUrl)
-                  )
-                }
-                initialFiles={floorPlans}
-                fileTypeCategory="FLOOR_PLAN"
-                multiple
-                accept="image/jpeg, image/png, image/gif, image/webp, application/pdf"
-              />
-            </CardContent>
-          </Card>
-
-          {/* Other Files */}
-          <Card className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-3 text-lg">
-                <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                  <FiFileText className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
-                </div>
-                <div>
-                  <span className="font-bold text-gray-900 dark:text-white">
-                    Other Files
-                  </span>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Upload any other supporting documents
-                  </p>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FileUpload
-                onUploadSuccess={(uploadedFiles) =>
-                  setFiles((prev: any) => [...prev, ...uploadedFiles])
-                }
-                onFileRemove={(fileUrl) =>
-                  setFiles((prev: any) =>
-                    prev.filter((f) => f.url !== fileUrl)
-                  )
-                }
-                initialFiles={files}
-                fileTypeCategory="FILE"
-                multiple
-              />
-            </CardContent>
-          </Card>
-
-          {/* Document Sections */}
-          {[
-            {
-              title: "Architectural Design",
-              icon: FiHome,
-              iconColor: "text-purple-600 dark:text-purple-400",
-              bgColor: "bg-purple-100 dark:bg-purple-900/30",
-              state: architecturalDesign,
-              setState: setArchitecturalDesign,
-              fields: [
-                {
-                  id: "pdfFiles",
-                  label: "PDF Files",
-                  accept: "application/pdf",
-                },
-                {
-                  id: "cadFiles",
-                  label: "CAD Files",
-                  accept: ".dwg, .dxf",
-                }, // Adjust accept as needed
-              ],
-            },
-            {
-              title: "Structural Design",
-              icon: FiLayers,
-              iconColor: "text-orange-600 dark:text-orange-400",
-              bgColor: "bg-orange-100 dark:bg-orange-900/30",
-              state: structuralDesign,
-              setState: setStructuralDesign,
-              fields: [
-                {
-                  id: "pdfFiles",
-                  label: "PDF Files",
-                  accept: "application/pdf",
-                },
-                {
-                  id: "cadFiles",
-                  label: "CAD Files",
-                  accept: ".dwg, .dxf",
-                },
-              ],
-            },
-            {
-              title: "Bill of Quantities",
-              icon: FiFileText,
-              iconColor: "text-red-600 dark:text-red-400",
-              bgColor: "bg-red-100 dark:bg-red-900/30",
-              state: billOfQuantities,
-              setState: setBillOfQuantities,
-              fields: [
-                {
-                  id: "excelFiles",
-                  label: "Excel/CSV Files",
-                  accept:
-                    ".xlsx, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                },
-                {
-                  id: "pdfFiles",
-                  label: "PDF Files",
-                  accept: "application/pdf",
-                },
-              ],
-            },
-          ].map((doc) => (
-            <Card
-              key={doc.title}
-              className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm"
-            >
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-3 text-lg">
-                  <div className={`p-2 ${doc.bgColor} rounded-lg`}>
-                    <doc.icon className={`w-5 h-5 ${doc.iconColor}`} />
-                  </div>
-                  <span className="font-bold text-gray-900 dark:text-white">
-                    {doc.title}
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-
-                {doc.fields.map((field) => (
-                  <div key={field.id}>
-                    <Label className="text-sm font-semibold text-gray-900 dark:text-white mb-3 block">
-                      {field.label}
-                    </Label>
-                    <FileUpload
-                      onUploadSuccess={(files) =>
-                        doc.setState((prev: any) => ({
-                          ...prev,
-                          [field.id]: [...prev[field.id], ...files],
-                        }))
-                      }
-                      onFileRemove={(fileUrl) =>
-                        doc.setState((prev: any) => ({
-                          ...prev,
-                          [field.id]: prev[field.id].filter(
-                            (f: any) => f.url !== fileUrl
-                          ),
-                        }))
-                      }
-                      initialFiles={doc.state[field.id]}
-                      fileTypeCategory={categoryMap[field.id] || "OTHER"}
-                      multiple
-                      accept={field.accept}
-                    />
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-);
-
-const CostEstimatesStep = React.memo(
-  ({
-    minBuildingCost,
-    setMinBuildingCost,
-    maxBuildingCost,
-    setMaxBuildingCost,
-    buildingCostEstimates,
-    setBuildingCostEstimates,
-    handleCostBreakdownChange,
-    addCostBreakdownItem,
-    removeCostBreakdownItem,
-  }: any) => (
-    <div className="space-y-8">
-      <SectionHeader
-        icon={FiFileText}
-        title="Building Cost Estimates"
-        description="Provide optional cost breakdowns for different build tiers"
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <FormField
-          label="Min Building Cost ($)"
-          htmlFor="minBuildingCost"
-          description="Estimated minimum cost to build this design"
-        >
-          <Input
-            id="minBuildingCost"
-            name="minBuildingCost"
-            type="number"
-            min="0"
-            step="100"
-            value={minBuildingCost}
-            onChange={(e) => setMinBuildingCost(e.target.value)}
-            placeholder="e.g., 50000"
-            className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
-          />
-        </FormField>
-        <FormField
-          label="Max Building Cost ($)"
-          htmlFor="maxBuildingCost"
-          description="Estimated maximum cost to build this design"
-        >
-          <Input
-            id="maxBuildingCost"
-            name="maxBuildingCost"
-            type="number"
-            min="0"
-            step="100"
-            value={maxBuildingCost}
-            onChange={(e) => setMaxBuildingCost(e.target.value)}
-            placeholder="e.g., 80000"
-            className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
-          />
-        </FormField>
-      </div>
-
-      {/* Cost Tiers */}
-      {(["basic", "luxury"] as const).map((tier) => (
-        <Card
-          key={tier}
-          className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm"
-        >
-          <CardHeader>
-            <CardTitle className="capitalize text-xl font-bold text-gray-900 dark:text-white">
-              {tier} Finish
+        {/* General Images */}
+        <Card className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <FiImage className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <span className="font-bold text-gray-900 dark:text-white">
+                  General Images *
+                </span>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Upload high-quality images of your design. At least one image
+                  is required.
+                </p>
+              </div>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <FormField label="Description" htmlFor={`${tier}-description`}>
-              <Textarea
-                id={`${tier}-description`}
-                value={buildingCostEstimates[tier].description}
-                onChange={(e) =>
-                  setBuildingCostEstimates((prev: any) => ({
-                    ...prev,
-                    [tier]: {
-                      ...prev[tier],
-                      description: e.target.value,
-                    },
-                  }))
-                }
-                placeholder={`Describe the ${tier} finish...`}
-                className="rounded-xl min-h-[100px] text-base border-2 focus:border-blue-500"
-              />
-            </FormField>
-
-            <div>
-              <Label className="text-sm font-semibold text-gray-900 dark:text-white mb-3 block">
-                Cost Breakdown
-              </Label>
-              <div className="space-y-4">
-                {buildingCostEstimates[tier].costBreakdown.map(
-                  (item: any, index: number) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        type="text"
-                        value={item.item}
-                        onChange={(e) =>
-                          handleCostBreakdownChange(
-                            tier,
-                            index,
-                            "item",
-                            e.target.value
-                          )
-                        }
-                        placeholder="Item (e.g., Foundation)"
-                        className="rounded-xl h-12 text-base border-2"
-                      />
-                      <Input
-                        type="number"
-                        value={item.cost}
-                        onChange={(e) =>
-                          handleCostBreakdownChange(
-                            tier,
-                            index,
-                            "cost",
-                            e.target.value
-                          )
-                        }
-                        placeholder="Cost ($)"
-                        className="rounded-xl h-12 text-base border-2 w-1/3"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeCostBreakdownItem(tier, index)}
-                        className="text-gray-500 hover:text-red-500"
-                      >
-                        <FiTrash className="w-5 h-5" />
-                      </Button>
-                    </div>
-                  )
-                )}
+          <CardContent>
+            <FileUpload
+              onUploadSuccess={(files) => {
+                setImages([...images, ...files]);
+                setFieldErrors({ ...fieldErrors, images: "" });
+              }}
+              onFileRemove={(fileUrl) =>
+                setImages(images.filter((f) => f.url !== fileUrl))
+              }
+              initialFiles={images}
+              fileTypeCategory="IMAGE"
+              multiple
+              accept="image/jpeg, image/png, image/gif, image/webp"
+            />
+            {fieldErrors.images && (
+              <div className="flex items-center gap-1 text-red-600 dark:text-red-400 text-sm mt-2">
+                <FiAlertCircle className="w-4 h-4" />
+                <span>{fieldErrors.images}</span>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => addCostBreakdownItem(tier)}
-                className="mt-4"
-              >
-                <FiPlus className="w-4 h-4 mr-2" />
-                Add Item
-              </Button>
-            </div>
+            )}
           </CardContent>
         </Card>
-      ))}
-    </div>
-  )
-);
 
-const PackageOptionsStep = React.memo(
-  ({
-    packageOptions,
-    addPackageOption,
-    removePackageOption,
-    handlePackageChange,
-    handlePackageFile,
-  }: any) => (
-    <div className="space-y-8">
-      <SectionHeader
-        icon={FiPackage}
-        title="Package Options"
-        description="Define additional packages or services available with this design"
-      />
-      <div className="space-y-6">
-        {packageOptions.map((option: any, index: number) => (
-          <Card
-            key={index}
-            className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm relative"
-          >
-            <CardContent className="pt-6 space-y-4">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => removePackageOption(index)}
-                className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
-              >
-                <FiX className="w-5 h-5" />
-              </Button>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField label="Package Name" htmlFor={`pkg-name-${index}`}>
-                  <Input
-                    id={`pkg-name-${index}`}
-                    value={option.name}
-                    onChange={(e) =>
-                      handlePackageChange(index, "name", e.target.value)
-                    }
-                    placeholder="e.g., 3D Visualization Package"
-                    className="rounded-xl h-12 text-base border-2"
-                  />
-                </FormField>
-                <FormField label="Price ($)" htmlFor={`pkg-price-${index}`}>
-                  <Input
-                    id={`pkg-price-${index}`}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={option.price}
-                    onChange={(e) =>
-                      handlePackageChange(index, "price", e.target.value)
-                    }
-                    placeholder="0.00"
-                    className="rounded-xl h-12 text-base border-2"
-                  />
-                </FormField>
+        {/* Floor Plans */}
+        <Card className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                <FiLayers className="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
-              <FormField label="File (Optional)" htmlFor={`pkg-file-${index}`}>
-                <FileUpload
-                  onUploadSuccess={(files) => handlePackageFile(index, files)}
-                  onFileRemove={() => handlePackageFile(index, [])}
-                  initialFiles={option.file}
-                  fileTypeCategory="FILE"
-                  multiple={false} // Only one file per package
-                />
-              </FormField>
+              <div>
+                <span className="font-bold text-gray-900 dark:text-white">
+                  Floor Plans
+                </span>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Upload floor plans as images or PDF documents
+                </p>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FileUpload
+              onUploadSuccess={(files) =>
+                setFloorPlans([...floorPlans, ...files])
+              }
+              onFileRemove={(fileUrl) =>
+                setFloorPlans(floorPlans.filter((f) => f.url !== fileUrl))
+              }
+              initialFiles={floorPlans}
+              fileTypeCategory="FLOOR_PLAN"
+              multiple
+              accept="image/jpeg, image/png, image/gif, image/webp, application/pdf"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Other Files */}
+        <Card className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+                <FiFileText className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              <div>
+                <span className="font-bold text-gray-900 dark:text-white">
+                  Other Files
+                </span>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Upload any other supporting documents
+                </p>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FileUpload
+              onUploadSuccess={(uploadedFiles) =>
+                setFiles([...files, ...uploadedFiles])
+              }
+              onFileRemove={(fileUrl) =>
+                setFiles(files.filter((f) => f.url !== fileUrl))
+              }
+              initialFiles={files}
+              fileTypeCategory="FILE"
+              multiple
+            />
+          </CardContent>
+        </Card>
+
+        {/* Document Sections */}
+        {[
+          {
+            title: "Architectural Design",
+            icon: FiHome,
+            iconColor: "text-purple-600 dark:text-purple-400",
+            bgColor: "bg-purple-100 dark:bg-purple-900/30",
+            state: architecturalDesign,
+            setState: setArchitecturalDesign,
+            fields: [
+              {
+                id: "pdfFiles",
+                label: "PDF Files",
+                accept: "application/pdf",
+              },
+              {
+                id: "cadFiles",
+                label: "CAD Files",
+                accept: ".dwg, .dxf",
+              },
+            ],
+          },
+          {
+            title: "Structural Design",
+            icon: FiLayers,
+            iconColor: "text-orange-600 dark:text-orange-400",
+            bgColor: "bg-orange-100 dark:bg-orange-900/30",
+            state: structuralDesign,
+            setState: setStructuralDesign,
+            fields: [
+              {
+                id: "pdfFiles",
+                label: "PDF Files",
+                accept: "application/pdf",
+              },
+              {
+                id: "cadFiles",
+                label: "CAD Files",
+                accept: ".dwg, .dxf",
+              },
+            ],
+          },
+          {
+            title: "Bill of Quantities",
+            icon: FiFileText,
+            iconColor: "text-red-600 dark:text-red-400",
+            bgColor: "bg-red-100 dark:bg-red-900/30",
+            state: billOfQuantities,
+            setState: setBillOfQuantities,
+            fields: [
+              {
+                id: "excelFiles",
+                label: "Excel/CSV Files",
+                accept:
+                  ".xlsx, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              },
+              {
+                id: "pdfFiles",
+                label: "PDF Files",
+                accept: "application/pdf",
+              },
+            ],
+          },
+        ].map((doc) => (
+          <Card
+            key={doc.title}
+            className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm"
+          >
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-lg">
+                <div className={`p-2 ${doc.bgColor} rounded-lg`}>
+                  <doc.icon className={`w-5 h-5 ${doc.iconColor}`} />
+                </div>
+                <span className="font-bold text-gray-900 dark:text-white">
+                  {doc.title}
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {doc.fields.map((field) => (
+                <div key={field.id}>
+                  <Label className="text-sm font-semibold text-gray-900 dark:text-white mb-3 block">
+                    {field.label}
+                  </Label>
+                  <FileUpload
+                    onUploadSuccess={(files) =>
+                      doc.setState({
+                        ...doc.state,
+                        [field.id]: [...doc.state[field.id], ...files],
+                      })
+                    }
+                    onFileRemove={(fileUrl) =>
+                      doc.setState({
+                        ...doc.state,
+                        [field.id]: doc.state[field.id].filter(
+                          (f: FileType) => f.url !== fileUrl
+                        ),
+                      })
+                    }
+                    initialFiles={doc.state[field.id]}
+                    fileTypeCategory={categoryMap[field.id] || "OTHER"}
+                    multiple
+                    accept={field.accept}
+                  />
+                </div>
+              ))}
             </CardContent>
           </Card>
         ))}
-        <Button
-          type="button"
-          variant="outline"
-          onClick={addPackageOption}
-          className="w-full"
-        >
-          <FiPlus className="w-4 h-4 mr-2" />
-          Add New Package
-        </Button>
       </div>
     </div>
-  )
+  );
+};
+
+const FilesStep = React.memo(FilesStepComponent);
+FilesStep.displayName = "FilesStep";
+
+interface PackageOption {
+  name: string;
+  price: string;
+  file: FileType[];
+}
+
+interface PackageOptionsStepProps {
+  packageOptions: PackageOption[];
+  addPackageOption: () => void;
+  removePackageOption: (index: number) => void;
+  handlePackageChange: (index: number, field: string, value: string) => void;
+  handlePackageFile: (index: number, files: FileType[]) => void;
+}
+
+const PackageOptionsStepComponent: React.FC<PackageOptionsStepProps> = ({
+  packageOptions,
+  addPackageOption,
+  removePackageOption,
+  handlePackageChange,
+  handlePackageFile,
+}) => (
+  <div className="space-y-8">
+    <SectionHeader
+      icon={FiPackage}
+      title="Package Options"
+      description="Define additional packages or services available with this design"
+    />
+    <div className="space-y-6">
+      {packageOptions.map((option, index) => (
+        <Card
+          key={index}
+          className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm relative"
+        >
+          <CardContent className="pt-6 space-y-4">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => removePackageOption(index)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
+            >
+              <FiX className="w-5 h-5" />
+            </Button>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="Package Name" htmlFor={`pkg-name-${index}`}>
+                <Input
+                  id={`pkg-name-${index}`}
+                  value={option.name}
+                  onChange={(e) =>
+                    handlePackageChange(index, "name", e.target.value)
+                  }
+                  placeholder="e.g., 3D Visualization Package"
+                  className="rounded-xl h-12 text-base border-2"
+                />
+              </FormField>
+              <FormField label="Price ($)" htmlFor={`pkg-price-${index}`}>
+                <Input
+                  id={`pkg-price-${index}`}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={option.price}
+                  onChange={(e) =>
+                    handlePackageChange(index, "price", e.target.value)
+                  }
+                  placeholder="0.00"
+                  className="rounded-xl h-12 text-base border-2"
+                />
+              </FormField>
+            </div>
+            <FormField label="File (Optional)" htmlFor={`pkg-file-${index}`}>
+              <FileUpload
+                onUploadSuccess={(files) => handlePackageFile(index, files)}
+                onFileRemove={() => handlePackageFile(index, [])}
+                initialFiles={option.file}
+                fileTypeCategory="FILE"
+                multiple={false}
+              />
+            </FormField>
+          </CardContent>
+        </Card>
+      ))}
+      <Button
+        type="button"
+        variant="outline"
+        onClick={addPackageOption}
+        className="w-full"
+      >
+        <FiPlus className="w-4 h-4 mr-2" />
+        Add New Package
+      </Button>
+    </div>
+  </div>
 );
+
+const PackageOptionsStep = React.memo(PackageOptionsStepComponent);
+PackageOptionsStep.displayName = "PackageOptionsStep";
+
+const ReviewStep = ({ designData }: { designData: any }) => {
+  return (
+    <div className="space-y-8">
+      <SectionHeader
+        icon={FiCheck}
+        title="Review Your Design"
+        description="Please review the details below before submitting."
+      />
+      <div className="space-y-4 p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border-2">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+          {designData.name || "Untitled Design"}
+        </h3>
+        <p className="text-base text-gray-600 dark:text-gray-400">
+          {designData.description || "No description provided."}
+        </p>
+        <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4">
+          <p className="text-lg font-semibold">
+            Base Price:{" "}
+            <span className="font-bold text-blue-600 dark:text-blue-400">
+              ${parseFloat(designData.basePrice || 0).toFixed(2)}
+            </span>
+          </p>
+        </div>
+        <div>
+          <h4 className="font-semibold text-lg mb-2">Uploaded Images:</h4>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+            {designData.images.length > 0 ? (
+              designData.images.map((img: any, index: number) => (
+                <img
+                  key={index}
+                  src={img.url}
+                  alt={`preview ${index}`}
+                  className="w-full h-24 object-cover rounded-lg shadow-md"
+                />
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No images uploaded.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default DesignForm;

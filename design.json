@@ -1,148 +1,143 @@
 {
-  "name": "Classic Two-Story Family Home",
-  "description": "A timeless two-story design with a traditional facade, pitched roof, and spacious interiors. Includes formal dining, a large family room, and a generous backyard layout.",
-  "categoryId": "clx1j2x0z0003l8x0x0x0x0x3",
+  "name": "Sustainable Tiny House",
+  "description": "A highly efficient, compact dwelling designed for minimal environmental impact. Features a small footprint, maximizing natural light, and optimized for off-grid capabilities like solar and rainwater harvesting.",
+  "categoryId": "clx1j2x0z0004l8x0x0x0x0x4",
   "planDetails": [
-    "5 Bedrooms",
-    "4 Bathrooms",
-    "Formal dining room",
-    "Two-car attached garage",
-    "Laundry room on main floor"
+    "1 Bedroom (loft)",
+    "1 Bathroom",
+    "Open-concept kitchen/living",
+    "Composting toilet option",
+    "Utility closet for systems"
   ],
-  "bedrooms": 5,
-  "bathrooms": 4,
-  "area": 320,
-  "floors": 2,
-  "basePrice": 850,
-  "priceRange": "$850 - $1500",
-  "architecturalPdfPrice": 180,
-  "architecturalCadPrice": 350,
-  "structuralPdfPrice": 120,
-  "structuralCadPrice": 250,
-  "billOfQuantitiesPrice": 60,
+  "bedrooms": 1,
+  "bathrooms": 1,
+  "area": 40,
+  "floors": 1,
+  "basePrice": 250,
+  "priceRange": "$250 - $450",
+  "architecturalPdfPrice": 50,
+  "architecturalCadPrice": 120,
+  "structuralPdfPrice": 40,
+  "structuralCadPrice": 100,
+  "billOfQuantitiesPrice": 25,
   "images": [
     {
-      "name": "suburban-exterior-traditional.jpg",
-      "url": "https://example.com/images/suburban-exterior-traditional.jpg",
+      "name": "tiny-house-exterior-solar.jpg",
+      "url": "https://example.com/images/tiny-house-exterior-solar.jpg",
       "type": "IMAGE"
     },
     {
-      "name": "formal-dining-room.jpg",
-      "url": "https://example.com/images/formal-dining-room.jpg",
+      "name": "tiny-house-loft-interior.jpg",
+      "url": "https://example.com/images/tiny-house-loft-interior.jpg",
       "type": "IMAGE"
     }
   ],
   "floorPlans": [
     {
-      "name": "ground-floor-traditional.pdf",
-      "url": "https://example.com/files/ground-floor-traditional.pdf",
-      "type": "FLOOR_PLAN"
-    },
-    {
-      "name": "second-floor-traditional.pdf",
-      "url": "https://example.com/files/second-floor-traditional.pdf",
+      "name": "tiny-house-plan.pdf",
+      "url": "https://example.com/files/tiny-house-plan.pdf",
       "type": "FLOOR_PLAN"
     }
   ],
   "architecturalDesign": {
-    "description": "Comprehensive plans including detailed elevations, window and door schedules, and exterior material specifications.",
-    "overview": "Complete set of plans for a standard residential construction.",
+    "description": "Simplified plans focusing on high insulation values and efficient use of space.",
+    "overview": "Architectural drawings optimized for small-scale, affordable construction.",
     "pdfFiles": [
       {
-        "name": "traditional-architectural-plans.pdf",
-        "url": "https://example.com/files/traditional-architectural-plans.pdf",
+        "name": "tiny-house-architectural-plans.pdf",
+        "url": "https://example.com/files/tiny-house-architectural-plans.pdf",
         "type": "PDF"
       }
     ],
     "cadFiles": [
       {
-        "name": "traditional-architectural-plans.dwg",
-        "url": "https://example.com/files/traditional-architectural-plans.dwg",
+        "name": "tiny-house-architectural-plans.dwg",
+        "url": "https://example.com/files/tiny-house-architectural-plans.dwg",
         "type": "CAD"
       }
     ]
   },
   "structuralDesign": {
-    "description": "Structural drawings for concrete slab foundation, load-bearing walls, and conventional pitched roof framing.",
-    "overview": "Ensures adherence to residential building codes.",
+    "description": "Lightweight structural plans for stability, often including trailer-mounting details for mobile versions.",
+    "overview": "Structural details for a robust, small structure.",
     "pdfFiles": [
       {
-        "name": "traditional-structural-plans.pdf",
-        "url": "https://example.com/files/traditional-structural-plans.pdf",
+        "name": "tiny-house-structural-plans.pdf",
+        "url": "https://example.com/files/tiny-house-structural-plans.pdf",
         "type": "PDF"
       }
     ],
     "cadFiles": [
       {
-        "name": "traditional-structural-plans.dwg",
-        "url": "https://example.com/files/traditional-structural-plans.dwg",
+        "name": "tiny-house-structural-plans.dwg",
+        "url": "https://example.com/files/tiny-house-structural-plans.dwg",
         "type": "CAD"
       }
     ]
   },
   "billOfQuantities": {
-    "description": "Detailed material and labor estimation for a larger, multi-room home.",
-    "overview": "Used for obtaining accurate contractor bids.",
+    "description": "Material list focused on cost-effective, locally sourced, and sustainable options.",
+    "overview": "Minimized material list for low waste and cost.",
     "excelFiles": [
       {
-        "name": "traditional-bill-of-quantities.xlsx",
-        "url": "https://example.com/files/traditional-bill-of-quantities.xlsx",
+        "name": "tiny-house-bill-of-quantities.xlsx",
+        "url": "https://example.com/files/tiny-house-bill-of-quantities.xlsx",
         "type": "EXCEL"
       }
     ]
   },
-  "minBuildingCost": 220000,
-  "maxBuildingCost": 400000,
+  "minBuildingCost": 30000,
+  "maxBuildingCost": 60000,
   "buildingCostEstimates": {
     "basic": {
-      "description": "Standard builder-grade finishes, vinyl siding, and basic appliance package.",
+      "description": "DIY-friendly materials, basic fittings, and standard insulation.",
       "costBreakdown": [
         {
-          "item": "Foundation & Grading",
-          "cost": 30000
+          "item": "Trailer/Foundation",
+          "cost": 5000
         },
         {
-          "item": "Framing & Roofing",
-          "cost": 50000
+          "item": "Shell & Framing",
+          "cost": 10000
         },
         {
-          "item": "Interior & Exterior Finishes",
-          "cost": 80000
+          "item": "Finishes & Utilities",
+          "cost": 15000
         }
       ]
     },
     "luxury": {
-      "description": "High-end custom millwork, stone veneer exterior, premium insulation, and custom kitchen/bathrooms.",
+      "description": "High-efficiency windows, premium wood finishes, and integrated solar/battery systems.",
       "costBreakdown": [
         {
-          "item": "Foundation & Grading",
-          "cost": 35000
+          "item": "Trailer/Foundation",
+          "cost": 8000
         },
         {
-          "item": "Framing & Roofing",
-          "cost": 65000
+          "item": "Shell & Framing (Premium)",
+          "cost": 15000
         },
         {
-          "item": "Luxury Finishes & Customization",
-          "cost": 150000
+          "item": "Luxury Finishes & Systems",
+          "cost": 30000
         }
       ]
     }
   },
   "packageOptions": [
     {
-      "name": "Land Survey & Site Analysis",
-      "price": 400,
-      "file": null
-    },
-    {
-      "name": "Exterior Color Palette Guide",
-      "price": 100,
+      "name": "Off-Grid System Integration Manual",
+      "price": 200,
       "file": {
-        "name": "color-palette-guide.pdf",
-        "url": "https://example.com/files/color-palette-guide.pdf",
+        "name": "off-grid-manual.pdf",
+        "url": "https://example.com/files/off-grid-manual.pdf",
         "type": "PDF"
       }
+    },
+    {
+      "name": "Interior Furniture Layout Guide",
+      "price": 100,
+      "file": null
     }
   ]
 }

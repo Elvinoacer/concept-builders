@@ -99,6 +99,7 @@ const NewDesignForm = ({
       setBillOfQuantities(
         designToEdit.billOfQuantities || {
           excelFiles: [],
+          pdfFiles: [],
         }
       );
 
@@ -113,6 +114,9 @@ const NewDesignForm = ({
       setBillOfQuantitiesPrice(
         designToEdit.billOfQuantitiesPrice?.toString() || ""
       );
+      setBillOfQuantitiesPdfPrice(
+        designToEdit.billOfQuantitiesPdfPrice?.toString() || ""
+      );
       setPackageOptions(
         designToEdit.packageOptions.map((opt) => ({
           ...opt,
@@ -123,6 +127,7 @@ const NewDesignForm = ({
 
       setImages(designToEdit.images || []);
       setFloorPlans(designToEdit.floorPlans || []);
+      setFiles(designToEdit.files || []);
     }
   }, [designToEdit, isEditMode]);
 
