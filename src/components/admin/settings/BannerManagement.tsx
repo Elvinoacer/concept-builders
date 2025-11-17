@@ -114,7 +114,7 @@ const BannerManagement = () => {
       uploadFormData.append("file", selectedFile);
 
       try {
-        const uploadResponse = await fetch("/api/files/upload", {
+        const uploadResponse = await fetch("/api/upload-file", {
           method: "POST",
           body: uploadFormData,
         });
