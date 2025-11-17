@@ -816,6 +816,8 @@ create: packageOptionsPayload,
                       setStructuralCadPrice={setStructuralCadPrice}
                       billOfQuantitiesPrice={billOfQuantitiesPrice}
                       setBillOfQuantitiesPrice={setBillOfQuantitiesPrice}
+                      billOfQuantitiesPdfPrice={billOfQuantitiesPdfPrice}
+                      setBillOfQuantitiesPdfPrice={setBillOfQuantitiesPdfPrice}
                       fieldErrors={fieldErrors}
                       setFieldErrors={setFieldErrors}
                     />
@@ -826,6 +828,8 @@ create: packageOptionsPayload,
                       setImages={setImages}
                       floorPlans={floorPlans}
                       setFloorPlans={setFloorPlans}
+                      files={files}
+                      setFiles={setFiles}
                       architecturalDesign={architecturalDesign}
                       setArchitecturalDesign={setArchitecturalDesign}
                       structuralDesign={structuralDesign}
@@ -1194,6 +1198,8 @@ const FilesStep = React.memo(
     setImages,
     floorPlans,
     setFloorPlans,
+    files,
+    setFiles,
     architecturalDesign,
     setArchitecturalDesign,
     structuralDesign,
