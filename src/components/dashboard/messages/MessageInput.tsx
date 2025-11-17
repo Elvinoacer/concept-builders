@@ -184,7 +184,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         formData.append("file", file);
 
         try {
-          const response = await fetch("/api/files/upload", {
+          const response = await fetch("/api/upload-file", {
             method: "POST",
             body: formData,
           });
