@@ -1,143 +1,148 @@
 {
-  "name": "Urban Minimalist Loft",
-  "description": "A sleek, single-story loft design perfect for city living. Features exposed structural elements, high ceilings, polished concrete floors, and a focus on open-plan living with hidden storage.",
-  "categoryId": "clx1j2x0z0002l8x0x0x0x0x2",
+  "name": "Classic Two-Story Family Home",
+  "description": "A timeless two-story design with a traditional facade, pitched roof, and spacious interiors. Includes formal dining, a large family room, and a generous backyard layout.",
+  "categoryId": "clx1j2x0z0003l8x0x0x0x0x3",
   "planDetails": [
-    "1 Large Bedroom (or open sleeping area)",
-    "1.5 Bathrooms",
-    "Double-height living space",
-    "Mezzanine/Storage",
-    "Private balcony"
+    "5 Bedrooms",
+    "4 Bathrooms",
+    "Formal dining room",
+    "Two-car attached garage",
+    "Laundry room on main floor"
   ],
-  "bedrooms": 1,
-  "bathrooms": 2,
-  "area": 120,
-  "floors": 1,
-  "basePrice": 300,
-  "priceRange": "$300 - $650",
-  "architecturalPdfPrice": 80,
-  "architecturalCadPrice": 200,
-  "structuralPdfPrice": 70,
-  "structuralCadPrice": 160,
-  "billOfQuantitiesPrice": 35,
+  "bedrooms": 5,
+  "bathrooms": 4,
+  "area": 320,
+  "floors": 2,
+  "basePrice": 850,
+  "priceRange": "$850 - $1500",
+  "architecturalPdfPrice": 180,
+  "architecturalCadPrice": 350,
+  "structuralPdfPrice": 120,
+  "structuralCadPrice": 250,
+  "billOfQuantitiesPrice": 60,
   "images": [
     {
-      "name": "loft-interior-view.jpg",
-      "url": "https://example.com/images/loft-interior-view.jpg",
+      "name": "suburban-exterior-traditional.jpg",
+      "url": "https://example.com/images/suburban-exterior-traditional.jpg",
       "type": "IMAGE"
     },
     {
-      "name": "loft-kitchen-area.jpg",
-      "url": "https://example.com/images/loft-kitchen-area.jpg",
+      "name": "formal-dining-room.jpg",
+      "url": "https://example.com/images/formal-dining-room.jpg",
       "type": "IMAGE"
     }
   ],
   "floorPlans": [
     {
-      "name": "loft-main-level-plan.pdf",
-      "url": "https://example.com/files/loft-main-level-plan.pdf",
+      "name": "ground-floor-traditional.pdf",
+      "url": "https://example.com/files/ground-floor-traditional.pdf",
+      "type": "FLOOR_PLAN"
+    },
+    {
+      "name": "second-floor-traditional.pdf",
+      "url": "https://example.com/files/second-floor-traditional.pdf",
       "type": "FLOOR_PLAN"
     }
   ],
   "architecturalDesign": {
-    "description": "Clean, precise plans emphasizing spatial efficiency and material selection (concrete, steel, glass).",
-    "overview": "Detailed plans for a modern urban dwelling.",
+    "description": "Comprehensive plans including detailed elevations, window and door schedules, and exterior material specifications.",
+    "overview": "Complete set of plans for a standard residential construction.",
     "pdfFiles": [
       {
-        "name": "loft-architectural-plans.pdf",
-        "url": "https://example.com/files/loft-architectural-plans.pdf",
+        "name": "traditional-architectural-plans.pdf",
+        "url": "https://example.com/files/traditional-architectural-plans.pdf",
         "type": "PDF"
       }
     ],
     "cadFiles": [
       {
-        "name": "loft-architectural-plans.dwg",
-        "url": "https://example.com/files/loft-architectural-plans.dwg",
+        "name": "traditional-architectural-plans.dwg",
+        "url": "https://example.com/files/traditional-architectural-plans.dwg",
         "type": "CAD"
       }
     ]
   },
   "structuralDesign": {
-    "description": "Structural analysis for the steel framework and mezzanine support.",
-    "overview": "Focuses on maximizing open, column-free space.",
+    "description": "Structural drawings for concrete slab foundation, load-bearing walls, and conventional pitched roof framing.",
+    "overview": "Ensures adherence to residential building codes.",
     "pdfFiles": [
       {
-        "name": "loft-structural-plans.pdf",
-        "url": "https://example.com/files/loft-structural-plans.pdf",
+        "name": "traditional-structural-plans.pdf",
+        "url": "https://example.com/files/traditional-structural-plans.pdf",
         "type": "PDF"
       }
     ],
     "cadFiles": [
       {
-        "name": "loft-structural-plans.dwg",
-        "url": "https://example.com/files/loft-structural-plans.dwg",
+        "name": "traditional-structural-plans.dwg",
+        "url": "https://example.com/files/traditional-structural-plans.dwg",
         "type": "CAD"
       }
     ]
   },
   "billOfQuantities": {
-    "description": "Itemized list focusing on industrial materials, high-end fixtures, and specialized concrete work.",
-    "overview": "Used for precise cost control in a compact build.",
+    "description": "Detailed material and labor estimation for a larger, multi-room home.",
+    "overview": "Used for obtaining accurate contractor bids.",
     "excelFiles": [
       {
-        "name": "loft-bill-of-quantities.xlsx",
-        "url": "https://example.com/files/loft-bill-of-quantities.xlsx",
+        "name": "traditional-bill-of-quantities.xlsx",
+        "url": "https://example.com/files/traditional-bill-of-quantities.xlsx",
         "type": "EXCEL"
       }
     ]
   },
-  "minBuildingCost": 80000,
-  "maxBuildingCost": 140000,
+  "minBuildingCost": 220000,
+  "maxBuildingCost": 400000,
   "buildingCostEstimates": {
     "basic": {
-      "description": "Standard finishes, basic HVAC, and exposed conduit/minimalist fixtures.",
+      "description": "Standard builder-grade finishes, vinyl siding, and basic appliance package.",
       "costBreakdown": [
         {
-          "item": "Slab & Foundation",
-          "cost": 10000
-        },
-        {
-          "item": "Steel Frame & Shell",
-          "cost": 25000
-        },
-        {
-          "item": "Interior Finishes (Basic)",
+          "item": "Foundation & Grading",
           "cost": 30000
+        },
+        {
+          "item": "Framing & Roofing",
+          "cost": 50000
+        },
+        {
+          "item": "Interior & Exterior Finishes",
+          "cost": 80000
         }
       ]
     },
     "luxury": {
-      "description": "Custom cabinetry, smart home systems, premium soundproofing, and designer finishes.",
+      "description": "High-end custom millwork, stone veneer exterior, premium insulation, and custom kitchen/bathrooms.",
       "costBreakdown": [
         {
-          "item": "Slab & Foundation",
-          "cost": 12000
+          "item": "Foundation & Grading",
+          "cost": 35000
         },
         {
-          "item": "Steel Frame & Shell",
-          "cost": 30000
-        },
-        {
-          "item": "Luxury Finishes & Systems",
+          "item": "Framing & Roofing",
           "cost": 65000
+        },
+        {
+          "item": "Luxury Finishes & Customization",
+          "cost": 150000
         }
       ]
     }
   },
   "packageOptions": [
     {
-      "name": "Smart Home Integration Plan",
-      "price": 350,
-      "file": {
-        "name": "smart-home-plan.pdf",
-        "url": "https://example.com/files/smart-home-plan.pdf",
-        "type": "PDF"
-      }
+      "name": "Land Survey & Site Analysis",
+      "price": 400,
+      "file": null
     },
     {
-      "name": "Custom Furniture Design Package",
-      "price": 600,
-      "file": null
+      "name": "Exterior Color Palette Guide",
+      "price": 100,
+      "file": {
+        "name": "color-palette-guide.pdf",
+        "url": "https://example.com/files/color-palette-guide.pdf",
+        "type": "PDF"
+      }
     }
   ]
 }

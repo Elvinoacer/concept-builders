@@ -149,7 +149,7 @@ const AdminProfilePage = () => {
     uploadFormData.append("file", file);
 
     try {
-      const uploadRes = await fetch("/api/files/upload", {
+      const uploadRes = await fetch("/api/upload-file", {
         method: "POST",
         body: uploadFormData,
       });
