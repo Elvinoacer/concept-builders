@@ -38,6 +38,7 @@ export async function GET(
         billOfQuantities: {
           include: {
             excelFiles: true,
+            pdfFiles: true,
           },
         },
         packageOptions: {
@@ -67,154 +68,137 @@ export async function PUT(
     const { id } = params;
     const body = await request.json();
 
-    const updateData: any = {};
+    const {
+      name,
+      description,
+      basePrice,
+      priceRange,
+      bedrooms,
+      bathrooms,
+      area,
+      floors,
+      categoryId,
+      architecturalPdfPrice,
+      architecturalCadPrice,
+      structuralPdfPrice,
+      structuralCadPrice,
+      billOfQuantitiesPrice,
+      billOfQuantitiesPdfPrice,
+      images,
+      floorPlans,
+      files,
+      packageOptions,
+      architecturalDesign,
+      structuralDesign,
+      billOfQuantities,
+    } = body;
 
-    if ("name" in body) updateData.name = body.name;
-    if ("description" in body) updateData.description = body.description;
-    if ("basePrice" in body) updateData.basePrice = body.basePrice;
-    if ("priceRange" in body) updateData.priceRange = body.priceRange;
-    if ("bedrooms" in body) updateData.bedrooms = body.bedrooms;
-    if ("bathrooms" in body) updateData.bathrooms = body.bathrooms;
-    if ("area" in body) updateData.area = body.area;
-    if ("floors" in body) updateData.floors = body.floors;
-    if ("categoryId" in body) updateData.categoryId = body.categoryId;
-    if ("planDetails" in body) updateData.planDetails = body.planDetails;
-    if ("folderId" in body) updateData.folderId = body.folderId; // Can be null to unlink
-    if ("buildingCostEstimates" in body)
-      updateData.buildingCostEstimates = body.buildingCostEstimates;
-    if ("buildingCostFactors" in body)
-      updateData.buildingCostFactors = body.buildingCostFactors;
-    if ("packageOptions" in body)
-      updateData.packageOptions = body.packageOptions;
-    if ("minBuildingCost" in body)
-      updateData.minBuildingCost = body.minBuildingCost;
-    if ("maxBuildingCost" in body)
-      updateData.maxBuildingCost = body.maxBuildingCost;
-    if ("faq" in body) updateData.faq = body.faq;
-    if ("pdfPrice" in body) updateData.pdfPrice = body.pdfPrice;
-    if ("cadPrice" in body) updateData.cadPrice = body.cadPrice;
-    if ("pdfAndCadPrice" in body)
-      updateData.pdfAndCadPrice = body.pdfAndCadPrice;
+    const updateData: any = {
+      name,
+      description,
+      basePrice,
+      priceRange,
+      bedrooms,
+      bathrooms,
+      area,
+      floors,
+      categoryId,
+      architecturalPdfPrice,
+      architecturalCadPrice,
+      structuralPdfPrice,
+      structuralCadPrice,
+      billOfQuantitiesPrice,
+      billOfQuantitiesPdfPrice,
+    };
 
-    // Handle files update only if 'files' is explicitly provided in the body
+    if (images) {
+      updateData.images = {
+        deleteMany: {},
+        create: images.create,
+      };
+    }
 
-    if (body.architecturalDesign) {
+    if (floorPlans) {
+      updateData.floorPlans = {
+        deleteMany: {},
+        create: floorPlans.create,
+      };
+    }
+
+    if (files) {
+      updateData.files = {
+        deleteMany: {},
+        create: files.create,
+      };
+    }
+
+    if (packageOptions) {
+      updateData.packageOptions = {
+        deleteMany: {},
+        create: packageOptions.create,
+      };
+    }
+
+    if (architecturalDesign) {
       updateData.architecturalDesign = {
         upsert: {
           create: {
             type: "ARCHITECTURAL",
-            description: body.architecturalDesign.description,
-            overview: body.architecturalDesign.overview,
-            pdfFiles: {
-              create: body.architecturalDesign.pdfFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "PDF",
-              })),
-            },
-            cadFiles: {
-              create: body.architecturalDesign.cadFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "CAD",
-              })),
-            },
+            pdfFiles: { create: architecturalDesign.pdfFiles },
+            cadFiles: { create: architecturalDesign.cadFiles },
           },
           update: {
-            description: body.architecturalDesign.description,
-            overview: body.architecturalDesign.overview,
             pdfFiles: {
               deleteMany: {},
-              create: body.architecturalDesign.pdfFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "PDF",
-              })),
+              create: architecturalDesign.pdfFiles,
             },
             cadFiles: {
               deleteMany: {},
-              create: body.architecturalDesign.cadFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "CAD",
-              })),
+              create: architecturalDesign.cadFiles,
             },
           },
         },
       };
     }
 
-    if (body.structuralDesign) {
+    if (structuralDesign) {
       updateData.structuralDesign = {
         upsert: {
           create: {
             type: "STRUCTURAL",
-            description: body.structuralDesign.description,
-            overview: body.structuralDesign.overview,
-            pdfFiles: {
-              create: body.structuralDesign.pdfFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "PDF",
-              })),
-            },
-            cadFiles: {
-              create: body.structuralDesign.cadFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "CAD",
-              })),
-            },
+            pdfFiles: { create: structuralDesign.pdfFiles },
+            cadFiles: { create: structuralDesign.cadFiles },
           },
           update: {
-            description: body.structuralDesign.description,
-            overview: body.structuralDesign.overview,
             pdfFiles: {
               deleteMany: {},
-              create: body.structuralDesign.pdfFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "PDF",
-              })),
+              create: structuralDesign.pdfFiles,
             },
             cadFiles: {
               deleteMany: {},
-              create: body.structuralDesign.cadFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "CAD",
-              })),
+              create: structuralDesign.cadFiles,
             },
           },
         },
       };
     }
 
-    if (body.billOfQuantities) {
+    if (billOfQuantities) {
       updateData.billOfQuantities = {
         upsert: {
           create: {
             type: "BILL_OF_QUANTITIES",
-            description: body.billOfQuantities.description,
-            overview: body.billOfQuantities.overview,
-            excelFiles: {
-              create: body.billOfQuantities.excelFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "EXCEL",
-              })),
-            },
+            excelFiles: { create: billOfQuantities.excelFiles },
+            pdfFiles: { create: billOfQuantities.pdfFiles },
           },
           update: {
-            description: body.billOfQuantities.description,
-            overview: body.billOfQuantities.overview,
             excelFiles: {
               deleteMany: {},
-              create: body.billOfQuantities.excelFiles.map((file: any) => ({
-                name: file.name,
-                url: file.url,
-                type: "EXCEL",
-              })),
+              create: billOfQuantities.excelFiles,
+            },
+            pdfFiles: {
+              deleteMany: {},
+              create: billOfQuantities.pdfFiles,
             },
           },
         },
@@ -224,17 +208,12 @@ export async function PUT(
     const updatedDesign = await prisma.design.update({
       where: { id },
       data: updateData,
-      include: {
-        files: true,
-        reviews: {
-          include: {
-            author: true,
-          },
-        },
-      },
     });
 
     revalidatePath("/");
+    revalidatePath(`/admin/designs`);
+    revalidatePath(`/admin/designs/${id}`);
+    revalidatePath(`/designs/${id}`);
 
     return NextResponse.json(updatedDesign, { status: 200 });
   } catch (error) {

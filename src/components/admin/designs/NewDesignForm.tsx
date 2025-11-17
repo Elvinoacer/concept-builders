@@ -34,45 +34,34 @@ const NewDesignForm = ({
   const [bathrooms, setBathrooms] = useState("");
   const [area, setArea] = useState("");
   const [floors, setFloors] = useState("");
-  const [planDetails, setPlanDetails] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [minBuildingCost, setMinBuildingCost] = useState("");
-  const [maxBuildingCost, setMaxBuildingCost] = useState("");
-  const [buildingCostEstimates, setBuildingCostEstimates] = useState({
-    basic: { description: "", costBreakdown: [{ item: "", cost: "" }] },
-    luxury: { description: "", costBreakdown: [{ item: "", cost: "" }] },
-  });
 
   const [packageOptions, setPackageOptions] = useState<
     { name: string; price: string; file: any[] }[]
   >([]);
   const [architecturalDesign, setArchitecturalDesign] = useState({
-    description: "",
-    overview: "",
     pdfFiles: [],
     cadFiles: [],
   });
   const [structuralDesign, setStructuralDesign] = useState({
-    description: "",
-    overview: "",
     pdfFiles: [],
     cadFiles: [],
   });
   const [billOfQuantities, setBillOfQuantities] = useState({
-    description: "",
-    overview: "",
     excelFiles: [],
+    pdfFiles: [],
   });
   const [architecturalPdfPrice, setArchitecturalPdfPrice] = useState("");
   const [architecturalCadPrice, setArchitecturalCadPrice] = useState("");
   const [structuralPdfPrice, setStructuralPdfPrice] = useState("");
   const [structuralCadPrice, setStructuralCadPrice] = useState("");
   const [billOfQuantitiesPrice, setBillOfQuantitiesPrice] = useState("");
+  const [billOfQuantitiesPdfPrice, setBillOfQuantitiesPdfPrice] = useState("");
   const [images, setImages] = useState<any[]>([]);
   const [floorPlans, setFloorPlans] = useState<any[]>([]);
+  const [files, setFiles] = useState<any[]>([]);
 
   const isEditMode = Boolean(designToEdit);
 
@@ -94,54 +83,24 @@ const NewDesignForm = ({
       setBathrooms(designToEdit.bathrooms?.toString() || "");
       setArea(designToEdit.area?.toString() || "");
       setFloors(designToEdit.floors?.toString() || "");
-      setPlanDetails(
-        Array.isArray(designToEdit.planDetails)
-          ? designToEdit.planDetails.join("\n")
-          : ""
-      );
       setCategoryId(designToEdit.categoryId || "");
       setArchitecturalDesign(
         designToEdit.architecturalDesign || {
-          description: "",
-          overview: "",
           pdfFiles: [],
           cadFiles: [],
         }
       );
       setStructuralDesign(
         designToEdit.structuralDesign || {
-          description: "",
-          overview: "",
           pdfFiles: [],
           cadFiles: [],
         }
       );
       setBillOfQuantities(
         designToEdit.billOfQuantities || {
-          description: "",
-          overview: "",
           excelFiles: [],
         }
       );
-      setMinBuildingCost(designToEdit.minBuildingCost?.toString() || "");
-      setMaxBuildingCost(designToEdit.maxBuildingCost?.toString() || "");
-
-      if (designToEdit.buildingCostEstimates) {
-        const estimates = {
-          basic: { description: "", costBreakdown: [] },
-          luxury: { description: "", costBreakdown: [] },
-        };
-        designToEdit.buildingCostEstimates.forEach((est) => {
-          estimates[est.tier] = {
-            description: est.description,
-            costBreakdown: est.costBreakdown.map((item) => ({
-              item: item.item,
-              cost: item.cost.toString(),
-            })),
-          };
-        });
-        setBuildingCostEstimates(estimates);
-      }
 
       setArchitecturalPdfPrice(
         designToEdit.architecturalPdfPrice?.toString() || ""
@@ -166,29 +125,6 @@ const NewDesignForm = ({
       setFloorPlans(designToEdit.floorPlans || []);
     }
   }, [designToEdit, isEditMode]);
-
-  const handleCostBreakdownChange = (
-    tier: "basic" | "luxury",
-    index: number,
-    field: "item" | "cost",
-    value: string
-  ) => {
-    const newEstimates = { ...buildingCostEstimates };
-    newEstimates[tier].costBreakdown[index][field] = value;
-    setBuildingCostEstimates(newEstimates);
-  };
-
-  const addCostBreakdownItem = (tier: "basic" | "luxury") => {
-    const newEstimates = { ...buildingCostEstimates };
-    newEstimates[tier].costBreakdown.push({ item: "", cost: "" });
-    setBuildingCostEstimates(newEstimates);
-  };
-
-  const removeCostBreakdownItem = (tier: "basic" | "luxury", index: number) => {
-    const newEstimates = { ...buildingCostEstimates };
-    newEstimates[tier].costBreakdown.splice(index, 1);
-    setBuildingCostEstimates(newEstimates);
-  };
 
   const validateForm = () => {
     const errors = [];
@@ -220,40 +156,19 @@ const NewDesignForm = ({
         type,
       }));
 
-    const costEstimatesData = Object.entries(buildingCostEstimates)
-      .map(([tier, data]: [string, any]) => ({
-        tier,
-        description: data.description,
-        costBreakdown: data.costBreakdown
-          .filter((item: any) => item.item.trim() && item.cost)
-          .map((item: any) => ({
-            ...item,
-            cost: parseFloat(item.cost) || 0,
-          })),
-      }))
-      .filter(
-        (estimate: any) =>
-          estimate.description || estimate.costBreakdown.length > 0
-      );
-
     const architecturalDesignData = {
-      description: architecturalDesign.description,
-      overview: architecturalDesign.overview,
       pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
       cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
     };
 
     const structuralDesignData = {
-      description: structuralDesign.description,
-      overview: structuralDesign.overview,
       pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
       cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
     };
 
     const billOfQuantitiesData = {
-      description: billOfQuantities.description,
-      overview: billOfQuantities.overview,
       excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
+      pdfFiles: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
     };
 
     const commonData = {
@@ -265,24 +180,17 @@ const NewDesignForm = ({
       bathrooms: bathrooms ? parseInt(bathrooms) : null,
       area: area ? parseFloat(area) : null,
       floors: floors ? parseInt(floors) : null,
-      planDetails: planDetails
-        ? planDetails.split("\n").filter((line) => line.trim())
-        : [],
-      folderId: isEditMode ? designToEdit.folderId : folderId,
       categoryId,
-      minBuildingCost: parseFloat(minBuildingCost) || null,
-      maxBuildingCost: parseFloat(maxBuildingCost) || null,
       architecturalPdfPrice: parseFloat(architecturalPdfPrice) || null,
       architecturalCadPrice: parseFloat(architecturalCadPrice) || null,
       structuralPdfPrice: parseFloat(structuralPdfPrice) || null,
       structuralCadPrice: parseFloat(structuralCadPrice) || null,
       billOfQuantitiesPrice: parseFloat(billOfQuantitiesPrice) || null,
+      billOfQuantitiesPdfPrice: parseFloat(billOfQuantitiesPdfPrice) || null,
     };
 
     let payload;
-    const url = isEditMode
-      ? `/api/designs/${designToEdit.id}`
-      : "/api/designs";
+    const url = isEditMode ? `/api/designs/${designToEdit.id}` : "/api/designs";
     const method = isEditMode ? "PUT" : "POST";
 
     const packageOptionsCreatePayload = packageOptions
@@ -313,10 +221,13 @@ const NewDesignForm = ({
         ...commonData,
         // --- Fields with custom backend logic (expect flat object) ---
         architecturalDesign: architecturalDesignData,
-        structuralDesign: structuralDesignData,
+        ...(structuralDesignData.pdfFiles.length > 0 ||
+        structuralDesignData.cadFiles.length > 0
+          ? { structuralDesign: structuralDesignData }
+          : designToEdit.structuralDesign
+            ? { structuralDesign: { delete: true } }
+            : {}),
         billOfQuantities: billOfQuantitiesData,
-        // --- JSON field (expects plain array) ---
-        buildingCostEstimates: costEstimatesData,
         // --- True relational fields (expect Prisma update object) ---
         images: {
           deleteMany: {},
@@ -325,6 +236,10 @@ const NewDesignForm = ({
         floorPlans: {
           deleteMany: {},
           create: fileListPayload(floorPlans, "FLOOR_PLAN"),
+        },
+        files: {
+          deleteMany: {},
+          create: fileListPayload(files, "FILE"),
         },
         packageOptions: {
           deleteMany: {},
@@ -337,16 +252,21 @@ const NewDesignForm = ({
         ...commonData,
         images: { create: fileListPayload(images, "IMAGE") },
         floorPlans: { create: fileListPayload(floorPlans, "FLOOR_PLAN") },
-        buildingCostEstimates: { create: costEstimatesData },
+        files: { create: fileListPayload(files, "FILE") },
         packageOptions: {
           create: packageOptionsCreatePayload,
         },
         architecturalDesign: {
           create: { type: "ARCHITECTURAL", ...architecturalDesignData },
         },
-        structuralDesign: {
-          create: { type: "STRUCTURAL", ...structuralDesignData },
-        },
+        ...(structuralDesignData.pdfFiles.length > 0 ||
+        structuralDesignData.cadFiles.length > 0
+          ? {
+              structuralDesign: {
+                create: { type: "STRUCTURAL", ...structuralDesignData },
+              },
+            }
+          : {}),
         billOfQuantities: {
           create: { type: "BILL_OF_QUANTITIES", ...billOfQuantitiesData },
         },
@@ -372,9 +292,7 @@ const NewDesignForm = ({
         onClose();
       } else {
         const errorData = await response.json();
-        toast.error(
-          `Error: ${errorData.error || "Failed to save design"}`
-        );
+        toast.error(`Error: ${errorData.error || "Failed to save design"}`);
       }
     } catch (error) {
       toast.error(`An unexpected error occurred.`);
@@ -496,20 +414,6 @@ const NewDesignForm = ({
                     className="text-sm sm:text-base min-h-[80px] sm:min-h-[100px] resize-vertical"
                   />
                 </div>
-
-                <div className="space-y-1.5 sm:space-y-2">
-                  <Label htmlFor="planDetails" className="text-sm sm:text-base">
-                    Plan Details (one per line)
-                  </Label>
-                  <Textarea
-                    id="planDetails"
-                    name="planDetails"
-                    value={planDetails}
-                    onChange={(e) => setPlanDetails(e.target.value)}
-                    placeholder="e.g., 3 Bedrooms\n2 Bathrooms\nOpen-plan kitchen"
-                    className="text-sm sm:text-base min-h-[80px] sm:min-h-[100px] resize-vertical"
-                  />
-                </div>
               </div>
 
               {/* Specifications */}
@@ -582,7 +486,7 @@ const NewDesignForm = ({
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
                     <Label htmlFor="area" className="text-sm sm:text-base">
-                      Area (sq ft)
+                      Area (sq mt)
                     </Label>
                     <Input
                       id="area"
@@ -690,7 +594,7 @@ const NewDesignForm = ({
                       htmlFor="billOfQuantitiesPrice"
                       className="text-sm sm:text-base"
                     >
-                      Bill of Quantities
+                      Bill of Quantities (Excel)
                     </Label>
                     <Input
                       id="billOfQuantitiesPrice"
@@ -698,6 +602,23 @@ const NewDesignForm = ({
                       type="number"
                       value={billOfQuantitiesPrice}
                       onChange={(e) => setBillOfQuantitiesPrice(e.target.value)}
+                      placeholder="e.g., 80"
+                      className="text-sm sm:text-base h-10 sm:h-11"
+                    />
+                  </div>
+                  <div className="space-y-1.5 sm:space-y-2 sm:col-span-2 lg:col-span-1">
+                    <Label
+                      htmlFor="billOfQuantitiesPdfPrice"
+                      className="text-sm sm:text-base"
+                    >
+                      Bill of Quantities (PDF)
+                    </Label>
+                    <Input
+                      id="billOfQuantitiesPdfPrice"
+                      name="billOfQuantitiesPdfPrice"
+                      type="number"
+                      value={billOfQuantitiesPdfPrice}
+                      onChange={(e) => setBillOfQuantitiesPdfPrice(e.target.value)}
                       placeholder="e.g., 80"
                       className="text-sm sm:text-base h-10 sm:h-11"
                     />
@@ -835,6 +756,12 @@ const NewDesignForm = ({
                       accept: ".xls, .xlsx",
                       category: "EXCEL",
                     },
+                    {
+                      label: "PDFs",
+                      key: "pdfFiles",
+                      accept: "application/pdf",
+                      category: "PDF",
+                    },
                   ],
                 },
               ].map((section, index) => (
@@ -844,36 +771,6 @@ const NewDesignForm = ({
                   </h3>
 
                   <div className="space-y-3">
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <Label className="text-sm sm:text-base">
-                        Description
-                      </Label>
-                      <Input
-                        value={section.state.description}
-                        onChange={(e) =>
-                          section.setState((prev) => ({
-                            ...prev,
-                            description: e.target.value,
-                          }))
-                        }
-                        className="text-sm sm:text-base h-10 sm:h-11"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <Label className="text-sm sm:text-base">Overview</Label>
-                      <Textarea
-                        value={section.state.overview}
-                        onChange={(e) =>
-                          section.setState((prev) => ({
-                            ...prev,
-                            overview: e.target.value,
-                          }))
-                        }
-                        className="text-sm sm:text-base min-h-[80px] resize-vertical"
-                      />
-                    </div>
-
                     {section.fileTypes.map((fileType, fileIndex) => (
                       <div key={fileIndex} className="space-y-1.5 sm:space-y-2">
                         <Label className="text-sm sm:text-base">
@@ -949,143 +846,24 @@ const NewDesignForm = ({
                       accept="image/jpeg, image/png, image/gif, image/webp, application/pdf"
                     />
                   </div>
-                </div>
-              </div>
 
-              {/* Building Cost Estimates */}
-              <div className="space-y-4">
-                <h3 className="text-base sm:text-lg font-medium text-foreground/90">
-                  Building Cost Estimates
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-1.5 sm:space-y-2">
-                    <Label
-                      htmlFor="minBuildingCost"
-                      className="text-sm sm:text-base"
-                    >
-                      Min Building Cost
-                    </Label>
-                    <Input
-                      id="minBuildingCost"
-                      name="minBuildingCost"
-                      type="number"
-                      value={minBuildingCost}
-                      onChange={(e) => setMinBuildingCost(e.target.value)}
-                      placeholder="e.g., 100000"
-                      className="text-sm sm:text-base h-10 sm:h-11"
-                    />
-                  </div>
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <Label
-                      htmlFor="maxBuildingCost"
-                      className="text-sm sm:text-base"
-                    >
-                      Max Building Cost
-                    </Label>
-                    <Input
-                      id="maxBuildingCost"
-                      name="maxBuildingCost"
-                      type="number"
-                      value={maxBuildingCost}
-                      onChange={(e) => setMaxBuildingCost(e.target.value)}
-                      placeholder="e.g., 150000"
-                      className="text-sm sm:text-base h-10 sm:h-11"
+                    <Label className="text-sm sm:text-base">Other Files</Label>
+                    <FileUpload
+                      onUploadSuccess={(uploadedFiles) =>
+                        setFiles((prev) => [...prev, ...uploadedFiles])
+                      }
+                      onFileRemove={(fileUrl) =>
+                        setFiles((prev) =>
+                          prev.filter((f) => f.url !== fileUrl)
+                        )
+                      }
+                      initialFiles={files}
+                      fileTypeCategory="FILE"
+                      multiple
                     />
                   </div>
                 </div>
-
-                {["basic", "luxury"].map((tier) => (
-                  <div
-                    key={tier}
-                    className="rounded-lg border p-3 sm:p-4 bg-muted/30"
-                  >
-                    <h4 className="text-sm sm:text-md font-medium capitalize mb-3">
-                      {tier} Tier
-                    </h4>
-
-                    <div className="space-y-3">
-                      <div className="space-y-1.5 sm:space-y-2">
-                        <Label
-                          htmlFor={`${tier}-description`}
-                          className="text-sm sm:text-base"
-                        >
-                          Description
-                        </Label>
-                        <Textarea
-                          id={`${tier}-description`}
-                          value={buildingCostEstimates[tier]?.description || ""}
-                          onChange={(e) => {
-                            const newEstimates = { ...buildingCostEstimates };
-                            newEstimates[tier].description = e.target.value;
-                            setBuildingCostEstimates(newEstimates);
-                          }}
-                          rows={2}
-                          className="text-sm sm:text-base resize-vertical"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <h5 className="text-sm font-medium">Cost Breakdown</h5>
-                        {buildingCostEstimates[tier]?.costBreakdown.map(
-                          (item, index) => (
-                            <div
-                              key={index}
-                              className="flex flex-col sm:flex-row gap-2 items-start sm:items-center"
-                            >
-                              <Input
-                                placeholder="Item"
-                                value={item.item}
-                                onChange={(e) =>
-                                  handleCostBreakdownChange(
-                                    tier,
-                                    index,
-                                    "item",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-sm sm:text-base flex-1"
-                              />
-                              <Input
-                                placeholder="Cost"
-                                value={item.cost}
-                                onChange={(e) =>
-                                  handleCostBreakdownChange(
-                                    tier,
-                                    index,
-                                    "cost",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-sm sm:text-base w-full sm:w-32"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                onClick={() =>
-                                  removeCostBreakdownItem(tier, index)
-                                }
-                                className="h-10 sm:h-9 w-full sm:w-auto mt-1 sm:mt-0"
-                              >
-                                Remove
-                              </Button>
-                            </div>
-                          )
-                        )}
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => addCostBreakdownItem(tier)}
-                          className="w-full sm:w-auto mt-2"
-                        >
-                          Add Item
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           </ScrollArea>

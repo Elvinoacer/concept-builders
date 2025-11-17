@@ -155,6 +155,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log("Received payload:", JSON.stringify(body, null, 2));
+
     const {
       name,
       description,
@@ -165,66 +167,39 @@ export async function POST(request: Request) {
       area,
       floors,
       categoryId,
-      planDetails,
       folderId,
-      buildingCostEstimates,
-      buildingCostFactors,
-      packageOptions,
-      images,
-      floorPlans,
-      minBuildingCost,
-      maxBuildingCost,
       architecturalPdfPrice,
       architecturalCadPrice,
       structuralPdfPrice,
       structuralCadPrice,
       billOfQuantitiesPrice,
+      billOfQuantitiesPdfPrice,
+      packageOptions,
+      images,
+      floorPlans,
+      files,
       architecturalDesign,
       structuralDesign,
       billOfQuantities,
     } = body;
 
-    // More robust validation
-    const errors = [];
-    if (!name || typeof name !== 'string' || name.trim() === '') {
-      errors.push('Design Name is required.');
-    }
-    if (!description || typeof description !== 'string' || description.trim() === '') {
-      errors.push('Description is required.');
-    }
-    if (!categoryId || typeof categoryId !== 'string' || categoryId.trim() === '') {
-      errors.push('Category is required.');
-    }
-    if (!basePrice || typeof basePrice !== 'number' || basePrice <= 0) {
-      errors.push('Base Price must be a positive number.');
-    }
-    if (!images || !images.create || !Array.isArray(images.create) || images.create.length === 0) {
-      errors.push('At least one image is required.');
+    // --- Basic Validation ---
+    if (!name || !description || !categoryId || !basePrice) {
+      return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    if (errors.length > 0) {
-      return new NextResponse(errors.join('\n'), { status: 400 });
-    }
-
-    // Build the design data with safe defaults
+    // --- Build Core Design Data ---
     const designData: any = {
       name,
       description,
       basePrice: parseFloat(basePrice),
-      priceRange: priceRange || "",
+      priceRange,
       bedrooms: bedrooms ? parseInt(bedrooms) : null,
       bathrooms: bathrooms ? parseInt(bathrooms) : null,
       area: area ? parseFloat(area) : null,
       floors: floors ? parseInt(floors) : null,
       categoryId,
-      planDetails: Array.isArray(planDetails)
-        ? planDetails
-        : planDetails
-          ? [planDetails]
-          : [],
       folderId: folderId || null,
-      minBuildingCost: minBuildingCost ? parseFloat(minBuildingCost) : null,
-      maxBuildingCost: maxBuildingCost ? parseFloat(maxBuildingCost) : null,
       architecturalPdfPrice: architecturalPdfPrice
         ? parseFloat(architecturalPdfPrice)
         : null,
@@ -240,61 +215,66 @@ export async function POST(request: Request) {
       billOfQuantitiesPrice: billOfQuantitiesPrice
         ? parseFloat(billOfQuantitiesPrice)
         : null,
+      billOfQuantitiesPdfPrice: billOfQuantitiesPdfPrice
+        ? parseFloat(billOfQuantitiesPdfPrice)
+        : null,
     };
 
-    // Handle buildingCostEstimates - FIXED for Json[] field
-    if (buildingCostEstimates && Array.isArray(buildingCostEstimates)) {
-      designData.buildingCostEstimates = buildingCostEstimates.map(
-        (estimate) => ({
-          tier: estimate.tier,
-          description: estimate.description || "",
-          costBreakdown: estimate.costBreakdown || [],
-        })
-      );
+    // --- Handle Relational Data ---
+
+    // Images (required)
+    if (images?.create?.length > 0) {
+      designData.images = {
+        create: images.create.map((img: any) => ({
+          name: img.name,
+          url: img.url,
+          type: img.type || "IMAGE",
+        })),
+      };
     } else {
-      designData.buildingCostEstimates = [];
+      return new NextResponse("At least one image is required.", {
+        status: 400,
+      });
     }
 
-    // Handle buildingCostFactors - FIXED for Json field
-    if (
-      buildingCostFactors &&
-      buildingCostFactors.options &&
-      Array.isArray(buildingCostFactors.options)
-    ) {
-      designData.buildingCostFactors = {
-        options: buildingCostFactors.options.map((factor) => ({
-          name: factor.name || "",
-          unit: factor.unit || "",
-          price: factor.price ? parseFloat(factor.price) : 0,
+    // Floor Plans (optional)
+    if (floorPlans?.create?.length > 0) {
+      designData.floorPlans = {
+        create: floorPlans.create.map((plan: any) => ({
+          name: plan.name,
+          url: plan.url,
+          type: plan.type || "FLOOR_PLAN",
         })),
       };
     }
 
-    // Handle packageOptions with files
-    if (
-      packageOptions &&
-      packageOptions.create &&
-      Array.isArray(packageOptions.create)
-    ) {
+    // Generic Files (optional)
+    if (files?.create?.length > 0) {
+      designData.files = {
+        create: files.create.map((file: any) => ({
+          name: file.name,
+          url: file.url,
+          type: file.type || "FILE",
+        })),
+      };
+    }
+
+    // Package Options (optional)
+    if (packageOptions?.create?.length > 0) {
       designData.packageOptions = {
-        create: packageOptions.create.map((option) => {
+        create: packageOptions.create.map((pkg: any) => {
           const packageData: any = {
-            name: option.name || "",
-            price: option.price ? parseFloat(option.price) : 0,
+            name: pkg.name,
+            price: parseFloat(pkg.price),
           };
 
-          // Only include file if it exists and has data
-          if (
-            option.file &&
-            option.file.create &&
-            option.file.create.name &&
-            option.file.create.url
-          ) {
+          // Handle package file if it exists
+          if (pkg.file?.create) {
             packageData.file = {
               create: {
-                name: option.file.create.name,
-                url: option.file.create.url,
-                type: option.file.create.type || "FILE",
+                name: pkg.file.create.name,
+                url: pkg.file.create.url,
+                type: pkg.file.create.type || "FILE",
               },
             };
           }
@@ -304,143 +284,107 @@ export async function POST(request: Request) {
       };
     }
 
-    // Handle images
-    if (images && images.create && Array.isArray(images.create)) {
-      designData.images = {
-        create: images.create.map((image: any) => ({
-          name: image.name,
-          url: image.url,
-          type: "IMAGE",
-        })),
-      };
-    }
+    // Handle Design Documents - FIXED VERSION
+    // Architectural Design
+    if (architecturalDesign?.create) {
+      const createData = architecturalDesign.create;
+      const pdfFiles = createData.pdfFiles || [];
+      const cadFiles = createData.cadFiles || [];
 
-    // Handle floorPlans
-    if (floorPlans && floorPlans.create && Array.isArray(floorPlans.create)) {
-      designData.floorPlans = {
-        create: floorPlans.create.map((plan: any) => ({
-          name: plan.name,
-          url: plan.url,
-          type: "FLOOR_PLAN",
-        })),
-      };
-    }
-
-    // Handle architecturalDesign - FIXED for relation structure
-    if (architecturalDesign && architecturalDesign.create) {
-      const archData: any = {
-        type: "ARCHITECTURAL",
-        description: architecturalDesign.create.description || "",
-        overview: architecturalDesign.create.overview || "",
-      };
-
-      // Handle PDF files
-      if (
-        architecturalDesign.create.pdfFiles &&
-        architecturalDesign.create.pdfFiles.create &&
-        Array.isArray(architecturalDesign.create.pdfFiles.create)
-      ) {
-        archData.pdfFiles = {
-          create: architecturalDesign.create.pdfFiles.create.map(
-            (file: any) => ({
-              name: file.name,
-              url: file.url,
-              type: "PDF",
-            })
-          ),
+      if (pdfFiles.length > 0 || cadFiles.length > 0) {
+        designData.architecturalDesign = {
+          create: {
+            type: createData.type || "ARCHITECTURAL",
+            ...(pdfFiles.length > 0 && {
+              pdfFiles: {
+                create: pdfFiles.map((file: any) => ({
+                  name: file.name,
+                  url: file.url,
+                  type: "PDF",
+                })),
+              },
+            }),
+            ...(cadFiles.length > 0 && {
+              cadFiles: {
+                create: cadFiles.map((file: any) => ({
+                  name: file.name,
+                  url: file.url,
+                  type: "CAD",
+                })),
+              },
+            }),
+          },
         };
       }
-
-      // Handle CAD files
-      if (
-        architecturalDesign.create.cadFiles &&
-        architecturalDesign.create.cadFiles.create &&
-        Array.isArray(architecturalDesign.create.cadFiles.create)
-      ) {
-        archData.cadFiles = {
-          create: architecturalDesign.create.cadFiles.create.map(
-            (file: any) => ({
-              name: file.name,
-              url: file.url,
-              type: "CAD",
-            })
-          ),
-        };
-      }
-
-      designData.architecturalDesign = { create: archData };
     }
 
-    // Handle structuralDesign - FIXED for relation structure
-    if (structuralDesign && structuralDesign.create) {
-      const structData: any = {
-        type: "STRUCTURAL",
-        description: structuralDesign.create.description || "",
-        overview: structuralDesign.create.overview || "",
-      };
+    // Structural Design
+    if (structuralDesign?.create) {
+      const createData = structuralDesign.create;
+      const pdfFiles = createData.pdfFiles || [];
+      const cadFiles = createData.cadFiles || [];
 
-      if (
-        structuralDesign.create.pdfFiles &&
-        structuralDesign.create.pdfFiles.create &&
-        Array.isArray(structuralDesign.create.pdfFiles.create)
-      ) {
-        structData.pdfFiles = {
-          create: structuralDesign.create.pdfFiles.create.map((file: any) => ({
-            name: file.name,
-            url: file.url,
-            type: "PDF",
-          })),
+      if (pdfFiles.length > 0 || cadFiles.length > 0) {
+        designData.structuralDesign = {
+          create: {
+            type: createData.type || "STRUCTURAL",
+            ...(pdfFiles.length > 0 && {
+              pdfFiles: {
+                create: pdfFiles.map((file: any) => ({
+                  name: file.name,
+                  url: file.url,
+                  type: "PDF",
+                })),
+              },
+            }),
+            ...(cadFiles.length > 0 && {
+              cadFiles: {
+                create: cadFiles.map((file: any) => ({
+                  name: file.name,
+                  url: file.url,
+                  type: "CAD",
+                })),
+              },
+            }),
+          },
         };
       }
-
-      if (
-        structuralDesign.create.cadFiles &&
-        structuralDesign.create.cadFiles.create &&
-        Array.isArray(structuralDesign.create.cadFiles.create)
-      ) {
-        structData.cadFiles = {
-          create: structuralDesign.create.cadFiles.create.map((file: any) => ({
-            name: file.name,
-            url: file.url,
-            type: "CAD",
-          })),
-        };
-      }
-
-      designData.structuralDesign = { create: structData };
     }
 
-    // Handle billOfQuantities - FIXED for relation structure
-    if (billOfQuantities && billOfQuantities.create) {
-      const boqData: any = {
-        type: "BILL_OF_QUANTITIES",
-        description: billOfQuantities.create.description || "",
-        overview: billOfQuantities.create.overview || "",
-      };
+    // Bill of Quantities
+    if (billOfQuantities?.create) {
+      const createData = billOfQuantities.create;
+      const excelFiles = createData.excelFiles || [];
+      const pdfFiles = createData.pdfFiles || [];
 
-      if (
-        billOfQuantities.create.excelFiles &&
-        billOfQuantities.create.excelFiles.create &&
-        Array.isArray(billOfQuantities.create.excelFiles.create)
-      ) {
-        boqData.excelFiles = {
-          create: billOfQuantities.create.excelFiles.create.map(
-            (file: any) => ({
-              name: file.name,
-              url: file.url,
-              type: "EXCEL",
-            })
-          ),
+      if (excelFiles.length > 0 || pdfFiles.length > 0) {
+        designData.billOfQuantities = {
+          create: {
+            type: createData.type || "BILL_OF_QUANTITIES",
+            ...(excelFiles.length > 0 && {
+              excelFiles: {
+                create: excelFiles.map((file: any) => ({
+                  name: file.name,
+                  url: file.url,
+                  type: "EXCEL",
+                })),
+              },
+            }),
+            ...(pdfFiles.length > 0 && {
+              pdfFiles: {
+                create: pdfFiles.map((file: any) => ({
+                  name: file.name,
+                  url: file.url,
+                  type: "PDF",
+                })),
+              },
+            }),
+          },
         };
       }
-
-      designData.billOfQuantities = { create: boqData };
     }
 
-    console.log(
-      "Creating design with data:",
-      JSON.stringify(designData, null, 2)
-    );
+    console.log("Final designData:", JSON.stringify(designData, null, 2));
 
     const newDesign = await prisma.design.create({
       data: designData,
@@ -448,22 +392,14 @@ export async function POST(request: Request) {
         category: true,
         images: true,
         floorPlans: true,
-        architecturalDesign: {
-          include: { pdfFiles: true, cadFiles: true },
-        },
-        structuralDesign: {
-          include: { pdfFiles: true, cadFiles: true },
-        },
-        billOfQuantities: {
-          include: { excelFiles: true },
-        },
-        packageOptions: {
-          include: { file: true },
-        },
+        files: true,
+        architecturalDesign: { include: { pdfFiles: true, cadFiles: true } },
+        structuralDesign: { include: { pdfFiles: true, cadFiles: true } },
+        billOfQuantities: { include: { excelFiles: true, pdfFiles: true } },
+        packageOptions: { include: { file: true } },
       },
     });
 
-    // Revalidate paths
     revalidatePath("/");
     revalidatePath("/admin/designs");
     revalidatePath("/designs");
@@ -471,14 +407,11 @@ export async function POST(request: Request) {
     return NextResponse.json(newDesign, { status: 201 });
   } catch (error) {
     console.error("Error creating design:", error);
-
-    // More detailed error response
     if (error instanceof Error) {
       return new NextResponse(`Internal Server Error: ${error.message}`, {
         status: 500,
       });
     }
-
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

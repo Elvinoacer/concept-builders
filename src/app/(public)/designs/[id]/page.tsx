@@ -5,7 +5,6 @@ import Breadcrumbs from "@/components/design-detail/Breadcrumbs";
 import DesignGallery from "@/components/design-detail/DesignGallery";
 import DesignHeader from "@/components/design-detail/DesignHeader";
 import DesignTabs from "@/components/design-detail/DesignTabs";
-import CostToBuildTab from "@/components/design-detail/CostToBuildTab";
 import FloorPlan from "@/components/design-detail/FloorPlan";
 import PurchaseSidebar from "@/components/design-detail/PurchaseSidebar";
 import RelatedDesigns from "@/components/design-detail/RelatedDesigns";
@@ -17,8 +16,10 @@ import NotFoundState from "@/components/design-detail/NotFoundState";
 import { DesignViewTracker } from "@/components/design-detail/DesignViewTracker";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const DesignDetailPage = () => {
+  const router = useRouter();
   const [design, setDesign] = useState<Design | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +53,7 @@ const DesignDetailPage = () => {
   }
 
   if (error) {
-    return <ErrorState message={error} />;
+    return <ErrorState onRetry={() => router.refresh()} message={error} />;
   }
 
   if (!design) {
@@ -90,12 +91,8 @@ const DesignDetailPage = () => {
               <Breadcrumbs designName={design.name} />
             </motion.div>
 
-            <motion.div
-              className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12"
-            >
-              <motion.div
-                className="lg:col-span-2 space-y-6 sm:space-y-8 lg:space-y-12"
-              >
+            <motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
+              <motion.div className="lg:col-span-2 space-y-6 sm:space-y-8 lg:space-y-12">
                 <motion.div>
                   <DesignHeader
                     name={design.name}
@@ -103,18 +100,12 @@ const DesignDetailPage = () => {
                   />
                 </motion.div>
 
-                <motion.div
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
+                <motion.div whileInView="visible" viewport={{ once: true }}>
                   <DesignGallery images={images} />
                 </motion.div>
 
                 {renderings.length > 0 && (
-                  <motion.div
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                  >
+                  <motion.div whileInView="visible" viewport={{ once: true }}>
                     <Renderings renderings={renderings} />
                   </motion.div>
                 )}
@@ -144,10 +135,7 @@ const DesignDetailPage = () => {
                   </motion.div>
                 )}
 
-                <motion.div
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
+                <motion.div whileInView="visible" viewport={{ once: true }}>
                   {design && (
                     <DesignTabs design={design} onFaqSubmitted={() => {}} />
                   )}
@@ -164,14 +152,6 @@ const DesignDetailPage = () => {
                   <PurchaseSidebar design={design} />
                 </div>
               </motion.div>
-            </motion.div>
-
-            <motion.div
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="mt-16 sm:mt-20 lg:mt-24"
-            >
-              {design && <CostToBuildTab design={design} />}
             </motion.div>
 
             <motion.div

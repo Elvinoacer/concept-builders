@@ -35,19 +35,25 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
       ],
     },
     {
+      title: "Bill of Quantities",
+      document: billOfQuantities,
+      files: [
+        { type: "Excel", files: billOfQuantities?.excelFiles },
+        { type: "PDF", files: billOfQuantities?.pdfFiles },
+      ],
+    },
+  ];
+
+  if (structuralDesign) {
+    documentSections.splice(1, 0, {
       title: "Structural Design",
       document: structuralDesign,
       files: [
         { type: "PDF", files: structuralDesign?.pdfFiles },
         { type: "CAD", files: structuralDesign?.cadFiles },
       ],
-    },
-    {
-      title: "Bill of Quantities",
-      document: billOfQuantities,
-      files: [{ type: "Excel", files: billOfQuantities?.excelFiles }],
-    },
-  ];
+    });
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -183,9 +189,6 @@ const WhatsIncludedTab: React.FC<WhatsIncludedTabProps> = ({ design }) => {
                       <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 dark:text-white leading-tight">
                         {section.title}
                       </h4>
-                      <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-                        {section.document.description}
-                      </p>
                     </div>
                   </motion.div>
 

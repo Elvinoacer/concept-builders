@@ -126,74 +126,72 @@ const DesignForm = ({ design }: DesignFormProps) => {
   );
   const [area, setArea] = useState(design?.area?.toString() || "");
   const [floors, setFloors] = useState(design?.floors?.toString() || "");
-  const [planDetails, setPlanDetails] = useState(
-    design?.planDetails?.join("\n") || ""
-  );
+
   const [categoryId, setCategoryId] = useState(design?.categoryId || "");
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [minBuildingCost, setMinBuildingCost] = useState(
-    design?.minBuildingCost?.toString() || ""
-  );
-  const [maxBuildingCost, setMaxBuildingCost] = useState(
-    design?.maxBuildingCost?.toString() || ""
-  );
-
-  // FIX: 3. Prefill building cost estimates by transforming array to object
-  const initialCostEstimates = useMemo(() => {
-    const defaultState = {
-      basic: { description: "", costBreakdown: [{ item: "", cost: "" }] },
-      luxury: { description: "", costBreakdown: [{ item: "", cost: "" }] },
-    };
-
-    if (
-      design?.buildingCostEstimates &&
-      Array.isArray(design.buildingCostEstimates) &&
-      design.buildingCostEstimates.length > 0
-    ) {
-      const estimates: any = {};
-      const basicEstimate = design.buildingCostEstimates.find(
-        (e: any) => e.tier === "basic"
+  useEffect(() => {
+    if (design) {
+      setName(design.name || "");
+      setDescription(design.description || "");
+      setBasePrice(design.basePrice?.toString() || "");
+      setPriceRange(design.priceRange || "");
+      setBedrooms(design.bedrooms?.toString() || "");
+      setBathrooms(design.bathrooms?.toString() || "");
+      setArea(design.area?.toString() || "");
+      setFloors(design.floors?.toString() || "");
+      setCategoryId(design.categoryId || "");
+      setArchitecturalDesign(
+        design.architecturalDesign || {
+          pdfFiles: [],
+          cadFiles: [],
+        }
       );
-      const luxuryEstimate = design.buildingCostEstimates.find(
-        (e: any) => e.tier === "luxury"
+      setStructuralDesign(
+        design.structuralDesign || {
+          pdfFiles: [],
+          cadFiles: [],
+        }
       );
-
-      estimates.basic = {
-        description: basicEstimate?.description || "",
-        costBreakdown:
-          basicEstimate?.costBreakdown?.map((item: any) => ({
-            item: item.item || "",
-            cost: item.cost?.toString() || "",
-          })) || [],
-      };
-
-      estimates.luxury = {
-        description: luxuryEstimate?.description || "",
-        costBreakdown:
-          luxuryEstimate?.costBreakdown?.map((item: any) => ({
-            item: item.item || "",
-            cost: item.cost?.toString() || "",
-          })) || [],
-      };
-
-      // Ensure at least one row if empty
-      if (estimates.basic.costBreakdown.length === 0) {
-        estimates.basic.costBreakdown.push({ item: "", cost: "" });
+      setBillOfQuantities(
+        design.billOfQuantities || {
+          excelFiles: [],
+          pdfFiles: [],
+        }
+      );
+      setArchitecturalPdfPrice(
+        design.architecturalPdfPrice?.toString() || ""
+      );
+      setArchitecturalCadPrice(
+        design.architecturalCadPrice?.toString() || ""
+      );
+      setStructuralPdfPrice(design.structuralPdfPrice?.toString() || "");
+      setStructuralCadPrice(design.structuralCadPrice?.toString() || "");
+      setBillOfQuantitiesPrice(
+        design.billOfQuantitiesPrice?.toString() || ""
+      );
+      setBillOfQuantitiesPdfPrice(
+        design.billOfQuantitiesPdfPrice?.toString() || ""
+      );
+      setImages(design.images || []);
+      setFloorPlans(design.floorPlans || []);
+      setFiles(design.files || []);
+      if (design.packageOptions) {
+        setPackageOptions(
+          design.packageOptions.map((opt: any) => ({
+            ...opt,
+            price: opt.price.toString(),
+            file: opt.file ? [opt.file] : [],
+          }))
+        );
+      } else {
+        setPackageOptions([{ name: "", price: "", file: [] }]);
       }
-      if (estimates.luxury.costBreakdown.length === 0) {
-        estimates.luxury.costBreakdown.push({ item: "", cost: "" });
-      }
-
-      return estimates;
     }
-
-    return defaultState;
   }, [design]);
 
-  const [buildingCostEstimates, setBuildingCostEstimates] =
-    useState(initialCostEstimates);
+
 
   const [packageOptions, setPackageOptions] = useState<any[]>([]);
 
@@ -216,25 +214,20 @@ const DesignForm = ({ design }: DesignFormProps) => {
 
   const [architecturalDesign, setArchitecturalDesign] = useState(
     design?.architecturalDesign || {
-      description: "",
-      overview: "",
       pdfFiles: [],
       cadFiles: [],
     }
   );
   const [structuralDesign, setStructuralDesign] = useState(
     design?.structuralDesign || {
-      description: "",
-      overview: "",
       pdfFiles: [],
       cadFiles: [],
     }
   );
   const [billOfQuantities, setBillOfQuantities] = useState(
     design?.billOfQuantities || {
-      description: "",
-      overview: "",
       excelFiles: [],
+      pdfFiles: [],
     }
   );
 
@@ -253,8 +246,12 @@ const DesignForm = ({ design }: DesignFormProps) => {
   const [billOfQuantitiesPrice, setBillOfQuantitiesPrice] = useState(
     design?.billOfQuantitiesPrice?.toString() || ""
   );
+  const [billOfQuantitiesPdfPrice, setBillOfQuantitiesPdfPrice] = useState(
+    design?.billOfQuantitiesPdfPrice?.toString() || ""
+  );
   const [images, setImages] = useState<any[]>(design?.images || []);
   const [floorPlans, setFloorPlans] = useState<any[]>(design?.floorPlans || []);
+  const [files, setFiles] = useState<any[]>(design?.files || []);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
@@ -289,13 +286,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
       description: "Images, plans, and design files",
       required: true,
     },
-    {
-      id: "costing",
-      label: "Cost Estimates",
-      icon: FiFileText,
-      description: "Building cost breakdowns",
-      required: false,
-    },
+
     {
       id: "packages",
       label: "Package Options",
@@ -344,17 +335,14 @@ const DesignForm = ({ design }: DesignFormProps) => {
       newCompleted.add(3);
     }
 
-    // Step 4: Costing (Optional)
-    if (minBuildingCost || maxBuildingCost) {
-      newCompleted.add(4);
-    }
 
-    // Step 5: Packages (Optional)
+
+    // Step 4: Packages (Optional)
     if (
       packageOptions.length > 0 &&
       (packageOptions[0]?.name.trim() || packageOptions[0]?.price.trim())
     ) {
-      newCompleted.add(5);
+      newCompleted.add(4);
     }
 
     setCompletedSteps(newCompleted);
@@ -368,9 +356,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
     floors, // Step 1
     basePrice, // Step 2
     images, // Step 3
-    minBuildingCost,
-    maxBuildingCost, // Step 4
-    packageOptions, // Step 5
+    packageOptions, // Step 4
   ]);
 
   const validateCurrentStep = () => {
@@ -419,33 +405,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
     );
   };
 
-  // --- Cost Breakdown Handlers ---
-  const handleCostBreakdownChange = (
-    tier: "basic" | "luxury",
-    index: number,
-    field: "item" | "cost",
-    value: string
-  ) => {
-    const newEstimates = { ...buildingCostEstimates };
-    newEstimates[tier].costBreakdown[index][field] = value;
-    setBuildingCostEstimates(newEstimates);
-  };
 
-  const addCostBreakdownItem = (tier: "basic" | "luxury") => {
-    const newEstimates = { ...buildingCostEstimates };
-    newEstimates[tier].costBreakdown.push({ item: "", cost: "" });
-    setBuildingCostEstimates(newEstimates);
-  };
-
-  const removeCostBreakdownItem = (tier: "basic" | "luxury", index: number) => {
-    const newEstimates = { ...buildingCostEstimates };
-    newEstimates[tier].costBreakdown.splice(index, 1);
-    // If it's the last one, add a new empty one
-    if (newEstimates[tier].costBreakdown.length === 0) {
-      newEstimates[tier].costBreakdown.push({ item: "", cost: "" });
-    }
-    setBuildingCostEstimates(newEstimates);
-  };
 
   // --- Package Option Handlers ---
   const addPackageOption = () => {
@@ -537,21 +497,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
         };
       });
 
-    const costEstimatesPayload = Object.entries(buildingCostEstimates)
-      .map(([tier, data]: [string, any]) => ({
-        tier,
-        description: data.description,
-        costBreakdown: data.costBreakdown
-          .filter((item: any) => item.item.trim() && item.cost)
-          .map((item: any) => ({
-            ...item,
-            cost: parseFloat(item.cost) || 0,
-          })),
-      }))
-      .filter(
-        (estimate: any) =>
-          estimate.description || estimate.costBreakdown.length > 0
-      );
+
 
     const commonData = {
       name,
@@ -562,12 +508,9 @@ const DesignForm = ({ design }: DesignFormProps) => {
       bathrooms: bathrooms ? parseInt(bathrooms) : null,
       area: area ? parseFloat(area) : null,
       floors: floors ? parseInt(floors) : null,
-      planDetails: planDetails
-        ? planDetails.split("\n").filter((line) => line.trim())
-        : [],
+      planDetails: [],
       categoryId,
-      minBuildingCost: minBuildingCost ? parseFloat(minBuildingCost) : null,
-      maxBuildingCost: maxBuildingCost ? parseFloat(maxBuildingCost) : null,
+
       architecturalPdfPrice: architecturalPdfPrice
         ? parseFloat(architecturalPdfPrice)
         : null,
@@ -583,6 +526,9 @@ const DesignForm = ({ design }: DesignFormProps) => {
       billOfQuantitiesPrice: billOfQuantitiesPrice
         ? parseFloat(billOfQuantitiesPrice)
         : null,
+      billOfQuantitiesPdfPrice: billOfQuantitiesPdfPrice
+        ? parseFloat(billOfQuantitiesPdfPrice)
+        : null,
     };
 
     let payload;
@@ -595,21 +541,21 @@ const DesignForm = ({ design }: DesignFormProps) => {
         ...commonData,
         // --- Fields with custom backend logic (expect flat object) ---
         architecturalDesign: {
-          description: architecturalDesign.description,
-          overview: architecturalDesign.overview,
           pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
           cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
         },
-        structuralDesign: {
-          description: structuralDesign.description,
-          overview: structuralDesign.overview,
-          pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
-          cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
-        },
+        ...(structuralDesign.pdfFiles.length > 0 ||
+        structuralDesign.cadFiles.length > 0
+          ? {
+              structuralDesign: {
+                pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
+                cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
+              },
+            }
+          : {}),
         billOfQuantities: {
-          description: billOfQuantities.description,
-          overview: billOfQuantities.overview,
           excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
+          pdfFiles: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
         },
 
         // --- True relational fields (expect Prisma update object) ---
@@ -621,13 +567,15 @@ const DesignForm = ({ design }: DesignFormProps) => {
           deleteMany: {},
           create: fileListPayload(floorPlans, "FLOOR_PLAN"),
         },
+        files: {
+          deleteMany: {},
+          create: fileListPayload(files, "FILE"),
+        },
         packageOptions: {
           deleteMany: {},
 create: packageOptionsPayload,
         },
 
-        // --- JSON field (expects plain array) ---
-        buildingCostEstimates: costEstimatesPayload,
       };
     } else {
       // CREATE PAYLOAD
@@ -635,13 +583,12 @@ create: packageOptionsPayload,
         ...commonData,
         images: { create: fileListPayload(images, "IMAGE") },
         floorPlans: { create: fileListPayload(floorPlans, "FLOOR_PLAN") },
+        files: { create: fileListPayload(files, "FILE") },
         packageOptions: { create: packageOptionsPayload },
-        buildingCostEstimates: { create: costEstimatesPayload },
+
         architecturalDesign: {
           create: {
             type: "ARCHITECTURAL",
-            description: architecturalDesign.description,
-            overview: architecturalDesign.overview,
             pdfFiles: {
               create: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
             },
@@ -650,26 +597,36 @@ create: packageOptionsPayload,
             },
           },
         },
-        structuralDesign: {
-          create: {
-            type: "STRUCTURAL",
-            description: structuralDesign.description,
-            overview: structuralDesign.overview,
-            pdfFiles: {
-              create: fileListPayload(structuralDesign.pdfFiles, "PDF"),
-            },
-            cadFiles: {
-              create: fileListPayload(structuralDesign.cadFiles, "CAD"),
-            },
-          },
-        },
+        ...(structuralDesign.pdfFiles.length > 0 ||
+        structuralDesign.cadFiles.length > 0
+          ? {
+              structuralDesign: {
+                create: {
+                  type: "STRUCTURAL",
+                  pdfFiles: {
+                    create: fileListPayload(
+                      structuralDesign.pdfFiles,
+                      "PDF"
+                    ),
+                  },
+                  cadFiles: {
+                    create: fileListPayload(
+                      structuralDesign.cadFiles,
+                      "CAD"
+                    ),
+                  },
+                },
+              },
+            }
+          : {}),
         billOfQuantities: {
           create: {
             type: "BILL_OF_QUANTITIES",
-            description: billOfQuantities.description,
-            overview: billOfQuantities.overview,
             excelFiles: {
               create: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
+            },
+            pdfFiles: {
+              create: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
             },
           },
         },
@@ -827,8 +784,6 @@ create: packageOptionsPayload,
                       categoryId={categoryId}
                       setCategoryId={setCategoryId}
                       categories={categories}
-                      planDetails={planDetails}
-                      setPlanDetails={setPlanDetails}
                       fieldErrors={fieldErrors}
                       setFieldErrors={setFieldErrors}
                     />
@@ -881,20 +836,8 @@ create: packageOptionsPayload,
                       setFieldErrors={setFieldErrors}
                     />
                   )}
+
                   {currentStep === 4 && (
-                    <CostEstimatesStep
-                      minBuildingCost={minBuildingCost}
-                      setMinBuildingCost={setMinBuildingCost}
-                      maxBuildingCost={maxBuildingCost}
-                      setMaxBuildingCost={setMaxBuildingCost}
-                      buildingCostEstimates={buildingCostEstimates}
-                      setBuildingCostEstimates={setBuildingCostEstimates}
-                      handleCostBreakdownChange={handleCostBreakdownChange}
-                      addCostBreakdownItem={addCostBreakdownItem}
-                      removeCostBreakdownItem={removeCostBreakdownItem}
-                    />
-                  )}
-                  {currentStep === 5 && (
                     <PackageOptionsStep
                       packageOptions={packageOptions}
                       addPackageOption={addPackageOption}
@@ -961,8 +904,6 @@ const BasicInfoStep = React.memo(
     categoryId,
     setCategoryId,
     categories,
-    planDetails,
-    setPlanDetails,
     fieldErrors,
     setFieldErrors,
   }: any) => (
@@ -1044,20 +985,7 @@ const BasicInfoStep = React.memo(
         />
       </FormField>
 
-      <FormField
-        label="Plan Details"
-        htmlFor="planDetails"
-        description="Enter each feature on a new line. These will be displayed as bullet points"
-      >
-        <Textarea
-          id="planDetails"
-          name="planDetails"
-          value={planDetails}
-          onChange={(e) => setPlanDetails(e.target.value)}
-          placeholder="3 Bedrooms&#10;2 Bathrooms&#10;Open-plan kitchen&#10;Swimming pool&#10;Garden area"
-          className="rounded-xl min-h-[140px] text-base border-2 focus:border-blue-500 resize-vertical transition-colors"
-        />
-      </FormField>
+
     </div>
   )
 );
@@ -1229,9 +1157,15 @@ const PricingStep = React.memo(
             },
             {
               id: "billOfQuantitiesPrice",
-              label: "Bill of Quantities",
+              label: "Bill of Quantities (Excel)",
               value: billOfQuantitiesPrice,
               setter: setBillOfQuantitiesPrice,
+            },
+            {
+              id: "billOfQuantitiesPdfPrice",
+              label: "Bill of Quantities (PDF)",
+              value: billOfQuantitiesPdfPrice,
+              setter: setBillOfQuantitiesPdfPrice,
             },
           ].map((field) => (
             <FormField key={field.id} label={field.label} htmlFor={field.id}>
@@ -1363,6 +1297,40 @@ const FilesStep = React.memo(
             </CardContent>
           </Card>
 
+          {/* Other Files */}
+          <Card className="border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-lg">
+                <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+                  <FiFileText className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                </div>
+                <div>
+                  <span className="font-bold text-gray-900 dark:text-white">
+                    Other Files
+                  </span>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Upload any other supporting documents
+                  </p>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FileUpload
+                onUploadSuccess={(uploadedFiles) =>
+                  setFiles((prev: any) => [...prev, ...uploadedFiles])
+                }
+                onFileRemove={(fileUrl) =>
+                  setFiles((prev: any) =>
+                    prev.filter((f) => f.url !== fileUrl)
+                  )
+                }
+                initialFiles={files}
+                fileTypeCategory="FILE"
+                multiple
+              />
+            </CardContent>
+          </Card>
+
           {/* Document Sections */}
           {[
             {
@@ -1419,6 +1387,11 @@ const FilesStep = React.memo(
                   accept:
                     ".xlsx, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 },
+                {
+                  id: "pdfFiles",
+                  label: "PDF Files",
+                  accept: "application/pdf",
+                },
               ],
             },
           ].map((doc) => (
@@ -1437,40 +1410,6 @@ const FilesStep = React.memo(
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <FormField
-                  label="Description"
-                  htmlFor={`${doc.title}-description`}
-                >
-                  <Textarea
-                    id={`${doc.title}-description`}
-                    value={doc.state.description}
-                    onChange={(e) =>
-                      doc.setState((prev: any) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                    placeholder={`Describe the ${doc.title.toLowerCase()}...`}
-                    className="rounded-xl min-h-[100px] text-base border-2 focus:border-blue-500"
-                  />
-                </FormField>
-                <FormField
-                  label="Overview / What's Included"
-                  htmlFor={`${doc.title}-overview`}
-                >
-                  <Textarea
-                    id={`${doc.title}-overview`}
-                    value={doc.state.overview}
-                    onChange={(e) =>
-                      doc.setState((prev: any) => ({
-                        ...prev,
-                        overview: e.target.value,
-                      }))
-                    }
-                    placeholder="List items included, e.g., 'Foundation plan', 'Roof plan'..."
-                    className="rounded-xl min-h-[100px] text-base border-2 focus:border-blue-500"
-                  />
-                </FormField>
 
                 {doc.fields.map((field) => (
                   <div key={field.id}>

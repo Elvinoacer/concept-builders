@@ -7,7 +7,6 @@ import FaqForm from "./FaqForm";
 
 const DesignTabs = ({ design, onFaqSubmitted }) => {
   const tabs = [
-    { id: "plan-details", label: "Plan Details", icon: "description" },
     { id: "whats-included", label: "What's Included", icon: "inventory_2" },
     { id: "reviews", label: "Reviews", icon: "reviews" },
     { id: "faq-support", label: "FAQ & Support", icon: "help" },
@@ -138,47 +137,6 @@ const DesignTabs = ({ design, onFaqSubmitted }) => {
             exit="exit"
             className="min-h-[300px] sm:min-h-[350px] md:min-h-[400px]"
           >
-            {activeTab === "plan-details" && (
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                <motion.h3
-                  className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 md:mb-8 bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3"
-                  variants={itemVariants}
-                >
-                  <span className="material-symbols-outlined text-primary">
-                    architecture
-                  </span>
-                  Detailed Specifications
-                </motion.h3>
-                <motion.ul
-                  className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6"
-                  variants={containerVariants}
-                >
-                  {Array.isArray(design.planDetails) &&
-                    design.planDetails.map((detail, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex items-start gap-2 sm:gap-3 md:gap-4 p-3 sm:p-4 rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 border border-gray-200/50 dark:border-gray-700/50 hover:border-primary/30 transition-all duration-300 group"
-                        variants={itemVariants}
-                        whileHover={{ x: 2, scale: 1.01 }}
-                      >
-                        <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-r from-primary to-blue-500 flex items-center justify-center mt-0.5">
-                          <span className="material-symbols-outlined text-white text-xs sm:text-sm">
-                            check
-                          </span>
-                        </div>
-                        <span className="text-sm sm:text-base text-gray-700 dark:text-gray-300 font-medium group-hover:text-slate-800 dark:group-hover:text-white transition-colors">
-                          {detail}
-                        </span>
-                      </motion.li>
-                    ))}
-                </motion.ul>
-              </motion.div>
-            )}
-
             {activeTab === "whats-included" && (
               <WhatsIncludedTab design={design} />
             )}

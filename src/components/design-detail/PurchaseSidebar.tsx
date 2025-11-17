@@ -64,8 +64,11 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
         case "structuralCad":
           price += design.structuralCadPrice || 0;
           break;
-        case "billOfQuantities":
+        case "billOfQuantitiesExcel":
           price += design.billOfQuantitiesPrice || 0;
+          break;
+        case "billOfQuantitiesPdf":
+          price += design.billOfQuantitiesPdfPrice || 0;
           break;
         default:
           break;
@@ -153,6 +156,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       icon: FileText,
       description: "Detailed PDF blueprints and plans",
       category: "architectural",
+      isAvailable: (design.architecturalDesign?.pdfFiles?.length || 0) > 0,
     },
     {
       key: "architecturalCad",
@@ -161,6 +165,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       icon: Building2,
       description: "Editable CAD files for modifications",
       category: "architectural",
+      isAvailable: (design.architecturalDesign?.cadFiles?.length || 0) > 0,
     },
     {
       key: "structuralPdf",
@@ -169,6 +174,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       icon: FileText,
       description: "Structural engineering drawings",
       category: "structural",
+      isAvailable: (design.structuralDesign?.pdfFiles?.length || 0) > 0,
     },
     {
       key: "structuralCad",
@@ -177,14 +183,25 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       icon: Building2,
       description: "Structural CAD files for engineers",
       category: "structural",
+      isAvailable: (design.structuralDesign?.cadFiles?.length || 0) > 0,
     },
     {
-      key: "billOfQuantities",
-      label: "Bill of Quantities",
+      key: "billOfQuantitiesExcel",
+      label: "Bill of Quantities (Excel)",
       price: design.billOfQuantitiesPrice || 0,
       icon: Calculator,
-      description: "Material and cost breakdown",
+      description: "Material and cost breakdown in Excel format",
       category: "additional",
+      isAvailable: (design.billOfQuantities?.excelFiles?.length || 0) > 0,
+    },
+    {
+      key: "billOfQuantitiesPdf",
+      label: "Bill of Quantities (PDF)",
+      price: design.billOfQuantitiesPdfPrice || 0,
+      icon: FileText,
+      description: "Material and cost breakdown in PDF format",
+      category: "additional",
+      isAvailable: (design.billOfQuantities?.pdfFiles?.length || 0) > 0,
     },
   ];
 
@@ -557,10 +574,20 @@ const DocumentOption: React.FC<{
         <span className="font-semibold text-slate-800 dark:text-white text-xs sm:text-sm md:text-base truncate">
           {option.label}
         </span>
+        {option.isAvailable && (
+          <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded-full dark:bg-green-900/30 dark:text-green-300">
+            Available
+          </span>
+        )}
       </div>
       <p className="text-gray-600 dark:text-gray-400 text-xs leading-tight line-clamp-2">
         {option.description}
       </p>
+      {!option.isAvailable && (
+        <p className="text-blue-600 dark:text-blue-400 text-xs mt-1">
+          Will be delivered within 3 days
+        </p>
+      )}
     </div>
 
     <motion.span
@@ -608,6 +635,16 @@ const ExtraOption: React.FC<{
       <span className="font-medium text-slate-800 dark:text-gray-100 text-xs sm:text-sm md:text-base truncate">
         {option.name}
       </span>
+      {option.file && (
+        <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded-full dark:bg-green-900/30 dark:text-green-300">
+          Available
+        </span>
+      )}
+      {!option.file && (
+        <p className="text-blue-600 dark:text-blue-400 text-xs mt-1">
+          Will be delivered within 3 days
+        </p>
+      )}
     </div>
     <motion.span
       className="font-bold text-primary text-xs sm:text-sm md:text-base"

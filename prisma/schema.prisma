@@ -190,6 +190,7 @@ model Design {
   structuralPdfPrice    Float?          @default(0)
   structuralCadPrice    Float?          @default(0)
   billOfQuantitiesPrice Float?          @default(0)
+  billOfQuantitiesPdfPrice Float?          @default(0)
   packageOptions        PackageOption[]
   buildingCostFactors   Json?
 
@@ -270,7 +271,7 @@ model File {
   designFloorPlanId String?
 
   packageOption PackageOption?
-
+  deliveredFiles DeliveredFile[]
   createdAt DateTime @default(now())
 }
 
@@ -340,6 +341,18 @@ model OrderItem {
   quantity          Int
   selectedFileTypes String[]
   selectedExtras    Json?
+  deliveredFiles    DeliveredFile[]
+}
+
+model DeliveredFile {
+  id          String    @id @default(cuid())
+  orderItemId String
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  fileId      String
+  file        File      @relation(fields: [fileId], references: [id])
+  createdAt   DateTime  @default(now())
+
+  @@unique([orderItemId, fileId]) // A file can only be delivered once per order item
 }
 
 model Project {
