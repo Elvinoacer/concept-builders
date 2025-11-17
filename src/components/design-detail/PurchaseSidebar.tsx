@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // Import the icons
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -29,6 +30,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
 
   const [selectedFileTypes, setSelectedFileTypes] = useState<string[]>([]);
   const [selectedExtras, setSelectedExtras] = useState<any[]>([]);
+  const [isCustomizationsExpanded, setIsCustomizationsExpanded] = useState(false); // New state for customizations
 
   const cartItem = useMemo(() => {
     return cart.find(
@@ -354,27 +356,45 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
             className="mt-4 xs:mt-5 sm:mt-6 lg:mt-8 space-y-2 xs:space-y-3 sm:space-y-4"
             variants={itemVariants}
           >
-            <h3 className="text-sm xs:text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 xs:mb-2 flex items-center gap-1 xs:gap-2 sm:gap-3">
+            <h3
+              className="text-sm xs:text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 xs:mb-2 flex items-center gap-1 xs:gap-2 sm:gap-3 cursor-pointer"
+              onClick={() => setIsCustomizationsExpanded(!isCustomizationsExpanded)}
+            >
               <PlusCircle className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
               <span className="text-xs xs:text-sm sm:text-base md:text-lg truncate">
                 Customizations
               </span>
+              {isCustomizationsExpanded ? (
+                <FiChevronUp className="w-4 h-4 text-gray-500" />
+              ) : (
+                <FiChevronDown className="w-4 h-4 text-gray-500" />
+              )}
             </h3>
-            <div className="space-y-1 xs:space-y-2 sm:space-y-3">
-              {design.packageOptions.map((option: any) => {
-                const isChecked = selectedExtras.some(
-                  (e) => e.id === option.id
-                );
-                return (
-                  <ExtraOption
-                    key={option.id}
-                    option={option}
-                    isChecked={isChecked}
-                    onToggle={handleExtraToggle}
-                  />
-                );
-              })}
-            </div>
+            <AnimatePresence>
+              {isCustomizationsExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="space-y-1 xs:space-y-2 sm:space-y-3 overflow-hidden"
+                >
+                  {design.packageOptions.map((option: any) => {
+                    const isChecked = selectedExtras.some(
+                      (e) => e.id === option.id
+                    );
+                    return (
+                      <ExtraOption
+                        key={option.id}
+                        option={option}
+                        isChecked={isChecked}
+                        onToggle={handleExtraToggle}
+                      />
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
