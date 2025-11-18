@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function GET(request: NextRequest) {
   try {
@@ -141,6 +143,36 @@ export async function GET(request: NextRequest) {
     });
 
     const totalDesigns = await prisma.design.count({ where });
+
+    const session = await getServerSession(authOptions);
+    const isAdmin = session?.user.role === "ADMIN";
+
+    if (!isAdmin) {
+      const sanitizeFileUrls = (files: any[]) => {
+        if (files) {
+          files.forEach((file) => {
+            if (file) {
+              (file as any).url = null;
+            }
+          });
+        }
+      };
+
+      designs.forEach((design: any) => {
+        sanitizeFileUrls(design.files);
+        if (design.architecturalDesign) {
+          sanitizeFileUrls(design.architecturalDesign.pdfFiles);
+          sanitizeFileUrls(design.architecturalDesign.cadFiles);
+        }
+        if (design.structuralDesign) {
+          sanitizeFileUrls(design.structuralDesign.pdfFiles);
+          sanitizeFileUrls(design.structuralDesign.cadFiles);
+        }
+        if (design.billOfQuantities) {
+          sanitizeFileUrls(design.billOfQuantities.excelFiles);
+        }
+      });
+    }
 
     return NextResponse.json({
       designs,
