@@ -3,12 +3,16 @@ import prisma from "@/lib/prisma";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    const isAdmin = session?.user.role === "ADMIN";
     const { id } = params;
 
     const design = await prisma.design.findUnique({
@@ -51,6 +55,39 @@ export async function GET(
 
     if (!design) {
       return new NextResponse("Design not found", { status: 404 });
+    }
+
+    if (!isAdmin) {
+      const sanitizeFileUrls = (files: any[]) => {
+        if (files) {
+          files.forEach((file) => {
+            if (file) {
+              (file as any).url = null;
+            }
+          });
+        }
+      };
+
+      sanitizeFileUrls(design.files);
+      if (design.architecturalDesign) {
+        sanitizeFileUrls(design.architecturalDesign.pdfFiles);
+        sanitizeFileUrls(design.architecturalDesign.cadFiles);
+      }
+      if (design.structuralDesign) {
+        sanitizeFileUrls(design.structuralDesign.pdfFiles);
+        sanitizeFileUrls(design.structuralDesign.cadFiles);
+      }
+      if (design.billOfQuantities) {
+        sanitizeFileUrls(design.billOfQuantities.excelFiles);
+        sanitizeFileUrls(design.billOfQuantities.pdfFiles);
+      }
+      if (design.packageOptions) {
+        design.packageOptions.forEach((option) => {
+          if (option.file) {
+            (option.file as any).url = null;
+          }
+        });
+      }
     }
 
     return NextResponse.json(design, { status: 200 });
