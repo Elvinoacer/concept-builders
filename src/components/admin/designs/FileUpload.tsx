@@ -9,6 +9,7 @@ import {
   FiUpload,
   FiImage,
   FiFileText,
+  FiCheckCircle,
 } from "react-icons/fi";
 import { CgSpinner } from "react-icons/cg";
 import { ProgressBar } from "@/components/ui/progress";
@@ -27,9 +28,10 @@ interface FileUploadProps {
 }
 
 interface UploadingFile {
-  id: string; // Add a unique ID for state management
+  id: string;
   file: File;
   progress: number;
+  status: "uploading" | "completed" | "error";
   error?: string;
 }
 
@@ -69,19 +71,29 @@ const FileUpload = ({
       const newUploadingFiles: UploadingFile[] = acceptedFiles.map((file) => ({
         file,
         progress: 0,
-        id: `${file.name}-${file.size}-${Date.now()}`, // Unique ID
+        id: `${file.name}-${file.size}-${Date.now()}`,
+        status: "uploading",
       }));
       setUploadingFiles((prev) => [...prev, ...newUploadingFiles]);
 
-      // --- Use Axios for progress ---
-      const uploadPromises = newUploadingFiles.map((uploadingFile) => {
+      const uploadPromises = newUploadingFiles.map(async (uploadingFile) => {
         const { file, id } = uploadingFile;
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("fileTypeCategory", fileTypeCategory);
 
-        return axios
-          .post("/api/designs/upload-proxy", formData, {
+        try {
+          const signedUrlResponse = await axios.post(
+            "/api/designs/generate-upload-url",
+            {
+              fileName: file.name,
+              fileType: file.type,
+              fileTypeCategory: fileTypeCategory,
+            }
+          );
+
+          const { signedUrl, fileUrl, originalFileName } =
+            signedUrlResponse.data;
+
+          await axios.put(signedUrl, file, {
+            headers: { "Content-Type": file.type },
             onUploadProgress: (progressEvent) => {
               const percentCompleted = Math.round(
                 (progressEvent.loaded * 100) / (progressEvent.total || 1)
@@ -92,44 +104,56 @@ const FileUpload = ({
                 )
               );
             },
-          })
-          .then((response) => {
-            // Success
-            const { url, originalFileName } = response.data;
-            setUploadingFiles((prev) => prev.filter((f) => f.id !== id));
-            return { url, type: fileTypeCategory, originalFileName };
-          })
-          .catch((error) => {
-            // Error
-            console.error("Upload error:", error);
-            const errorMessage =
-              error.response?.data?.error || "Upload failed. Please try again.";
-            setUploadingFiles((prev) =>
-              prev.map((f) =>
-                f.id === id ? { ...f, error: errorMessage, progress: 100 } : f
-              )
-            );
-            toast.error(`Failed to upload ${file.name}: ${errorMessage}`);
-            return null;
           });
+
+          // Mark as completed
+          setUploadingFiles((prev) =>
+            prev.map((f) =>
+              f.id === id ? { ...f, status: "completed", progress: 100 } : f
+            )
+          );
+
+          return {
+            id,
+            data: { url: fileUrl, type: fileTypeCategory, originalFileName },
+          };
+        } catch (error: any) {
+          console.error("Upload error:", error);
+          const errorMessage =
+            error.response?.data?.error || "Upload failed. Please try again.";
+          setUploadingFiles((prev) =>
+            prev.map((f) =>
+              f.id === id
+                ? { ...f, status: "error", error: errorMessage }
+                : f
+            )
+          );
+          toast.error(`Failed to upload ${file.name}: ${errorMessage}`);
+          return null;
+        }
       });
 
-      const newFilesData = await Promise.all(uploadPromises);
-      // --- End of Axios logic ---
+      const results = await Promise.all(uploadPromises);
+      const successfulUploads = results.filter((res) => res !== null);
 
-      const successfulUploads = newFilesData.filter((f) => f) as {
-        url: string;
-        type: string;
-        originalFileName: string;
-      }[];
       if (successfulUploads.length > 0) {
-        setUploadedFiles((prev) => [...prev, ...successfulUploads]);
-        onUploadSuccess(successfulUploads);
         toast.success(
           `Successfully uploaded ${successfulUploads.length} file${
             successfulUploads.length > 1 ? "s" : ""
           }`
         );
+
+        // Delay before moving to uploaded list
+        setTimeout(() => {
+          const newFilesData = successfulUploads.map((res) => res!.data);
+          onUploadSuccess(newFilesData);
+          setUploadedFiles((prev) => [...prev, ...newFilesData]);
+          setUploadingFiles((prev) =>
+            prev.filter(
+              (f) => !successfulUploads.some((s) => s!.id === f.id)
+            )
+          );
+        }, 1000); // 1-second delay
       }
     },
     [onUploadSuccess, fileTypeCategory, multiple]
@@ -268,7 +292,7 @@ const FileUpload = ({
           <div className="space-y-2">
             {uploadingFiles.map((uploadingFile) => (
               <div
-                key={uploadingFile.id} // Use unique ID for key
+                key={uploadingFile.id}
                 className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm"
               >
                 <div className="flex items-center justify-between gap-3">
@@ -283,30 +307,27 @@ const FileUpload = ({
                       </p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    {uploadingFile.error ? (
-                      <span className="text-xs text-red-500 font-medium">
-                        Failed
-                      </span>
+                    {uploadingFile.status === "completed" ? (
+                      <FiCheckCircle className="text-green-500" size={20} />
+                    ) : uploadingFile.status === "error" ? (
+                      <span className="text-xs text-red-500 font-medium">Failed</span>
                     ) : (
                       <span className="text-xs text-blue-600 font-medium">
                         {uploadingFile.progress}%
                       </span>
                     )}
                     <button
-                      onClick={
-                        () => handleRemoveUploading(uploadingFile.id) // Use unique ID
-                      }
+                      onClick={() => handleRemoveUploading(uploadingFile.id)}
                       className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50"
                       title="Cancel upload"
+                      disabled={uploadingFile.status === "completed"}
                     >
                       <FiX size={16} />
                     </button>
                   </div>
                 </div>
-
-                {uploadingFile.error ? (
+                {uploadingFile.status === "error" ? (
                   <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
                     <FiX size={12} />
                     {uploadingFile.error}
@@ -314,7 +335,11 @@ const FileUpload = ({
                 ) : (
                   <ProgressBar
                     value={uploadingFile.progress}
-                    className="mt-2 h-1. bg-blue-500 transition-all duration-300"
+                    className={`mt-2 h-1.5 ${
+                      uploadingFile.status === "completed"
+                        ? "bg-green-500"
+                        : "bg-blue-500"
+                    } transition-all duration-300`}
                   />
                 )}
               </div>
