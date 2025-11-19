@@ -1,10 +1,9 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
-import { auth } from "@/lib/auth"; // Assuming you have an auth utility
-
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 // Ensure you have these environment variables set
 const s3Client = new S3Client({
   region: process.env.AWS_REGION!,
@@ -71,7 +70,7 @@ const allowedFileTypesByCategory = {
 };
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
+  const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -116,9 +115,9 @@ export async function POST(req: NextRequest) {
       );
     }
     // --- End File Type Validation ---
-    
+
     // Sanitize file name to remove special characters
-    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.\-_]/g, '');
+    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.\-_]/g, "");
 
     const key = `designs/${uuidv4()}/${sanitizedFileName}`;
 
