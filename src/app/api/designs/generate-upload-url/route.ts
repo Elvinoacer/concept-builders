@@ -1,18 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { v4 as uuidv4 } from "uuid";
 import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { getSignedUrlForUpload } from "../../../../lib/do-spaces";
 import { authOptions } from "../../auth/[...nextauth]/route";
-// Ensure you have these environment variables set
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION!,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
 
+// Ensure you have these environment variables set
 const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 
 const allowedFileTypesByCategory = {
@@ -85,14 +76,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!S3_BUCKET_NAME) {
-      console.error("S3_BUCKET_NAME environment variable is not set.");
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
-
     // --- File Type Validation ---
     const allowedTypes =
       allowedFileTypesByCategory[
@@ -116,26 +99,15 @@ export async function POST(req: NextRequest) {
     }
     // --- End File Type Validation ---
 
-    // Sanitize file name to remove special characters
-    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.\-_]/g, "");
-
-    const key = `designs/${uuidv4()}/${sanitizedFileName}`;
-
-    const putCommand = new PutObjectCommand({
-      Bucket: S3_BUCKET_NAME,
-      Key: key,
-      ContentType: fileType,
-    });
-
-    const signedUrl = await getSignedUrl(s3Client, putCommand, {
-      expiresIn: 60 * 5, // 5 minutes
-    });
-
-    const fileUrl = `https://${S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    const { signedUrl, publicUrl, key } = await getSignedUrlForUpload(
+      fileName,
+      fileType
+    );
 
     return NextResponse.json({
       signedUrl,
-      fileUrl,
+      publicUrl,
+      key,
       originalFileName: fileName, // Pass back original name
     });
   } catch (error) {
