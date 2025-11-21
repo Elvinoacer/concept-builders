@@ -5,34 +5,23 @@ import { useDropzone } from "react-dropzone";
 import {
   FiFile,
   FiTrash,
-  FiX,
   FiUpload,
   FiImage,
   FiFileText,
-  FiCheckCircle,
 } from "react-icons/fi";
 import { CgSpinner } from "react-icons/cg";
-import { ProgressBar } from "@/components/ui/progress";
 import { toast } from "sonner";
-import axios from "axios"; // Import axios
+import { useUpload } from '@/contexts/UploadContext';
 
 interface FileUploadProps {
   onUploadSuccess: (
-    files: { url: string; type: string; originalFileName: string }[]
+    file: { url: string; type: string; originalFileName: string; fileId: string }
   ) => void;
   onFileRemove: (fileUrl: string) => void;
   initialFiles: { url: string; type: string; name: string }[];
   fileTypeCategory: string;
   multiple?: boolean;
   accept?: string;
-}
-
-interface UploadingFile {
-  id: string;
-  file: File;
-  progress: number;
-  status: "uploading" | "completed" | "error";
-  error?: string;
 }
 
 const FileUpload = ({
@@ -43,8 +32,8 @@ const FileUpload = ({
   accept,
   onFileRemove,
 }: FileUploadProps) => {
+  const { addUpload } = useUpload();
   const [uploadedFiles, setUploadedFiles] = useState(initialFiles);
-  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [removingFiles, setRemovingFiles] = useState<Map<string, boolean>>(
     new Map()
   );
@@ -68,109 +57,29 @@ const FileUpload = ({
         return;
       }
 
-      const newUploadingFiles: UploadingFile[] = acceptedFiles.map((file) => ({
-        file,
-        progress: 0,
-        id: `${file.name}-${file.size}-${Date.now()}`,
-        status: "uploading",
-      }));
-      setUploadingFiles((prev) => [...prev, ...newUploadingFiles]);
-
-      const uploadPromises = newUploadingFiles.map(async (uploadingFile) => {
-        const { file, id } = uploadingFile;
-
-        try {
-          const signedUrlResponse = await axios.post(
-            "/api/designs/generate-upload-url",
-            {
-              fileName: file.name,
-              fileType: file.type,
-              fileTypeCategory: fileTypeCategory,
-            }
-          );
-
-          const { signedUrl, fileUrl, originalFileName } =
-            signedUrlResponse.data;
-
-          await axios.put(signedUrl, file, {
-            headers: { "Content-Type": file.type },
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round(
-                (progressEvent.loaded * 100) / (progressEvent.total || 1)
-              );
-              setUploadingFiles((prev) =>
-                prev.map((f) =>
-                  f.id === id ? { ...f, progress: percentCompleted } : f
-                )
-              );
-            },
-          });
-
-          // Mark as completed
-          setUploadingFiles((prev) =>
-            prev.map((f) =>
-              f.id === id ? { ...f, status: "completed", progress: 100 } : f
-            )
-          );
-
-          return {
-            id,
-            data: { url: fileUrl, type: fileTypeCategory, originalFileName },
-          };
-        } catch (error: any) {
-          console.error("Upload error:", error);
-          const errorMessage =
-            error.response?.data?.error || "Upload failed. Please try again.";
-          setUploadingFiles((prev) =>
-            prev.map((f) =>
-              f.id === id
-                ? { ...f, status: "error", error: errorMessage }
-                : f
-            )
-          );
-          toast.error(`Failed to upload ${file.name}: ${errorMessage}`);
-          return null;
-        }
-      });
-
-      const results = await Promise.all(uploadPromises);
-      const successfulUploads = results.filter((res) => res !== null);
-
-      if (successfulUploads.length > 0) {
-        toast.success(
-          `Successfully uploaded ${successfulUploads.length} file${
-            successfulUploads.length > 1 ? "s" : ""
-          }`
-        );
-
-        // Delay before moving to uploaded list
-        setTimeout(() => {
-          const newFilesData = successfulUploads.map((res) => res!.data);
-          onUploadSuccess(newFilesData);
-          setUploadedFiles((prev) => [...prev, ...newFilesData]);
-          setUploadingFiles((prev) =>
-            prev.filter(
-              (f) => !successfulUploads.some((s) => s!.id === f.id)
-            )
-          );
-        }, 1000); // 1-second delay
+      for (const file of acceptedFiles) {
+        await addUpload(file, fileTypeCategory, (newFile) => {
+          if (multiple) {
+            onUploadSuccess([newFile] as any);
+          } else {
+            onUploadSuccess(newFile);
+          }
+        });
       }
     },
-    [onUploadSuccess, fileTypeCategory, multiple]
+    [addUpload, fileTypeCategory, multiple, onUploadSuccess]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple,
     accept: accept ? { [accept]: [] } : undefined,
-    maxSize: 50 * 1024 * 1024, // 50MB max file size
+    maxSize: 300 * 1024 * 1024, // 300MB max file size
   });
 
   const handleRemove = async (fileUrl: string) => {
     setRemovingFiles((prev) => new Map(prev.set(fileUrl, true)));
     try {
-      // NOTE: This only removes from the parent.
-      // You may need a separate API route to delete from DigitalOcean
       await onFileRemove(fileUrl);
       setUploadedFiles((prev) => prev.filter((file) => file.url !== fileUrl));
       toast.success("File removed successfully");
@@ -185,18 +94,8 @@ const FileUpload = ({
     }
   };
 
-  const handleRemoveUploading = (id: string) => {
-    // You would need to implement axios cancel tokens here for a true cancel
-    setUploadingFiles((prev) => prev.filter((f) => f.id !== id));
-    toast.info("Upload cancelled");
-  };
-
-  // --- All helper functions below are unchanged ---
-
-  const getFileIcon = (fileName: string, fileType: string) => {
-    const extension = fileName.split(".").pop()?.toLowerCase();
-
-    if (fileType === "IMAGE" || /\.(jpe?g|png|gif|bmp|webp)$/i.test(fileName)) {
+  const getFileIcon = (fileName: string) => {
+    if (/\.(jpe?g|png|gif|bmp|webp)$/i.test(fileName)) {
       return <FiImage className="text-blue-500 flex-shrink-0" size={20} />;
     } else if (/\.pdf$/i.test(fileName)) {
       return <FiFileText className="text-red-500 flex-shrink-0" size={20} />;
@@ -209,238 +108,68 @@ const FileUpload = ({
     }
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const getAcceptableFileTypes = () => {
-    if (!accept) return "any files";
-
-    const types = accept.split(",").map((type) => {
-      if (type.includes("image/")) return "images";
-      if (type.includes("application/pdf")) return "PDFs";
-      if (type.includes(".dwg") || type.includes(".dxf")) return "CAD files";
-      if (type.includes(".xls") || type.includes(".xlsx")) return "Excel files";
-      return type;
-    });
-
-    return types.join(", ");
-  };
-
   return (
     <div className="w-full">
-      {/* Dropzone Area */}
       <div
         {...getRootProps()}
         className={`
-          relative border-2 border-dashed rounded-xl p-4 sm:p-6 text-center cursor-pointer 
-          transition-all duration-200 ease-in-out min-h-[120px] flex flex-col items-center justify-center
+          relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer 
+          transition-all duration-200 ease-in-out
           ${
             isDragActive
-              ? "border-blue-500 bg-blue-50/50 shadow-lg scale-[1.02]"
-              : "border-gray-300 bg-gray-50/50 hover:border-gray-400 hover:bg-gray-100/50"
+              ? "border-blue-500 bg-blue-50/50"
+              : "border-gray-300 bg-gray-50/50 hover:border-gray-400"
           }
         `}
       >
         <input {...getInputProps()} />
-
-        <div className="flex flex-col items-center justify-center space-y-3">
-          <div className="p-3 bg-blue-100 rounded-full">
-            <FiUpload className="text-blue-600" size={24} />
-          </div>
-
-          <div className="space-y-2">
-            {isDragActive ? (
-              <p className="text-blue-600 font-medium text-base sm:text-lg">
-                Drop files here...
-              </p>
-            ) : (
-              <>
-                <p className="text-gray-700 font-medium text-base sm:text-lg">
-                  Drag & drop files here
-                </p>
-                <p className="text-gray-500 text-sm">
-                  or{" "}
-                  <span className="text-blue-600 font-medium">
-                    browse files
-                  </span>
-                </p>
-              </>
-            )}
-          </div>
-
-          <div className="text-xs text-gray-400 mt-2">
-            {multiple ? "Multiple files allowed" : "Single file only"} • Max
-            50MB • {getAcceptableFileTypes()}
-          </div>
+        <div className="flex flex-col items-center justify-center space-y-2">
+          <FiUpload className="text-gray-500" size={24} />
+          <p className="text-gray-600 text-sm">
+            Drag & drop or <span className="font-semibold text-blue-600">browse</span>
+          </p>
+          <p className="text-xs text-gray-400">Max 300MB</p>
         </div>
       </div>
 
-      {/* Uploading Files Section */}
-      {uploadingFiles.length > 0 && (
-        <div className="mt-4 sm:mt-6 space-y-3">
-          <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-            <CgSpinner className="animate-spin text-blue-500" size={16} />
-            Uploading {uploadingFiles.length} file
-            {uploadingFiles.length > 1 ? "s" : ""}
-          </h4>
-
-          <div className="space-y-2">
-            {uploadingFiles.map((uploadingFile) => (
-              <div
-                key={uploadingFile.id}
-                className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    {getFileIcon(uploadingFile.file.name, fileTypeCategory)}
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {uploadingFile.file.name}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {formatFileSize(uploadingFile.file.size)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {uploadingFile.status === "completed" ? (
-                      <FiCheckCircle className="text-green-500" size={20} />
-                    ) : uploadingFile.status === "error" ? (
-                      <span className="text-xs text-red-500 font-medium">Failed</span>
-                    ) : (
-                      <span className="text-xs text-blue-600 font-medium">
-                        {uploadingFile.progress}%
-                      </span>
-                    )}
-                    <button
-                      onClick={() => handleRemoveUploading(uploadingFile.id)}
-                      className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50"
-                      title="Cancel upload"
-                      disabled={uploadingFile.status === "completed"}
-                    >
-                      <FiX size={16} />
-                    </button>
-                  </div>
-                </div>
-                {uploadingFile.status === "error" ? (
-                  <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                    <FiX size={12} />
-                    {uploadingFile.error}
-                  </p>
-                ) : (
-                  <ProgressBar
-                    value={uploadingFile.progress}
-                    className={`mt-2 h-1.5 ${
-                      uploadingFile.status === "completed"
-                        ? "bg-green-500"
-                        : "bg-blue-500"
-                    } transition-all duration-300`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Uploaded Files Section (Unchanged) */}
       {uploadedFiles.length > 0 && (
-        <div className="mt-4 sm:mt-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">
-            Uploaded Files ({uploadedFiles.length})
-          </h4>
-
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {uploadedFiles.map((file, index) => {
-              const fileName =
-                (file as any).originalFileName || // Handle new property
-                file.name || // Handle initialFiles
-                decodeURIComponent(file.url.split("/").pop() || "Unknown File");
-              const isImage =
-                file.type === "IMAGE" ||
-                (file.type === "FLOOR_PLAN" &&
-                  /\.(jpe?g|png|gif|bmp|webp)$/i.test(fileName));
+              const fileName = file.name || (file.url ? decodeURIComponent(file.url.split("/").pop() || "Unknown File") : "Unknown File");
+              const isImage = file.type === "IMAGE" || /\.(jpe?g|png|gif|bmp|webp)$/i.test(fileName);
               const isRemoving = removingFiles.get(file.url);
 
               return (
-                <div
-                  key={`uploaded-${index}`}
-                  className="relative group bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200"
-                >
+                <div key={index} className="relative group bg-white rounded-lg border overflow-hidden">
                   {isImage ? (
-                    <div className="aspect-square w-full relative">
-                      <img
-                        src={file.url}
-                        alt={fileName}
-                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                    </div>
+                    <img
+                      src={file.url}
+                      alt={fileName}
+                      className="h-28 w-full object-cover"
+                    />
                   ) : (
-                    <div className="aspect-square w-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
-                      {getFileIcon(fileName, file.type)}
-                      <div className="mt-2 text-center">
-                        <p className="text-xs text-gray-500 font-medium truncate w-full px-2">
-                          {fileName.split(".").pop()?.toUpperCase()}
-                        </p>
-                      </div>
+                    <div className="h-28 w-full flex flex-col items-center justify-center bg-gray-50 p-2">
+                      {getFileIcon(fileName)}
+                      <p className="text-xs text-gray-500 font-medium truncate w-full text-center mt-2">
+                        {fileName}
+                      </p>
                     </div>
                   )}
-
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                    <p
-                      className="text-white text-xs font-medium truncate"
-                      title={fileName}
-                    >
-                      {fileName}
-                    </p>
-                  </div>
-
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       type="button"
                       onClick={() => handleRemove(file.url)}
                       disabled={isRemoving}
-                      className="p-1.5 bg-white/90 hover:bg-white text-red-500 rounded-full shadow-lg transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Remove file"
+                      className="p-1.5 bg-white/80 hover:bg-white text-red-500 rounded-full shadow"
                     >
-                      {isRemoving ? (
-                        <CgSpinner className="animate-spin" size={14} />
-                      ) : (
-                        <FiTrash size={14} />
-                      )}
+                      {isRemoving ? <CgSpinner className="animate-spin" size={14} /> : <FiTrash size={14} />}
                     </button>
                   </div>
-
-                  {isRemoving && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
-                      <CgSpinner
-                        className="animate-spin text-white"
-                        size={20}
-                      />
-                    </div>
-                  )}
                 </div>
               );
             })}
           </div>
-        </div>
-      )}
-
-      {/* Empty State (Unchanged) */}
-      {uploadedFiles.length === 0 && uploadingFiles.length === 0 && (
-        <div className="mt-4 text-center py-8">
-          <FiFile className="mx-auto text-gray-300" size={48} />
-          <p className="text-gray-500 text-sm mt-2">No files uploaded yet</p>
-          <p className="text-gray-400 text-xs mt-1">
-            Files you upload will appear here
-          </p>
         </div>
       )}
     </div>

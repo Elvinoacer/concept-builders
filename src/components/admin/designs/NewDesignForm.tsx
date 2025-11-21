@@ -12,6 +12,7 @@ import Link from "next/link";
 import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import FileUpload from "./FileUpload";
+import { useUpload } from '@/contexts/UploadContext';
 
 interface NewDesignFormProps {
   onClose: () => void;
@@ -38,18 +39,19 @@ const NewDesignForm = ({
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [packageOptions, setPackageOptions] = useState<
-    { name: string; price: string; file: any[] }[]
-  >([]);
-  const [architecturalDesign, setArchitecturalDesign] = useState({
+  const { uploadingFiles } = useUpload();
+  const activeUploads = uploadingFiles.filter(f => f.status === 'uploading' || f.status === 'pending');
+
+  const [packageOptions, setPackageOptions] = useState<any[]>([]);
+  const [architecturalDesign, setArchitecturalDesign] = useState<any>({
     pdfFiles: [],
     cadFiles: [],
   });
-  const [structuralDesign, setStructuralDesign] = useState({
+  const [structuralDesign, setStructuralDesign] = useState<any>({
     pdfFiles: [],
     cadFiles: [],
   });
-  const [billOfQuantities, setBillOfQuantities] = useState({
+  const [billOfQuantities, setBillOfQuantities] = useState<any>({
     excelFiles: [],
     pdfFiles: [],
   });
@@ -75,106 +77,54 @@ const NewDesignForm = ({
     fetchCategories();
 
     if (isEditMode) {
-      setName(designToEdit.name || "");
-      setDescription(designToEdit.description || "");
-      setBasePrice(designToEdit.basePrice?.toString() || "");
-      setPriceRange(designToEdit.priceRange || "");
-      setBedrooms(designToEdit.bedrooms?.toString() || "");
-      setBathrooms(designToEdit.bathrooms?.toString() || "");
-      setArea(designToEdit.area?.toString() || "");
-      setFloors(designToEdit.floors?.toString() || "");
-      setCategoryId(designToEdit.categoryId || "");
-      setArchitecturalDesign(
-        designToEdit.architecturalDesign || {
-          pdfFiles: [],
-          cadFiles: [],
-        }
-      );
-      setStructuralDesign(
-        designToEdit.structuralDesign || {
-          pdfFiles: [],
-          cadFiles: [],
-        }
-      );
-      setBillOfQuantities(
-        designToEdit.billOfQuantities || {
-          excelFiles: [],
-          pdfFiles: [],
-        }
-      );
-
-      setArchitecturalPdfPrice(
-        designToEdit.architecturalPdfPrice?.toString() || ""
-      );
-      setArchitecturalCadPrice(
-        designToEdit.architecturalCadPrice?.toString() || ""
-      );
-      setStructuralPdfPrice(designToEdit.structuralPdfPrice?.toString() || "");
-      setStructuralCadPrice(designToEdit.structuralCadPrice?.toString() || "");
-      setBillOfQuantitiesPrice(
-        designToEdit.billOfQuantitiesPrice?.toString() || ""
-      );
-      setBillOfQuantitiesPdfPrice(
-        designToEdit.billOfQuantitiesPdfPrice?.toString() || ""
-      );
-      setPackageOptions(
-        designToEdit.packageOptions.map((opt) => ({
-          ...opt,
-          price: opt.price.toString(),
-          file: opt.file ? [opt.file] : [],
-        })) || []
-      );
-
-      setImages(designToEdit.images || []);
-      setFloorPlans(designToEdit.floorPlans || []);
-      setFiles(designToEdit.files || []);
+        setName(designToEdit.name || "");
+        setDescription(designToEdit.description || "");
+        setBasePrice(designToEdit.basePrice?.toString() || "");
+        setPriceRange(designToEdit.priceRange || "");
+        setBedrooms(designToEdit.bedrooms?.toString() || "");
+        setBathrooms(designToEdit.bathrooms?.toString() || "");
+        setArea(designToEdit.area?.toString() || "");
+        setFloors(designToEdit.floors?.toString() || "");
+        setCategoryId(designToEdit.categoryId || "");
+        setArchitecturalDesign(designToEdit.architecturalDesign || { pdfFiles: [], cadFiles: [] });
+        setStructuralDesign(designToEdit.structuralDesign || { pdfFiles: [], cadFiles: [] });
+        setBillOfQuantities(designToEdit.billOfQuantities || { excelFiles: [], pdfFiles: [] });
+        setArchitecturalPdfPrice(designToEdit.architecturalPdfPrice?.toString() || "");
+        setArchitecturalCadPrice(designToEdit.architecturalCadPrice?.toString() || "");
+        setStructuralPdfPrice(designToEdit.structuralPdfPrice?.toString() || "");
+        setStructuralCadPrice(designToEdit.structuralCadPrice?.toString() || "");
+        setBillOfQuantitiesPrice(designToEdit.billOfQuantitiesPrice?.toString() || "");
+        setBillOfQuantitiesPdfPrice(designToEdit.billOfQuantitiesPdfPrice?.toString() || "");
+        setPackageOptions(designToEdit.packageOptions.map((opt:any) => ({ ...opt, price: opt.price.toString(), file: opt.file ? [opt.file] : [] })) || []);
+        setImages(designToEdit.images || []);
+        setFloorPlans(designToEdit.floorPlans || []);
+        setFiles(designToEdit.files || []);
     }
   }, [designToEdit, isEditMode]);
 
   const validateForm = () => {
-    const errors = [];
-    if (!name.trim()) errors.push("Design Name is required.");
-    if (!description.trim()) errors.push("Description is required.");
-    if (!categoryId) errors.push("Category is required.");
-    if (!basePrice || parseFloat(basePrice) <= 0)
-      errors.push("Base Price must be a positive number.");
-    if (images.length === 0) errors.push("At least one image is required.");
-    return errors;
+    if (!name.trim()) return "Design Name is required.";
+    if (!description.trim()) return "Description is required.";
+    if (!categoryId) return "Category is required.";
+    if (!basePrice || parseFloat(basePrice) <= 0) return "Base Price must be a positive number.";
+    if (images.length === 0 && !isEditMode) return "At least one image is required.";
+    return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formErrors = validateForm();
-    if (formErrors.length > 0) {
-      toast.error(formErrors.join("\n"));
+    const error = validateForm();
+    if (error) {
+      toast.error(error);
       return;
     }
 
     setIsSubmitting(true);
 
-    // Common payload processing helpers
-    const fileListPayload = (files: any[], type: string) =>
-      files.map((file: any) => ({
-        name: file.originalFileName || file.name || file.url.split("/").pop(),
-        url: file.url,
-        type,
-      }));
-
-    const architecturalDesignData = {
-      pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
-      cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
-    };
-
-    const structuralDesignData = {
-      pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
-      cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
-    };
-
-    const billOfQuantitiesData = {
-      excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
-      pdfFiles: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
-    };
+    const connectFiles = (files: any[]) => ({
+        connect: files.map(f => ({ id: f.fileId }))
+    });
 
     const commonData = {
       name,
@@ -194,106 +144,54 @@ const NewDesignForm = ({
       billOfQuantitiesPdfPrice: parseFloat(billOfQuantitiesPdfPrice) || null,
     };
 
+    const packageOptionsPayload = packageOptions.map(opt => ({
+        name: opt.name,
+        price: parseFloat(opt.price) || 0,
+        file: opt.file.length > 0 ? { connect: { id: opt.file[0].fileId } } : undefined,
+    }));
+
     let payload;
     const url = isEditMode ? `/api/designs/${designToEdit.id}` : "/api/designs";
     const method = isEditMode ? "PUT" : "POST";
 
-    const packageOptionsCreatePayload = packageOptions
-      .filter((opt) => opt.name.trim() && opt.price.trim())
-      .map((option) => {
-        const file = option.file?.[0];
-        let fileCreate = undefined;
-        if (file) {
-          fileCreate = {
-            create: {
-              name:
-                file.originalFileName || file.name || file.url.split("/").pop(),
-              url: file.url,
-              type: "FILE",
-            },
-          };
-        }
-        return {
-          name: option.name,
-          price: parseFloat(option.price) || 0,
-          file: fileCreate,
-        };
-      });
-
     if (isEditMode) {
-      // UPDATE PAYLOAD
       payload = {
         ...commonData,
-        // --- Fields with custom backend logic (expect flat object) ---
-        architecturalDesign: architecturalDesignData,
-        ...(structuralDesignData.pdfFiles.length > 0 ||
-        structuralDesignData.cadFiles.length > 0
-          ? { structuralDesign: structuralDesignData }
-          : designToEdit.structuralDesign
-            ? { structuralDesign: { delete: true } }
-            : {}),
-        billOfQuantities: billOfQuantitiesData,
-        // --- True relational fields (expect Prisma update object) ---
-        images: {
-          deleteMany: {},
-          create: fileListPayload(images, "IMAGE"),
-        },
-        floorPlans: {
-          deleteMany: {},
-          create: fileListPayload(floorPlans, "FLOOR_PLAN"),
-        },
-        files: {
-          deleteMany: {},
-          create: fileListPayload(files, "FILE"),
-        },
+        images: connectFiles(images),
+        floorPlans: connectFiles(floorPlans),
+        files: connectFiles(files),
+        architecturalDesign: { update: { pdfFiles: connectFiles(architecturalDesign.pdfFiles), cadFiles: connectFiles(architecturalDesign.cadFiles) }},
+        structuralDesign: { update: { pdfFiles: connectFiles(structuralDesign.pdfFiles), cadFiles: connectFiles(structuralDesign.cadFiles) }},
+        billOfQuantities: { update: { excelFiles: connectFiles(billOfQuantities.excelFiles), pdfFiles: connectFiles(billOfQuantities.pdfFiles) }},
         packageOptions: {
-          deleteMany: {},
-          create: packageOptionsCreatePayload,
+            deleteMany: {},
+            create: packageOptionsPayload,
         },
       };
     } else {
-      // CREATE PAYLOAD
       payload = {
         ...commonData,
-        images: { create: fileListPayload(images, "IMAGE") },
-        floorPlans: { create: fileListPayload(floorPlans, "FLOOR_PLAN") },
-        files: { create: fileListPayload(files, "FILE") },
-        packageOptions: {
-          create: packageOptionsCreatePayload,
-        },
-        architecturalDesign: {
-          create: { type: "ARCHITECTURAL", ...architecturalDesignData },
-        },
-        ...(structuralDesignData.pdfFiles.length > 0 ||
-        structuralDesignData.cadFiles.length > 0
-          ? {
-              structuralDesign: {
-                create: { type: "STRUCTURAL", ...structuralDesignData },
-              },
-            }
-          : {}),
-        billOfQuantities: {
-          create: { type: "BILL_OF_QUANTITIES", ...billOfQuantitiesData },
-        },
+        folderId,
+        images: connectFiles(images),
+        floorPlans: connectFiles(floorPlans),
+        files: connectFiles(files),
+        architecturalDesign: { create: { type: "ARCHITECTURAL", pdfFiles: connectFiles(architecturalDesign.pdfFiles), cadFiles: connectFiles(architecturalDesign.cadFiles) }},
+        structuralDesign: { create: { type: "STRUCTURAL", pdfFiles: connectFiles(structuralDesign.pdfFiles), cadFiles: connectFiles(structuralDesign.cadFiles) }},
+        billOfQuantities: { create: { type: "BILL_OF_QUANTITIES", excelFiles: connectFiles(billOfQuantities.excelFiles), pdfFiles: connectFiles(billOfQuantities.pdfFiles) }},
+        packageOptions: { create: packageOptionsPayload },
       };
     }
 
     try {
       const response = await fetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        toast.success(
-          `Design ${isEditMode ? "updated" : "created"} successfully!`
-        );
-        if (onSuccess) {
-          onSuccess();
-        }
+        toast.success(`Design ${isEditMode ? "updated" : "created"} successfully!`);
+        if (onSuccess) onSuccess();
         onClose();
       } else {
         const errorData = await response.json();
@@ -301,71 +199,21 @@ const NewDesignForm = ({
       }
     } catch (error) {
       toast.error(`An unexpected error occurred.`);
-      console.error(
-        `Error ${isEditMode ? "updating" : "creating"} design:`,
-        error
-      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-2 sm:p-4"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -50, opacity: 0 }}
-        className="bg-card rounded-2xl shadow-2xl w-full max-w-3xl mx-auto flex flex-col h-[90vh]"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -50, opacity: 0 }} className="bg-card rounded-lg shadow-xl w-full max-w-3xl flex flex-col h-[95vh]">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
-          <div className="p-4 sm:p-6 border-b border-border flex-shrink-0 flex justify-between items-center bg-gradient-to-r from-blue-600 to-cyan-400 text-white rounded-t-2xl">
-            <div className="flex items-center gap-2 sm:gap-3">
-              {isEditMode ? (
-                <FiEdit size={20} className="sm:w-6 sm:h-6" />
-              ) : (
-                <FiPlus size={20} className="sm:w-6 sm:h-6" />
-              )}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                <h3 className="text-lg sm:text-xl font-semibold leading-tight">
-                  {isEditMode ? "Edit Design" : "Create New Design"}
-                </h3>
-                {isEditMode ? (
-                  <Link
-                    href={`/admin/designs/new?id=${designToEdit.id}`}
-                    className="text-xs sm:text-sm text-yellow-300 hover:text-yellow-100 transition-colors"
-                  >
-                    (Edit in page)
-                  </Link>
-                ) : (
-                  <Link
-                    href="/admin/designs/new"
-                    className="text-xs sm:text-sm text-yellow-300 hover:text-yellow-100 transition-colors"
-                  >
-                    (Add in page)
-                  </Link>
-                )}
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="h-8 w-8 sm:h-10 sm:w-10 hover:bg-white/20 transition-colors"
-            >
-              <FiX size={16} className="sm:w-5 sm:h-5" />
-            </Button>
+          <div className="p-6 border-b">
+            <h3 className="text-xl font-semibold">{isEditMode ? "Edit Design" : "Create New Design"}</h3>
           </div>
 
-          <ScrollArea className="flex-1 min-h-0">
-            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+          <ScrollArea className="flex-1">
+            <div className="p-6 space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-base sm:text-lg font-medium text-foreground/90">
@@ -678,14 +526,14 @@ const NewDesignForm = ({
                       </Button>
                     </div>
                     <FileUpload
-                      onUploadSuccess={(files) => {
+                      onUploadSuccess={(file) => {
                         const newOptions = [...packageOptions];
-                        newOptions[index].file = files;
+                        newOptions[index].file = [file];
                         setPackageOptions(newOptions);
                       }}
-                      onFileRemove={() => {
+                      onFileRemove={(fileUrl) => {
                         const newOptions = [...packageOptions];
-                        newOptions[index].file = [];
+                        newOptions[index].file = newOptions[index].file.filter((f: any) => f.url !== fileUrl);
                         setPackageOptions(newOptions);
                       }}
                       initialFiles={option.file}
@@ -782,17 +630,17 @@ const NewDesignForm = ({
                           {fileType.label}
                         </Label>
                         <FileUpload
-                          onUploadSuccess={(files) =>
-                            section.setState((prev) => ({
+                          onUploadSuccess={(file) =>
+                            section.setState((prev:any) => ({
                               ...prev,
-                              [fileType.key]: [...prev[fileType.key], ...files],
+                              [fileType.key]: [...prev[fileType.key], file],
                             }))
                           }
                           onFileRemove={(fileUrl) =>
-                            section.setState((prev) => ({
+                            section.setState((prev:any) => ({
                               ...prev,
                               [fileType.key]: prev[fileType.key].filter(
-                                (f) => f.url !== fileUrl
+                                (f:any) => f.url !== fileUrl
                               ),
                             }))
                           }
@@ -819,8 +667,8 @@ const NewDesignForm = ({
                       General Images
                     </Label>
                     <FileUpload
-                      onUploadSuccess={(files) =>
-                        setImages((prev) => [...prev, ...files])
+                      onUploadSuccess={(file) =>
+                        setImages((prev) => [...prev, file])
                       }
                       onFileRemove={(fileUrl) =>
                         setImages((prev) =>
@@ -837,8 +685,8 @@ const NewDesignForm = ({
                   <div className="space-y-1.5 sm:space-y-2">
                     <Label className="text-sm sm:text-base">Floor Plans</Label>
                     <FileUpload
-                      onUploadSuccess={(files) =>
-                        setFloorPlans((prev) => [...prev, ...files])
+                      onUploadSuccess={(file) =>
+                        setFloorPlans((prev) => [...prev, file])
                       }
                       onFileRemove={(fileUrl) =>
                         setFloorPlans((prev) =>
@@ -855,8 +703,8 @@ const NewDesignForm = ({
                   <div className="space-y-1.5 sm:space-y-2">
                     <Label className="text-sm sm:text-base">Other Files</Label>
                     <FileUpload
-                      onUploadSuccess={(uploadedFiles) =>
-                        setFiles((prev) => [...prev, ...uploadedFiles])
+                      onUploadSuccess={(file) =>
+                        setFiles((prev) => [...prev, file])
                       }
                       onFileRemove={(fileUrl) =>
                         setFiles((prev) =>
@@ -894,12 +742,12 @@ const NewDesignForm = ({
                 <FiSave className="mr-2 w-4 h-4" />
               )}
               {isSubmitting
-                ? isEditMode
-                  ? "Updating..."
-                  : "Saving..."
+                ? "Saving..."
+                : activeUploads.length > 0
+                ? `Uploading (${activeUploads.length})...`
                 : isEditMode
-                  ? "Update Design"
-                  : "Save Design"}
+                ? "Update Design"
+                : "Save Design"}
             </Button>
           </div>
         </form>

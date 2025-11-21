@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -21,72 +15,69 @@ model User {
   email                    String?           @unique
   emailVerified            DateTime?
   image                    String?
-  phone                    String?           @unique
-  hashedPassword           String?
-  accounts                 Account[]
-  sessions                 Session[]
-  orders                   Order[]
-  projects                 Project[]
   role                     Role              @default(CLIENT)
-  reviews                  Review[]
-  wishlist                 Design[]
-  folders                  Folder[]
+  hashedPassword           String?
   status                   UserStatus        @default(ACTIVE)
-  loginHistory             LoginHistory[]
   impersonatingUserId      String?
   referralSource           String?
-  emailVerificationToken   String?
-  emailVerificationExpires DateTime?
-  passwordResetToken       String?
-  passwordResetExpires     DateTime?
   createdAt                DateTime          @default(now())
   updatedAt                DateTime          @default(now()) @updatedAt
-  cart                     Cart?
-  notifications            Notification[]
-  conversations            Conversation[]    @relation("ConversationUsers")
-  sentMessages             Message[]
-  readMessages             Message[]         @relation("ReadMessages")
-  feedback                 Feedback[]
-  clientFeedback           ProjectFeedback[] @relation("ClientFeedback")
-  adminFeedback            ProjectFeedback[] @relation("AdminFeedback")
-  designViews              DesignView[]
-  bio                      String?
-  adminRole                String?
-  // Referral System Fields
-  referralCode             String            @unique @default(cuid()) // Now required
-  referredByCode           String?
+  emailVerificationExpires DateTime?
+  emailVerificationToken   String?
+  passwordResetExpires     DateTime?
+  passwordResetToken       String?
   referralBonus            Float             @default(0)
   referralBonusConverted   Float             @default(0)
-
-  // New self-referencing relation for referred users
-  referredUsers User[] @relation("ReferredBy") // Users referred by this user
-  referrer      User?  @relation("ReferredBy", fields: [referredByCode], references: [referralCode]) // The user who referred this user
+  referralCode             String            @unique @default(cuid())
+  referredByCode           String?
+  bio                      String?
+  adminRole                String?
+  phone                    String?           @unique
+  accounts                 Account[]
+  cart                     Cart?
+  designViews              DesignView[]
+  feedback                 Feedback[]
+  folders                  Folder[]
+  loginHistory             LoginHistory[]
+  sentMessages             Message[]
+  notifications            Notification[]
+  orders                   Order[]
+  projects                 Project[]
+  adminFeedback            ProjectFeedback[] @relation("AdminFeedback")
+  clientFeedback           ProjectFeedback[] @relation("ClientFeedback")
+  reviews                  Review[]
+  sessions                 Session[]
+  referrer                 User?             @relation("ReferredBy", fields: [referredByCode], references: [referralCode])
+  referredUsers            User[]            @relation("ReferredBy")
+  conversations            Conversation[]    @relation("ConversationUsers")
+  wishlist                 Design[]          @relation("DesignToUser")
+  readMessages             Message[]         @relation("ReadMessages")
 }
 
 model Cart {
   id             String     @id @default(cuid())
-  user           User       @relation(fields: [userId], references: [id])
   userId         String     @unique
-  items          CartItem[]
-  discountCode   String?
-  discountAmount Float?
-  discountId     String?
-  discount       Discount?  @relation(fields: [discountId], references: [id])
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
+  discountAmount Float?
+  discountCode   String?
+  discountId     String?
+  discount       Discount?  @relation(fields: [discountId], references: [id])
+  user           User       @relation(fields: [userId], references: [id])
+  items          CartItem[]
 }
 
 model CartItem {
   id                String   @id @default(cuid())
-  cart              Cart     @relation(fields: [cartId], references: [id])
   cartId            String
-  design            Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
   designId          String
   quantity          Int      @default(1)
   createdAt         DateTime @default(now())
+  selectedExtras    Json?
   selectedFileTypes String[]
   selectedPackage   String[]
-  selectedExtras    Json?
+  cart              Cart     @relation(fields: [cartId], references: [id])
+  design            Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
 
   @@unique([cartId, designId, selectedFileTypes, selectedPackage, selectedExtras])
 }
@@ -94,9 +85,9 @@ model CartItem {
 model LoginHistory {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   ipAddress String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
@@ -105,16 +96,15 @@ model Account {
   type                     String
   provider                 String
   providerAccountId        String
-  refresh_token            String? @db.Text
-  access_token             String? @db.Text
+  refresh_token            String?
+  access_token             String?
   expires_at               Int?
-  refresh_token_expires_in Int?
   token_type               String?
   scope                    String?
-  id_token                 String? @db.Text
+  id_token                 String?
   session_state            String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refresh_token_expires_in Int?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -124,8 +114,8 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -140,8 +130,8 @@ model Category {
   id         String   @id @default(cuid())
   name       String   @unique
   image      String?
-  designs    Design[]
   isFeatured Boolean  @default(false)
+  designs    Design[]
 }
 
 model Folder {
@@ -149,140 +139,101 @@ model Folder {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  designs   Design[]
   userId    String
+  designs   Design[]
   user      User     @relation(fields: [userId], references: [id])
 }
 
 model Design {
-  id          String @id @default(cuid())
-  name        String
-  description String
-  basePrice   Float
-  priceRange  String
-  bedrooms    Int?
-  bathrooms   Int?
-  area        Float?
-  floors      Int?
-
-  // Organized file structure
-  architecturalDesign DesignDocuments? @relation("ArchitecturalDesign")
-  structuralDesign    DesignDocuments? @relation("StructuralDesign")
-  billOfQuantities    DesignDocuments? @relation("BillOfQuantities")
-
-  planDetails String[]
-  images      File[]   @relation("DesignImages")
-  floorPlans  File[]   @relation("DesignFloorPlans")
-  files       File[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  folder      Folder?  @relation(fields: [folderId], references: [id])
-  folderId    String?
-
-  buildingCostEstimates Json[]
-  minBuildingCost       Float?
-  maxBuildingCost       Float?
-  faq                   Json[]
-
-  // Pricing for different packages
-  architecturalPdfPrice Float?          @default(0)
-  architecturalCadPrice Float?          @default(0)
-  structuralPdfPrice    Float?          @default(0)
-  structuralCadPrice    Float?          @default(0)
-  billOfQuantitiesPrice Float?          @default(0)
-  billOfQuantitiesPdfPrice Float?          @default(0)
-  packageOptions        PackageOption[]
-  buildingCostFactors   Json?
-
-  wishlistedBy User[]
-  category     Category?        @relation(fields: [categoryId], references: [id])
-  categoryId   String?
-  reviews      Review[]
-  orderItems   OrderItem[]
-  cartItems    CartItem[]
-  views        Int              @default(0)
-  isFeatured   Boolean          @default(false)
-  discounts    DesignDiscount[]
-  designViews  DesignView[]
+  id                       String           @id @default(cuid())
+  name                     String
+  description              String
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
+  categoryId               String?
+  basePrice                Float
+  priceRange               String
+  area                     Float?
+  bathrooms                Int?
+  bedrooms                 Int?
+  floors                   Int?
+  folderId                 String?
+  planDetails              String[]
+  views                    Int              @default(0)
+  buildingCostEstimates    Json[]
+  faq                      Json[]
+  isFeatured               Boolean          @default(false)
+  maxBuildingCost          Float?
+  minBuildingCost          Float?
+  buildingCostFactors      Json?
+  architecturalCadPrice    Float?           @default(0)
+  architecturalPdfPrice    Float?           @default(0)
+  billOfQuantitiesPrice    Float?           @default(0)
+  structuralCadPrice       Float?           @default(0)
+  structuralPdfPrice       Float?           @default(0)
+  billOfQuantitiesPdfPrice Float?           @default(0)
+  cartItems                CartItem[]
+  category                 Category?        @relation(fields: [categoryId], references: [id])
+  folder                   Folder?          @relation(fields: [folderId], references: [id])
+  discounts                DesignDiscount[]
+  architecturalDesign      DesignDocuments? @relation("ArchitecturalDesign")
+  billOfQuantities         DesignDocuments? @relation("BillOfQuantities")
+  structuralDesign         DesignDocuments? @relation("StructuralDesign")
+  designViews              DesignView[]
+  floorPlans               File[]           @relation("DesignFloorPlans")
+  files                    File[]
+  images                   File[]           @relation("DesignImages")
+  orderItems               OrderItem[]
+  packageOptions           PackageOption[]
+  reviews                  Review[]
+  wishlistedBy             User[]           @relation("DesignToUser")
 }
 
-// New model to organize design documents by type
 model DesignDocuments {
-  id          String       @id @default(cuid())
-  type        DocumentType // ARCHITECTURAL, STRUCTURAL, BILL_OF_QUANTITIES
-  description String? // Overview of what this document package contains
-
-  // File references
-  pdfFiles   File[] @relation("PdfDocuments")
-  cadFiles   File[] @relation("CadDocuments")
-  excelFiles File[] @relation("ExcelDocuments")
-
-  // Overview/content description
-  overview       String?
-  features       String[]
-  specifications Json? // Can store structured spec data
-
-  design                Design? @relation(name: "ArchitecturalDesign", fields: [architecturalDesignId], references: [id], onDelete: Cascade)
-  architecturalDesignId String? @unique
-  structuralDesign      Design? @relation(name: "StructuralDesign", fields: [structuralDesignId], references: [id], onDelete: Cascade)
-  structuralDesignId    String? @unique
-  billOfQuantities      Design? @relation(name: "BillOfQuantities", fields: [billOfQuantitiesId], references: [id], onDelete: Cascade)
-  billOfQuantitiesId    String? @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                    String       @id @default(cuid())
+  type                  DocumentType
+  description           String?
+  overview              String?
+  features              String[]
+  specifications        Json?
+  architecturalDesignId String?      @unique
+  structuralDesignId    String?      @unique
+  billOfQuantitiesId    String?      @unique
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  design                Design?      @relation("ArchitecturalDesign", fields: [architecturalDesignId], references: [id], onDelete: Cascade)
+  billOfQuantities      Design?      @relation("BillOfQuantities", fields: [billOfQuantitiesId], references: [id], onDelete: Cascade)
+  structuralDesign      Design?      @relation("StructuralDesign", fields: [structuralDesignId], references: [id], onDelete: Cascade)
+  cadFiles              File[]       @relation("CadDocuments")
+  excelFiles            File[]       @relation("ExcelDocuments")
+  pdfFiles              File[]       @relation("PdfDocuments")
 }
 
-enum DocumentType {
-  ARCHITECTURAL
-  STRUCTURAL
-  BILL_OF_QUANTITIES
-}
-
-// Updated File model to support document types
 model File {
-  id             String   @id @default(cuid())
-  name           String
-  url            String
-  type           FileType
-  size           Int?
-  version        Int      @default(1)
-  isLatest       Boolean  @default(true)
-  fileIdentifier String?
-
-  // Relations to different document types
-  pdfDocument   DesignDocuments? @relation("PdfDocuments", fields: [pdfDocumentId], references: [id])
-  pdfDocumentId String?
-
-  cadDocument   DesignDocuments? @relation("CadDocuments", fields: [cadDocumentId], references: [id])
-  cadDocumentId String?
-
-  excelDocument   DesignDocuments? @relation("ExcelDocuments", fields: [excelDocumentId], references: [id])
-  excelDocumentId String?
-
-  // Existing relation to Design
-  design   Design? @relation(fields: [designId], references: [id], onDelete: Cascade)
-  designId String?
-
-  designImage   Design? @relation("DesignImages", fields: [designImageId], references: [id], onDelete: Cascade)
-  designImageId String?
-
-  designFloorPlan   Design? @relation("DesignFloorPlans", fields: [designFloorPlanId], references: [id], onDelete: Cascade)
+  id                String           @id @default(cuid())
+  url               String
+  type              FileType
+  designId          String?
+  createdAt         DateTime         @default(now())
+  cadDocumentId     String?
+  excelDocumentId   String?
+  name              String
+  pdfDocumentId     String?
+  size              Int?
   designFloorPlanId String?
-
-  packageOption PackageOption?
-  deliveredFiles DeliveredFile[]
-  createdAt DateTime @default(now())
-}
-
-enum FileType {
-  PDF
-  CAD
-  EXCEL
-  IMAGE
-  FLOOR_PLAN
-  FILE
-  OTHER
+  designImageId     String?
+  fileIdentifier    String?
+  isLatest          Boolean          @default(true)
+  version           Int              @default(1)
+  deliveredFiles    DeliveredFile[]
+  cadDocument       DesignDocuments? @relation("CadDocuments", fields: [cadDocumentId], references: [id])
+  designFloorPlan   Design?          @relation("DesignFloorPlans", fields: [designFloorPlanId], references: [id], onDelete: Cascade)
+  design            Design?          @relation(fields: [designId], references: [id], onDelete: Cascade)
+  designImage       Design?          @relation("DesignImages", fields: [designImageId], references: [id], onDelete: Cascade)
+  excelDocument     DesignDocuments? @relation("ExcelDocuments", fields: [excelDocumentId], references: [id])
+  pdfDocument       DesignDocuments? @relation("PdfDocuments", fields: [pdfDocumentId], references: [id])
+  packageOption     PackageOption?
+  status            UploadStatus @default(COMPLETED)
 }
 
 model Review {
@@ -290,10 +241,10 @@ model Review {
   rating    Int
   comment   String
   authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
   designId  String
-  design    Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  design    Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
 }
 
 model Testimonial {
@@ -318,41 +269,41 @@ model Post {
 model Order {
   id             String      @id @default(cuid())
   userId         String
-  user           User        @relation(fields: [userId], references: [id])
-  cartId         String?     @unique // New field to link to cart
   createdAt      DateTime    @default(now())
-  items          OrderItem[]
-  status         OrderStatus @default(PENDING)
   amount         Float
+  status         OrderStatus @default(PENDING)
   paymentGateway String?
   paymentId      String?     @unique
-  discountCode   String?
   discountAmount Float?
+  discountCode   String?
   discountId     String?
+  cartId         String?     @unique
   discount       Discount?   @relation(fields: [discountId], references: [id])
+  user           User        @relation(fields: [userId], references: [id])
+  items          OrderItem[]
 }
 
 model OrderItem {
-  id                String   @id @default(cuid())
+  id                String          @id @default(cuid())
   orderId           String
-  order             Order    @relation(fields: [orderId], references: [id])
   designId          String
-  design            Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
   quantity          Int
-  selectedFileTypes String[]
   selectedExtras    Json?
+  selectedFileTypes String[]
   deliveredFiles    DeliveredFile[]
+  design            Design          @relation(fields: [designId], references: [id], onDelete: Cascade)
+  order             Order           @relation(fields: [orderId], references: [id])
 }
 
 model DeliveredFile {
   id          String    @id @default(cuid())
   orderItemId String
-  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
   fileId      String
-  file        File      @relation(fields: [fileId], references: [id])
   createdAt   DateTime  @default(now())
+  file        File      @relation(fields: [fileId], references: [id])
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
 
-  @@unique([orderItemId, fileId]) // A file can only be delivered once per order item
+  @@unique([orderItemId, fileId])
 }
 
 model Project {
@@ -361,37 +312,19 @@ model Project {
   description       String?
   imageUrl          String?
   progress          Int                  @default(0)
-  status            ProjectStatus        @default(PLANNING)
   userId            String
-  user              User                 @relation(fields: [userId], references: [id])
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
   completionRemarks String?
   declaration       Boolean              @default(false)
   totalCost         Float                @default(0)
+  status            ProjectStatus        @default(PLANNING)
+  invoices          Invoice[]
+  user              User                 @relation(fields: [userId], references: [id])
+  costs             ProjectCost[]
+  feedback          ProjectFeedback[]
   milestones        ProjectMilestone[]
   requirements      ProjectRequirement[]
-  feedback          ProjectFeedback[]
-  costs             ProjectCost[]
-  invoices          Invoice[]
-}
-
-enum Role {
-  CLIENT
-  TEAM
-  ADMIN
-}
-
-enum UserStatus {
-  ACTIVE
-  BLOCKED
-}
-
-enum OrderStatus {
-  PENDING
-  PAID
-  REFUND_REQUESTED
-  REFUNDED
 }
 
 model ReferralVisit {
@@ -421,46 +354,38 @@ model CustomDesignRequest {
   budget      String?
   attachments String[]
   createdAt   DateTime                  @default(now())
-  updatedAt   DateTime                  @default(now()) @updatedAt
   status      CustomDesignRequestStatus @default(PENDING)
-}
-
-enum CustomDesignRequestStatus {
-  PENDING
-  IN_REVIEW
-  APPROVED
-  REJECTED
-  COMPLETED
+  updatedAt   DateTime                  @default(now()) @updatedAt
 }
 
 model Conversation {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  users     User[]    @relation("ConversationUsers")
   messages  Message[]
+  users     User[]    @relation("ConversationUsers")
 }
 
 model Message {
   id             String       @id @default(cuid())
   createdAt      DateTime     @default(now())
   content        String
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
   conversationId String
-  sender         User         @relation(fields: [senderId], references: [id])
   senderId       String
+  attachments    Attachment[]
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation(fields: [senderId], references: [id])
   readBy         User[]       @relation("ReadMessages")
-  attachments    Attachment[] // New relation for multiple attachments
 }
 
 model Attachment {
   id        String   @id @default(cuid())
   url       String
-  type      String // e.g., "image/jpeg", "application/pdf"
-  name      String // Original file name
-  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  type      String
+  name      String
   messageId String
   createdAt DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }
 
 model MarqueeItem {
@@ -472,11 +397,11 @@ model MarqueeItem {
 
 model Banner {
   id          String   @id @default(cuid())
-  title       String
   description String
   image       String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  title       String
 }
 
 model Discount {
@@ -491,23 +416,18 @@ model Discount {
   isActive          Boolean          @default(true)
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-  orders            Order[]
-  carts             Cart[] // New inverse relation
+  carts             Cart[]
   designs           DesignDiscount[]
+  orders            Order[]
 }
 
 model DesignDiscount {
-  design     Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
   designId   String
-  discount   Discount @relation(fields: [discountId], references: [id])
   discountId String
+  design     Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
+  discount   Discount @relation(fields: [discountId], references: [id])
 
   @@id([designId, discountId])
-}
-
-enum DiscountType {
-  PERCENTAGE
-  FIXED_AMOUNT
 }
 
 model NewsletterSubscription {
@@ -523,11 +443,192 @@ model Feedback {
   feedback   String
   createdAt  DateTime @default(now())
   userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
   isFeatured Boolean  @default(false)
+  user       User?    @relation(fields: [userId], references: [id])
 }
 
-// New Enums
+model ProjectMilestone {
+  id            String          @id @default(cuid())
+  projectId     String
+  name          String
+  description   String?
+  dueDate       DateTime
+  completedDate DateTime?
+  status        MilestoneStatus @default(PENDING)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectRequirement {
+  id          String            @id @default(cuid())
+  projectId   String
+  description String
+  status      RequirementStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectFeedback {
+  id        String   @id @default(cuid())
+  projectId String
+  clientId  String
+  adminId   String?
+  message   String
+  rating    Int?
+  createdAt DateTime @default(now())
+  admin     User?    @relation("AdminFeedback", fields: [adminId], references: [id])
+  client    User     @relation("ClientFeedback", fields: [clientId], references: [id])
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectCost {
+  id           String   @id @default(cuid())
+  projectId    String
+  description  String
+  amount       Float
+  dateIncurred DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  projectId     String
+  invoiceNumber String        @unique
+  issueDate     DateTime      @default(now())
+  dueDate       DateTime
+  totalAmount   Float
+  status        InvoiceStatus @default(PENDING)
+  type          InvoiceType   @default(CUSTOM)
+  documentUrl   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  project       Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  invoiceItems  InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Int
+  unitPrice   Float
+  total       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model MonthlyCost {
+  id           String   @id @default(cuid())
+  month        DateTime @unique
+  digitalOcean Float
+  resendEmails Float
+  hosting      Float
+  total        Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model DesignView {
+  id        String   @id @default(cuid())
+  designId  String
+  userId    String?
+  createdAt DateTime @default(now())
+  design    Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model OngoingProject {
+  id                      String          @id @default(cuid())
+  title                   String
+  slug                    String          @unique
+  description             String?
+  clientName              String?
+  location                String?
+  status                  ProjectStatus   @default(PLANNING)
+  category                ProjectCategory
+  startDate               DateTime?
+  estimatedCompletionDate DateTime?
+  completedAt             DateTime?
+  featuredImage           String?
+  gallery                 Json?
+  size                    String?
+  value                   String?
+  highlights              String[]
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  published               Boolean         @default(false)
+
+  @@map("ongoing_projects")
+}
+
+model PackageOption {
+  id       String  @id @default(cuid())
+  name     String
+  price    Float
+  fileId   String? @unique
+  designId String
+  design   Design  @relation(fields: [designId], references: [id], onDelete: Cascade)
+  file     File?   @relation(fields: [fileId], references: [id])
+}
+
+enum DocumentType {
+  ARCHITECTURAL
+  STRUCTURAL
+  BILL_OF_QUANTITIES
+}
+
+enum FileType {
+  PDF
+  CAD
+  EXCEL
+  IMAGE
+  OTHER
+  FLOOR_PLAN
+  FILE
+}
+
+enum UploadStatus {
+  UPLOADING
+  COMPLETED
+  FAILED
+}
+
+enum Role {
+  CLIENT
+  TEAM
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  REFUND_REQUESTED
+  REFUNDED
+}
+
+enum CustomDesignRequestStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
 enum ProjectStatus {
   PLANNING
   IN_PROGRESS
@@ -563,135 +664,6 @@ enum InvoiceType {
   CUSTOM
 }
 
-// New Models
-model ProjectMilestone {
-  id            String          @id @default(cuid())
-  projectId     String
-  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  name          String
-  description   String?
-  dueDate       DateTime
-  completedDate DateTime?
-  status        MilestoneStatus @default(PENDING)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-}
-
-model ProjectRequirement {
-  id          String            @id @default(cuid())
-  projectId   String
-  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  description String
-  status      RequirementStatus @default(PENDING)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-}
-
-model ProjectFeedback {
-  id        String   @id @default(cuid())
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  clientId  String
-  client    User     @relation(name: "ClientFeedback", fields: [clientId], references: [id])
-  adminId   String? // Optional, if feedback can be from client to admin or vice-versa
-  admin     User?    @relation(name: "AdminFeedback", fields: [adminId], references: [id])
-  message   String
-  rating    Int? // Optional rating
-  createdAt DateTime @default(now())
-}
-
-model ProjectCost {
-  id           String   @id @default(cuid())
-  projectId    String
-  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  description  String
-  amount       Float
-  dateIncurred DateTime @default(now())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-}
-
-model Invoice {
-  id            String        @id @default(cuid())
-  projectId     String
-  project       Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  invoiceNumber String        @unique
-  issueDate     DateTime      @default(now())
-  dueDate       DateTime
-  totalAmount   Float
-  status        InvoiceStatus @default(PENDING)
-  type          InvoiceType   @default(CUSTOM)
-  documentUrl   String? // URL to the generated PDF invoice
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  invoiceItems  InvoiceItem[]
-}
-
-model InvoiceItem {
-  id          String   @id @default(cuid())
-  invoiceId   String
-  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  description String
-  quantity    Int
-  unitPrice   Float
-  total       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model MonthlyCost {
-  id           String   @id @default(cuid())
-  month        DateTime // Store as first day of the month
-  digitalOcean Float
-  resendEmails Float
-  hosting      Float
-  total        Float
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@unique([month]) // Ensure only one record per month
-}
-
-model DesignView {
-  id        String   @id @default(cuid())
-  designId  String
-  design    Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
-  userId    String? // Optional: if we want to track views by logged-in users
-  user      User?    @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-}
-
-model OngoingProject {
-  id          String  @id @default(cuid())
-  title       String
-  slug        String  @unique
-  description String?
-
-  clientName String?
-  location   String?
-
-  status   ProjectStatus   @default(PLANNING)
-  category ProjectCategory
-
-  startDate               DateTime?
-  estimatedCompletionDate DateTime?
-  completedAt             DateTime?
-
-  featuredImage String?
-  gallery       Json?
-
-  size  String?
-  value String?
-
-  highlights String[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  published Boolean  @default(false)
-
-  @@map("ongoing_projects")
-}
-
 enum ProjectCategory {
   RESIDENTIAL
   COMMERCIAL
@@ -699,14 +671,4 @@ enum ProjectCategory {
   RENOVATION
   INFRASTRUCTURE
   INTERIOR_FIT_OUT
-}
-
-model PackageOption {
-  id       String  @id @default(cuid())
-  name     String
-  price    Float
-  file     File?   @relation(fields: [fileId], references: [id])
-  fileId   String? @unique
-  design   Design  @relation(fields: [designId], references: [id], onDelete: Cascade)
-  designId String
 }
