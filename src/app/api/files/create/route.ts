@@ -4,26 +4,23 @@ import { FileType } from "@/generated/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { fileName, fileTypeCategory } = await req.json();
+    const { fileName, fileTypeCategory, key, url } = await req.json();
 
-    if (!fileName || !fileTypeCategory) {
-      return new NextResponse("Missing fileName or fileTypeCategory", { status: 400 });
+    if (!fileName || !fileTypeCategory || !key || !url) {
+      return new NextResponse("Missing required fields: fileName, fileTypeCategory, key, url", { status: 400 });
     }
     
-    const key = `designs/${Date.now()}-${fileName}`;
-    const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.sfo3.digitaloceanspaces.com/${key}`;
-
     const newFile = await prisma.file.create({
       data: {
         name: fileName,
-        url: publicUrl,
+        url: url,
         type: fileTypeCategory as FileType,
-        status: 'UPLOADING',
+        status: 'PENDING', // Status is now PENDING until upload is confirmed
         fileIdentifier: key,
       },
     });
 
-    return NextResponse.json({ fileId: newFile.id, publicUrl, key });
+    return NextResponse.json({ fileId: newFile.id });
   } catch (error) {
     console.error("Error creating file record:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

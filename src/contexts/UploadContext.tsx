@@ -56,33 +56,37 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
   const processUpload = async (uploadingFile: UploadingFile) => {
     const { file, id, fileTypeCategory, onSuccess } = uploadingFile;
 
+    let fileId: string | null = null;
+
     try {
-      // Step 1: Create file record
-      setUploadingFiles(prev => prev.map(f => f.id === id ? { ...f, status: 'uploading' } : f));
+      setUploadingFiles(prev => prev.map(f => f.id === id ? { ...f, status: 'uploading', progress: 5 } : f));
       
-      const createResponse = await axios.post('/api/files/create', {
+      // Step 1: Get a pre-signed URL from our server
+      const signedUrlResponse = await axios.post('/api/upload/generate-presigned-url', {
         fileName: file.name,
-        fileTypeCategory: fileTypeCategory,
+        fileType: file.type,
       });
 
-      const { fileId, publicUrl, key } = createResponse.data;
+      const { signedUrl, fileKey, publicUrl, originalFileName } = signedUrlResponse.data;
+      setUploadingFiles(prev => prev.map(f => f.id === id ? { ...f, progress: 15, key: fileKey, remoteUrl: publicUrl } : f));
 
-      // Update with file record details
-      setUploadingFiles(prev => prev.map(f => 
-        f.id === id 
-          ? { ...f, fileId, remoteUrl: publicUrl, key, progress: 10 }
-          : f
-      ));
+      // Step 2: Create file record in our database
+      const createResponse = await axios.post('/api/files/create', {
+        fileName: originalFileName,
+        fileTypeCategory: fileTypeCategory,
+        key: fileKey,
+        url: publicUrl,
+      });
 
-      // Step 2: Upload to S3
-      await axios.post('/api/upload', file, {
-                  headers: {
-                    'x-file-key': key,
-                    'Content-Type': file.type,
-                    'x-file-name': file.name,
-                  },        onUploadProgress: (progressEvent) => {
+      fileId = createResponse.data.fileId;
+      setUploadingFiles(prev => prev.map(f => f.id === id ? { ...f, fileId, progress: 25 } : f));
+      
+      // Step 3: Upload the file directly to S3/DO Spaces
+      await axios.put(signedUrl, file, {
+        headers: { 'Content-Type': file.type },
+        onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round(
-            10 + (progressEvent.loaded * 90) / (progressEvent.total || 1) // Start from 10%
+            25 + (progressEvent.loaded * 70) / (progressEvent.total || 1) // Start from 25%
           );
           setUploadingFiles(prev => prev.map(f => 
             f.id === id ? { ...f, progress: percentCompleted } : f
@@ -90,7 +94,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
         },
       });
 
-      // Step 3: Update status to completed
+      // Step 4: Update status to completed in our database
       await axios.post('/api/files/update-status', { 
         fileId, 
         status: 'COMPLETED' 
@@ -100,7 +104,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
         f.id === id ? { ...f, status: 'completed', progress: 100 } : f
       ));
 
-      // Step 4: Call success callback
+      // Step 5: Call success callback
       if (onSuccess) {
         onSuccess({ 
           url: publicUrl, 
@@ -116,11 +120,10 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
       console.error("Upload error:", error);
       
       // Update file status to failed if we have a fileId
-      const failedFile = uploadingFiles.find(f => f.id === id);
-      if (failedFile?.fileId) {
+      if (fileId) {
         try {
           await axios.post('/api/files/update-status', { 
-            fileId: failedFile.fileId, 
+            fileId: fileId, 
             status: 'FAILED' 
           });
         } catch (updateError) {
