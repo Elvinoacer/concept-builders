@@ -187,7 +187,6 @@ export async function GET(request: NextRequest) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log("Received payload:", JSON.stringify(body, null, 2));
 
     const {
       name,
@@ -215,12 +214,14 @@ export async function POST(request: Request) {
       billOfQuantities,
     } = body;
 
-    // --- Basic Validation ---
     if (!name || !description || !categoryId || !basePrice) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
+    
+    if (!images || !images.connect || images.connect.length === 0) {
+        return new NextResponse("At least one image is required.", { status: 400 });
+    }
 
-    // --- Build Core Design Data ---
     const designData: any = {
       name,
       description,
@@ -232,191 +233,63 @@ export async function POST(request: Request) {
       floors: floors ? parseInt(floors) : null,
       categoryId,
       folderId: folderId || null,
-      architecturalPdfPrice: architecturalPdfPrice
-        ? parseFloat(architecturalPdfPrice)
-        : null,
-      architecturalCadPrice: architecturalCadPrice
-        ? parseFloat(architecturalCadPrice)
-        : null,
-      structuralPdfPrice: structuralPdfPrice
-        ? parseFloat(structuralPdfPrice)
-        : null,
-      structuralCadPrice: structuralCadPrice
-        ? parseFloat(structuralCadPrice)
-        : null,
-      billOfQuantitiesPrice: billOfQuantitiesPrice
-        ? parseFloat(billOfQuantitiesPrice)
-        : null,
-      billOfQuantitiesPdfPrice: billOfQuantitiesPdfPrice
-        ? parseFloat(billOfQuantitiesPdfPrice)
-        : null,
+      architecturalPdfPrice: architecturalPdfPrice ? parseFloat(architecturalPdfPrice) : null,
+      architecturalCadPrice: architecturalCadPrice ? parseFloat(architecturalCadPrice) : null,
+      structuralPdfPrice: structuralPdfPrice ? parseFloat(structuralPdfPrice) : null,
+      structuralCadPrice: structuralCadPrice ? parseFloat(structuralCadPrice) : null,
+      billOfQuantitiesPrice: billOfQuantitiesPrice ? parseFloat(billOfQuantitiesPrice) : null,
+      billOfQuantitiesPdfPrice: billOfQuantitiesPdfPrice ? parseFloat(billOfQuantitiesPdfPrice) : null,
+      
+      images: { connect: images.connect },
     };
 
-    // --- Handle Relational Data ---
-
-    // Images (required)
-    if (images?.create?.length > 0) {
-      designData.images = {
-        create: images.create.map((img: any) => ({
-          name: img.name,
-          url: img.url,
-          type: img.type || "IMAGE",
-        })),
-      };
-    } else {
-      return new NextResponse("At least one image is required.", {
-        status: 400,
-      });
+    if (floorPlans?.connect?.length > 0) {
+      designData.floorPlans = { connect: floorPlans.connect };
     }
 
-    // Floor Plans (optional)
-    if (floorPlans?.create?.length > 0) {
-      designData.floorPlans = {
-        create: floorPlans.create.map((plan: any) => ({
-          name: plan.name,
-          url: plan.url,
-          type: plan.type || "FLOOR_PLAN",
-        })),
-      };
+    if (files?.connect?.length > 0) {
+      designData.files = { connect: files.connect };
     }
 
-    // Generic Files (optional)
-    if (files?.create?.length > 0) {
-      designData.files = {
-        create: files.create.map((file: any) => ({
-          name: file.name,
-          url: file.url,
-          type: file.type || "FILE",
-        })),
-      };
-    }
-
-    // Package Options (optional)
     if (packageOptions?.create?.length > 0) {
       designData.packageOptions = {
-        create: packageOptions.create.map((pkg: any) => {
-          const packageData: any = {
-            name: pkg.name,
-            price: parseFloat(pkg.price),
-          };
-
-          // Handle package file if it exists
-          if (pkg.file?.create) {
-            packageData.file = {
-              create: {
-                name: pkg.file.create.name,
-                url: pkg.file.create.url,
-                type: pkg.file.create.type || "FILE",
-              },
-            };
-          }
-
-          return packageData;
-        }),
+        create: packageOptions.create.map((pkg: any) => ({
+          name: pkg.name,
+          price: parseFloat(pkg.price),
+          ...(pkg.file?.connect && { file: { connect: { id: pkg.file.connect.id } } }),
+        })),
       };
     }
 
-    // Handle Design Documents - FIXED VERSION
-    // Architectural Design
-    if (architecturalDesign?.create) {
-      const createData = architecturalDesign.create;
-      const pdfFiles = createData.pdfFiles || [];
-      const cadFiles = createData.cadFiles || [];
+    const handleDesignDocument = (doc: any) => {
+        if (!doc?.create) return undefined;
+        const { type, pdfFiles, cadFiles, excelFiles } = doc.create;
+        const createData: any = { type };
+        
+        if (pdfFiles?.connect?.length > 0) {
+            createData.pdfFiles = { connect: pdfFiles.connect };
+        }
+        if (cadFiles?.connect?.length > 0) {
+            createData.cadFiles = { connect: cadFiles.connect };
+        }
+        if (excelFiles?.connect?.length > 0) {
+            createData.excelFiles = { connect: excelFiles.connect };
+        }
 
-      if (pdfFiles.length > 0 || cadFiles.length > 0) {
-        designData.architecturalDesign = {
-          create: {
-            type: createData.type || "ARCHITECTURAL",
-            ...(pdfFiles.length > 0 && {
-              pdfFiles: {
-                create: pdfFiles.map((file: any) => ({
-                  name: file.name,
-                  url: file.url,
-                  type: "PDF",
-                })),
-              },
-            }),
-            ...(cadFiles.length > 0 && {
-              cadFiles: {
-                create: cadFiles.map((file: any) => ({
-                  name: file.name,
-                  url: file.url,
-                  type: "CAD",
-                })),
-              },
-            }),
-          },
-        };
-      }
-    }
+        if (Object.keys(createData).length > 1) {
+            return { create: createData };
+        }
+        return undefined;
+    };
 
-    // Structural Design
-    if (structuralDesign?.create) {
-      const createData = structuralDesign.create;
-      const pdfFiles = createData.pdfFiles || [];
-      const cadFiles = createData.cadFiles || [];
+    const ad = handleDesignDocument(architecturalDesign);
+    if (ad) designData.architecturalDesign = ad;
 
-      if (pdfFiles.length > 0 || cadFiles.length > 0) {
-        designData.structuralDesign = {
-          create: {
-            type: createData.type || "STRUCTURAL",
-            ...(pdfFiles.length > 0 && {
-              pdfFiles: {
-                create: pdfFiles.map((file: any) => ({
-                  name: file.name,
-                  url: file.url,
-                  type: "PDF",
-                })),
-              },
-            }),
-            ...(cadFiles.length > 0 && {
-              cadFiles: {
-                create: cadFiles.map((file: any) => ({
-                  name: file.name,
-                  url: file.url,
-                  type: "CAD",
-                })),
-              },
-            }),
-          },
-        };
-      }
-    }
+    const sd = handleDesignDocument(structuralDesign);
+    if (sd) designData.structuralDesign = sd;
 
-    // Bill of Quantities
-    if (billOfQuantities?.create) {
-      const createData = billOfQuantities.create;
-      const excelFiles = createData.excelFiles || [];
-      const pdfFiles = createData.pdfFiles || [];
-
-      if (excelFiles.length > 0 || pdfFiles.length > 0) {
-        designData.billOfQuantities = {
-          create: {
-            type: createData.type || "BILL_OF_QUANTITIES",
-            ...(excelFiles.length > 0 && {
-              excelFiles: {
-                create: excelFiles.map((file: any) => ({
-                  name: file.name,
-                  url: file.url,
-                  type: "EXCEL",
-                })),
-              },
-            }),
-            ...(pdfFiles.length > 0 && {
-              pdfFiles: {
-                create: pdfFiles.map((file: any) => ({
-                  name: file.name,
-                  url: file.url,
-                  type: "PDF",
-                })),
-              },
-            }),
-          },
-        };
-      }
-    }
-
-    console.log("Final designData:", JSON.stringify(designData, null, 2));
+    const bq = handleDesignDocument(billOfQuantities);
+    if (bq) designData.billOfQuantities = bq;
 
     const newDesign = await prisma.design.create({
       data: designData,
@@ -440,9 +313,13 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Error creating design:", error);
     if (error instanceof Error) {
-      return new NextResponse(`Internal Server Error: ${error.message}`, {
-        status: 500,
-      });
+      const message = error.message || "An unexpected error occurred.";
+      // Look for Prisma-specific errors
+      if ((error as any).code) {
+         console.error("Prisma error code:", (error as any).code);
+         console.error("Prisma error meta:", (error as any).meta);
+      }
+      return new NextResponse(`Internal Server Error: ${message}`, { status: 500 });
     }
     return new NextResponse("Internal Server Error", { status: 500 });
   }
