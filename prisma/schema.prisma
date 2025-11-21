@@ -233,7 +233,7 @@ model File {
   excelDocument     DesignDocuments? @relation("ExcelDocuments", fields: [excelDocumentId], references: [id])
   pdfDocument       DesignDocuments? @relation("PdfDocuments", fields: [pdfDocumentId], references: [id])
   packageOption     PackageOption?
-  status            UploadStatus @default(COMPLETED)
+  status            UploadStatus     @default(COMPLETED)
 }
 
 model Review {

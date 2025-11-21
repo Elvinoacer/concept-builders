@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
         name: fileName,
         url: url,
         type: fileTypeCategory as FileType,
-        status: 'PENDING', // Status is now PENDING until upload is confirmed
+        status: 'UPLOADING', // Status is now UPLOADING until upload is confirmed
         fileIdentifier: key,
       },
     });
