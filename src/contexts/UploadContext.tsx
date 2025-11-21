@@ -83,7 +83,10 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
       
       // Step 3: Upload the file directly to S3/DO Spaces
       await axios.put(signedUrl, file, {
-        headers: { 'Content-Type': file.type },
+        headers: { 
+          'Content-Type': file.type,
+          'x-amz-acl': 'public-read'
+        },
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round(
             25 + (progressEvent.loaded * 70) / (progressEvent.total || 1) // Start from 25%
