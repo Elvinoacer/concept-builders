@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+export const runtime = 'nodejs';
+export const maxDuration = 300; // 5 minutes
 
 const s3Client = new S3Client({
   endpoint: `https://sfo3.digitaloceanspaces.com`,
@@ -16,39 +14,37 @@ const s3Client = new S3Client({
   },
 });
 
-export async function POST(req: NextRequest) { // Changed to POST
+export async function POST(req: NextRequest) {
   try {
     const fileKey = req.headers.get('x-file-key');
     const contentType = req.headers.get('content-type');
-    const fileName = req.headers.get('x-file-name'); // Added fileName
+    const fileName = req.headers.get('x-file-name');
 
-    if (!fileKey || !contentType || !fileName || !req.body) { // Added fileName to check
+    if (!fileKey || !contentType || !fileName || !req.body) {
       return new NextResponse('Missing file key, content type, file name, or body', { status: 400 });
     }
 
-    // Convert ReadableStream to Buffer
-    const chunks = [];
-    const reader = req.body.getReader();
-    
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-    }
-
-    const fileBuffer = Buffer.concat(chunks);
-
-    const command = new PutObjectCommand({
-      Bucket: process.env.DO_SPACES_BUCKET!,
-      Key: fileKey,
-      Body: fileBuffer,
-      ContentType: contentType,
-      ACL: 'public-read',
+    const upload = new Upload({
+      client: s3Client,
+      params: {
+        Bucket: process.env.DO_SPACES_BUCKET!,
+        Key: fileKey,
+        Body: req.body,
+        ContentType: contentType,
+        ACL: 'public-read',
+      },
+      queueSize: 4, //
+      partSize: 1024 * 1024 * 5, // 5MB
+      leavePartsOnError: false, 
     });
 
-    await s3Client.send(command);
+    upload.on('httpUploadProgress', (progress) => {
+      console.log(progress);
+    });
 
-    const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.sfo3.digitaloceanspaces.com/${fileKey}`; // Use fileKey
+    await upload.done();
+
+    const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.sfo3.digitaloceanspaces.com/${fileKey}`;
     return NextResponse.json({ publicUrl, originalFileName: fileName });
   } catch (error) {
     console.error('Upload error:', error);
