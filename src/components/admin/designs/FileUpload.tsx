@@ -59,11 +59,8 @@ const FileUpload = ({
 
       for (const file of acceptedFiles) {
         await addUpload(file, fileTypeCategory, (newFile) => {
-          if (multiple) {
-            onUploadSuccess([newFile] as any);
-          } else {
-            onUploadSuccess(newFile);
-          }
+          onUploadSuccess(newFile);
+
         });
       }
     },
