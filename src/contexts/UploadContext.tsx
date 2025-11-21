@@ -64,7 +64,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
       // Step 1: Get a pre-signed URL from our server
       const signedUrlResponse = await axios.post('/api/upload/generate-presigned-url', {
         fileName: file.name,
-        fileType: file.type,
+        fileType: file.type || 'application/octet-stream',
       });
 
       const { signedUrl, fileKey, publicUrl, originalFileName } = signedUrlResponse.data;
