@@ -2,11 +2,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+import { Role } from "@/generated/prisma";
+
 export async function GET(request: NextRequest) {
   try {
     const clients = await prisma.user.findMany({
       where: {
-        role: 'CLIENT',
+        role: Role.CLIENT,
       },
     });
 

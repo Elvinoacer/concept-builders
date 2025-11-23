@@ -6,6 +6,7 @@ import ChatWindow from "@/components/dashboard/messages/ChatWindow";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Conversation } from "@/generated/prisma";
 import {
   ChevronLeft,
@@ -13,10 +14,13 @@ import {
   Menu,
   MessageCircle,
   Search,
-  Users
+  Users,
+  MoreVertical,
+  CheckCheck
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const AdminMessagesPage = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -146,19 +150,19 @@ const AdminMessagesPage = () => {
     return (
       <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-10">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-10 shadow-sm">
           <div className="flex items-center justify-between">
             {showConversationList || !selectedConversation ? (
               <>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                    <MessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/20">
+                    <MessageCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h1 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
                       Messages
                     </h1>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                       {conversations.length} conversations
                     </p>
                   </div>
@@ -175,7 +179,7 @@ const AdminMessagesPage = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleBackToConversations}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full px-3"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Back
@@ -184,6 +188,7 @@ const AdminMessagesPage = () => {
                   variant="ghost"
                   size="sm"
                   onClick={toggleConversationList}
+                  className="rounded-full w-8 h-8 p-0"
                 >
                   <Menu className="w-4 h-4" />
                 </Button>
@@ -194,36 +199,32 @@ const AdminMessagesPage = () => {
           {/* Search and Filter - Only show when viewing conversation list */}
           {(showConversationList || !selectedConversation) && (
             <div className="mt-4 space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <div className="relative group">
+                <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors w-4 h-4" />
                 <Input
                   placeholder="Search conversations..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
+                  className="pl-10 bg-gray-100/50 dark:bg-gray-700/50 border-transparent focus:bg-white dark:focus:bg-gray-800 focus:border-blue-500/20 focus:ring-2 focus:ring-blue-500/20 rounded-xl transition-all h-11"
                 />
               </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                  <Filter className="w-3 h-3 inline mr-1" />
-                  Filter:
-                </span>
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 <button
                   onClick={() => setFilter("all")}
-                  className={`px-3 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors ${
+                  className={`px-4 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all ${
                     filter === "all"
-                      ? "bg-blue-500 text-white shadow-sm"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                      ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md"
+                      : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700"
                   }`}
                 >
-                  All
+                  All Chats
                 </button>
                 <button
                   onClick={() => setFilter("unread")}
-                  className={`px-3 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors ${
+                  className={`px-4 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all ${
                     filter === "unread"
-                      ? "bg-blue-500 text-white shadow-sm"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                      ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md"
+                      : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700"
                   }`}
                 >
                   Unread
@@ -234,31 +235,31 @@ const AdminMessagesPage = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden relative">
           {showConversationList || !selectedConversation ? (
             /* Conversation List */
-            <div className="h-full bg-white dark:bg-gray-800 overflow-y-auto">
+            <ScrollArea className="h-full bg-white dark:bg-gray-900">
               {loading ? (
-                <div className="flex flex-col items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex flex-col items-center justify-center h-64">
+                  <div className="w-10 h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p className="mt-4 text-sm font-medium text-gray-500 dark:text-gray-400 animate-pulse">
                     Loading conversations...
                   </p>
                 </div>
               ) : conversations.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                    <MessageCircle className="w-8 h-8 text-gray-400" />
+                <div className="flex flex-col items-center justify-center h-full text-center p-8 pt-20">
+                  <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6 ring-1 ring-gray-100 dark:ring-gray-700">
+                    <MessageCircle className="w-10 h-10 text-gray-300 dark:text-gray-600" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                     No conversations yet
                   </h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
-                    Start a new conversation to begin messaging.
+                  <p className="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto leading-relaxed">
+                    Start a new conversation to begin messaging with your clients.
                   </p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                <div className="p-2 space-y-1">
                   {conversations.map((conversation) => {
                     const otherParticipants = conversation.users.filter(
                       (user) => user.email !== session?.user?.email
@@ -285,28 +286,29 @@ const AdminMessagesPage = () => {
                       onlineUsers.includes(displayAvatarUser.id);
 
                     return (
-                      <div
+                      <motion.div
                         key={conversation.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
                         onClick={() => handleSelectConversation(conversation)}
-                        className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 cursor-pointer transition-colors"
+                        className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-transparent hover:border-gray-100 dark:hover:border-gray-700 hover:shadow-sm active:scale-[0.99] transition-all cursor-pointer"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-4">
                           <div className="relative flex-shrink-0">
-                            <Avatar className="w-12 h-12">
+                            <Avatar className="w-12 h-12 ring-2 ring-white dark:ring-gray-900 shadow-sm">
                               <AvatarImage
                                 src={
                                   displayAvatarUser?.image ||
                                   "/images/default-avatar.png"
                                 }
+                                className="object-cover"
                               />
-                              <AvatarFallback className="text-sm">
+                              <AvatarFallback className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 text-blue-700 dark:text-blue-300 font-bold">
                                 {displayAvatarUser?.name?.charAt(0) || "U"}
                               </AvatarFallback>
                             </Avatar>
                             {isOnline && (
-                              <span className="absolute -bottom-1 -right-1">
-                                <span className="block h-3 w-3 rounded-full bg-green-500 ring-2 ring-white dark:ring-gray-800" />
-                              </span>
+                              <span className="absolute -bottom-0.5 -right-0.5 block h-3.5 w-3.5 rounded-full bg-green-500 ring-2 ring-white dark:ring-gray-900 shadow-sm" />
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
@@ -315,7 +317,7 @@ const AdminMessagesPage = () => {
                                 {conversationDisplayName}
                               </h3>
                               {lastMessage && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2">
+                                <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500 whitespace-nowrap ml-2">
                                   {new Date(
                                     lastMessage.createdAt
                                   ).toLocaleTimeString([], {
@@ -325,20 +327,23 @@ const AdminMessagesPage = () => {
                                 </p>
                               )}
                             </div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate leading-relaxed">
+                              {lastMessage?.senderId === session?.user?.id && (
+                                <span className="mr-1">You:</span>
+                              )}
                               {lastMessage?.content || "No messages yet"}
                             </p>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
               )}
-            </div>
+            </ScrollArea>
           ) : (
             /* Chat Window */
-            <div className="h-full bg-white dark:bg-gray-800">
+            <div className="h-full bg-white dark:bg-gray-800 absolute inset-0 z-20">
               <ChatWindow
                 conversation={selectedConversation}
                 onlineUsers={onlineUsers}
@@ -354,23 +359,26 @@ const AdminMessagesPage = () => {
 
   // Desktop layout
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* Conversation List Sidebar */}
-      <div className="w-full md:w-96 lg:w-1/3 xl:w-96 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+      <div className="w-full md:w-80 lg:w-96 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-800 flex flex-col shadow-xl z-10">
         {/* Header */}
-        <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-4">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <MessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-2.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20">
+                <MessageCircle className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  All Conversations
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
+                  Messages
                 </h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {conversations.length} conversations
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    {onlineUsers.length} online
+                  </p>
+                </div>
               </div>
             </div>
             <NewClientConversationModal
@@ -381,40 +389,34 @@ const AdminMessagesPage = () => {
           </div>
 
           {/* Search */}
-          <div className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Search conversations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
-              />
-            </div>
+          <div className="mb-4 relative group">
+            <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors w-4 h-4" />
+            <Input
+              placeholder="Search conversations..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 rounded-xl transition-all h-11 shadow-sm"
+            />
           </div>
 
           {/* Filters */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              <Filter className="w-3 h-3 inline mr-1" />
-              Filter:
-            </span>
             <button
               onClick={() => setFilter("all")}
-              className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
                 filter === "all"
-                  ? "bg-blue-500 text-white shadow-sm"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md transform scale-[1.02]"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
             >
-              All
+              All Chats
             </button>
             <button
               onClick={() => setFilter("unread")}
-              className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
                 filter === "unread"
-                  ? "bg-blue-500 text-white shadow-sm"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md transform scale-[1.02]"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
             >
               Unread
@@ -423,112 +425,136 @@ const AdminMessagesPage = () => {
         </div>
 
         {/* Conversations List */}
-        <div className="flex-1 overflow-hidden">
+        <ScrollArea className="flex-1 bg-gray-50/50 dark:bg-gray-900/50">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-32">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                Loading conversations...
+            <div className="flex flex-col items-center justify-center h-40">
+              <div className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+              <p className="mt-4 text-xs font-medium text-gray-500 dark:text-gray-400 animate-pulse">
+                Syncing messages...
               </p>
             </div>
           ) : conversations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center p-8">
-              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                <Users className="w-8 h-8 text-gray-400" />
+            <div className="flex flex-col items-center justify-center h-full text-center p-8 pt-20">
+              <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-sm flex items-center justify-center mb-4 ring-1 ring-gray-100 dark:ring-gray-700">
+                <Users className="w-8 h-8 text-gray-300 dark:text-gray-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">
                 No conversations
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                Start a new conversation to begin messaging.
+              <p className="text-xs text-gray-500 dark:text-gray-400 max-w-[200px] mx-auto leading-relaxed">
+                Your inbox is empty. Start a new conversation to connect with clients.
               </p>
             </div>
           ) : (
-            <div className="overflow-y-auto h-full divide-y divide-gray-200 dark:divide-gray-700">
-              {conversations.map((conversation) => {
-                const otherParticipants = conversation.users.filter(
-                  (user) => user.email !== session?.user?.email
-                );
+            <div className="p-3 space-y-1">
+              <AnimatePresence>
+                {conversations.map((conversation, index) => {
+                  const otherParticipants = conversation.users.filter(
+                    (user) => user.email !== session?.user?.email
+                  );
 
-                let conversationDisplayName = "";
-                if (otherParticipants.length === 1) {
-                  conversationDisplayName =
-                    otherParticipants[0].name || otherParticipants[0].email;
-                } else if (otherParticipants.length > 1) {
-                  conversationDisplayName = otherParticipants
-                    .map((p) => p.name || p.email)
-                    .join(", ");
-                } else {
-                  conversationDisplayName = "Self Chat";
-                }
+                  let conversationDisplayName = "";
+                  if (otherParticipants.length === 1) {
+                    conversationDisplayName =
+                      otherParticipants[0].name || otherParticipants[0].email;
+                  } else if (otherParticipants.length > 1) {
+                    conversationDisplayName = otherParticipants
+                      .map((p) => p.name || p.email)
+                      .join(", ");
+                  } else {
+                    conversationDisplayName = "Self Chat";
+                  }
 
-                const displayAvatarUser = otherParticipants[0] || session?.user;
-                const lastMessage = conversation.messages[0];
-                const isOnline =
-                  displayAvatarUser &&
-                  session?.user &&
-                  onlineUsers.includes(displayAvatarUser.id);
+                  const displayAvatarUser = otherParticipants[0] || session?.user;
+                  const lastMessage = conversation.messages[0];
+                  const isOnline =
+                    displayAvatarUser &&
+                    session?.user &&
+                    onlineUsers.includes(displayAvatarUser.id);
+                  
+                  const isSelected = selectedConversation?.id === conversation.id;
 
-                return (
-                  <div
-                    key={conversation.id}
-                    onClick={() => setSelectedConversation(conversation)}
-                    className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${
-                      selectedConversation?.id === conversation.id
-                        ? "bg-blue-50 dark:bg-blue-900/20 border-r-2 border-r-blue-500"
-                        : ""
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex-shrink-0">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage
-                            src={
-                              displayAvatarUser?.image ||
-                              "/images/default-avatar.png"
-                            }
-                          />
-                          <AvatarFallback>
-                            {displayAvatarUser?.name?.charAt(0) || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                        {isOnline && (
-                          <span className="absolute -bottom-1 -right-1">
-                            <span className="block h-3 w-3 rounded-full bg-green-500 ring-2 ring-white dark:ring-gray-800" />
-                          </span>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-gray-900 dark:text-white truncate">
-                            {conversationDisplayName}
-                          </h3>
-                          {lastMessage && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2">
-                              {new Date(
-                                lastMessage.createdAt
-                              ).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </p>
+                  return (
+                    <motion.div
+                      key={conversation.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => setSelectedConversation(conversation)}
+                      className={`
+                        group relative p-3 rounded-xl cursor-pointer transition-all duration-200
+                        ${
+                          isSelected
+                            ? "bg-white dark:bg-gray-800 shadow-md ring-1 ring-black/5 dark:ring-white/10 z-10"
+                            : "hover:bg-white/60 dark:hover:bg-gray-800/60 hover:shadow-sm"
+                        }
+                      `}
+                    >
+                      {isSelected && (
+                        <div className="absolute left-0 top-3 bottom-3 w-1 bg-blue-600 rounded-r-full" />
+                      )}
+                      
+                      <div className="flex items-center gap-3.5 pl-1">
+                        <div className="relative flex-shrink-0">
+                          <Avatar className="w-12 h-12 ring-2 ring-white dark:ring-gray-900 shadow-sm group-hover:scale-105 transition-transform duration-200">
+                            <AvatarImage
+                              src={
+                                displayAvatarUser?.image ||
+                                "/images/default-avatar.png"
+                              }
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 text-gray-600 dark:text-gray-300 font-bold">
+                              {displayAvatarUser?.name?.charAt(0) || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                          {isOnline && (
+                            <span className="absolute -bottom-0.5 -right-0.5 block h-3.5 w-3.5 rounded-full bg-green-500 ring-2 ring-white dark:ring-gray-900 shadow-sm" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                          {lastMessage?.content || "No messages yet"}
-                        </p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <h3 className={`text-sm font-semibold truncate ${isSelected ? 'text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-white'}`}>
+                              {conversationDisplayName}
+                            </h3>
+                            {lastMessage && (
+                              <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500 whitespace-nowrap ml-2">
+                                {new Date(
+                                  lastMessage.createdAt
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <p className={`text-xs truncate leading-relaxed max-w-[180px] ${isSelected ? 'text-gray-600 dark:text-gray-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                              {lastMessage?.senderId === session?.user?.id && (
+                                <span className="font-medium mr-1">You:</span>
+                              )}
+                              {lastMessage?.content || "No messages yet"}
+                            </p>
+                            {/* Unread indicator could go here */}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                );
-              })}
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           )}
-        </div>
+        </ScrollArea>
       </div>
 
       {/* Chat Window */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-gray-50/50 dark:bg-gray-900 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05] pointer-events-none" 
+             style={{ backgroundImage: 'radial-gradient(#6b7280 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+        </div>
+
         {selectedConversation ? (
           <ChatWindow
             conversation={selectedConversation}
@@ -536,17 +562,28 @@ const AdminMessagesPage = () => {
             isMobile={false}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8">
-            <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-6">
-              <MessageCircle className="w-12 h-12 text-gray-400" />
+          <div className="flex flex-col items-center justify-center h-full text-center p-8 relative z-10">
+            <div className="w-24 h-24 bg-white dark:bg-gray-800 rounded-3xl shadow-xl flex items-center justify-center mb-8 ring-1 ring-gray-100 dark:ring-gray-700 rotate-3 hover:rotate-0 transition-transform duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-3xl"></div>
+              <MessageCircle className="w-12 h-12 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 tracking-tight">
               Select a conversation
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+            <p className="text-gray-500 dark:text-gray-400 max-w-md text-base leading-relaxed">
               Choose a conversation from the list to start messaging or create a
-              new one.
+              new one to connect with your clients.
             </p>
+            <div className="mt-8 flex gap-4">
+              <div className="flex -space-x-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-900"></div>
+                ))}
+              </div>
+              <p className="text-sm text-gray-400 dark:text-gray-500 self-center">
+                Connect with your team
+              </p>
+            </div>
           </div>
         )}
       </div>

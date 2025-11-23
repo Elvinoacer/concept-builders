@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Paperclip, Send, X, FileText, Image as ImageIcon } from "lucide-react";
+import { Paperclip, Send, X, FileText, Image as ImageIcon, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useSocket } from "@/app/Providers";
@@ -12,11 +12,13 @@ import { useSession } from "next-auth/react";
 interface MessageInputProps {
   conversationId: string;
   onSendMessage: (message: any) => void;
+  isMobile?: boolean;
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({
   conversationId,
   onSendMessage,
+  isMobile = false,
 }) => {
   const [content, setContent] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
@@ -246,34 +248,34 @@ const MessageInput: React.FC<MessageInputProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+      className="w-full max-w-4xl mx-auto"
     >
       {/* File Previews */}
       <AnimatePresence>
         {filePreviews.length > 0 && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="px-3 sm:px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750 overflow-x-auto"
+            initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+            animate={{ height: "auto", opacity: 1, marginBottom: 12 }}
+            exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+            className="overflow-hidden"
           >
-            <div className="flex gap-2 min-w-max">
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
               {filePreviews.map((preview, index) => (
                 <motion.div
                   key={preview.file.name + index}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="relative flex items-center bg-white dark:bg-gray-700 rounded-lg p-2 pr-8 border border-gray-200 dark:border-gray-600 min-w-0 max-w-[180px] sm:max-w-[200px]"
+                  className="relative flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl p-2 pr-8 border border-gray-100 dark:border-gray-700 shadow-sm min-w-[160px] max-w-[200px]"
                 >
                   {preview.type === "image" ? (
                     <img
                       src={preview.previewUrl}
                       alt={preview.file.name}
-                      className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded flex-shrink-0 mr-2"
+                      className="w-10 h-10 object-cover rounded-lg flex-shrink-0 mr-3"
                     />
                   ) : (
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-600 rounded mr-2 flex-shrink-0">
+                    <div className="w-10 h-10 flex items-center justify-center bg-white dark:bg-gray-700 rounded-lg mr-3 flex-shrink-0 shadow-sm">
                       {getFileIcon(preview.type)}
                     </div>
                   )}
@@ -288,7 +290,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
                   <button
                     type="button"
                     onClick={() => handleRemoveFile(preview.file)}
-                    className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-red-500 text-white rounded-full text-xs hover:bg-red-600 transition-colors flex-shrink-0"
+                    className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-full text-xs hover:bg-red-500 hover:text-white transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -303,15 +305,24 @@ const MessageInput: React.FC<MessageInputProps> = ({
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="p-3 sm:p-4 flex items-end gap-2 sm:gap-3"
+        className={`
+          relative flex items-center gap-2 p-1.5 rounded-[2rem] transition-all duration-300
+          ${isFocused 
+            ? "bg-white dark:bg-gray-800 shadow-[0_0_0_2px_rgba(59,130,246,0.5)] ring-4 ring-blue-500/10" 
+            : "bg-gray-100 dark:bg-gray-800/50 border border-transparent hover:bg-white hover:shadow-md hover:border-gray-200 dark:hover:bg-gray-800 dark:hover:border-gray-700"
+          }
+        `}
       >
         {/* File Attachment Button */}
         <label
           htmlFor="file-upload"
-          className="flex-shrink-0 cursor-pointer p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className={`
+            flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full cursor-pointer transition-all duration-200
+            ${attachedFiles.length > 0 ? "bg-blue-100 text-blue-600" : "text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"}
+          `}
           title="Attach files"
         >
-          <Paperclip className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 dark:text-gray-400" />
+          <Plus className={`w-5 h-5 transition-transform duration-200 ${attachedFiles.length > 0 ? "rotate-45" : ""}`} />
           <input
             ref={fileInputRef}
             id="file-upload"
@@ -324,31 +335,37 @@ const MessageInput: React.FC<MessageInputProps> = ({
         </label>
 
         {/* Message Input */}
-        <div className="flex-1 relative">
-          <Input
-            type="text"
-            placeholder="Type a message..."
-            value={content}
-            onChange={handleContentChange}
-            onKeyPress={handleKeyPress}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            className="w-full bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500 pr-12 py-3 sm:py-4 text-sm sm:text-base resize-none min-h-[48px]"
-            disabled={loading}
-          />
-        </div>
+        <Input
+          type="text"
+          placeholder="Type a message..."
+          value={content}
+          onChange={handleContentChange}
+          onKeyPress={handleKeyPress}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          className="flex-1 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 px-2 py-3 text-base placeholder:text-gray-400 dark:placeholder:text-gray-500"
+          disabled={loading}
+          autoComplete="off"
+        />
 
         {/* Send Button */}
         <Button
           type="submit"
           size="icon"
-          className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 text-white transition-all shadow-sm hover:shadow-md"
+          className={`
+            w-10 h-10 rounded-full transition-all duration-300 shadow-sm
+            ${
+              !content.trim() && attachedFiles.length === 0
+                ? "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
+            }
+          `}
           disabled={loading || (!content.trim() && attachedFiles.length === 0)}
         >
           {loading ? (
-            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
-            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Send className={`w-4 h-4 ${content.trim() || attachedFiles.length > 0 ? "ml-0.5" : ""}`} />
           )}
         </Button>
       </form>

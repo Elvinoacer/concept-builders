@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Message as MessageType } from "@/generated/prisma";
-import { Paperclip, Check, CheckCheck, Clock } from "lucide-react";
+import { Paperclip, Check, CheckCheck, Clock, FileText, Image as ImageIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
@@ -16,21 +16,19 @@ interface MessageWithAttachments extends MessageType {
 
 interface MessageProps {
   message: MessageWithAttachments;
+  isOwnMessage: boolean;
 }
 
-const Message: React.FC<MessageProps> = ({ message }) => {
-  const { data: session } = useSession();
-  const isSender = message.senderId === session?.user?.id;
-
+const Message: React.FC<MessageProps> = ({ message, isOwnMessage }) => {
   const getStatusIcon = () => {
     if (message.status === "pending") {
-      return isSender ? (
-        <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
+      return isOwnMessage ? (
+        <Clock className="w-3 h-3 text-gray-400 animate-pulse" />
       ) : null;
     } else if (message.status === "sent") {
-      return <Check className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />;
+      return <Check className="w-3.5 h-3.5 text-gray-400" />;
     } else if (message.status === "seen") {
-      return <CheckCheck className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />;
+      return <CheckCheck className="w-3.5 h-3.5 text-blue-500" />;
     }
     return null;
   };
@@ -41,111 +39,114 @@ const Message: React.FC<MessageProps> = ({ message }) => {
       .replace("less than a minute ago", "just now");
   };
 
+  const getFileIcon = (type: string) => {
+    if (type.startsWith("image/")) return <ImageIcon className="w-4 h-4" />;
+    if (type === "application/pdf") return <FileText className="w-4 h-4" />;
+    return <Paperclip className="w-4 h-4" />;
+  };
+
   return (
     <div
-      className={`flex items-start gap-2 sm:gap-3 px-3 sm:px-4 py-1 sm:py-2 ${isSender ? "flex-row-reverse" : ""}`}
+      className={`flex items-end gap-2 sm:gap-3 ${isOwnMessage ? "flex-row-reverse" : "flex-row"}`}
     >
-      {/* Avatar - Hidden for sender on mobile to save space */}
-      <Avatar
-        className={`w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 ${isSender ? "sm:flex hidden" : ""}`}
-      >
-        <Image
-          src={message.sender.image || "/images/default-avatar.png"}
-          alt={message.sender.name || "User Avatar"}
-          fill
-          className="rounded-full object-cover"
-          placeholder="blur"
-          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-          sizes="(max-width: 640px) 28px, 32px"
-        />
-        <AvatarFallback className="text-xs font-medium">
-          {message.sender.name?.charAt(0)?.toUpperCase() || "U"}
-        </AvatarFallback>
-      </Avatar>
+      {/* Avatar - Only show for other users */}
+      {!isOwnMessage && (
+        <Avatar className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0 ring-2 ring-white dark:ring-gray-800 shadow-sm mb-1">
+          <Image
+            src={message.sender.image || "/images/default-avatar.png"}
+            alt={message.sender.name || "User Avatar"}
+            fill
+            className="rounded-full object-cover"
+            sizes="(max-width: 640px) 32px, 36px"
+          />
+          <AvatarFallback className="text-xs font-bold bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-600 dark:text-gray-300">
+            {message.sender.name?.charAt(0)?.toUpperCase() || "U"}
+          </AvatarFallback>
+        </Avatar>
+      )}
 
-      {/* Message Content */}
-      <div
-        className={`flex flex-col gap-1 flex-1 min-w-0 ${isSender ? "items-end" : "items-start"}`}
-      >
-        {/* Sender Name - Only show for received messages */}
-        {!isSender && (
-          <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 px-1">
+      {/* Message Content Group */}
+      <div className={`flex flex-col max-w-[85%] sm:max-w-[75%] ${isOwnMessage ? "items-end" : "items-start"}`}>
+        {/* Sender Name - Only show for received messages in group chats (optional logic, keeping simple for now) */}
+        {!isOwnMessage && (
+          <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 ml-1 mb-1">
             {message.sender.name}
-          </p>
+          </span>
         )}
 
         {/* Message Bubble */}
         <div
-          className={`relative max-w-[85vw] sm:max-w-lg px-3 sm:px-4 py-2 sm:py-3 rounded-2xl ${
-            isSender
-              ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white rounded-br-sm"
-              : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-sm"
-          }`}
+          className={`
+            relative px-4 py-2.5 sm:px-5 sm:py-3 shadow-sm
+            ${
+              isOwnMessage
+                ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl rounded-tr-sm"
+                : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm border border-gray-100 dark:border-gray-700"
+            }
+          `}
         >
           {/* Message Text */}
-          <p className="text-sm sm:text-base leading-relaxed break-words whitespace-pre-wrap">
-            {message.content}
-          </p>
+          {message.content && (
+            <p className="text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap break-words">
+              {message.content}
+            </p>
+          )}
 
           {/* Attachments */}
           {message.attachments && message.attachments.length > 0 && (
-            <div className="mt-2 sm:mt-3 space-y-2">
+            <div className={`flex flex-col gap-2 ${message.content ? "mt-3" : ""}`}>
               {message.attachments.map((attachment, attIndex) => (
                 <a
                   key={attIndex}
                   href={attachment.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center text-xs sm:text-sm p-2 rounded-lg border transition-colors ${
-                    isSender
-                      ? "bg-blue-500/20 border-blue-400/30 hover:bg-blue-500/30 text-white"
-                      : "bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300"
-                  }`}
+                  className={`
+                    group flex items-center gap-3 p-2 rounded-xl transition-all duration-200
+                    ${
+                      isOwnMessage
+                        ? "bg-white/10 hover:bg-white/20 border border-white/10"
+                        : "bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-600"
+                    }
+                  `}
                 >
                   {attachment.type.startsWith("image/") ? (
-                    <div className="relative w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3 flex-shrink-0">
+                    <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
                       <Image
                         src={attachment.url}
                         alt={attachment.name}
                         fill
-                        className="object-cover rounded"
-                        placeholder="blur"
-                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-                        sizes="(max-width: 640px) 32px, 40px"
+                        className="object-cover group-hover:scale-110 transition-transform duration-300"
+                        sizes="48px"
                       />
                     </div>
                   ) : (
-                    <Paperclip className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                    <div className={`
+                      w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg flex-shrink-0
+                      ${isOwnMessage ? "bg-white/20" : "bg-gray-200 dark:bg-gray-600"}
+                    `}>
+                      {getFileIcon(attachment.type)}
+                    </div>
                   )}
-                  <span className="truncate flex-1 min-w-0">
-                    {attachment.name}
-                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-xs font-medium truncate ${isOwnMessage ? "text-white/90" : "text-gray-700 dark:text-gray-200"}`}>
+                      {attachment.name}
+                    </p>
+                    <p className={`text-[10px] ${isOwnMessage ? "text-white/70" : "text-gray-500 dark:text-gray-400"}`}>
+                      Click to view
+                    </p>
+                  </div>
                 </a>
               ))}
             </div>
           )}
-
-          {/* Message Tail */}
-          <div
-            className={`absolute bottom-0 ${
-              isSender
-                ? "right-[-6px] sm:right-[-8px]"
-                : "left-[-6px] sm:left-[-8px]"
-            } w-0 h-0 border-t-[6px] sm:border-t-[8px] border-t-transparent ${
-              isSender
-                ? "border-l-[6px] sm:border-l-[8px] border-l-blue-600"
-                : "border-r-[6px] sm:border-r-[8px] border-r-gray-100 dark:border-r-gray-700"
-            } border-b-[6px] sm:border-b-[8px] border-b-transparent`}
-          ></div>
         </div>
 
         {/* Timestamp and Status */}
-        <div
-          className={`flex items-center gap-1 px-1 ${isSender ? "flex-row-reverse" : ""}`}
-        >
-          <p className="text-[10px] xs:text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+        <div className={`flex items-center gap-1 mt-1 px-1 ${isOwnMessage ? "flex-row-reverse" : "flex-row"}`}>
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
             {formatMessageTime(new Date(message.createdAt))}
-          </p>
+          </span>
           {getStatusIcon()}
         </div>
       </div>
