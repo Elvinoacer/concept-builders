@@ -325,7 +325,7 @@ const FloorPlan = ({
             onClick={toggleZoom}
           >
             <motion.div
-              className="relative w-full max-w-7xl max-h-[90vh]"
+              className="relative w-full max-w-7xl h-[80vh] max-h-[90vh]"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
