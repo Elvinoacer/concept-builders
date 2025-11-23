@@ -23,6 +23,11 @@ import Pagination from "@/components/ui/CustomPagination";
 const UsersTable = ({ users, refetch, loading, searchTerm }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [emailModal, setEmailModal] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -111,6 +116,8 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
 
   const handleCloseEmailModal = () => {
     setEmailModal(false);
+    setEmailStatus({ type: null, message: "" });
+    setEmailSending(false);
   };
 
   const handleView = (user) => {
@@ -151,16 +158,44 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
 
   const handleSendEmailSubmit = async (e) => {
     e.preventDefault();
+    setEmailSending(true);
+    setEmailStatus({ type: null, message: "" });
+    
     const subject = e.target.subject.value;
     const message = e.target.message.value;
-    await fetch("/api/users/send-email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ to: selectedUser.email, subject, message }),
-    });
-    handleCloseEmailModal();
+    
+    try {
+      const response = await fetch("/api/users/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ to: selectedUser.email, subject, message }),
+      });
+      
+      if (response.ok) {
+        setEmailStatus({ 
+          type: "success", 
+          message: `Email sent successfully to ${selectedUser.name}!` 
+        });
+        setTimeout(() => {
+          handleCloseEmailModal();
+        }, 2000);
+      } else {
+        const data = await response.json();
+        setEmailStatus({ 
+          type: "error", 
+          message: data.message || "Failed to send email. Please try again." 
+        });
+      }
+    } catch (error) {
+      setEmailStatus({ 
+        type: "error", 
+        message: "An error occurred while sending the email." 
+      });
+    } finally {
+      setEmailSending(false);
+    }
   };
 
   const filteredUsers = users.filter((user) => {
@@ -583,71 +618,161 @@ const UsersTable = ({ users, refetch, loading, searchTerm }) => {
 
       {/* Email Modal */}
       {emailModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/30 backdrop-blur-sm">
-          <div className="flex min-h-screen items-center justify-center p-3 xs:p-4">
-            <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-4 xs:p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800 mx-auto">
-              <div className="flex items-start justify-between">
-                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                  Send Email to {selectedUser?.name}
-                </h3>
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 xs:p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-2xl transition-all"
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary to-blue-600 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                    <span className="material-symbols-outlined text-white text-xl">
+                      mail
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">
+                      Send Email
+                    </h3>
+                    <p className="text-sm text-white/80">
+                      To: {selectedUser?.name}
+                    </p>
+                  </div>
+                </div>
                 <button
                   onClick={handleCloseEmailModal}
-                  className="text-gray-400 hover:text-gray-500 focus:outline-none p-1"
+                  disabled={emailSending}
+                  className="text-white/80 hover:text-white focus:outline-none p-1 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined text-xl">
                     close
                   </span>
                 </button>
               </div>
-              <div className="mt-4">
-                <form onSubmit={handleSendEmailSubmit}>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="subject"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Subject
-                    </label>
-                    <input
-                      type="text"
-                      id="subject"
-                      required
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:focus:border-blue-400 transition-colors"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="message"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Message
-                    </label>
-                    <textarea
-                      id="message"
-                      rows={4}
-                      required
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-primary dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:focus:border-blue-400 transition-colors resize-vertical"
-                    ></textarea>
-                  </div>
-                  <div className="flex flex-col xs:flex-row gap-2 xs:gap-0 xs:justify-end">
-                    <button
-                      type="button"
-                      onClick={handleCloseEmailModal}
-                      className="order-2 xs:order-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="order-1 xs:order-2 rounded-lg border border-transparent bg-primary px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
-                    >
-                      Send Email
-                    </button>
-                  </div>
-                </form>
-              </div>
             </div>
-          </div>
+
+            {/* Body */}
+            <div className="p-6">
+              {/* Status Messages */}
+              {emailStatus.type && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`mb-4 p-4 rounded-xl flex items-start gap-3 ${
+                    emailStatus.type === "success"
+                      ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                      : "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+                  }`}
+                >
+                  <span
+                    className={`material-symbols-outlined text-xl ${
+                      emailStatus.type === "success"
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {emailStatus.type === "success"
+                      ? "check_circle"
+                      : "error"}
+                  </span>
+                  <p
+                    className={`text-sm font-medium ${
+                      emailStatus.type === "success"
+                        ? "text-green-800 dark:text-green-200"
+                        : "text-red-800 dark:text-red-200"
+                    }`}
+                  >
+                    {emailStatus.message}
+                  </p>
+                </motion.div>
+              )}
+
+              <form onSubmit={handleSendEmailSubmit} className="space-y-4">
+                {/* Recipient Info */}
+                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    Recipient
+                  </p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {selectedUser?.email}
+                  </p>
+                </div>
+
+                {/* Subject Field */}
+                <div>
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Subject <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="subject"
+                    required
+                    disabled={emailSending}
+                    placeholder="Enter email subject..."
+                    className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  />
+                </div>
+
+                {/* Message Field */}
+                <div>
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Message <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    id="message"
+                    rows={6}
+                    required
+                    disabled={emailSending}
+                    placeholder="Type your message here..."
+                    className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all resize-vertical"
+                  ></textarea>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col-reverse xs:flex-row gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleCloseEmailModal}
+                    disabled={emailSending}
+                    className="flex-1 xs:flex-none rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-6 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={emailSending}
+                    className="flex-1 xs:flex-none rounded-xl border border-transparent bg-gradient-to-r from-primary to-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:from-primary/90 hover:to-blue-600/90 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                  >
+                    {emailSending ? (
+                      <>
+                        <span className="material-symbols-outlined text-base animate-spin">
+                          progress_activity
+                        </span>
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-base">
+                          send
+                        </span>
+                        Send Email
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
         </div>
       )}
 
