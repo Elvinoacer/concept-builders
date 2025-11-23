@@ -3,12 +3,16 @@ import { Resend } from "resend";
 
 export async function GET() {
   const resend = new Resend(process.env.RESEND_API_KEY);
-  
+  const adminEmail = process.env.ADMIN_EMAIL;
+
   try {
-    console.log("Testing Resend with API Key:", process.env.RESEND_API_KEY ? "Set" : "Missing");
-    
+    console.log(
+      "Testing Resend with API Key:",
+      process.env.RESEND_API_KEY ? "Set" : "Missing"
+    );
+
     const { data, error } = await resend.emails.send({
-      from: "Concept Builders <support@conceptbuilders.co.ke>",
+      from: `Concept Builders <${adminEmail}>`,
       to: "omondielvin@gmail.com", // Test email
       subject: "Test Email from Concept Builders",
       html: "<h1>Success!</h1><p>If you receive this, Resend is working correctly.</p>",
@@ -23,6 +27,9 @@ export async function GET() {
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error("Unexpected error:", error);
-    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: String(error) },
+      { status: 500 }
+    );
   }
 }

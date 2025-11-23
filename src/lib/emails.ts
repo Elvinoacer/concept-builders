@@ -30,7 +30,7 @@ export async function sendPasswordResetEmail(
   try {
     console.log(`Attempting to send password reset email to ${to}`);
     const { data, error } = await resend.emails.send({
-      from: `Concept Builders <support@conceptbuilders.co.ke>`,
+      from: `Concept Builders <${process.env.ADMIN_EMAIL}>`,
       to: to,
       subject: `Password Reset Request for Concept Builders`,
       html: `<h1>Hello ${name},</h1><p>You have requested to reset your password for your Concept Builders account. Please click the link below to reset your password:</p><p><a href="${resetLink}">Reset Password</a></p><p>If you did not request a password reset, please ignore this email.</p>`,
@@ -54,7 +54,7 @@ export async function sendVerificationEmail(
   try {
     console.log(`Attempting to send verification email to ${to}`);
     const { data, error } = await resend.emails.send({
-      from: `Concept Builders <support@conceptbuilders.co.ke>`,
+      from: `Concept Builders <${process.env.ADMIN_EMAIL}>`,
       to: to,
       subject: `Verify Your Email for Concept Builders`,
       html: `<h1>Hello ${name},</h1><p>Thank you for registering with Concept Builders. Please click the link below to verify your email address:</p><p><a href="${verificationLink}">Verify Email</a></p><p>If you did not create an account, please ignore this email.</p>`,
@@ -265,9 +265,15 @@ export async function sendPurchaseNotificationEmails(orderId: string) {
           include: {
             design: {
               include: {
-                architecturalDesign: { include: { pdfFiles: true, cadFiles: true } },
-                structuralDesign: { include: { pdfFiles: true, cadFiles: true } },
-                billOfQuantities: { include: { excelFiles: true, pdfFiles: true } },
+                architecturalDesign: {
+                  include: { pdfFiles: true, cadFiles: true },
+                },
+                structuralDesign: {
+                  include: { pdfFiles: true, cadFiles: true },
+                },
+                billOfQuantities: {
+                  include: { excelFiles: true, pdfFiles: true },
+                },
                 packageOptions: { include: { file: true } },
               },
             },
@@ -286,7 +292,7 @@ export async function sendPurchaseNotificationEmails(orderId: string) {
     // Check for missing files
     for (const item of order.items) {
       const design = item.design;
-      
+
       // Check standard file types
       if (item.selectedFileTypes) {
         for (const fileType of item.selectedFileTypes) {
@@ -295,27 +301,33 @@ export async function sendPurchaseNotificationEmails(orderId: string) {
 
           switch (fileType) {
             case "architecturalPdf":
-              isAvailable = (design.architecturalDesign?.pdfFiles?.length || 0) > 0;
+              isAvailable =
+                (design.architecturalDesign?.pdfFiles?.length || 0) > 0;
               label = "Architectural PDF";
               break;
             case "architecturalCad":
-              isAvailable = (design.architecturalDesign?.cadFiles?.length || 0) > 0;
+              isAvailable =
+                (design.architecturalDesign?.cadFiles?.length || 0) > 0;
               label = "Architectural CAD";
               break;
             case "structuralPdf":
-              isAvailable = (design.structuralDesign?.pdfFiles?.length || 0) > 0;
+              isAvailable =
+                (design.structuralDesign?.pdfFiles?.length || 0) > 0;
               label = "Structural PDF";
               break;
             case "structuralCad":
-              isAvailable = (design.structuralDesign?.cadFiles?.length || 0) > 0;
+              isAvailable =
+                (design.structuralDesign?.cadFiles?.length || 0) > 0;
               label = "Structural CAD";
               break;
             case "billOfQuantitiesExcel":
-              isAvailable = (design.billOfQuantities?.excelFiles?.length || 0) > 0;
+              isAvailable =
+                (design.billOfQuantities?.excelFiles?.length || 0) > 0;
               label = "Bill of Quantities (Excel)";
               break;
             case "billOfQuantitiesPdf":
-              isAvailable = (design.billOfQuantities?.pdfFiles?.length || 0) > 0;
+              isAvailable =
+                (design.billOfQuantities?.pdfFiles?.length || 0) > 0;
               label = "Bill of Quantities (PDF)";
               break;
           }
@@ -329,22 +341,27 @@ export async function sendPurchaseNotificationEmails(orderId: string) {
       // Check extras
       if (item.selectedExtras) {
         let extras: any[] = [];
-        if (typeof item.selectedExtras === 'string') {
-            try {
-                extras = JSON.parse(item.selectedExtras);
-            } catch (e) {
-                extras = [];
-            }
+        if (typeof item.selectedExtras === "string") {
+          try {
+            extras = JSON.parse(item.selectedExtras);
+          } catch (e) {
+            extras = [];
+          }
         } else {
-            extras = item.selectedExtras as any[];
+          extras = item.selectedExtras as any[];
         }
 
         for (const extra of extras) {
-            // Find the corresponding package option in the design to check for file
-            const packageOption = design.packageOptions.find(po => po.id === extra.id);
-            if (packageOption && !packageOption.file) {
-                 missingFiles.push({ designName: design.name, itemType: `Customization: ${packageOption.name}` });
-            }
+          // Find the corresponding package option in the design to check for file
+          const packageOption = design.packageOptions.find(
+            (po) => po.id === extra.id
+          );
+          if (packageOption && !packageOption.file) {
+            missingFiles.push({
+              designName: design.name,
+              itemType: `Customization: ${packageOption.name}`,
+            });
+          }
         }
       }
     }
@@ -382,9 +399,10 @@ export async function sendPurchaseNotificationEmails(orderId: string) {
     // Send Admin Email (Always)
     const adminEmail = process.env.ADMIN_EMAIL;
     if (adminEmail) {
-      const missingFilesSection = missingFiles.length > 0 
-        ? `<h3>Missing Files (Action Required):</h3><ul>${missingFiles.map((f) => `<li><strong>${f.designName}</strong>: ${f.itemType}</li>`).join("")}</ul>` 
-        : "<p>All files are available.</p>";
+      const missingFilesSection =
+        missingFiles.length > 0
+          ? `<h3>Missing Files (Action Required):</h3><ul>${missingFiles.map((f) => `<li><strong>${f.designName}</strong>: ${f.itemType}</li>`).join("")}</ul>`
+          : "<p>All files are available.</p>";
 
       await resend.emails.send({
         from: `Concept Builders System <${process.env.ADMIN_EMAIL}>`,
@@ -403,7 +421,6 @@ export async function sendPurchaseNotificationEmails(orderId: string) {
         `,
       });
     }
-
   } catch (error) {
     console.error("Error in sendPurchaseNotificationEmails:", error);
     // Don't throw, just log, so we don't break the payment flow if email fails
