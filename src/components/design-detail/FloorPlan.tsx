@@ -167,21 +167,23 @@ const FloorPlan = ({
           </AnimatePresence>
 
           <motion.div
-            className={`w-full h-[250px] xs:h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] xl:h-[600px] bg-center bg-no-repeat bg-gray-100 dark:bg-gray-900 cursor-${isZoomed ? "zoom-out" : "zoom-in"} transition-all duration-500 ${
-              isZoomed ? "bg-contain" : "bg-contain"
-            }`}
-            style={{ backgroundImage: `url("${floorPlanUrl}")` }}
+            className={`relative w-full h-[250px] xs:h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] xl:h-[600px] bg-gray-100 dark:bg-gray-900 cursor-${isZoomed ? "zoom-out" : "zoom-in"} transition-all duration-500`}
             variants={zoomVariants}
             initial="initial"
             animate={isZoomed ? "zoomed" : "initial"}
             onClick={toggleZoom}
-          />
-          <img
-            src={floorPlanUrl}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            style={{ display: "none" }}
-          />
+          >
+            <Image
+              src={floorPlanUrl}
+              alt="Floor Plan"
+              fill
+              className={`object-contain transition-all duration-500`}
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 70vw"
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          </motion.div>
+
 
           <motion.div
             className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"
