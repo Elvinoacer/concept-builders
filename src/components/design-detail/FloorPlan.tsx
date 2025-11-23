@@ -170,7 +170,7 @@ const FloorPlan = ({
             className={`w-full h-[250px] xs:h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] xl:h-[600px] bg-center bg-no-repeat bg-gray-100 dark:bg-gray-900 cursor-${isZoomed ? "zoom-out" : "zoom-in"} transition-all duration-500 ${
               isZoomed ? "bg-contain" : "bg-contain"
             }`}
-            style={{ backgroundImage: `url(${floorPlanUrl})` }}
+            style={{ backgroundImage: `url("${floorPlanUrl}")` }}
             variants={zoomVariants}
             initial="initial"
             animate={isZoomed ? "zoomed" : "initial"}
