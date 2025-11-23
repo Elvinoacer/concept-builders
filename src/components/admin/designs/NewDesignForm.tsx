@@ -29,8 +29,7 @@ const NewDesignForm = ({
 }: NewDesignFormProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [basePrice, setBasePrice] = useState("");
-  const [priceRange, setPriceRange] = useState("");
+  // basePrice and priceRange removed from state, will be sent as defaults
   const [bedrooms, setBedrooms] = useState("");
   const [bathrooms, setBathrooms] = useState("");
   const [area, setArea] = useState("");
@@ -79,8 +78,7 @@ const NewDesignForm = ({
     if (isEditMode) {
         setName(designToEdit.name || "");
         setDescription(designToEdit.description || "");
-        setBasePrice(designToEdit.basePrice?.toString() || "");
-        setPriceRange(designToEdit.priceRange || "");
+        // basePrice and priceRange handled via defaults or ignored in edit if not needed for display
         setBedrooms(designToEdit.bedrooms?.toString() || "");
         setBathrooms(designToEdit.bathrooms?.toString() || "");
         setArea(designToEdit.area?.toString() || "");
@@ -106,7 +104,7 @@ const NewDesignForm = ({
     if (!name.trim()) return "Design Name is required.";
     if (!description.trim()) return "Description is required.";
     if (!categoryId) return "Category is required.";
-    if (!basePrice || parseFloat(basePrice) <= 0) return "Base Price must be a positive number.";
+    // basePrice validation removed
     if (images.length === 0 && !isEditMode) return "At least one image is required.";
     return null;
   };
@@ -126,22 +124,33 @@ const NewDesignForm = ({
         connect: files.map(f => ({ id: f.fileId }))
     });
 
+    const archPdfPrice = parseFloat(architecturalPdfPrice) || 0;
+    const archCadPrice = parseFloat(architecturalCadPrice) || 0;
+    const structPdfPrice = parseFloat(structuralPdfPrice) || 0;
+    const structCadPrice = parseFloat(structuralCadPrice) || 0;
+    const boqExcelPrice = parseFloat(billOfQuantitiesPrice) || 0;
+    const boqPdfPrice = parseFloat(billOfQuantitiesPdfPrice) || 0;
+
+    const calculatedBasePrice = archPdfPrice;
+    const totalPrice = archPdfPrice + archCadPrice + structPdfPrice + structCadPrice + boqExcelPrice + boqPdfPrice;
+    const calculatedPriceRange = `${calculatedBasePrice.toLocaleString()} - ${totalPrice.toLocaleString()}`;
+
     const commonData = {
       name,
       description,
-      basePrice: parseFloat(basePrice),
-      priceRange,
+      basePrice: calculatedBasePrice,
+      priceRange: calculatedPriceRange,
       bedrooms: bedrooms ? parseInt(bedrooms) : null,
       bathrooms: bathrooms ? parseInt(bathrooms) : null,
       area: area ? parseFloat(area) : null,
       floors: floors ? parseInt(floors) : null,
       categoryId,
-      architecturalPdfPrice: parseFloat(architecturalPdfPrice) || null,
-      architecturalCadPrice: parseFloat(architecturalCadPrice) || null,
-      structuralPdfPrice: parseFloat(structuralPdfPrice) || null,
-      structuralCadPrice: parseFloat(structuralCadPrice) || null,
-      billOfQuantitiesPrice: parseFloat(billOfQuantitiesPrice) || null,
-      billOfQuantitiesPdfPrice: parseFloat(billOfQuantitiesPdfPrice) || null,
+      architecturalPdfPrice: archPdfPrice || null,
+      architecturalCadPrice: archCadPrice || null,
+      structuralPdfPrice: structPdfPrice || null,
+      structuralCadPrice: structCadPrice || null,
+      billOfQuantitiesPrice: boqExcelPrice || null,
+      billOfQuantitiesPdfPrice: boqPdfPrice || null,
     };
 
     const packageOptionsPayload = packageOptions.map(opt => ({
@@ -274,39 +283,6 @@ const NewDesignForm = ({
                 <h3 className="text-base sm:text-lg font-medium text-foreground/90">
                   Specifications
                 </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <Label htmlFor="basePrice" className="text-sm sm:text-base">
-                      Base Price
-                    </Label>
-                    <Input
-                      id="basePrice"
-                      name="basePrice"
-                      type="number"
-                      value={basePrice}
-                      onChange={(e) => setBasePrice(e.target.value)}
-                      placeholder="e.g., 50000"
-                      className="text-sm sm:text-base h-10 sm:h-11"
-                    />
-                  </div>
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <Label
-                      htmlFor="priceRange"
-                      className="text-sm sm:text-base"
-                    >
-                      Price Range
-                    </Label>
-                    <Input
-                      id="priceRange"
-                      name="priceRange"
-                      value={priceRange}
-                      onChange={(e) => setPriceRange(e.target.value)}
-                      placeholder="e.g., $50k - $70k"
-                      className="text-sm sm:text-base h-10 sm:h-11"
-                    />
-                  </div>
-                </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   <div className="space-y-1.5 sm:space-y-2">

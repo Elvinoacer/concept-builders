@@ -159,10 +159,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
   const router = useRouter();
   const [name, setName] = useState(design?.name || "");
   const [description, setDescription] = useState(design?.description || "");
-  const [basePrice, setBasePrice] = useState(
-    design?.basePrice?.toString() || ""
-  );
-  const [priceRange, setPriceRange] = useState(design?.priceRange || "");
+  // basePrice and priceRange removed from state
   const [bedrooms, setBedrooms] = useState(design?.bedrooms?.toString() || "");
   const [bathrooms, setBathrooms] = useState(
     design?.bathrooms?.toString() || ""
@@ -178,8 +175,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
     if (design) {
       setName(design.name || "");
       setDescription(design.description || "");
-      setBasePrice(design.basePrice?.toString() || "");
-      setPriceRange(design.priceRange || "");
+      // basePrice and priceRange removed from init
       setBedrooms(design.bedrooms?.toString() || "");
       setBathrooms(design.bathrooms?.toString() || "");
       setArea(design.area?.toString() || "");
@@ -367,9 +363,18 @@ const DesignForm = ({ design }: DesignFormProps) => {
       newCompleted.add(1);
     }
 
-    // Step 2: Pricing (Required)
-    if (basePrice && parseFloat(basePrice) > 0) {
-      newCompleted.add(2);
+    // Step 2: Pricing (Required) - Check if at least one document price is set (optional but good practice) or just mark as complete since fields are optional/default 0
+    // For now, we'll assume pricing step is complete if we are on it, or just check if any doc price is set if we want strictness.
+    // Given the request, let's make it always valid or check for at least one price if needed.
+    // Let's check if at least one document price is provided/valid number, or just consider it done.
+    // Actually, since all prices default to 0/null, maybe we don't enforce a specific price > 0 unless required.
+    // Let's assume step 2 is valid if the user has visited it or just always valid since defaults exist.
+    // But to be consistent with "Required" label, maybe check if at least one price is > 0?
+    // The previous logic checked `basePrice > 0`. Now basePrice is derived.
+    // Let's check if derived basePrice > 0.
+    const currentArchPdfPrice = parseFloat(architecturalPdfPrice) || 0;
+    if (currentArchPdfPrice > 0) {
+       newCompleted.add(2);
     }
 
     // Step 3: Files (Required)
@@ -403,7 +408,8 @@ const DesignForm = ({ design }: DesignFormProps) => {
     bathrooms,
     area,
     floors, // Step 1
-    basePrice, // Step 2
+    floors, // Step 1
+    architecturalPdfPrice, // Step 2 (proxy for basePrice check)
     images, // Step 3
     packageOptions, // Step 4
   ]);
@@ -418,9 +424,11 @@ const DesignForm = ({ design }: DesignFormProps) => {
         if (!categoryId) errors.categoryId = "Category is required";
         break;
       case 2: // Pricing
-        if (!basePrice) errors.basePrice = "Base price is required";
-        else if (parseFloat(basePrice) <= 0)
-          errors.basePrice = "Base price must be greater than 0";
+        // Validation removed or changed to check derived base price if strictness is needed.
+        // For now, we can relax it or check architecturalPdfPrice if that's the base.
+        if (!architecturalPdfPrice || parseFloat(architecturalPdfPrice) <= 0) {
+             errors.architecturalPdfPrice = "Architectural PDF Price (Base Price) is required";
+        }
         break;
       case 3: // Files
         if (images.length === 0)
@@ -471,7 +479,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
 
   const handlePackageChange = (
     index: number,
-    field: "name" | "price",
+    field: string,
     value: string
   ) => {
     const newOptions = [...packageOptions];
@@ -490,8 +498,10 @@ const DesignForm = ({ design }: DesignFormProps) => {
     if (!name.trim()) errors.push("Design Name is required.");
     if (!description.trim()) errors.push("Description is required.");
     if (!categoryId) errors.push("Category is required.");
-    if (!basePrice || parseFloat(basePrice) <= 0)
-      errors.push("Base Price must be a positive number.");
+    if (!categoryId) errors.push("Category is required.");
+    // Check derived base price
+    if (!architecturalPdfPrice || parseFloat(architecturalPdfPrice) <= 0)
+      errors.push("Architectural PDF Price (Base Price) is required.");
     if (images.length === 0) errors.push("At least one image is required.");
     return errors;
   };
@@ -504,7 +514,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
       // Find the first step with an error and navigate to it
       if (!name.trim() || !description.trim() || !categoryId) {
         setCurrentStep(0);
-      } else if (!basePrice || parseFloat(basePrice) <= 0) {
+      } else if (!architecturalPdfPrice || parseFloat(architecturalPdfPrice) <= 0) {
         setCurrentStep(2);
       } else if (images.length === 0) {
         setCurrentStep(3);
@@ -544,11 +554,22 @@ const DesignForm = ({ design }: DesignFormProps) => {
         };
       });
 
+    const archPdfPrice = parseFloat(architecturalPdfPrice) || 0;
+    const archCadPrice = parseFloat(architecturalCadPrice) || 0;
+    const structPdfPrice = parseFloat(structuralPdfPrice) || 0;
+    const structCadPrice = parseFloat(structuralCadPrice) || 0;
+    const boqExcelPrice = parseFloat(billOfQuantitiesPrice) || 0;
+    const boqPdfPrice = parseFloat(billOfQuantitiesPdfPrice) || 0;
+
+    const calculatedBasePrice = archPdfPrice;
+    const totalPrice = archPdfPrice + archCadPrice + structPdfPrice + structCadPrice + boqExcelPrice + boqPdfPrice;
+    const calculatedPriceRange = `${calculatedBasePrice.toLocaleString()} - ${totalPrice.toLocaleString()}`;
+
     const commonData = {
       name,
       description,
-      basePrice: parseFloat(basePrice),
-      priceRange,
+      basePrice: calculatedBasePrice,
+      priceRange: calculatedPriceRange,
       bedrooms: bedrooms ? parseInt(bedrooms) : null,
       bathrooms: bathrooms ? parseInt(bathrooms) : null,
       area: area ? parseFloat(area) : null,
@@ -831,10 +852,6 @@ const DesignForm = ({ design }: DesignFormProps) => {
                   )}
                   {currentStep === 2 && (
                     <PricingStep
-                      basePrice={basePrice}
-                      setBasePrice={setBasePrice}
-                      priceRange={priceRange}
-                      setPriceRange={setPriceRange}
                       architecturalPdfPrice={architecturalPdfPrice}
                       setArchitecturalPdfPrice={setArchitecturalPdfPrice}
                       architecturalCadPrice={architecturalCadPrice}
@@ -885,7 +902,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
                       designData={{
                         name,
                         description,
-                        basePrice,
+                        basePrice: parseFloat(architecturalPdfPrice) || 0,
                         images,
                         floorPlans,
                       }}
@@ -954,7 +971,7 @@ interface BasicInfoStepProps {
   setCategoryId: (value: string) => void;
   categories: Category[];
   fieldErrors: Record<string, string>;
-  setFieldErrors: (errors: Record<string, string>) => void;
+  setFieldErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 const BasicInfoStepComponent: React.FC<BasicInfoStepProps> = ({
@@ -1130,10 +1147,6 @@ const SpecificationsStep = React.memo(SpecificationsStepComponent);
 SpecificationsStep.displayName = "SpecificationsStep";
 
 interface PricingStepProps {
-  basePrice: string;
-  setBasePrice: (value: string) => void;
-  priceRange: string;
-  setPriceRange: (value: string) => void;
   architecturalPdfPrice: string;
   setArchitecturalPdfPrice: (value: string) => void;
   architecturalCadPrice: string;
@@ -1147,15 +1160,11 @@ interface PricingStepProps {
   billOfQuantitiesPdfPrice: string;
   setBillOfQuantitiesPdfPrice: (value: string) => void;
   fieldErrors: Record<string, string>;
-  setFieldErrors: (errors: Record<string, string>) => void;
+  setFieldErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 // Define the component separately with a named function
 const PricingStepComponent: React.FC<PricingStepProps> = ({
-  basePrice,
-  setBasePrice,
-  priceRange,
-  setPriceRange,
   architecturalPdfPrice,
   setArchitecturalPdfPrice,
   architecturalCadPrice,
@@ -1179,52 +1188,14 @@ const PricingStepComponent: React.FC<PricingStepProps> = ({
       required
     />
 
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <FormField
-        label="Base Price ($)"
-        htmlFor="basePrice"
-        required
-        error={fieldErrors.basePrice}
-        description="The starting price for this design"
-      >
-        <Input
-          id="basePrice"
-          name="basePrice"
-          type="number"
-          min="0"
-          step="0.01"
-          value={basePrice}
-          onChange={(e) => {
-            setBasePrice(e.target.value);
-            setFieldErrors((prev) => ({ ...prev, basePrice: "" }));
-          }}
-          placeholder="0.00"
-          className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
-          required
-        />
-      </FormField>
-
-      <FormField
-        label="Price Range"
-        htmlFor="priceRange"
-        description="Displayed price range for customers (e.g., $50k - $70k)"
-      >
-        <Input
-          id="priceRange"
-          name="priceRange"
-          value={priceRange}
-          onChange={(e) => setPriceRange(e.target.value)}
-          placeholder="e.g., $50k - $70k"
-          className="rounded-xl h-12 text-base border-2 focus:border-blue-500 transition-colors"
-        />
-      </FormField>
-    </div>
-
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-3">
         <FiFileText className="w-6 h-6 text-blue-500" />
         Document Pricing
       </h3>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        Note: Base Price will be set to the Architectural PDF Price.
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {[
           {
@@ -1314,7 +1285,7 @@ interface FilesStepProps {
   billOfQuantities: DocumentState;
   setBillOfQuantities: (doc: DocumentState) => void;
   fieldErrors: Record<string, string>;
-  setFieldErrors: (errors: Record<string, string>) => void;
+  setFieldErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 const FilesStepComponent: React.FC<FilesStepProps> = ({
@@ -1369,9 +1340,10 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
           </CardHeader>
           <CardContent>
             <FileUpload
-              onUploadSuccess={(files) => {
-                setImages([...images, ...files]);
-                setFieldErrors({ ...fieldErrors, images: "" });
+              onUploadSuccess={(file) => {
+                const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
+                setImages([...images, mappedFile]);
+                setFieldErrors((prev) => ({ ...prev, images: "" }));
               }}
               onFileRemove={(fileUrl) =>
                 setImages(images.filter((f) => f.url !== fileUrl))
@@ -1409,9 +1381,10 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
           </CardHeader>
           <CardContent>
             <FileUpload
-              onUploadSuccess={(files) =>
-                setFloorPlans([...floorPlans, ...files])
-              }
+              onUploadSuccess={(file) => {
+                const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
+                setFloorPlans([...floorPlans, mappedFile]);
+              }}
               onFileRemove={(fileUrl) =>
                 setFloorPlans(floorPlans.filter((f) => f.url !== fileUrl))
               }
@@ -1442,9 +1415,10 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
           </CardHeader>
           <CardContent>
             <FileUpload
-              onUploadSuccess={(uploadedFiles) =>
-                setFiles([...files, ...uploadedFiles])
-              }
+              onUploadSuccess={(file) => {
+                const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
+                setFiles([...files, mappedFile]);
+              }}
               onFileRemove={(fileUrl) =>
                 setFiles(files.filter((f) => f.url !== fileUrl))
               }
@@ -1540,21 +1514,22 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
                     {field.label}
                   </Label>
                   <FileUpload
-                    onUploadSuccess={(files) =>
+                    onUploadSuccess={(file) => {
+                      const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
                       doc.setState({
                         ...doc.state,
-                        [field.id]: [...doc.state[field.id], ...files],
-                      })
-                    }
+                        [field.id]: [...doc.state[field.id as keyof DocumentState], mappedFile],
+                      });
+                    }}
                     onFileRemove={(fileUrl) =>
                       doc.setState({
                         ...doc.state,
-                        [field.id]: doc.state[field.id].filter(
+                        [field.id]: doc.state[field.id as keyof DocumentState].filter(
                           (f: FileType) => f.url !== fileUrl
                         ),
                       })
                     }
-                    initialFiles={doc.state[field.id]}
+                    initialFiles={doc.state[field.id as keyof DocumentState]}
                     fileTypeCategory={categoryMap[field.id] || "OTHER"}
                     multiple
                     accept={field.accept}
@@ -1645,8 +1620,16 @@ const PackageOptionsStepComponent: React.FC<PackageOptionsStepProps> = ({
             </div>
             <FormField label="File (Optional)" htmlFor={`pkg-file-${index}`}>
               <FileUpload
-                onUploadSuccess={(files) => handlePackageFile(index, files)}
-                onFileRemove={() => handlePackageFile(index, [])}
+                onUploadSuccess={(file) => {
+                  const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
+                  handlePackageFile(index, [mappedFile]);
+                }}
+                onFileRemove={(fileUrl) =>
+                  handlePackageFile(
+                    index,
+                    option.file.filter((f) => f.url !== fileUrl)
+                  )
+                }
                 initialFiles={option.file}
                 fileTypeCategory="FILE"
                 multiple={false}
