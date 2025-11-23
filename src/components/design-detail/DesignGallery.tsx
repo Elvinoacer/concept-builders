@@ -135,8 +135,9 @@ const DesignGallery = ({
               className="w-full h-full object-cover"
               placeholder="blur"
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-              sizes="(max-width: 640px) 100vw, (max-width: 768px) 80vw, (max-width: 1200px) 60vw, 50vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 85vw, 75vw"
               priority
+              quality={95}
             />
           </motion.div>
         </AnimatePresence>

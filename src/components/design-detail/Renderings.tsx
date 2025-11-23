@@ -246,6 +246,7 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
                   placeholder="blur"
                   blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                   priority={index < 3} // Prioritize loading first 3 images
+                  quality={95}
                 />
 
                 {/* Overlay */}
@@ -469,10 +470,11 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
                 alt={`3D Rendering ${selectedRendering + 1}`}
                 fill
                 className="object-contain select-none"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
+                sizes="100vw"
                 placeholder="blur"
                 blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 priority
+                quality={95}
               />
             </motion.div>
           </motion.div>

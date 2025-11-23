@@ -179,6 +179,7 @@ const FloorPlan = ({
               fill
               className={`object-contain transition-all duration-500`}
               sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 70vw"
+              quality={95}
               onLoad={handleImageLoad}
               onError={handleImageError}
             />
@@ -342,6 +343,7 @@ const FloorPlan = ({
                 placeholder="blur"
                 blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 70vw"
+                quality={95}
               />
               <motion.button
                 onClick={toggleZoom}
