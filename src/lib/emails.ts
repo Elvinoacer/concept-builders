@@ -30,7 +30,7 @@ export async function sendPasswordResetEmail(
   try {
     console.log(`Attempting to send password reset email to ${to}`);
     const { data, error } = await resend.emails.send({
-      from: `Concept Builders Accounts <support@conceptbuilders.co.ke>`,
+      from: `Concept Builders <support@conceptbuilders.co.ke>`,
       to: to,
       subject: `Password Reset Request for Concept Builders`,
       html: `<h1>Hello ${name},</h1><p>You have requested to reset your password for your Concept Builders account. Please click the link below to reset your password:</p><p><a href="${resetLink}">Reset Password</a></p><p>If you did not request a password reset, please ignore this email.</p>`,
@@ -54,7 +54,7 @@ export async function sendVerificationEmail(
   try {
     console.log(`Attempting to send verification email to ${to}`);
     const { data, error } = await resend.emails.send({
-      from: `Concept Builders <${process.env.ADMIN_EMAIL}>`,
+      from: `Concept Builders <support@conceptbuilders.co.ke>`,
       to: to,
       subject: `Verify Your Email for Concept Builders`,
       html: `<h1>Hello ${name},</h1><p>Thank you for registering with Concept Builders. Please click the link below to verify your email address:</p><p><a href="${verificationLink}">Verify Email</a></p><p>If you did not create an account, please ignore this email.</p>`,
