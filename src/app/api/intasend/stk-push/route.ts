@@ -1,8 +1,23 @@
+// app/api/intasend/stk-push/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import IntaSend from "intasend-node";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
+import { calculateItemTotal } from "@/lib/calculate-total";
+import { DiscountType } from "@/generated/prisma";
+
+class APIException extends Error {
+  public statusCode: number;
+  public metadata: any;
+
+  constructor(message: string, statusCode: number, metadata: any = {}) {
+    super(message);
+    this.statusCode = statusCode;
+    this.metadata = metadata;
+    this.name = "APIException";
+  }
+}
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -15,99 +30,322 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
+
     const {
       first_name,
       last_name,
       email,
-      amount,
       phone_number,
       discountCode,
-      discountAmount,
-      discountId,
     } = body;
 
-    let userCart = await prisma.cart.findUnique({
-      where: { userId },
-    });
-
-    if (!userCart) {
-      return NextResponse.json({ error: "Cart not found" }, { status: 404 });
-    }
-
-    // Update cart with discount details if provided
-    if (discountId || discountCode || discountAmount) {
-      userCart = await prisma.cart.update({
-        where: { id: userCart.id },
-        data: {
-          discountCode: discountCode || null,
-          discountAmount: discountAmount || null,
-          discountId: discountId || null,
+    // Validate required fields
+    if (!first_name || !email || !phone_number) {
+      throw new APIException("Missing required fields", 400, {
+        missingFields: {
+          first_name: !first_name,
+          email: !email,
+          phone_number: !phone_number,
         },
       });
     }
 
-    if (
-      !process.env.INTASEND_PUBLISHABLE_KEY ||
-      !process.env.INTASEND_SECRET_KEY
-    ) {
-      return NextResponse.json(
-        { error: "IntaSend keys not configured" },
-        { status: 500 }
+    // Find user cart
+    const userCart = await prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            design: {
+              include: {
+                packageOptions: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!userCart) {
+      throw new APIException("Cart not found", 404);
+    }
+
+    if (!userCart.items || userCart.items.length === 0) {
+      throw new APIException("Cart is empty", 400);
+    }
+
+    // Calculate total amount from cart items
+    let calculatedTotal = userCart.items.reduce((total, item) => {
+      // Cast item to satisfy the type expected by calculateItemTotal if necessary,
+      // though the include structure should match.
+      // We need to ensure selectedExtras is treated correctly (Json vs any[])
+      const itemForCalculation = {
+        ...item,
+        selectedExtras: item.selectedExtras as any[],
+      };
+      return total + calculateItemTotal(itemForCalculation);
+    }, 0);
+
+    let appliedDiscountAmount = 0;
+
+    // Handle Discount
+    if (discountCode) {
+      const discount = await prisma.discount.findUnique({
+        where: { code: discountCode },
+      });
+
+      if (discount) {
+        // Validate Discount
+        let isValid = true;
+        let errorMessage = "";
+
+        if (!discount.isActive) {
+          isValid = false;
+          errorMessage = "Discount is not active";
+        } else if (discount.expiresAt && new Date(discount.expiresAt) < new Date()) {
+          isValid = false;
+          errorMessage = "Discount has expired";
+        } else if (discount.maxUses && discount.uses >= discount.maxUses) {
+          isValid = false;
+          errorMessage = "Discount has reached its maximum uses";
+        } else if (discount.minPurchaseAmount && calculatedTotal < discount.minPurchaseAmount) {
+          isValid = false;
+          errorMessage = `Minimum purchase of ${discount.minPurchaseAmount.toFixed(2)} required`;
+        }
+
+        if (isValid) {
+          // Check if user already used it
+           const existingOrderWithDiscount = await prisma.order.findFirst({
+            where: {
+              userId: userId,
+              discountId: discount.id,
+              status: {
+                in: ['PAID', 'REFUND_REQUESTED'],
+              },
+            },
+          });
+
+          if (existingOrderWithDiscount) {
+             isValid = false;
+             errorMessage = "You have already used this discount code";
+          }
+        }
+
+        if (isValid) {
+          if (discount.type === DiscountType.PERCENTAGE) {
+            appliedDiscountAmount = calculatedTotal * (discount.value / 100);
+          } else if (discount.type === DiscountType.FIXED_AMOUNT) {
+            appliedDiscountAmount = discount.value;
+          }
+
+          // Cap discount at total
+          appliedDiscountAmount = Math.min(appliedDiscountAmount, calculatedTotal);
+          
+          calculatedTotal -= appliedDiscountAmount;
+
+          // Update cart with valid discount
+          await prisma.cart.update({
+            where: { id: userCart.id },
+            data: {
+                discountAmount: appliedDiscountAmount,
+                discountCode: discountCode,
+                discountId: discount.id
+            }
+          });
+
+        } else {
+             console.warn(`Invalid discount code provided: ${discountCode} - ${errorMessage}`);
+             throw new APIException(errorMessage, 400);
+        }
+      } else {
+          throw new APIException("Invalid discount code", 404);
+      }
+    }
+
+    // Ensure amount is positive
+    if (calculatedTotal <= 0) {
+      throw new APIException("Amount must be greater than 0 for M-Pesa payment", 400);
+    }
+
+    // CRITICAL: Validate IntaSend configuration
+    if (!process.env.INTASEND_PUBLISHABLE_KEY) {
+      throw new APIException("INTASEND_PUBLISHABLE_KEY not configured", 500);
+    }
+    if (!process.env.INTASEND_SECRET_KEY) {
+      throw new APIException("INTASEND_SECRET_KEY not configured", 500);
+    }
+
+    const host = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    if (!host) {
+      throw new APIException("App URL not configured", 500);
+    }
+
+    // Fetch USD to KES exchange rate
+    let usdToKesRate: number;
+    try {
+      const exchangeRateRes = await fetch(
+        `${req.nextUrl.origin}/api/exchange-rate`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          cache: "no-cache",
+        }
+      );
+
+      if (!exchangeRateRes.ok) {
+        console.error("Exchange rate API failed, using fallback");
+        usdToKesRate = 130;
+      } else {
+        const exchangeRateData = await exchangeRateRes.json();
+        usdToKesRate = exchangeRateData.usdToKesRate;
+      }
+    } catch (exchangeError) {
+      console.error("Exchange rate fetch error, using fallback");
+      usdToKesRate = 130;
+    }
+
+    if (!usdToKesRate || usdToKesRate <= 0) {
+      usdToKesRate = 130;
+    }
+
+    // Convert amount to KES
+    const amountKES = calculatedTotal * usdToKesRate;
+
+    console.log("🔧 Initializing IntaSend:", {
+      publishableKeyStart:
+        process.env.INTASEND_PUBLISHABLE_KEY?.substring(0, 10) + "...",
+      calculatedTotalUSD: calculatedTotal,
+      amountKES: amountKES,
+      discountApplied: appliedDiscountAmount
+    });
+
+    const intasend = new IntaSend(
+      process.env.INTASEND_PUBLISHABLE_KEY!,
+      process.env.INTASEND_SECRET_KEY!,
+      false
+    );
+    // Format phone number
+    let formattedPhone = phone_number.trim().replace(/\D/g, "");
+
+    if (formattedPhone.startsWith("0")) {
+      formattedPhone = `254${formattedPhone.substring(1)}`;
+    }
+
+    // Validate phone number
+    if (formattedPhone.length !== 12 || !formattedPhone.startsWith("2547")) {
+      throw new APIException(
+        "Phone number must be 12 digits starting with 2547",
+        400
       );
     }
 
-    const intasend = new IntaSend(
-      process.env.INTASEND_PUBLISHABLE_KEY,
-      process.env.INTASEND_SECRET_KEY,
-      // process.env.NODE_ENV !== "production"
-      false
-    );
+    // Prepare STK payload
+    const apiRef = `cart_${userCart.id}_${Date.now()}`;
 
-    const host = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    // Fetch USD to KES exchange rate
-    const exchangeRateRes = await fetch(
-      `${req.nextUrl.origin}/api/exchange-rate`
-    );
-    if (!exchangeRateRes.ok) {
-      throw new Error("Failed to fetch exchange rate for IntaSend payment");
-    }
-    const exchangeRateData = await exchangeRateRes.json();
-    const usdToKesRate = exchangeRateData.usdToKesRate;
-
-    if (!usdToKesRate) {
-      throw new Error("USD to KES exchange rate not available.");
-    }
-
-    const amountKES = (Number(amount) * usdToKesRate).toFixed(2); // Round to 2 decimal places
-
-    const collection = intasend.collection();
-    const resp = await collection.mpesaStkPush({
-      first_name,
-      last_name,
-      email,
+    const stkPayload = {
+      first_name: first_name.trim(),
+      last_name: (last_name || "").trim(),
+      email: email.trim(),
+      amount: amountKES,
+      phone_number: formattedPhone,
+      api_ref: apiRef,
       host: host,
-      amount: Number(amountKES),
-      phone_number: phone_number.startsWith("0")
-        ? `254${phone_number.substring(1)}`
-        : phone_number, // Ensure correct format
-      api_ref: userCart.id, // Use 'api_ref' for consistency
-      // callback_url: `${host}/api/intasend/webhook`,
-    });
+      currency: "KES",
+      callback_url: `${host}/api/intasend/webhook`,
+      narrative: `Purchase - ${apiRef}`,
+    };
 
-    return NextResponse.json(resp);
+    // Execute STK Push
+    try {
+      const collection = intasend.collection();
+      const resp = await collection.mpesaStkPush(stkPayload);
+
+      console.log("✅ IntaSend STK Push Success Response:", resp);
+
+      return NextResponse.json({
+        success: true,
+        data: resp,
+        metadata: {
+          amountKES: amountKES.toFixed(2),
+          apiRef: apiRef,
+          exchangeRate: usdToKesRate,
+          calculatedTotalUSD: calculatedTotal,
+          discountApplied: appliedDiscountAmount
+        },
+      });
+    } catch (intaSendError: any) {
+      console.error("❌ IntaSend API Call Failed:");
+
+      // Enhanced error logging
+      if (intaSendError.response) {
+        console.error("Response status:", intaSendError.response.status);
+
+        try {
+          // Try to get the actual error response from IntaSend
+          let errorData;
+          if (typeof intaSendError.response.data === "string") {
+            errorData = intaSendError.response.data;
+          } else if (
+            intaSendError.response.data &&
+            typeof intaSendError.response.data.text === "function"
+          ) {
+            errorData = await intaSendError.response.data.text();
+          } else {
+            errorData = intaSendError.response.data;
+          }
+          console.error("IntaSend Error Response:", errorData);
+        } catch (parseError) {
+          console.error("Could not parse IntaSend error response");
+        }
+      }
+
+      console.error("Error details:", {
+        message: intaSendError.message,
+        code: intaSendError.code,
+      });
+
+      // Specific error handling
+      if (intaSendError.response?.status === 401) {
+        throw new APIException(
+          "IntaSend authentication failed. Please check your live credentials and ensure you're not using test mode with live keys.",
+          401,
+          {
+            gateway: "intasend",
+            code: "AUTHENTICATION_FAILED",
+            // environment: testMode ? "TEST" : "LIVE",
+          }
+        );
+      }
+
+      throw new APIException(
+        "Payment gateway error: " + (intaSendError.message || "Unknown error"),
+        500,
+        { gateway: "intasend" }
+      );
+    }
   } catch (error: any) {
-    let errorMessage = "Failed to initiate M-Pesa STK Push";
-    console.error("IntaSend STK Push Error:", {
-      message: error.message,
-      stack: error.stack,
-      response: error.response?.data,
-    });
+    console.error("STK Push Error:", error.message);
+
+    if (error instanceof APIException) {
+      return NextResponse.json(
+        {
+          error: error.message,
+          details: error.metadata,
+        },
+        { status: error.statusCode }
+      );
+    }
 
     return NextResponse.json(
       {
-        error: errorMessage,
+        error: "Failed to initiate M-Pesa STK Push",
+        details:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
       },
-      { status: error.response?.status || 500 }
+      { status: 500 }
     );
   }
 }

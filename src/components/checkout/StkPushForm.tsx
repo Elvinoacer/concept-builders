@@ -110,7 +110,11 @@ export default function StkPushForm({
         5 * 60 * 1000
       );
     } else {
-      toast.error(result.error || "Failed to initiate STK Push");
+      const errorMsg = result.details 
+        ? `${result.error}: ${typeof result.details === 'string' ? result.details : JSON.stringify(result.details, null, 2)}`
+        : result.error || "Failed to initiate STK Push";
+      toast.error(errorMsg);
+      console.error("M-Pesa Error Details:", result);
     }
     setLoading(false);
   };

@@ -4,6 +4,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
+import { calculateItemTotal } from "@/lib/calculate-total";
+import { DiscountType } from "@/generated/prisma";
+import { sendPurchaseNotificationEmails } from "@/lib/emails";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -14,25 +17,111 @@ export async function POST(request: Request) {
 
   const userId = session.user.id;
 
-  const body = await request.json();
-  const { orderID, discountCode, discountAmount, discountId, cart } = body;
-
-  if (!orderID) {
-    return NextResponse.json(
-      { error: "Order ID is required" },
-      { status: 400 }
-    );
-  }
-
-  // Validate cart data
-  if (!cart || !Array.isArray(cart) || cart.length === 0) {
-    return NextResponse.json(
-      { error: "Cart data is invalid or empty" },
-      { status: 400 }
-    );
-  }
-
   try {
+    const body = await request.json();
+    const { orderID, discountCode } = body;
+
+    if (!orderID) {
+      return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
+    }
+
+    // Fetch user cart
+    const userCart = await prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            design: {
+              include: {
+                packageOptions: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!userCart || userCart.items.length === 0) {
+      return NextResponse.json({ error: "Cart is empty or no longer exists" }, { status: 400 });
+    }
+
+    // Calculate total amount from cart items
+    let calculatedTotal = userCart.items.reduce((total, item) => {
+      const itemForCalculation = {
+        ...item,
+        selectedExtras: item.selectedExtras as any[],
+      };
+      return total + calculateItemTotal(itemForCalculation);
+    }, 0);
+
+    let appliedDiscountAmount = 0;
+    let appliedDiscountId = null;
+
+    // Handle Discount
+    if (discountCode) {
+      const discount = await prisma.discount.findUnique({
+        where: { code: discountCode },
+      });
+
+      if (discount) {
+        // Validate Discount
+        let isValid = true;
+        let errorMessage = "";
+
+        if (!discount.isActive) {
+          isValid = false;
+          errorMessage = "Discount is not active";
+        } else if (discount.expiresAt && new Date(discount.expiresAt) < new Date()) {
+          isValid = false;
+          errorMessage = "Discount has expired";
+        } else if (discount.maxUses && discount.uses >= discount.maxUses) {
+          isValid = false;
+          errorMessage = "Discount has reached its maximum uses";
+        } else if (discount.minPurchaseAmount && calculatedTotal < discount.minPurchaseAmount) {
+          isValid = false;
+          errorMessage = `Minimum purchase of ${discount.minPurchaseAmount.toFixed(2)} required`;
+        }
+
+        if (isValid) {
+           const existingOrderWithDiscount = await prisma.order.findFirst({
+            where: {
+              userId: userId,
+              discountId: discount.id,
+              status: {
+                in: ['PAID', 'REFUND_REQUESTED'],
+              },
+            },
+          });
+
+          if (existingOrderWithDiscount) {
+             isValid = false;
+             errorMessage = "You have already used this discount code";
+          }
+        }
+
+        if (isValid) {
+          if (discount.type === DiscountType.PERCENTAGE) {
+            appliedDiscountAmount = calculatedTotal * (discount.value / 100);
+          } else if (discount.type === DiscountType.FIXED_AMOUNT) {
+            appliedDiscountAmount = discount.value;
+          }
+
+          // Cap discount at total
+          appliedDiscountAmount = Math.min(appliedDiscountAmount, calculatedTotal);
+          
+          calculatedTotal -= appliedDiscountAmount;
+          appliedDiscountId = discount.id;
+
+        } else {
+             console.warn(`Invalid discount code provided: ${discountCode} - ${errorMessage}`);
+             return NextResponse.json({ error: errorMessage }, { status: 400 });
+        }
+      } else {
+          return NextResponse.json({ error: "Invalid discount code" }, { status: 404 });
+      }
+    }
+
+    // Capture Payment
     const PaypalClient = client();
     const req = new paypal.orders.OrdersCaptureRequest(orderID);
     req.requestBody({});
@@ -40,20 +129,40 @@ export async function POST(request: Request) {
     console.log("Attempting to capture PayPal order:", orderID);
 
     const response = await PaypalClient.execute(req);
-    console.log("PayPal Capture Response:", {
-      status: response.statusCode,
-      result: response.result,
-    });
 
     if (response.statusCode !== 201) {
-      const errorMsg = `PayPal capture failed with status: ${response.statusCode}`;
-      console.error(errorMsg, response.result);
+      console.error("PayPal Capture Failed Response:", JSON.stringify(response.result, null, 2));
+      
+      let errorMsg = `PayPal capture failed with status: ${response.statusCode}`;
+      
+      // Extract specific error details
+      if (response.result && response.result.details && response.result.details.length > 0) {
+        const issue = response.result.details[0].issue;
+        const description = response.result.details[0].description;
+        
+        switch (issue) {
+          case 'INSTRUMENT_DECLINED':
+            errorMsg = "Your payment method was declined. Please try a different card or bank account.";
+            break;
+          case 'TRANSACTION_REFUSED':
+            errorMsg = "The transaction was refused by PayPal. Please contact PayPal support or try again.";
+            break;
+          case 'PAYER_ACTION_REQUIRED':
+            errorMsg = "Additional action is required to complete the payment. Please try again.";
+            break;
+          case 'DUPLICATE_INVOICE_ID':
+            errorMsg = "This order has already been paid.";
+            break;
+          default:
+            errorMsg = description || `Payment failed: ${issue}`;
+        }
+      }
 
       await prisma.notification.create({
         data: {
           userId: userId,
           title: "Payment Capture Failed",
-          description: `Failed to capture payment for order ${orderID}. Status: ${response.statusCode}`,
+          description: `Failed to capture payment for order ${orderID}. ${errorMsg}`,
           icon: "AlertTriangle",
         },
       });
@@ -62,149 +171,56 @@ export async function POST(request: Request) {
     }
 
     const capture = response.result.purchase_units[0].payments.captures[0];
-    console.log("Payment Capture Details:", {
-      captureId: capture.id,
-      status: capture.status,
-      amount: capture.amount?.value,
-    });
-
-    // Verify payment was actually completed
+    
     if (capture.status !== "COMPLETED") {
-      console.error("Payment not completed:", capture.status);
-
-      await prisma.notification.create({
-        data: {
-          userId: userId,
-          title: "Payment Not Completed",
-          description: `Payment for order ${orderID} was not completed. Status: ${capture.status}`,
-          icon: "AlertTriangle",
-        },
-      });
-
       return NextResponse.json(
         { error: `Payment not completed. Status: ${capture.status}` },
         { status: 400 }
       );
     }
 
-    // Check if order already exists (prevent duplicates)
-    const existingOrder = await prisma.order.findUnique({
-      where: { paymentId: capture.id },
-    });
-
-    if (existingOrder) {
-      console.log("Order already exists:", existingOrder.id);
-      return NextResponse.json({
-        success: true,
-        orderId: existingOrder.id,
-        redirect_url: `/purchase-confirmation?purchaseId=${existingOrder.id}`,
-      });
-    }
-
-    // Verify user cart still exists and has items
-    const userCart = await prisma.cart.findUnique({
-      where: { userId },
-      include: { items: { include: { design: true } } },
-    });
-
-    if (!userCart || userCart.items.length === 0) {
-      return NextResponse.json(
-        { error: "Cart is empty or no longer exists" },
-        { status: 400 }
-      );
-    }
-
-    // Calculate total amount from cart
-    const totalAmount = userCart.items.reduce((acc, item) => {
-      let itemTotal = item.design.basePrice * item.quantity;
-      if (item.selectedExtras) {
-        let extras;
-        if (typeof item.selectedExtras === "string") {
-          try {
-            extras = JSON.parse(item.selectedExtras);
-          } catch (error) {
-            console.error("Error parsing selectedExtras:", error);
-            extras = [];
-          }
-        } else {
-          extras = item.selectedExtras;
-        }
-        extras.forEach((extra: any) => {
-          itemTotal += extra.price || 0;
-        });
-      }
-      return acc + itemTotal;
-    }, 0);
-
-    // Apply discount if exists
-    const finalAmount = discountAmount
-      ? totalAmount - discountAmount
-      : totalAmount;
-
-    // Verify the captured amount matches our expected amount
+    // Verify Amount
     const capturedAmount = parseFloat(capture.amount.value);
-    if (Math.abs(capturedAmount - finalAmount) > 0.01) {
+    if (Math.abs(capturedAmount - calculatedTotal) > 0.01) {
       console.error("Amount mismatch:", {
         captured: capturedAmount,
-        expected: finalAmount,
+        expected: calculatedTotal,
       });
-
-      await prisma.notification.create({
-        data: {
-          userId: userId,
-          title: "Payment Amount Mismatch",
-          description: `Captured amount (${capturedAmount}) does not match expected amount (${finalAmount})`,
-          icon: "AlertTriangle",
-        },
-      });
-
       return NextResponse.json(
         { error: "Payment amount mismatch detected" },
         { status: 400 }
       );
     }
 
-    // Create order in database - only after successful payment verification
+    // Create Order
     const newOrder = await prisma.$transaction(async (tx) => {
       const order = await tx.order.create({
         data: {
           userId: userId,
-          amount: finalAmount,
+          amount: calculatedTotal,
           status: "PAID",
           paymentGateway: "PAYPAL",
           paymentId: capture.id,
           discountCode: discountCode || null,
-          discountAmount: discountAmount || null,
-          discountId: discountId || null,
+          discountAmount: appliedDiscountAmount > 0 ? appliedDiscountAmount : null,
+          discountId: appliedDiscountId,
+          cartId: userCart.id, // Store cartId for reference
         },
       });
 
-      // Create order items
       await tx.orderItem.createMany({
-        data: userCart.items.map((item) => {
-          let selectedExtras = item.selectedExtras;
-          if (typeof selectedExtras === "string") {
-            try {
-              selectedExtras = JSON.parse(selectedExtras);
-            } catch (error) {
-              console.error("Error parsing selectedExtras:", error);
-              selectedExtras = null;
-            }
-          }
-          return {
-            orderId: order.id,
-            designId: item.designId,
-            quantity: item.quantity,
-            selectedFileTypes: item.selectedFileTypes,
-            selectedExtras: selectedExtras,
-          };
-        }),
+        data: userCart.items.map((item) => ({
+          orderId: order.id,
+          designId: item.designId,
+          quantity: item.quantity,
+          selectedFileTypes: item.selectedFileTypes,
+          selectedExtras: item.selectedExtras as any,
+        })),
       });
 
-      // Update discount usage if applicable
-      if (discountId) {
+      if (appliedDiscountId) {
         await tx.discount.update({
-          where: { id: discountId },
+          where: { id: appliedDiscountId },
           data: {
             uses: {
               increment: 1,
@@ -213,11 +229,8 @@ export async function POST(request: Request) {
         });
       }
 
-      // Clear cart
-      await tx.cartItem.deleteMany({ where: { cartId: userCart.id } });
       await tx.cart.delete({ where: { id: userCart.id } });
 
-      // Create success notification
       await tx.notification.create({
         data: {
           userId: userId,
@@ -230,42 +243,32 @@ export async function POST(request: Request) {
       return order;
     });
 
-    console.log("Order created successfully:", newOrder.id);
+    // Send notification emails (User & Admin)
+    // We do this outside the transaction to avoid blocking it if email service is slow
+    // and to ensure we only send email if transaction committed successfully
+    await sendPurchaseNotificationEmails(newOrder.id);
 
     return NextResponse.json({
       success: true,
       orderId: newOrder.id,
       redirect_url: `/purchase-confirmation?purchaseId=${newOrder.id}`,
     });
+
   } catch (error: any) {
-    console.error("PayPal Capture Transaction Error:", {
-      message: error.message,
-      stack: error.stack,
-      orderID: orderID,
-      userId: userId,
-    });
-
-    // Create error notification
-    await prisma.notification.create({
-      data: {
-        userId: userId,
-        title: "Payment Processing Failed",
-        description: `Failed to process payment for order ${orderID}. Please contact support.`,
-        icon: "AlertTriangle",
-      },
-    });
-
+    console.error("PayPal Capture Error:", error);
+    
+    // Handle SDK errors that might throw exceptions
     let errorMessage = "Internal server error during payment processing";
-    if (error.message?.includes("insufficient")) {
-      errorMessage = "Insufficient funds in your account";
-    } else if (error.message?.includes("card")) {
-      errorMessage = "Card declined. Please check your card details.";
-    } else if (error.message?.includes("currency")) {
-      errorMessage = "Currency not supported for this payment method";
+    if (error.message) {
+        if (error.message.includes("INSTRUMENT_DECLINED")) {
+            errorMessage = "Your payment method was declined. Please try a different card.";
+        } else if (error.message.includes("insufficient funds")) {
+            errorMessage = "Insufficient funds in your account.";
+        }
     }
 
     return NextResponse.json(
-      { error: `${errorMessage}: ${error.message}` },
+      { error: errorMessage },
       { status: 500 }
     );
   }

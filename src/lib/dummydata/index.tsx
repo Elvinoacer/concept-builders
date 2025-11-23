@@ -284,43 +284,43 @@ export const slides = [
     title: "Your Dream. Our Blueprint.",
     description:
       "We turn dreams into reality with exceptional architectural designs and quality craftsmanship tailored to your needs and lifestyle",
-    image:
-      "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763456171240-A_13%20-%20Photo%20(8).jpg",
+    image: "/images/banners/banner1.jpg",
+    // "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763456171240-A_13%20-%20Photo%20(8).jpg",
   },
   {
     title: "Core Promise Building Dreams, One Home at a Time.",
     description:
       "From initial design concepts to final construction, we offer a seamless and personalized experience to transform your dream home into a reality.",
-    image:
-      "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763456346215-A_17%20-%20Photo%20(11).jpg",
+    image: "/images/banners/banner2.jpg",
+    // "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763456346215-A_17%20-%20Photo%20(11).jpg",
   },
   {
     title: "Build your Dream Home",
     description:
       "Explore our curated collections of house plans and start your journey to homeownership today.",
-    image:
-      "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763395917465-IMG_20250703_165532_700.jpg",
+    image: "/images/banners/banner3.jpg",
+    // "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763395917465-IMG_20250703_165532_700.jpg",
   },
   {
     title: "Your Vision, Our Precision.",
     description:
       "Where Vision Meets Precision. We collaborate with you to achieve a shared vision, ensuring a seamless journey from concept to keys.",
-    image:
-      "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763456253468-A_13%20-%20Photo.jpg",
+    image: "images/banners/banner4.jpg",
+    // "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763456253468-A_13%20-%20Photo.jpg",
   },
   {
     title: "Luxurious and Affordable Designs",
     description:
       "Find the perfect balance of luxury and affordability with our range of House plans.",
-    image:
-      "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763563958663-A_9%20-%20Photo.jpg",
+    image: "/images/banners/banner5.jpg",
+    // "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763563958663-A_9%20-%20Photo.jpg",
   },
   {
     title: "Customizable plans to fit your Needs",
     description:
       "Our team of experts can help you customize any of our plans to create your perfect home.",
-    image:
-      "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763564065464-A_2%20-%20Photo.jpg",
+    image: "/images/banners/banner6.jpg",
+    // "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763564065464-A_2%20-%20Photo.jpg",
   },
 ];
 

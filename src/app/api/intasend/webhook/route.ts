@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { sendPurchaseNotificationEmails } from "@/lib/emails";
+import { calculateItemTotal } from "@/lib/calculate-total";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
@@ -25,7 +27,23 @@ export async function POST(req: NextRequest) {
     const data = JSON.parse(body);
 
     if (data.state === "COMPLETE") {
-      const cartId = data.api_ref;
+      // api_ref format: cart_{cartId}_{timestamp}
+      // We need to extract the cartId.
+      // If api_ref doesn't match the format (legacy), fallback to using it as is.
+      let cartId = data.api_ref;
+      if (data.api_ref && data.api_ref.startsWith("cart_")) {
+          const parts = data.api_ref.split('_');
+          if (parts.length >= 2) {
+              cartId = parts[1];
+          }
+      } else if (data.api_ref && data.api_ref.startsWith("cart-")) {
+          // Handle legacy format cart-{cartId}-{timestamp} just in case
+           const parts = data.api_ref.split('-');
+           if (parts.length >= 2) {
+               cartId = parts[1];
+           }
+      }
+
       const paymentId = data.invoice_id;
       const amountPaidKES = data.value;
 
@@ -43,19 +61,24 @@ export async function POST(req: NextRequest) {
       });
 
       if (!userCart) {
+        console.error(`Cart not found for api_ref: ${data.api_ref}, extracted cartId: ${cartId}`);
         return NextResponse.json({ error: "Cart not found" }, { status: 404 });
       }
 
       // Fetch USD to KES exchange rate to convert amount back to USD
-      const exchangeRateRes = await fetch(`${req.nextUrl.origin}/api/exchange-rate`);
-      if (!exchangeRateRes.ok) {
-        throw new Error('Failed to fetch exchange rate for order creation');
-      }
-      const exchangeRateData = await exchangeRateRes.json();
-      const usdToKesRate = exchangeRateData.usdToKesRate;
-
-      if (!usdToKesRate) {
-        throw new Error('USD to KES exchange rate not available.');
+      // Note: In production, it might be safer to use the rate stored in the cart or a fixed rate, 
+      // but fetching current rate is acceptable if volatility is low.
+      let usdToKesRate = 130; // Default fallback
+      try {
+        const exchangeRateRes = await fetch(`${req.nextUrl.origin}/api/exchange-rate`);
+        if (exchangeRateRes.ok) {
+            const exchangeRateData = await exchangeRateRes.json();
+            if (exchangeRateData.usdToKesRate) {
+                usdToKesRate = exchangeRateData.usdToKesRate;
+            }
+        }
+      } catch (e) {
+          console.error("Failed to fetch exchange rate in webhook, using fallback", e);
       }
 
       const amountPaidUSD = parseFloat(amountPaidKES) / usdToKesRate;
@@ -68,7 +91,7 @@ export async function POST(req: NextRequest) {
             status: "PAID",
             paymentGateway: "INTASEND",
             paymentId: paymentId,
-            cartId: userCart.id,
+            cartId: userCart.id, // Store the original cart ID for reference
             discountCode: userCart.discountCode || null,
             discountAmount: userCart.discountAmount || null,
             discountId: userCart.discountId || null,
@@ -109,7 +132,15 @@ export async function POST(req: NextRequest) {
       });
     } else {
       console.log("Payment failed:", data);
-      const cartId = data.api_ref;
+      // Try to extract cartId for notification
+      let cartId = data.api_ref;
+      if (data.api_ref && data.api_ref.startsWith("cart_")) {
+          const parts = data.api_ref.split('_');
+          if (parts.length >= 2) {
+              cartId = parts[1];
+          }
+      }
+
       const userCart = await prisma.cart.findUnique({
         where: { id: cartId },
       });

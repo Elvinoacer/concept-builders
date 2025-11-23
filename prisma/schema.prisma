@@ -52,19 +52,21 @@ model User {
   conversations            Conversation[]    @relation("ConversationUsers")
   wishlist                 Design[]          @relation("DesignToUser")
   readMessages             Message[]         @relation("ReadMessages")
+  paymentAttempts          PaymentAttempt[]
 }
 
 model Cart {
-  id             String     @id @default(cuid())
-  userId         String     @unique
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  discountAmount Float?
-  discountCode   String?
-  discountId     String?
-  discount       Discount?  @relation(fields: [discountId], references: [id])
-  user           User       @relation(fields: [userId], references: [id])
-  items          CartItem[]
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  discountAmount  Float?
+  discountCode    String?
+  discountId      String?
+  discount        Discount?        @relation(fields: [discountId], references: [id])
+  user            User             @relation(fields: [userId], references: [id])
+  items           CartItem[]
+  paymentAttempts PaymentAttempt[]
 }
 
 model CartItem {
@@ -540,6 +542,27 @@ model DesignView {
   createdAt DateTime @default(now())
   design    Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
   user      User?    @relation(fields: [userId], references: [id])
+}
+
+// Add this to your schema.prisma
+model PaymentAttempt {
+  id            String   @id @default(cuid())
+  userId        String
+  cartId        String
+  amount        Float
+  amountKES     Float
+  amountInCents Int
+  phoneNumber   String
+  apiRef        String
+  status        String // initiated, success, failed
+  gateway       String // intasend
+  response      String? // JSON response from gateway
+  exchangeRate  Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  cart Cart @relation(fields: [cartId], references: [id])
 }
 
 model OngoingProject {

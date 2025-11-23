@@ -1,70 +1,133 @@
 import { client } from "@/lib/paypal";
 import paypal from "@paypal/checkout-server-sdk";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import prisma from "@/lib/prisma";
+import { calculateItemTotal } from "@/lib/calculate-total";
+import { DiscountType } from "@/generated/prisma";
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const { cart, discountAmount } = body;
+  const session = await getServerSession(authOptions);
 
-  const subTotal = cart.reduce((total: number, item: any) => {
-    let itemTotal = item.design.basePrice * item.quantity;
-
-    if (item.selectedFileTypes) {
-      if (item.selectedFileTypes.includes('architecturalPdf')) {
-        itemTotal += item.design.architecturalPdfPrice || 0;
-      }
-      if (item.selectedFileTypes.includes('architecturalCad')) {
-        itemTotal += item.design.architecturalCadPrice || 0;
-      }
-      if (item.selectedFileTypes.includes('structuralPdf')) {
-        itemTotal += item.design.structuralPdfPrice || 0;
-      }
-      if (item.selectedFileTypes.includes('structuralCad')) {
-        itemTotal += item.design.structuralCadPrice || 0;
-      }
-      if (item.selectedFileTypes.includes('billOfQuantities')) {
-        itemTotal += item.design.billOfQuantitiesPrice || 0;
-      }
-    }
-
-    if (item.selectedExtras) {
-      itemTotal += item.selectedExtras.reduce((sum: number, extra: any) => sum + extra.price, 0);
-    }
-
-    return total + itemTotal;
-  }, 0);
-
-  const totalAmount = subTotal - (discountAmount || 0);
-
-  // Enhanced validation
-  if (isNaN(totalAmount) || totalAmount <= 0) {
-    return NextResponse.json(
-      { error: "Valid total amount is required and must be greater than 0" },
-      { status: 400 }
-    );
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!cart || !Array.isArray(cart) || cart.length === 0) {
-    return NextResponse.json(
-      { error: "Cart is empty or invalid" },
-      { status: 400 }
-    );
-  }
-
-  if (totalAmount < 0.01) {
-    return NextResponse.json(
-      { error: "Total amount must be at least $0.01" },
-      { status: 400 }
-    );
-  }
+  const userId = session.user.id;
 
   try {
+    const body = await request.json();
+    const { discountCode } = body;
+
+    // Fetch user cart
+    const userCart = await prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            design: {
+              include: {
+                packageOptions: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!userCart) {
+      return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+    }
+
+    if (!userCart.items || userCart.items.length === 0) {
+      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+    }
+
+    // Calculate total amount from cart items
+    let calculatedTotal = userCart.items.reduce((total, item) => {
+      const itemForCalculation = {
+        ...item,
+        selectedExtras: item.selectedExtras as any[],
+      };
+      return total + calculateItemTotal(itemForCalculation);
+    }, 0);
+
+    let appliedDiscountAmount = 0;
+
+    // Handle Discount
+    if (discountCode) {
+      const discount = await prisma.discount.findUnique({
+        where: { code: discountCode },
+      });
+
+      if (discount) {
+        // Validate Discount
+        let isValid = true;
+        let errorMessage = "";
+
+        if (!discount.isActive) {
+          isValid = false;
+          errorMessage = "Discount is not active";
+        } else if (discount.expiresAt && new Date(discount.expiresAt) < new Date()) {
+          isValid = false;
+          errorMessage = "Discount has expired";
+        } else if (discount.maxUses && discount.uses >= discount.maxUses) {
+          isValid = false;
+          errorMessage = "Discount has reached its maximum uses";
+        } else if (discount.minPurchaseAmount && calculatedTotal < discount.minPurchaseAmount) {
+          isValid = false;
+          errorMessage = `Minimum purchase of ${discount.minPurchaseAmount.toFixed(2)} required`;
+        }
+
+        if (isValid) {
+           const existingOrderWithDiscount = await prisma.order.findFirst({
+            where: {
+              userId: userId,
+              discountId: discount.id,
+              status: {
+                in: ['PAID', 'REFUND_REQUESTED'],
+              },
+            },
+          });
+
+          if (existingOrderWithDiscount) {
+             isValid = false;
+             errorMessage = "You have already used this discount code";
+          }
+        }
+
+        if (isValid) {
+          if (discount.type === DiscountType.PERCENTAGE) {
+            appliedDiscountAmount = calculatedTotal * (discount.value / 100);
+          } else if (discount.type === DiscountType.FIXED_AMOUNT) {
+            appliedDiscountAmount = discount.value;
+          }
+
+          // Cap discount at total
+          appliedDiscountAmount = Math.min(appliedDiscountAmount, calculatedTotal);
+          
+          calculatedTotal -= appliedDiscountAmount;
+
+        } else {
+             console.warn(`Invalid discount code provided: ${discountCode} - ${errorMessage}`);
+             return NextResponse.json({ error: errorMessage }, { status: 400 });
+        }
+      } else {
+          return NextResponse.json({ error: "Invalid discount code" }, { status: 404 });
+      }
+    }
+
+    if (calculatedTotal <= 0) {
+      return NextResponse.json(
+        { error: "Total amount must be greater than 0" },
+        { status: 400 }
+      );
+    }
+
     const PaypalClient = client();
     const req = new paypal.orders.OrdersCreateRequest();
     req.headers["Prefer"] = "return=representation";
-
-    // Enhanced order creation with better item details
-    const itemTotal = subTotal; // The sub total is the item total
 
     req.requestBody({
       intent: "CAPTURE",
@@ -72,53 +135,20 @@ export async function POST(request: Request) {
         {
           amount: {
             currency_code: "USD",
-            value: totalAmount.toFixed(2),
+            value: calculatedTotal.toFixed(2),
             breakdown: {
               item_total: {
                 currency_code: "USD",
-                value: itemTotal.toFixed(2),
+                value: (calculatedTotal + appliedDiscountAmount).toFixed(2),
               },
               discount: {
                 currency_code: "USD",
-                value: (discountAmount || 0).toFixed(2),
+                value: appliedDiscountAmount.toFixed(2),
               },
             },
           },
-          items: cart.map((item: any, index: number) => {
-            let itemTotal = item.design.basePrice;
-
-            if (item.selectedFileTypes) {
-              if (item.selectedFileTypes.includes('architecturalPdf')) {
-                itemTotal += item.design.architecturalPdfPrice || 0;
-              }
-              if (item.selectedFileTypes.includes('architecturalCad')) {
-                itemTotal += item.design.architecturalCadPrice || 0;
-              }
-              if (item.selectedFileTypes.includes('structuralPdf')) {
-                itemTotal += item.design.structuralPdfPrice || 0;
-              }
-              if (item.selectedFileTypes.includes('structuralCad')) {
-                itemTotal += item.design.structuralCadPrice || 0;
-              }
-              if (item.selectedFileTypes.includes('billOfQuantities')) {
-                itemTotal += item.design.billOfQuantitiesPrice || 0;
-              }
-            }
-
-            if (item.selectedExtras) {
-              itemTotal += item.selectedExtras.reduce((sum: number, extra: any) => sum + extra.price, 0);
-            }
-
-            return {
-              name: item.design?.title || `Design Item ${index + 1}`,
-              description: item.design?.description || "Digital design product",
-              quantity: item.quantity.toString(),
-              unit_amount: {
-                currency_code: "USD",
-                value: itemTotal.toFixed(2),
-              },
-            };
-          }),
+          // We can optionally verify items here, but total is what matters for payment
+          description: `Order for Cart ${userCart.id}`,
         },
       ],
       application_context: {
@@ -149,32 +179,15 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("PayPal Order Created Successfully:", {
-      orderID: response.result.id,
-      amount: totalAmount.toFixed(2),
-      status: response.result.status,
-    });
-
     return NextResponse.json({
       orderID: response.result.id,
       status: response.result.status,
     });
+
   } catch (error: any) {
-    console.error("PayPal Order Creation Error:", {
-      message: error.message,
-      stack: error.stack,
-      amount: totalAmount,
-    });
-
-    let errorMessage = "Internal server error during order creation";
-    if (error.message?.includes("currency")) {
-      errorMessage = "Currency not supported for payment";
-    } else if (error.message?.includes("authentication")) {
-      errorMessage = "Payment authentication failed";
-    }
-
+    console.error("PayPal Order Creation Error:", error);
     return NextResponse.json(
-      { error: `${errorMessage}: ${error.message}` },
+      { error: "Internal server error during order creation" },
       { status: 500 }
     );
   }

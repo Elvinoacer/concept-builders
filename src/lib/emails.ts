@@ -8,6 +8,7 @@ import {
   Project,
 } from "@/generated/prisma";
 import { Resend } from "resend";
+import prisma from "@/lib/prisma";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -250,5 +251,161 @@ export async function sendInvoiceEmail(invoice: InvoiceWithDetails) {
   } catch (error) {
     console.error("Error in sendInvoiceEmail function:", error);
     throw error;
+  }
+}
+
+export async function sendPurchaseNotificationEmails(orderId: string) {
+  try {
+    // Fetch full order details
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: true,
+        items: {
+          include: {
+            design: {
+              include: {
+                architecturalDesign: { include: { pdfFiles: true, cadFiles: true } },
+                structuralDesign: { include: { pdfFiles: true, cadFiles: true } },
+                billOfQuantities: { include: { excelFiles: true, pdfFiles: true } },
+                packageOptions: { include: { file: true } },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      console.error(`Order not found for email notification: ${orderId}`);
+      return;
+    }
+
+    const missingFiles: { designName: string; itemType: string }[] = [];
+
+    // Check for missing files
+    for (const item of order.items) {
+      const design = item.design;
+      
+      // Check standard file types
+      if (item.selectedFileTypes) {
+        for (const fileType of item.selectedFileTypes) {
+          let isAvailable = false;
+          let label = fileType;
+
+          switch (fileType) {
+            case "architecturalPdf":
+              isAvailable = (design.architecturalDesign?.pdfFiles?.length || 0) > 0;
+              label = "Architectural PDF";
+              break;
+            case "architecturalCad":
+              isAvailable = (design.architecturalDesign?.cadFiles?.length || 0) > 0;
+              label = "Architectural CAD";
+              break;
+            case "structuralPdf":
+              isAvailable = (design.structuralDesign?.pdfFiles?.length || 0) > 0;
+              label = "Structural PDF";
+              break;
+            case "structuralCad":
+              isAvailable = (design.structuralDesign?.cadFiles?.length || 0) > 0;
+              label = "Structural CAD";
+              break;
+            case "billOfQuantitiesExcel":
+              isAvailable = (design.billOfQuantities?.excelFiles?.length || 0) > 0;
+              label = "Bill of Quantities (Excel)";
+              break;
+            case "billOfQuantitiesPdf":
+              isAvailable = (design.billOfQuantities?.pdfFiles?.length || 0) > 0;
+              label = "Bill of Quantities (PDF)";
+              break;
+          }
+
+          if (!isAvailable) {
+            missingFiles.push({ designName: design.name, itemType: label });
+          }
+        }
+      }
+
+      // Check extras
+      if (item.selectedExtras) {
+        let extras: any[] = [];
+        if (typeof item.selectedExtras === 'string') {
+            try {
+                extras = JSON.parse(item.selectedExtras);
+            } catch (e) {
+                extras = [];
+            }
+        } else {
+            extras = item.selectedExtras as any[];
+        }
+
+        for (const extra of extras) {
+            // Find the corresponding package option in the design to check for file
+            const packageOption = design.packageOptions.find(po => po.id === extra.id);
+            if (packageOption && !packageOption.file) {
+                 missingFiles.push({ designName: design.name, itemType: `Customization: ${packageOption.name}` });
+            }
+        }
+      }
+    }
+
+    // Send User Email
+    if (missingFiles.length > 0) {
+      const missingFilesHtml = missingFiles
+        .map((f) => `<li><strong>${f.designName}</strong>: ${f.itemType}</li>`)
+        .join("");
+
+      await resend.emails.send({
+        from: `Concept Builders <${process.env.ADMIN_EMAIL}>`,
+        to: order.user.email!,
+        subject: `Order Confirmation #${order.id} - Important Information`,
+        html: `
+          <h1>Thank you for your purchase!</h1>
+          <p>Your order #${order.id} has been confirmed.</p>
+          <p>We noticed that some of the files you purchased are currently being prepared and are not immediately available for download. These files will be sent to you within 3 days.</p>
+          <h3>Pending Files:</h3>
+          <ul>${missingFilesHtml}</ul>
+          <p>All other available files can be downloaded from your dashboard immediately.</p>
+          <p>Thank you for your patience and for choosing Concept Builders!</p>
+        `,
+      });
+    } else {
+      // Standard confirmation if all files are present
+      await resend.emails.send({
+        from: `Concept Builders <${process.env.ADMIN_EMAIL}>`,
+        to: order.user.email!,
+        subject: `Your Concept Builders Order Confirmation #${order.id}`,
+        html: `<h1>Thank you for your order!</h1><p>Your order #${order.id} has been confirmed. You can access your files from your dashboard.</p>`,
+      });
+    }
+
+    // Send Admin Email (Always)
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (adminEmail) {
+      const missingFilesSection = missingFiles.length > 0 
+        ? `<h3>Missing Files (Action Required):</h3><ul>${missingFiles.map((f) => `<li><strong>${f.designName}</strong>: ${f.itemType}</li>`).join("")}</ul>` 
+        : "<p>All files are available.</p>";
+
+      await resend.emails.send({
+        from: `Concept Builders System <${process.env.ADMIN_EMAIL}>`,
+        to: adminEmail,
+        subject: `New Order #${order.id} - ${missingFiles.length > 0 ? "ACTION REQUIRED" : "Confirmed"}`,
+        html: `
+          <h1>New Order Received</h1>
+          <p><strong>Order ID:</strong> ${order.id}</p>
+          <p><strong>Amount:</strong> $${order.amount.toFixed(2)}</p>
+          <p><strong>Customer:</strong> ${order.user.name} (${order.user.email})</p>
+          <p><strong>Phone:</strong> ${order.user.phone || "N/A"}</p>
+          
+          ${missingFilesSection}
+          
+          <p><a href="${process.env.NEXTAUTH_URL}/admin/purchases">View Order in Admin Panel</a></p>
+        `,
+      });
+    }
+
+  } catch (error) {
+    console.error("Error in sendPurchaseNotificationEmails:", error);
+    // Don't throw, just log, so we don't break the payment flow if email fails
   }
 }
