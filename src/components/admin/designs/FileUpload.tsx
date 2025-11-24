@@ -13,6 +13,9 @@ import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import { useUpload } from '@/contexts/UploadContext';
 
+
+const MAX_UPLOAD_SIZE=2 * 1024 * 1024 * 1024;
+
 interface FileUploadProps {
   onUploadSuccess: (
     file: { url: string; type: string; originalFileName: string; fileId: string }
@@ -71,7 +74,7 @@ const FileUpload = ({
     onDrop,
     multiple,
     accept: accept ? { [accept]: [] } : undefined,
-    maxSize: 300 * 1024 * 1024, // 300MB max file size
+    maxSize: MAX_UPLOAD_SIZE, // 2GB max file size
   });
 
   const handleRemove = async (fileUrl: string) => {
@@ -125,7 +128,7 @@ const FileUpload = ({
           <p className="text-gray-600 text-sm">
             Drag & drop or <span className="font-semibold text-blue-600">browse</span>
           </p>
-          <p className="text-xs text-gray-400">Max 300MB</p>
+          <p className="text-xs text-gray-400">Max 2GB</p>
         </div>
       </div>
 

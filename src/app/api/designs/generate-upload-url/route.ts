@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSignedUrlForUpload } from "../../../../lib/do-spaces";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
+// Configure route to handle large file uploads
+export const maxDuration = 300; // 5 minutes
+export const dynamic = 'force-dynamic';
+
 // Ensure you have these environment variables set
 const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 

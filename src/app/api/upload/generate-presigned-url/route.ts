@@ -3,6 +3,10 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
 
+// Configure route to handle large file uploads
+export const maxDuration = 300; // 5 minutes
+export const dynamic = 'force-dynamic';
+
 const s3Client = new S3Client({
   endpoint: `https://sfo3.digitaloceanspaces.com`,
   region: "sfo3",
@@ -30,8 +34,8 @@ export async function POST(req: NextRequest) {
     });
 
     const signedUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: 3600,
-    }); // URL expires in 1 hour
+      expiresIn: 7200,
+    }); // URL expires in 2 hours to support large file uploads
 
     const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.sfo3.digitaloceanspaces.com/${fileKey}`;
 

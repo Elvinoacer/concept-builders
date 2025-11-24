@@ -28,7 +28,7 @@ export const getSignedUrlForUpload = async (
     ContentType: contentType,
     ACL: "public-read",
   });
-  const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+  const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 7200 }); // 2 hours for large uploads
   const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.sfo3.digitaloceanspaces.com/${key}`;
   return { signedUrl, publicUrl, key };
 };

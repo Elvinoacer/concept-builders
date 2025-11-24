@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { FileType } from "@/generated/prisma";
 
+// Configure route for large file metadata handling
+export const maxDuration = 300; // 5 minutes
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     const { fileName, fileTypeCategory, key, url } = await req.json();
