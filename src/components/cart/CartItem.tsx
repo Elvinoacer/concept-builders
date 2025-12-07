@@ -90,31 +90,71 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
             </p>
             <div className="flex flex-wrap gap-x-4 gap-y-2">
               {[
-                { type: "architecturalPdf", label: "Architectural PDF" },
-                { type: "architecturalCad", label: "Architectural CAD" },
-                { type: "structuralPdf", label: "Structural PDF" },
-                { type: "structuralCad", label: "Structural CAD" },
-                { type: "billOfQuantities", label: "Bill of Quantities" },
+                { 
+                  type: "architecturalPdf", 
+                  label: "Architectural PDF", 
+                  isBase: true,
+                  isAvailable: (item.design.architecturalDesign?.pdfFiles?.length || 0) > 0 
+                },
+                { 
+                  type: "architecturalCad", 
+                  label: "Architectural CAD",
+                  isAvailable: (item.design.architecturalDesign?.cadFiles?.length || 0) > 0
+                },
+                { 
+                  type: "structuralPdf", 
+                  label: "Structural PDF",
+                  isAvailable: (item.design.structuralDesign?.pdfFiles?.length || 0) > 0
+                },
+                { 
+                  type: "structuralCad", 
+                  label: "Structural CAD",
+                  isAvailable: (item.design.structuralDesign?.cadFiles?.length || 0) > 0
+                },
+                { 
+                  type: "billOfQuantitiesExcel", // Fixed key from billOfQuantities to match PurchaseSidebar
+                  label: "Bill of Quantities (Excel)",
+                  isAvailable: (item.design.billOfQuantities?.excelFiles?.length || 0) > 0
+                },
+                { 
+                  type: "billOfQuantitiesPdf", 
+                  label: "Bill of Quantities (PDF)",
+                  isAvailable: (item.design.billOfQuantities?.pdfFiles?.length || 0) > 0
+                },
               ].map((fileTypeOption) => (
-                <label
-                  key={fileTypeOption.type}
-                  className="flex items-center gap-2 text-xs xs:text-sm w-full sm:w-auto"
-                >
-                  <input
-                    type="checkbox"
-                    checked={item.selectedFileTypes.includes(
-                      fileTypeOption.type
-                    )}
-                    onChange={(e) =>
-                      handleFileTypeChange(
-                        fileTypeOption.type,
-                        e.target.checked
-                      )
-                    }
-                    className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600 w-3 h-3 xs:w-4 xs:h-4"
-                  />
-                  <span className="sm:whitespace-nowrap">{fileTypeOption.label}</span>
-                </label>
+                <div key={fileTypeOption.type} className="flex flex-col w-full sm:w-auto">
+                  <label
+                    className={`flex items-center gap-2 text-xs xs:text-sm ${
+                      fileTypeOption.isBase ? "cursor-not-allowed opacity-80" : "cursor-pointer"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={
+                        fileTypeOption.isBase || // Always checked if base
+                        item.selectedFileTypes.includes(fileTypeOption.type)
+                      }
+                      onChange={(e) => {
+                        if (fileTypeOption.isBase) return; // Prevent change if base
+                        handleFileTypeChange(
+                          fileTypeOption.type,
+                          e.target.checked
+                        )
+                      }}
+                      disabled={fileTypeOption.isBase}
+                      className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600 w-3 h-3 xs:w-4 xs:h-4 disabled:opacity-50"
+                    />
+                    <span className="sm:whitespace-nowrap">
+                      {fileTypeOption.label}
+                      {fileTypeOption.isBase && " (Base Price)"}
+                    </span>
+                  </label>
+                  {!fileTypeOption.isAvailable && (
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 ml-5 sm:ml-6 animate-pulse">
+                      Available in 3 days
+                    </span>
+                  )}
+                </div>
               ))}
             </div>
           </div>

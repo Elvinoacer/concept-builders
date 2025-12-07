@@ -13,6 +13,7 @@ import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import FileUpload from "./FileUpload";
 import { useUpload } from '@/contexts/UploadContext';
+import { useFormPersistence } from "@/hooks/useFormPersistence";
 
 interface NewDesignFormProps {
   onClose: () => void;
@@ -63,8 +64,78 @@ const NewDesignForm = ({
   const [images, setImages] = useState<any[]>([]);
   const [floorPlans, setFloorPlans] = useState<any[]>([]);
   const [files, setFiles] = useState<any[]>([]);
+  const [draftRestored, setDraftRestored] = useState(false);
 
   const isEditMode = Boolean(designToEdit);
+
+  // Local storage persistence for form data
+  const formData = {
+    name,
+    description,
+    categoryId,
+    bedrooms,
+    bathrooms,
+    area,
+    floors,
+    architecturalPdfPrice,
+    architecturalCadPrice,
+    structuralPdfPrice,
+    structuralCadPrice,
+    billOfQuantitiesPrice,
+    billOfQuantitiesPdfPrice,
+    images,
+    floorPlans,
+    files,
+    architecturalDesign,
+    structuralDesign,
+    billOfQuantities,
+    packageOptions,
+  };
+
+  const { loadFromStorage, clearStorage } = useFormPersistence(
+    'design-form-draft', // Same key as DesignForm
+    formData,
+    1000 // 1 second debounce
+  );
+
+  // Restore from local storage on mount (only for new designs, not edits)
+  useEffect(() => {
+    if (!isEditMode && !draftRestored) {
+      const savedData = loadFromStorage();
+      if (savedData) {
+        const confirmRestore = window.confirm(
+          'Found a saved draft of your design form. Would you like to restore it?'
+        );
+        
+        if (confirmRestore) {
+          setName(savedData.name || '');
+          setDescription(savedData.description || '');
+          setCategoryId(savedData.categoryId || '');
+          setBedrooms(savedData.bedrooms || '');
+          setBathrooms(savedData.bathrooms || '');
+          setArea(savedData.area || '');
+          setFloors(savedData.floors || '');
+          setArchitecturalPdfPrice(savedData.architecturalPdfPrice || '');
+          setArchitecturalCadPrice(savedData.architecturalCadPrice || '');
+          setStructuralPdfPrice(savedData.structuralPdfPrice || '');
+          setStructuralCadPrice(savedData.structuralCadPrice || '');
+          setBillOfQuantitiesPrice(savedData.billOfQuantitiesPrice || '');
+          setBillOfQuantitiesPdfPrice(savedData.billOfQuantitiesPdfPrice || '');
+          setImages(savedData.images || []);
+          setFloorPlans(savedData.floorPlans || []);
+          setFiles(savedData.files || []);
+          setArchitecturalDesign(savedData.architecturalDesign || { pdfFiles: [], cadFiles: [] });
+          setStructuralDesign(savedData.structuralDesign || { pdfFiles: [], cadFiles: [] });
+          setBillOfQuantities(savedData.billOfQuantities || { excelFiles: [], pdfFiles: [] });
+          setPackageOptions(savedData.packageOptions || [{ name: '', price: '', file: [] }]);
+          toast.success('Draft restored successfully!');
+        } else {
+          clearStorage();
+        }
+      }
+      setDraftRestored(true);
+    }
+  }, [isEditMode, draftRestored, loadFromStorage, clearStorage]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -199,6 +270,10 @@ const NewDesignForm = ({
       });
 
       if (response.ok) {
+        // Clear local storage on successful submission (only for new designs)
+        if (!isEditMode) {
+          clearStorage();
+        }
         toast.success(`Design ${isEditMode ? "updated" : "created"} successfully!`);
         if (onSuccess) onSuccess();
         onClose();
@@ -216,7 +291,15 @@ const NewDesignForm = ({
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
       <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -50, opacity: 0 }} className="bg-card rounded-lg shadow-xl w-full max-w-3xl flex flex-col h-[95vh]">
-        <form onSubmit={handleSubmit} className="flex flex-col h-full">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col h-full"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA") {
+              e.preventDefault();
+            }
+          }}
+        >
           <div className="p-6 border-b">
             <h3 className="text-xl font-semibold">{isEditMode ? "Edit Design" : "Create New Design"}</h3>
           </div>

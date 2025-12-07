@@ -235,9 +235,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate phone number
-    if (formattedPhone.length !== 12 || !formattedPhone.startsWith("2547")) {
+    if (formattedPhone.length !== 12 || (!formattedPhone.startsWith("2547") && !formattedPhone.startsWith("2541"))) {
       throw new APIException(
-        "Phone number must be 12 digits starting with 2547",
+        "Phone number must be 12 digits starting with 2547 or 2541",
         400
       );
     }

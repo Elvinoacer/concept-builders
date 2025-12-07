@@ -30,6 +30,7 @@ import {
 } from "react-icons/fi";
 import { toast } from "sonner";
 import FileUpload from "./FileUpload";
+import { useFormPersistence } from "@/hooks/useFormPersistence";
 
 const SectionHeader = ({
   icon: Icon,
@@ -171,6 +172,123 @@ const DesignForm = ({ design }: DesignFormProps) => {
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [packageOptions, setPackageOptions] = useState<any[]>([]);
+
+  const [architecturalDesign, setArchitecturalDesign] = useState(
+    design?.architecturalDesign || {
+      pdfFiles: [],
+      cadFiles: [],
+    }
+  );
+  const [structuralDesign, setStructuralDesign] = useState(
+    design?.structuralDesign || {
+      pdfFiles: [],
+      cadFiles: [],
+    }
+  );
+  const [billOfQuantities, setBillOfQuantities] = useState(
+    design?.billOfQuantities || {
+      excelFiles: [],
+      pdfFiles: [],
+    }
+  );
+
+  const [architecturalPdfPrice, setArchitecturalPdfPrice] = useState(
+    design?.architecturalPdfPrice?.toString() || ""
+  );
+  const [architecturalCadPrice, setArchitecturalCadPrice] = useState(
+    design?.architecturalCadPrice?.toString() || ""
+  );
+  const [structuralPdfPrice, setStructuralPdfPrice] = useState(
+    design?.structuralPdfPrice?.toString() || ""
+  );
+  const [structuralCadPrice, setStructuralCadPrice] = useState(
+    design?.structuralCadPrice?.toString() || ""
+  );
+  const [billOfQuantitiesPrice, setBillOfQuantitiesPrice] = useState(
+    design?.billOfQuantitiesPrice?.toString() || ""
+  );
+  const [billOfQuantitiesPdfPrice, setBillOfQuantitiesPdfPrice] = useState(
+    design?.billOfQuantitiesPdfPrice?.toString() || ""
+  );
+  const [images, setImages] = useState<any[]>(design?.images || []);
+  const [floorPlans, setFloorPlans] = useState<any[]>(design?.floorPlans || []);
+  const [files, setFiles] = useState<any[]>(design?.files || []);
+
+  const [currentStep, setCurrentStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [draftRestored, setDraftRestored] = useState(false);
+
+  // Local storage persistence for form data
+  const formData = {
+    name,
+    description,
+    categoryId,
+    bedrooms,
+    bathrooms,
+    area,
+    floors,
+    architecturalPdfPrice,
+    architecturalCadPrice,
+    structuralPdfPrice,
+    structuralCadPrice,
+    billOfQuantitiesPrice,
+    billOfQuantitiesPdfPrice,
+    images,
+    floorPlans,
+    files,
+    architecturalDesign,
+    structuralDesign,
+    billOfQuantities,
+    packageOptions,
+  };
+
+  const { loadFromStorage, clearStorage } = useFormPersistence(
+    'design-form-draft',
+    formData,
+    1000 // 1 second debounce
+  );
+
+  // Restore from local storage on mount (only for new designs, not edits)
+  useEffect(() => {
+    if (!design && !draftRestored) {
+      const savedData = loadFromStorage();
+      if (savedData) {
+        const confirmRestore = window.confirm(
+          'Found a saved draft of your design form. Would you like to restore it?'
+        );
+        
+        if (confirmRestore) {
+          setName(savedData.name || '');
+          setDescription(savedData.description || '');
+          setCategoryId(savedData.categoryId || '');
+          setBedrooms(savedData.bedrooms || '');
+          setBathrooms(savedData.bathrooms || '');
+          setArea(savedData.area || '');
+          setFloors(savedData.floors || '');
+          setArchitecturalPdfPrice(savedData.architecturalPdfPrice || '');
+          setArchitecturalCadPrice(savedData.architecturalCadPrice || '');
+          setStructuralPdfPrice(savedData.structuralPdfPrice || '');
+          setStructuralCadPrice(savedData.structuralCadPrice || '');
+          setBillOfQuantitiesPrice(savedData.billOfQuantitiesPrice || '');
+          setBillOfQuantitiesPdfPrice(savedData.billOfQuantitiesPdfPrice || '');
+          setImages(savedData.images || []);
+          setFloorPlans(savedData.floorPlans || []);
+          setFiles(savedData.files || []);
+          setArchitecturalDesign(savedData.architecturalDesign || { pdfFiles: [], cadFiles: [] });
+          setStructuralDesign(savedData.structuralDesign || { pdfFiles: [], cadFiles: [] });
+          setBillOfQuantities(savedData.billOfQuantities || { excelFiles: [], pdfFiles: [] });
+          setPackageOptions(savedData.packageOptions || [{ name: '', price: '', file: [] }]);
+          toast.success('Draft restored successfully!');
+        } else {
+          clearStorage();
+        }
+      }
+      setDraftRestored(true);
+    }
+  }, [design, draftRestored, loadFromStorage, clearStorage]);
+
   useEffect(() => {
     if (design) {
       setName(design.name || "");
@@ -224,8 +342,6 @@ const DesignForm = ({ design }: DesignFormProps) => {
     }
   }, [design]);
 
-  const [packageOptions, setPackageOptions] = useState<any[]>([]);
-
   // Correctly initialize packageOptions from design, converting price to string
   useEffect(() => {
     if (design?.packageOptions) {
@@ -236,57 +352,12 @@ const DesignForm = ({ design }: DesignFormProps) => {
           file: opt.file ? [opt.file] : [], // FileUpload expects an array
         }))
       );
-    } else {
+    } else if (!design && packageOptions.length === 0) {
       setPackageOptions([
         { name: "", price: "", file: [] }, // Start with one empty package
       ]);
     }
   }, [design]);
-
-  const [architecturalDesign, setArchitecturalDesign] = useState(
-    design?.architecturalDesign || {
-      pdfFiles: [],
-      cadFiles: [],
-    }
-  );
-  const [structuralDesign, setStructuralDesign] = useState(
-    design?.structuralDesign || {
-      pdfFiles: [],
-      cadFiles: [],
-    }
-  );
-  const [billOfQuantities, setBillOfQuantities] = useState(
-    design?.billOfQuantities || {
-      excelFiles: [],
-      pdfFiles: [],
-    }
-  );
-
-  const [architecturalPdfPrice, setArchitecturalPdfPrice] = useState(
-    design?.architecturalPdfPrice?.toString() || ""
-  );
-  const [architecturalCadPrice, setArchitecturalCadPrice] = useState(
-    design?.architecturalCadPrice?.toString() || ""
-  );
-  const [structuralPdfPrice, setStructuralPdfPrice] = useState(
-    design?.structuralPdfPrice?.toString() || ""
-  );
-  const [structuralCadPrice, setStructuralCadPrice] = useState(
-    design?.structuralCadPrice?.toString() || ""
-  );
-  const [billOfQuantitiesPrice, setBillOfQuantitiesPrice] = useState(
-    design?.billOfQuantitiesPrice?.toString() || ""
-  );
-  const [billOfQuantitiesPdfPrice, setBillOfQuantitiesPdfPrice] = useState(
-    design?.billOfQuantitiesPdfPrice?.toString() || ""
-  );
-  const [images, setImages] = useState<any[]>(design?.images || []);
-  const [floorPlans, setFloorPlans] = useState<any[]>(design?.floorPlans || []);
-  const [files, setFiles] = useState<any[]>(design?.files || []);
-
-  const [currentStep, setCurrentStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const steps = [
     {
@@ -690,6 +761,10 @@ const DesignForm = ({ design }: DesignFormProps) => {
       });
 
       if (response.ok) {
+        // Clear local storage on successful submission
+        if (!design) {
+          clearStorage();
+        }
         toast.success(`Design ${design ? "updated" : "created"} successfully!`);
         router.push("/admin/designs");
         router.refresh();
@@ -1371,7 +1446,7 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
               </div>
               <div>
                 <span className="font-bold text-gray-900 dark:text-white">
-                  Floor Plans
+                  Floor Plans <span className="text-xs font-normal text-gray-500">(Optional)</span>
                 </span>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   Upload floor plans as images or PDF documents
@@ -1405,7 +1480,7 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
               </div>
               <div>
                 <span className="font-bold text-gray-900 dark:text-white">
-                  Other Files
+                  Other Files <span className="text-xs font-normal text-gray-500">(Optional)</span>
                 </span>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   Upload any other supporting documents
@@ -1502,9 +1577,11 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
                 <div className={`p-2 ${doc.bgColor} rounded-lg`}>
                   <doc.icon className={`w-5 h-5 ${doc.iconColor}`} />
                 </div>
-                <span className="font-bold text-gray-900 dark:text-white">
-                  {doc.title}
-                </span>
+                <div>
+                  <span className="font-bold text-gray-900 dark:text-white">
+                    {doc.title} <span className="text-xs font-normal text-gray-500">(Optional)</span>
+                  </span>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">

@@ -168,7 +168,7 @@ export default function CategoriesPage() {
       {/* Header */}
       <header className="relative h-40 xs:h-48 sm:h-56 md:h-64 rounded-b-2xl flex items-center justify-center text-center text-white overflow-hidden">
         <Image
-          src="/images/banner-1.png"
+          src="/images/banners/banner1.jpg"
           alt="Categories background"
           fill
           className="object-cover"

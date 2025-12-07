@@ -22,7 +22,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 
-const DesignsList = ({ designs }) => {
+interface DesignsListProps {
+  designs: any[];
+  onEditClick?: (designId: string) => void;
+}
+
+const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -135,14 +140,12 @@ const DesignsList = ({ designs }) => {
                     View Details
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={`/admin/designs/${design.id}/edit`}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <FiEdit className="w-4 h-4" />
-                    Edit Design
-                  </Link>
+                <DropdownMenuItem
+                  onClick={() => onEditClick?.(design.id)}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <FiEdit className="w-4 h-4" />
+                  Edit Design
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -295,14 +298,12 @@ const DesignsList = ({ designs }) => {
                   View Details
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link
-                  href={`/admin/designs/${design.id}/edit`}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <FiEdit className="w-4 h-4" />
-                  Edit Design
-                </Link>
+              <DropdownMenuItem
+                onClick={() => onEditClick?.(design.id)}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <FiEdit className="w-4 h-4" />
+                Edit Design
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

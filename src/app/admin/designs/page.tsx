@@ -26,6 +26,8 @@ const DesignsPage = () => {
   const [loadingFolders, setLoadingFolders] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [editingDesign, setEditingDesign] = useState<any>(null);
+  const [loadingDesign, setLoadingDesign] = useState(false);
 
   const handleOpenRenameModal = (folder) => {
     setRenamingFolder(folder);
@@ -118,6 +120,26 @@ const DesignsPage = () => {
     }
   };
 
+  const handleEditClick = async (designId: string) => {
+    try {
+      setLoadingDesign(true);
+      const response = await fetch(`/api/designs/${designId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch design');
+      }
+      
+      const design = await response.json();
+      setEditingDesign(design);
+      setFormOpen(true);
+    } catch (error) {
+      console.error('Error fetching design:', error);
+      toast.error('Failed to load design for editing');
+    } finally {
+      setLoadingDesign(false);
+    }
+  };
+
   const handleRefresh = async () => {
     if (activeTab === "folders") {
       await fetchFolders();
@@ -200,7 +222,7 @@ const DesignsPage = () => {
 
         {/* Content Section */}
         <div className="min-h-[400px]">
-          {activeTab === "all" && <DesignsTable />}
+          {activeTab === "all" && <DesignsTable onEditClick={handleEditClick} />}
           {activeTab === "folders" && (
             <div className="space-y-4">
               {/* Folders Header with Refresh */}
@@ -283,10 +305,16 @@ const DesignsPage = () => {
       {/* Modals */}
       {isFormOpen && (
         <NewDesignForm
-          onClose={() => setFormOpen(false)}
+          onClose={() => {
+            setFormOpen(false);
+            setEditingDesign(null);
+          }}
+          designToEdit={editingDesign}
           onSuccess={() => {
             setFormOpen(false);
-            // Optionally refresh designs table here
+            setEditingDesign(null);
+            // Refresh the designs table
+            window.location.reload();
           }}
         />
       )}

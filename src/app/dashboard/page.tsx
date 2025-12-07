@@ -18,6 +18,7 @@ import {
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import PhoneNumberModal from "@/components/dashboard/PhoneNumberModal";
+import { NotificationPermissionModal } from "@/components/notifications/NotificationPermissionModal";
 
 const DashboardPage = () => {
   const { data: session } = useSession();
@@ -160,6 +161,7 @@ const DashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
+      <NotificationPermissionModal />
       <div className="px-3 xs:px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header Section */}
         <motion.header
@@ -169,71 +171,77 @@ const DashboardPage = () => {
           animate="visible"
         >
           {/* Welcome Section */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
             <div className="flex-1 min-w-0">
               <motion.div
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700/30 text-blue-600 dark:text-blue-400 text-xs font-medium mb-3"
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-xs font-semibold tracking-wide uppercase mb-4"
                 variants={headerVariants}
               >
-                <Bell className="w-3 h-3" />
-                Your Dashboard
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                Dashboard Overview
               </motion.div>
 
               <motion.h1
                 variants={headerVariants}
-                className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-gray-900 dark:text-white mb-2"
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-3 tracking-tight"
               >
-                Welcome Back, {session?.user?.name?.split(" ")[0] || "User"}!
+                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">{session?.user?.name?.split(" ")[0] || "User"}</span>
               </motion.h1>
 
               <motion.p
                 variants={headerVariants}
                 transition={{ delay: 0.1 }}
-                className="text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed"
+                className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl"
               >
-                Here's a summary of your account and recent activity.
+                Manage your projects, view purchased designs, and explore new architectural possibilities.
               </motion.p>
             </div>
 
             {/* Action Buttons */}
             <motion.div
-              className="flex items-center gap-2"
+              className="flex items-center gap-3"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
               <motion.button
                 onClick={refreshData}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, rotate: 180 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-200"
+                transition={{ duration: 0.3 }}
+                className="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl shadow-sm hover:shadow-md transition-all"
                 title="Refresh data"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-5 h-5" />
               </motion.button>
 
-              {/* View Toggle - Hidden on mobile since we default to list */}
+              {/* View Toggle */}
               {!isMobile && (
-                <div className="flex bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl p-1">
+                <div className="flex bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 shadow-sm">
                   <button
                     onClick={() => setActiveView("grid")}
                     className={`p-2 rounded-lg transition-all duration-200 ${
                       activeView === "grid"
-                        ? "bg-blue-500 text-white"
-                        : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shadow-sm"
+                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     }`}
+                    title="Grid View"
                   >
-                    <Grid3X3 className="w-4 h-4" />
+                    <Grid3X3 className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setActiveView("list")}
                     className={`p-2 rounded-lg transition-all duration-200 ${
                       activeView === "list"
-                        ? "bg-blue-500 text-white"
-                        : "text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shadow-sm"
+                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     }`}
+                    title="List View"
                   >
-                    <List className="w-4 h-4" />
+                    <List className="w-5 h-5" />
                   </button>
                 </div>
               )}

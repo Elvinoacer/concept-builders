@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, Save } from "lucide-react";
 import { toast } from "sonner";
+import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 
 const ProfileSettings = () => {
   const [userProfile, setUserProfile] = useState({
@@ -186,6 +187,14 @@ const ProfileSettings = () => {
             )}
             {saving ? "Saving..." : "Update Profile"}
           </motion.button>
+
+          {/* Notification Settings */}
+          <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Notification Preferences
+            </h3>
+            <NotificationSettings />
+          </div>
         </div>
       </form>
     </motion.div>

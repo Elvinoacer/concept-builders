@@ -450,7 +450,7 @@ export const designs: DesignCard[] = [
     category: "Modern",
     description:
       "A beautiful and spacious modern home with a minimalist design.",
-    image: "/images/banner-1.png",
+    image: "/images/banners/banner1.jpg",
     pricing: {
       pdf: 999,
       cad: 2499,
@@ -469,7 +469,7 @@ export const designs: DesignCard[] = [
     category: "Traditional",
     description:
       "A charming cottage perfect for a small family or as a vacation home.",
-    image: "/images/banner-2.png",
+    image: "/images/banners/banner2.jpg",
     pricing: {
       pdf: 799,
       cad: 1999,
@@ -488,7 +488,7 @@ export const designs: DesignCard[] = [
     category: "Luxury",
     description:
       "An expansive and luxurious villa with all the modern amenities.",
-    image: "/images/banner-3.png",
+    image: "/images/banners/banner3.jpg",
     pricing: {
       pdf: 1999,
       cad: 4999,

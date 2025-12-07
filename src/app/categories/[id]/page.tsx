@@ -171,7 +171,7 @@ export default function CategoryPage({
       {/* Header Section */}
       <header className="relative h-40 xs:h-48 sm:h-56 md:h-64 rounded-b-2xl flex items-center justify-center text-center text-white overflow-hidden">
         <Image
-          src={category.image || "/images/banner-2.png"}
+          src={category.image || "/images/banners/banner2.jpg"}
           alt={category.name}
           fill
           className="object-cover"

@@ -41,6 +41,24 @@ export async function GET(req: Request) {
                 billOfQuantitiesPrice: true,
                 images: true,
                 packageOptions: true,
+                architecturalDesign: {
+                  select: {
+                    pdfFiles: true,
+                    cadFiles: true,
+                  }
+                },
+                structuralDesign: {
+                  select: {
+                    pdfFiles: true,
+                    cadFiles: true,
+                  }
+                },
+                billOfQuantities: {
+                  select: {
+                    excelFiles: true,
+                    pdfFiles: true,
+                  }
+                },
               },
             },
           },

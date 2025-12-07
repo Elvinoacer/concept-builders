@@ -426,3 +426,43 @@ export async function sendPurchaseNotificationEmails(orderId: string) {
     // Don't throw, just log, so we don't break the payment flow if email fails
   }
 }
+
+export async function sendDesignInquiryEmail(inquiryData: any) {
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (!adminEmail) {
+      console.error("ADMIN_EMAIL environment variable is not set.");
+      return;
+    }
+
+    console.log(
+      `Attempting to send design inquiry email to ${adminEmail}`
+    );
+    const { data, error } = await resend.emails.send({
+      from: `Concept Builders <${process.env.ADMIN_EMAIL}>`,
+      to: adminEmail,
+      subject: `New Design Inquiry: ${inquiryData.designName} - ${inquiryData.inquiryType}`,
+      html: `<h1>New Design Inquiry</h1>
+        <p><strong>Design:</strong> ${inquiryData.designName} (ID: ${inquiryData.designId})</p>
+        <p><strong>Inquiry Type:</strong> ${inquiryData.inquiryType}</p>
+        <hr />
+        <p><strong>Name:</strong> ${inquiryData.name}</p>
+        <p><strong>Email:</strong> ${inquiryData.email}</p>
+        <p><strong>Phone:</strong> ${inquiryData.phone}</p>
+        <p><strong>Message:</strong></p>
+        <p>${inquiryData.message}</p>
+        <hr />
+        <p><a href="${process.env.NEXTAUTH_URL}/admin/inquiries">View in Admin Panel</a></p>`,
+    });
+
+    if (error) {
+      console.error("Error sending design inquiry email:", error);
+      throw error;
+    }
+
+    console.log("Design inquiry email sent successfully:", data);
+  } catch (error) {
+    console.error("Error in sendDesignInquiryEmail function:", error);
+    throw error;
+  }
+}

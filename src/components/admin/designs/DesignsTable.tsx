@@ -19,7 +19,11 @@ import { Button } from "@/components/ui/button";
 import { FiSearch, FiRefreshCw, FiAlertCircle, FiFilter } from "react-icons/fi";
 import { toast } from "sonner";
 
-const DesignsTable = () => {
+interface DesignsTableProps {
+  onEditClick?: (designId: string) => void;
+}
+
+const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
@@ -318,7 +322,7 @@ const DesignsTable = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <DesignsList designs={designs} />
+              <DesignsList designs={designs} onEditClick={onEditClick} />
               
               {/* Empty State */}
               {designs.length === 0 && (

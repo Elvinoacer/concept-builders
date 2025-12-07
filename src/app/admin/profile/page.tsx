@@ -38,6 +38,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { toast } from "sonner";
+import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 
 const AdminProfilePage = () => {
   const { data: session, status, update } = useSession();
@@ -697,7 +698,9 @@ const AdminProfilePage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <NotificationSettings />
+                
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg opacity-50 pointer-events-none">
                   <div className="space-y-1">
                     <Label className="text-base font-semibold">
                       Email Notifications
@@ -714,24 +717,7 @@ const AdminProfilePage = () => {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                  <div className="space-y-1">
-                    <Label className="text-base font-semibold">
-                      Push Notifications
-                    </Label>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Receive browser notifications
-                    </p>
-                  </div>
-                  <Switch
-                    checked={formData.notifications.push}
-                    onCheckedChange={(checked) =>
-                      handleNotificationChange("push", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg opacity-50 pointer-events-none">
                   <div className="space-y-1">
                     <Label className="text-base font-semibold">
                       SMS Notifications

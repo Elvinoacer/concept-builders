@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
       const userCart = await prisma.cart.findUnique({
         where: { id: cartId },
-        include: { items: { include: { design: true } }, discount: true },
+        include: { items: { include: { design: true } }, discount: true, user: true },
       });
 
       if (!userCart) {
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
 
       const amountPaidUSD = parseFloat(amountPaidKES) / usdToKesRate;
 
-      await prisma.$transaction(async (tx) => {
+      const order = await prisma.$transaction(async (tx) => {
         const order = await tx.order.create({
           data: {
             userId: userCart.userId,
@@ -128,8 +128,69 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        await tx.cart.delete({ where: { id: userCart.id } });
+        return order;
       });
+
+      // Send email notifications
+      await sendPurchaseNotificationEmails(order.id);
+
+      // Send Push Notifications
+      try {
+        const { getAdminMessaging } = await import("@/lib/firebase-admin");
+        const adminMessaging = getAdminMessaging();
+
+        // 1. Notify Admin
+        const admin = await prisma.user.findFirst({
+          where: { role: "ADMIN" }, // Use string literal if Role enum import is tricky, or import Role
+        });
+
+        if (admin) {
+          const adminTokens = await prisma.deviceToken.findMany({
+            where: { userId: admin.id },
+            select: { token: true },
+          });
+
+          const tokens = adminTokens.map((t) => t.token);
+
+          if (tokens.length > 0) {
+            await adminMessaging.sendEachForMulticast({
+              tokens,
+              notification: {
+                title: "New Order Received",
+                body: `Order #${order.id.substring(0, 8)} by ${userCart.user.name || "Customer"}`,
+              },
+              data: {
+                url: `/admin/purchases`,
+                orderId: order.id,
+              },
+            });
+          }
+        }
+
+        // 2. Notify User
+        const userTokens = await prisma.deviceToken.findMany({
+          where: { userId: userCart.userId },
+          select: { token: true },
+        });
+
+        const tokens = userTokens.map((t) => t.token);
+
+        if (tokens.length > 0) {
+          await adminMessaging.sendEachForMulticast({
+            tokens,
+            notification: {
+              title: "Order Confirmed",
+              body: `Your order #${order.id.substring(0, 8)} has been successfully placed.`,
+            },
+            data: {
+              url: `/dashboard/purchases/${order.id}`,
+              orderId: order.id,
+            },
+          });
+        }
+      } catch (pushError) {
+        console.error("Failed to send push notification:", pushError);
+      }
     } else {
       console.log("Payment failed:", data);
       // Try to extract cartId for notification

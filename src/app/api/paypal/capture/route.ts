@@ -38,6 +38,7 @@ export async function POST(request: Request) {
             },
           },
         },
+        user: true,
       },
     });
 
@@ -247,6 +248,64 @@ export async function POST(request: Request) {
     // We do this outside the transaction to avoid blocking it if email service is slow
     // and to ensure we only send email if transaction committed successfully
     await sendPurchaseNotificationEmails(newOrder.id);
+
+    // Send Push Notifications
+    try {
+      const { getAdminMessaging } = await import("@/lib/firebase-admin");
+      const adminMessaging = getAdminMessaging();
+
+      // 1. Notify Admin
+      const admin = await prisma.user.findFirst({
+        where: { role: "ADMIN" },
+      });
+
+      if (admin) {
+        const adminTokens = await prisma.deviceToken.findMany({
+          where: { userId: admin.id },
+          select: { token: true },
+        });
+
+        const tokens = adminTokens.map((t) => t.token);
+
+        if (tokens.length > 0) {
+          await adminMessaging.sendEachForMulticast({
+            tokens,
+            notification: {
+              title: "New Order Received",
+              body: `Order #${newOrder.id.substring(0, 8)} by ${userCart.user.name || "Customer"}`,
+            },
+            data: {
+              url: `/admin/purchases`,
+              orderId: newOrder.id,
+            },
+          });
+        }
+      }
+
+      // 2. Notify User
+      const userTokens = await prisma.deviceToken.findMany({
+        where: { userId: userId },
+        select: { token: true },
+      });
+
+      const tokens = userTokens.map((t) => t.token);
+
+      if (tokens.length > 0) {
+        await adminMessaging.sendEachForMulticast({
+          tokens,
+          notification: {
+            title: "Order Confirmed",
+            body: `Your order #${newOrder.id.substring(0, 8)} has been successfully placed.`,
+          },
+          data: {
+            url: `/dashboard/purchases/${newOrder.id}`,
+            orderId: newOrder.id,
+          },
+        });
+      }
+    } catch (pushError) {
+      console.error("Failed to send push notification:", pushError);
+    }
 
     return NextResponse.json({
       success: true,

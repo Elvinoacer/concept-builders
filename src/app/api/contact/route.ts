@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import prisma from "@/lib/prisma";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -14,7 +15,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const adminEmail = process.env.ADMIN_EMAIL || "onboarding@resend.dev"; // Replace with actual admin email
+    const adminEmail =
+      process.env.MAIN_EMAIL ||
+      "support@conceptbuilders.co.ke" ||
+      "onboarding@resend.dev"; // Replace with actual admin email
 
     const data = await resend.emails.send({
       from: `Contact Form <${adminEmail}>`, // Replace with your verified Resend domain
@@ -37,6 +41,50 @@ export async function POST(req: Request) {
     if (data.error) {
       console.error("Resend email error:", data.error);
       return NextResponse.json({ error: data.error.message }, { status: 500 });
+    }
+
+    // Create notification for admin
+    const admin = await prisma.user.findFirst({
+      where: { role: "ADMIN" },
+    });
+
+    if (admin) {
+      await prisma.notification.create({
+        data: {
+          userId: admin.id,
+          title: "New Contact Form Submission",
+          description: `New message from ${name}: ${subject}`,
+          icon: "Mail",
+        },
+      });
+
+      // Send Push Notification
+      try {
+        const { getAdminMessaging } = await import("@/lib/firebase-admin");
+        const adminMessaging = getAdminMessaging();
+
+        const adminTokens = await prisma.deviceToken.findMany({
+          where: { userId: admin.id },
+          select: { token: true },
+        });
+
+        const tokens = adminTokens.map((t) => t.token);
+
+        if (tokens.length > 0) {
+          await adminMessaging.sendEachForMulticast({
+            tokens,
+            notification: {
+              title: "New Contact Message",
+              body: `${name}: ${subject}`,
+            },
+            data: {
+              url: `/admin/messages`, // Assuming there's a messages page, or just link to dashboard
+            },
+          });
+        }
+      } catch (pushError) {
+        console.error("Failed to send push notification:", pushError);
+      }
     }
 
     return NextResponse.json(

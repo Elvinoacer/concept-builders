@@ -1,44 +1,44 @@
-import { PrismaClient, FileType } from '../src/generated/prisma';
+import { PrismaClient, FileType } from "../src/generated/prisma";
 
 const prisma = new PrismaClient();
 
 const categoriesData = [
   {
     name: "Bungalows",
-    image: "/images/banner-1.png",
+    image: "/images/banners/banner1.jpg",
   },
   {
     name: "Duplexes",
-    image: "/images/banner-2.png",
+    image: "/images/banners/banner2.jpg",
   },
   {
     name: "Apartments",
-    image: "/images/banner-3.png",
+    image: "/images/banners/banner3.jpg",
   },
   {
     name: "Modern",
-    image: "/images/banner-1.png",
+    image: "/images/banners/banner1.jpg",
   },
   {
     name: "Traditional",
-    image: "/images/banner-2.png",
+    image: "/images/banners/banner2.jpg",
   },
   {
     name: "Luxury",
-    image: "/images/banner-3.png",
+    image: "/images/banners/banner3.jpg",
   },
   {
     name: "Mansion",
-    image: "/images/banner-1.png",
+    image: "/images/banners/banner1.jpg",
   },
   {
     name: "Tiny Homes",
-    image: "/images/banner-2.png",
+    image: "/images/banners/banner2.jpg",
   },
   {
     name: "Farmhouse",
-    image: "/images/banner-3.png",
-  }
+    image: "/images/banners/banner3.jpg",
+  },
 ];
 
 const designsData = [
@@ -54,7 +54,7 @@ const designsData = [
     area: 2200,
     floors: 2,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{url: "/images/banner-1.png", type: FileType.IMAGE}]
+    files: [{ url: "/images/banners/banner1.jpg", type: FileType.IMAGE }],
   },
   {
     name: "Cozy Cottage",
@@ -68,7 +68,7 @@ const designsData = [
     area: 1500,
     floors: 1,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{url: "/images/banner-2.png", type: FileType.IMAGE}]
+    files: [{ url: "/images/banners/banner2.jpg", type: FileType.IMAGE }],
   },
   {
     name: "Luxury Villa",
@@ -82,7 +82,7 @@ const designsData = [
     area: 5000,
     floors: 2,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{url: "/images/banner-3.png", type: FileType.IMAGE}]
+    files: [{ url: "/images/banners/banner3.jpg", type: FileType.IMAGE }],
   },
   {
     name: "The Grandeur",
@@ -94,8 +94,13 @@ const designsData = [
     bathrooms: 10,
     area: 12000,
     floors: 3,
-    planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans", "Smart Home Integration"],
-    files: [{url: "/images/banner-1.png", type: FileType.IMAGE}]
+    planDetails: [
+      "Detailed Floor Plans",
+      "3D Renderings",
+      "Electrical Plans",
+      "Smart Home Integration",
+    ],
+    files: [{ url: "/images/banners/banner1.jpg", type: FileType.IMAGE }],
   },
   {
     name: "The Homesteader",
@@ -107,8 +112,13 @@ const designsData = [
     bathrooms: 3,
     area: 3500,
     floors: 2,
-    planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans", "Barn and Stable Plans"],
-    files: [{url: "/images/banner-2.png", type: FileType.IMAGE}]
+    planDetails: [
+      "Detailed Floor Plans",
+      "3D Renderings",
+      "Electrical Plans",
+      "Barn and Stable Plans",
+    ],
+    files: [{ url: "/images/banners/banner2.jpg", type: FileType.IMAGE }],
   },
   {
     name: "The Urbanite",
@@ -121,7 +131,7 @@ const designsData = [
     area: 800,
     floors: 1,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{url: "/images/banner-3.png", type: FileType.IMAGE}]
+    files: [{ url: "/images/banners/banner3.jpg", type: FileType.IMAGE }],
   },
   {
     name: "The Weekender",
@@ -134,12 +144,13 @@ const designsData = [
     area: 400,
     floors: 1,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{url: "/images/banner-1.png", type: FileType.IMAGE}]
+    files: [{ url: "/images/banners/banner1.jpg", type: FileType.IMAGE }],
   },
   {
     name: "The Gemini",
     category: "Duplexes",
-    description: "A versatile duplex for multi-generational living or rental income.",
+    description:
+      "A versatile duplex for multi-generational living or rental income.",
     basePrice: 1599,
     priceRange: "$1599 - $8999",
     bedrooms: 6,
@@ -147,8 +158,8 @@ const designsData = [
     area: 4000,
     floors: 2,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{url: "/images/banner-2.png", type: FileType.IMAGE}]
-  }
+    files: [{ url: "/images/banners/banner2.jpg", type: FileType.IMAGE }],
+  },
 ];
 
 async function main() {
@@ -180,40 +191,66 @@ async function main() {
           planDetails: design.planDetails,
           architecturalDesign: {
             create: {
-              type: 'ARCHITECTURAL',
-              description: 'Architectural drawings',
-              overview: 'Architectural drawings overview',
+              type: "ARCHITECTURAL",
+              description: "Architectural drawings",
+              overview: "Architectural drawings overview",
               pdfFiles: {
-                create: [{ name: 'architectural.pdf', url: '/files/architectural.pdf', type: 'PDF' }]
+                create: [
+                  {
+                    name: "architectural.pdf",
+                    url: "/files/architectural.pdf",
+                    type: "PDF",
+                  },
+                ],
               },
               cadFiles: {
-                create: [{ name: 'architectural.cad', url: '/files/architectural.cad', type: 'CAD' }]
-              }
-            }
+                create: [
+                  {
+                    name: "architectural.cad",
+                    url: "/files/architectural.cad",
+                    type: "CAD",
+                  },
+                ],
+              },
+            },
           },
           structuralDesign: {
             create: {
-              type: 'STRUCTURAL',
-              description: 'Structural drawings',
-              overview: 'Structural drawings overview',
+              type: "STRUCTURAL",
+              description: "Structural drawings",
+              overview: "Structural drawings overview",
               pdfFiles: {
-                create: [{ name: 'structural.pdf', url: '/files/structural.pdf', type: 'PDF' }]
+                create: [
+                  {
+                    name: "structural.pdf",
+                    url: "/files/structural.pdf",
+                    type: "PDF",
+                  },
+                ],
               },
               cadFiles: {
-                create: [{ name: 'structural.cad', url: '/files/structural.cad', type: 'CAD' }]
-              }
-            }
+                create: [
+                  {
+                    name: "structural.cad",
+                    url: "/files/structural.cad",
+                    type: "CAD",
+                  },
+                ],
+              },
+            },
           },
           billOfQuantities: {
             create: {
-              type: 'BILL_OF_QUANTITIES',
-              description: 'Bill of Quantities',
-              overview: 'Bill of Quantities overview',
+              type: "BILL_OF_QUANTITIES",
+              description: "Bill of Quantities",
+              overview: "Bill of Quantities overview",
               excelFiles: {
-                create: [{ name: 'boq.xlsx', url: '/files/boq.xlsx', type: 'EXCEL' }]
-              }
-            }
-          }
+                create: [
+                  { name: "boq.xlsx", url: "/files/boq.xlsx", type: "EXCEL" },
+                ],
+              },
+            },
+          },
         },
       });
     }

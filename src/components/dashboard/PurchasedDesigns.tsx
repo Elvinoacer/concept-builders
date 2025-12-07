@@ -11,6 +11,7 @@ import {
   FileText,
   FolderOpen,
   Grid3X3,
+  Image as ImageIcon,
   List,
   Loader2,
   Package,
@@ -69,7 +70,6 @@ const PurchasedDesigns = ({
   );
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [localViewMode, setLocalViewMode] = useState<"grid" | "list">("list");
   const [filteredDesigns, setFilteredDesigns] = useState<PurchasedDesign[]>([]);
   const [downloadStates, setDownloadStates] = useState<DownloadState>({});
 
@@ -141,86 +141,6 @@ const PurchasedDesigns = ({
     }
   }, [searchQuery, purchasedDesigns]);
 
-  // Enhanced download function with progress tracking
-  const handleDownloadFile = async (designId: string, file: DesignFile) => {
-    try {
-      // Update download state
-      setDownloadStates((prev) => ({
-        ...prev,
-        [designId]: {
-          ...prev[designId],
-          isDownloading: true,
-        },
-      }));
-
-      toast.info(`Downloading ${file.name}...`);
-
-      // Create a direct download link
-      const link = document.createElement("a");
-      link.href = file.url;
-      link.download = file.name;
-      link.target = "_blank";
-
-      // Simulate progress for better UX
-      const progressInterval = setInterval(() => {
-        setDownloadStates((prev) => ({
-          ...prev,
-          [designId]: {
-            ...prev[designId],
-            progress: Math.min((prev[designId]?.progress || 0) + 10, 90),
-          },
-        }));
-      }, 200);
-
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Wait a bit for download to start
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      clearInterval(progressInterval);
-
-      // Mark as downloaded
-      setDownloadStates((prev) => ({
-        ...prev,
-        [designId]: {
-          ...prev[designId],
-          isDownloading: false,
-          downloadedFiles: new Set(prev[designId]?.downloadedFiles).add(
-            file.id
-          ),
-          progress: 100,
-        },
-      }));
-
-      toast.success(`Downloaded ${file.name} successfully!`);
-
-      // Reset progress after a delay
-      setTimeout(() => {
-        setDownloadStates((prev) => ({
-          ...prev,
-          [designId]: {
-            ...prev[designId],
-            progress: 0,
-          },
-        }));
-      }, 2000);
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      setDownloadStates((prev) => ({
-        ...prev,
-        [designId]: {
-          ...prev[designId],
-          isDownloading: false,
-          progress: 0,
-        },
-      }));
-      toast.error(`Failed to download ${file.name}`);
-    }
-  };
-
   const handleDownloadAll = async (design: PurchasedDesign) => {
     try {
       setDownloadStates((prev) => ({
@@ -233,23 +153,25 @@ const PurchasedDesigns = ({
       }));
 
       toast.info(
-        `Zipping ${design.purchasedFiles.length} files... This may take a moment.`
+        `Preparing your package... This may take a moment.`
       );
 
       const zip = new JSZip();
+      const folderName = design.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const rootFolder = zip.folder(folderName);
 
-      // Fetch and add each file to the zip
+      if (!rootFolder) throw new Error("Failed to create zip folder");
+
+      // Add purchased files
       for (let i = 0; i < design.purchasedFiles.length; i++) {
         const file = design.purchasedFiles[i];
-        const progress = ((i + 1) / design.purchasedFiles.length) * 100;
+        const progress = ((i + 1) / (design.purchasedFiles.length + design.images.length)) * 100;
 
         try {
           const response = await fetch(file.url);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch ${file.name}`);
-          }
+          if (!response.ok) throw new Error(`Failed to fetch ${file.name}`);
           const blob = await response.blob();
-          zip.file(file.name, blob);
+          rootFolder.file(file.name, blob);
 
           setDownloadStates((prev) => ({
             ...prev,
@@ -260,13 +182,30 @@ const PurchasedDesigns = ({
           }));
         } catch (error) {
           console.error(`Error fetching file ${file.name}:`, error);
-          toast.error(`Skipping ${file.name} due to an error.`);
+        }
+      }
+
+      // Add design images
+      const imagesFolder = rootFolder.folder("images");
+      if (imagesFolder) {
+        for (let i = 0; i < design.images.length; i++) {
+          const image = design.images[i];
+          try {
+             const response = await fetch(image.url);
+             if (response.ok) {
+               const blob = await response.blob();
+               const ext = image.url.split('.').pop() || 'jpg';
+               imagesFolder.file(`image_${i + 1}.${ext}`, blob);
+             }
+          } catch (error) {
+            console.error("Error fetching image:", error);
+          }
         }
       }
 
       // Generate and download the zip file
       const zipBlob = await zip.generateAsync({ type: "blob" });
-      saveAs(zipBlob, `${design.name.replace(/\s+/g, "_")}_files.zip`);
+      saveAs(zipBlob, `${folderName}_complete_package.zip`);
 
       setDownloadStates((prev) => ({
         ...prev,
@@ -277,7 +216,7 @@ const PurchasedDesigns = ({
         },
       }));
 
-      toast.success(`All files downloaded successfully as a zip!`);
+      toast.success(`Package downloaded successfully!`);
     } catch (error) {
       console.error("Error creating zip file:", error);
       setDownloadStates((prev) => ({
@@ -288,24 +227,16 @@ const PurchasedDesigns = ({
           progress: 0,
         },
       }));
-      toast.error("Failed to create zip file.");
+      toast.error("Failed to create download package.");
     }
-  };
-
-  // Preview file in new tab
-  const handlePreviewFile = (file: DesignFile) => {
-    window.open(file.url, "_blank");
-    toast.info(`Opening ${file.name} in new tab`);
   };
 
   const handleViewInvoice = (designId: string) => {
     window.location.href = `/dashboard/invoice/${designId}`;
-    toast.info("Opening invoice...");
   };
 
   const handleViewDesign = (designId: string) => {
     window.open(`/designs/${designId}`, "_blank");
-    toast.info("Viewing design details...");
   };
 
   // Animation variants
@@ -314,7 +245,7 @@ const PurchasedDesigns = ({
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: isMobile ? 0.05 : 0.1,
+        staggerChildren: 0.1,
       },
     },
   };
@@ -331,60 +262,30 @@ const PurchasedDesigns = ({
     },
   };
 
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.4,
-        ease: "easeOut",
-      },
-    },
-    hover: {
-      y: -4,
-      scale: 1.02,
-      transition: {
-        duration: 0.2,
-        ease: "easeInOut",
-      },
-    },
-  };
-
-  // File type icons
   const getFileIcon = (format: string | undefined) => {
-    if (!format) {
-      return <FileText className="w-4 h-4 text-gray-500" />;
-    }
+    if (!format) return <FileText className="w-4 h-4 text-gray-500" />;
     const formatLower = format.toLowerCase();
-    if (formatLower.includes("pdf"))
-      return <FileText className="w-4 h-4 text-red-500" />;
-    if (formatLower.includes("cad") || formatLower.includes("dwg"))
-      return <Grid3X3 className="w-4 h-4 text-blue-500" />;
-    if (formatLower.includes("excel") || formatLower.includes("xlsx"))
-      return <FileDown className="w-4 h-4 text-green-500" />;
+    if (formatLower.includes("pdf")) return <FileText className="w-4 h-4 text-red-500" />;
+    if (formatLower.includes("cad") || formatLower.includes("dwg")) return <Grid3X3 className="w-4 h-4 text-blue-500" />;
+    if (formatLower.includes("excel") || formatLower.includes("xlsx")) return <FileDown className="w-4 h-4 text-green-500" />;
+    if (formatLower.includes("jpg") || formatLower.includes("png")) return <ImageIcon className="w-4 h-4 text-purple-500" />;
     return <FileText className="w-4 h-4 text-gray-500" />;
   };
 
-  // Loading skeleton
   if (loading) {
     return (
       <section ref={resultsRef as React.RefObject<HTMLDivElement>}>
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
             My Purchased Designs
           </h3>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          {[1, 2, 3].map((i) => (
+        <div className="space-y-4">
+          {[1, 2].map((i) => (
             <div
               key={i}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border-2 border-gray-200/50 dark:border-gray-700/50 p-4 sm:p-6 animate-pulse"
-            >
-              <div className="h-40 sm:h-48 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4"></div>
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-3"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-            </div>
+              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-6 animate-pulse h-48"
+            />
           ))}
         </div>
       </section>
@@ -393,281 +294,169 @@ const PurchasedDesigns = ({
 
   return (
     <section ref={resultsRef as React.RefObject<HTMLDivElement>}>
-      {/* Header with Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
             My Purchased Designs
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-            {filteredDesigns.length} design
-            {filteredDesigns.length !== 1 ? "s" : ""} purchased
-            {filteredDesigns.length > 0 &&
-              ` • ${filteredDesigns.reduce((total, design) => total + design.purchasedFiles.length, 0)} files available`}
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Manage and download your purchased design packages.
           </p>
         </div>
-
-
       </div>
 
-<AnimatePresence mode="wait">
+      <AnimatePresence mode="wait">
         {filteredDesigns.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="text-center py-8 sm:py-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50"
+            className="text-center py-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl border border-dashed border-gray-300 dark:border-gray-700"
           >
-            <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+            <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Package className="w-8 h-8 text-blue-500" />
             </div>
-            <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">
-              {searchQuery
-                ? "No designs match your search"
-                : "You haven't purchased any designs yet"}
-            </p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-              {searchQuery
-                ? "Try adjusting your search terms"
-                : "Start exploring our collection of architectural designs"}
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              No Purchases Yet
+            </h4>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-sm mx-auto">
+              Start your journey by exploring our collection of premium architectural designs.
             </p>
             <motion.a
               href="/designs"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20"
             >
-              Explore Designs
+              Browse Designs
               <ArrowRight className="w-4 h-4" />
             </motion.a>
           </motion.div>
         ) : (
-          /* List View */
           <motion.div
-            key="list-view"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="space-y-4"
+            className="space-y-6"
           >
             {filteredDesigns.map((design) => (
               <motion.div
                 key={design.id}
                 variants={itemVariants}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border-2 border-gray-200/50 dark:border-gray-700/50 hover:border-blue-300/50 dark:hover:border-blue-600/30 transition-all duration-300 overflow-hidden"
+                className="group bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
               >
-                {/* Download Progress Bar */}
-                {downloadStates[design.id]?.progress &&
-                  downloadStates[design.id].progress > 0 && (
-                    <div className="h-1 bg-gray-200 dark:bg-gray-700">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-green-500 to-blue-500"
-                        initial={{ width: 0 }}
-                        animate={{
-                          width: `${downloadStates[design.id].progress}%`,
-                        }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </div>
-                  )}
-
-                <div className="flex flex-col sm:flex-row">
-                  {/* Image */}
-                  <div className="relative w-full sm:w-48 h-40 sm:h-auto bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 flex-shrink-0">
+                <div className="flex flex-col lg:flex-row">
+                  {/* Image Section */}
+                  <div className="relative w-full lg:w-72 h-48 lg:h-auto flex-shrink-0 bg-gray-100 dark:bg-gray-900">
                     <Image
-                      src={
-                        design.images[0]?.url ||
-                        "/images/category-placeholder.png"
-                      }
+                      src={design.images[0]?.url || "/images/category-placeholder.png"}
                       alt={design.name}
                       fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 192px"
-                      placeholder="blur"
-                      blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent sm:bg-gradient-to-r sm:from-black/50 sm:to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent lg:hidden" />
+                    <div className="absolute bottom-4 left-4 lg:hidden">
+                      <h4 className="text-white font-bold text-lg line-clamp-1">{design.name}</h4>
+                      <p className="text-gray-200 text-sm">{new Date(design.createdAt).toLocaleDateString()}</p>
+                    </div>
                   </div>
 
-                  {/* Content */}
-                  <div className="flex-1 p-4 sm:p-6">
-                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-3">
-                          <h4 className="text-xl font-bold text-gray-900 dark:text-white leading-tight line-clamp-2">
+                  {/* Content Section */}
+                  <div className="flex-1 p-6 lg:p-8 flex flex-col justify-between">
+                    <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-6">
+                      <div className="space-y-4 flex-1">
+                        <div className="hidden lg:block">
+                          <div className="flex items-center justify-between">
+                             <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                             {design.name}
                           </h4>
-                          <div className="flex items-center gap-2 ml-2 flex-shrink-0">
-                            <motion.button
-                              onClick={() => handleViewDesign(design.id)}
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                              title="View Design"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </motion.button>
-                            <motion.button
-                              onClick={() => handleDownloadAll(design)}
-                              disabled={
-                                downloadStates[design.id]?.isDownloading
-                              }
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              className="p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors disabled:opacity-50"
-                              title="Download All"
-                            >
-                              {downloadStates[design.id]?.isDownloading ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <Download className="w-4 h-4" />
-                              )}
-                            </motion.button>
+                          <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded-full">
+                            Purchased
+                          </span>
                           </div>
+                         
+                          <p className="text-gray-500 dark:text-gray-400 text-sm">
+                            Order ID: <span className="font-mono text-gray-700 dark:text-gray-300">#{design.orderId.substring(0, 8)}</span> • {new Date(design.createdAt).toLocaleDateString()}
+                          </p>
                         </div>
 
-                        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
-                          <div className="flex items-center gap-2">
-                            <Package className="w-4 h-4 text-blue-500" />
-                            <span className="font-medium">
-                              {design.selectedPackage || "Digital Download"}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-green-500" />
-                            <span>
-                              Format: {design.selectedFileTypes.join(", ")}
-                            </span>
-                          </div>
-                          {design.selectedExtras &&
-                            design.selectedExtras.length > 0 && (
-                              <div className="flex items-center gap-2">
-                                <Zap className="w-4 h-4 text-amber-500" />
-                                <span>
-                                  Extras:{" "}
-                                  {design.selectedExtras
-                                    .map((extra: any) => extra.name)
-                                    .join(", ")}
-                                </span>
+                        {/* Included Items Grid */}
+                        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-4 border border-gray-100 dark:border-gray-800">
+                          <h5 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                            Package Contents
+                          </h5>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {design.purchasedFiles.map((file) => (
+                              <div key={file.id} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                {getFileIcon(file.type)}
+                                <span className="truncate">{file.name}</span>
+                              </div>
+                            ))}
+                            {design.images.length > 0 && (
+                               <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                <ImageIcon className="w-4 h-4 text-purple-500" />
+                                <span>{design.images.length} High-Res Images</span>
                               </div>
                             )}
-                          <div className="text-xs text-gray-500 dark:text-gray-500">
-                            Purchased:{" "}
-                            {new Date(design.createdAt).toLocaleDateString()}
-                          </div>
-                        </div>
-
-                        {/* Purchased Files */}
-                        <div className="mt-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              <FolderOpen className="w-4 h-4 text-green-500" />
-                              <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                Files ({design.purchasedFiles.length})
-                              </span>
-                            </div>
-                            {design.purchasedFiles.length > 1 && (
-                              <motion.button
-                                onClick={() => handleDownloadAll(design)}
-                                disabled={
-                                  downloadStates[design.id]?.isDownloading
-                                }
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
-                              >
-                                {downloadStates[design.id]?.isDownloading ? (
-                                  <Loader2 className="w-3 h-3 animate-spin" />
-                                ) : (
-                                  <Download className="w-3 h-3" />
-                                )}
-                                All
-                              </motion.button>
-                            )}
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {design.purchasedFiles.map((file) => (
-                              <motion.div
-                                key={file.id}
-                                whileHover={{ scale: 1.01 }}
-                                className="flex items-center justify-between p-2 bg-gray-50/50 dark:bg-gray-700/50 rounded-lg border border-gray-200/50 dark:border-gray-600/50"
-                              >
-                                <div className="flex items-center gap-2 min-w-0 flex-1">
-                                  {getFileIcon(file.type)}
-                                  <div className="min-w-0 flex-1">
-                                    <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                                      {file.name}
-                                    </p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                                      {file.type}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-1 ml-2">
-                                  {downloadStates[
-                                    design.id
-                                  ]?.downloadedFiles.has(file.id) && (
-                                    <CheckCircle2 className="w-3 h-3 text-green-500 flex-shrink-0" />
-                                  )}
-                                  <motion.button
-                                    onClick={() => handlePreviewFile(file)}
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                                    title="Preview"
-                                  >
-                                    <ExternalLink className="w-3 h-3" />
-                                  </motion.button>
-                                  <motion.button
-                                    onClick={() =>
-                                      handleDownloadFile(design.id, file)
-                                    }
-                                    disabled={
-                                      downloadStates[design.id]?.isDownloading
-                                    }
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    className="p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors disabled:opacity-50"
-                                    title="Download"
-                                  >
-                                    <Download className="w-3 h-3" />
-                                  </motion.button>
-                                </div>
-                              </motion.div>
-                            ))}
                           </div>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex flex-col sm:flex-row lg:flex-col gap-2 lg:min-w-40">
+                      <div className="flex flex-col sm:flex-row lg:flex-col gap-3 min-w-[160px]">
                         <motion.button
                           onClick={() => handleDownloadAll(design)}
                           disabled={downloadStates[design.id]?.isDownloading}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold rounded-lg transition-all duration-200 text-sm min-w-32 disabled:opacity-50"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {downloadStates[design.id]?.isDownloading ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
                             <Download className="w-4 h-4" />
                           )}
-                          {downloadStates[design.id]?.isDownloading
-                            ? "Downloading..."
-                            : "Download All"}
+                          <span>
+                            {downloadStates[design.id]?.isDownloading
+                              ? "Zipping..."
+                              : "Download Package"}
+                          </span>
                         </motion.button>
-                        <motion.button
-                          onClick={() => handleViewInvoice(design.id)}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex items-center justify-center gap-2 px-4 py-2 bg-white/80 dark:bg-gray-700/80 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 font-semibold rounded-lg transition-all duration-200 text-sm min-w-32"
-                        >
-                          <Receipt className="w-4 h-4" />
-                          Invoice
-                        </motion.button>
+
+                        <div className="flex gap-2">
+                          <motion.button
+                            onClick={() => handleViewDesign(design.id)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                          >
+                            <Eye className="w-4 h-4" />
+                            View
+                          </motion.button>
+                          <motion.button
+                            onClick={() => handleViewInvoice(design.id)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                          >
+                            <Receipt className="w-4 h-4" />
+                            Invoice
+                          </motion.button>
+                        </div>
                       </div>
                     </div>
+
+                    {/* Progress Bar */}
+                    {downloadStates[design.id]?.isDownloading && (
+                      <div className="w-full h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-blue-500"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${downloadStates[design.id].progress}%` }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

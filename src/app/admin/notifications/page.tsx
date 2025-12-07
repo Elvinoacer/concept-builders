@@ -2,13 +2,16 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -24,8 +28,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { CgSpinner } from "react-icons/cg";
 import {
   FiBell,
@@ -34,6 +39,7 @@ import {
   FiEye,
   FiFilter,
   FiSearch,
+  FiSend,
   FiTrash2,
 } from "react-icons/fi";
 import { toast } from "sonner";
@@ -43,154 +49,110 @@ interface Notification {
   title: string;
   description: string;
   read: boolean;
-  createdAt: Date;
+  createdAt: string; // Changed to string to handle JSON serialization
   icon?: string;
   type?: "info" | "warning" | "success" | "error";
+  userId: string;
 }
 
 const AdminNotificationsPage = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [filteredNotifications, setFilteredNotifications] = useState<
-    Notification[]
-  >([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
-    {}
-  );
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
-  const [selectedNotifications, setSelectedNotifications] = useState<
-    Set<string>
-  >(new Set());
+  const [selectedNotifications, setSelectedNotifications] = useState<Set<string>>(
+    new Set()
+  );
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
 
-  const fetchNotifications = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/admin/notifications");
-      if (!response.ok) {
-        throw new Error("Failed to fetch notifications");
-      }
-      const data = await response.json();
-      setNotifications(data);
-      setFilteredNotifications(data);
-    } catch (error: any) {
-      console.error("Error fetching notifications:", error);
-      toast.error(`Failed to load notifications: ${error.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Filter notifications based on search and filter
-  useEffect(() => {
-    let filtered = notifications;
-
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (notif) =>
-          notif.title.toLowerCase().includes(query) ||
-          notif.description.toLowerCase().includes(query)
-      );
-    }
-
-    // Apply read/unread filter
-    if (filter === "unread") {
-      filtered = filtered.filter((notif) => !notif.read);
-    } else if (filter === "read") {
-      filtered = filtered.filter((notif) => notif.read);
-    }
-
-    setFilteredNotifications(filtered);
-  }, [notifications, searchQuery, filter]);
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [sendFormData, setSendFormData] = useState({
+    title: "",
+    body: "",
+  });
+  const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
     fetchNotifications();
-  }, [fetchNotifications]);
+  }, []);
 
-  const handleMarkAsRead = async (id: string) => {
-    setLoadingStates((prev) => ({ ...prev, [id]: true }));
+  const fetchNotifications = async () => {
     try {
-      const response = await fetch(`/api/admin/notifications/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ read: true }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to mark notification as read");
-      }
-
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notif.id === id ? { ...notif, read: true } : notif
-        )
-      );
-      setSelectedNotifications((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(id);
-        return newSet;
-      });
-      toast.success("Notification marked as read.");
-    } catch (error: any) {
-      console.error("Error marking notification as read:", error);
-      toast.error(`Failed to mark as read: ${error.message}`);
+      setIsLoading(true);
+      const response = await fetch("/api/admin/notifications");
+      if (!response.ok) throw new Error("Failed to fetch notifications");
+      const data = await response.json();
+      setNotifications(data);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      toast.error("Failed to load notifications");
     } finally {
-      setLoadingStates((prev) => ({ ...prev, [id]: false }));
+      setIsLoading(false);
     }
   };
 
-  const handleMarkMultipleAsRead = async () => {
-    if (selectedNotifications.size === 0) return;
+  const filteredNotifications = notifications.filter((notification) => {
+    const matchesSearch =
+      notification.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      notification.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (filter === "unread") return matchesSearch && !notification.read;
+    if (filter === "read") return matchesSearch && notification.read;
+    return matchesSearch;
+  });
 
-    const selectedArray = Array.from(selectedNotifications);
-    setLoadingStates((prev) => {
-      const newStates = { ...prev };
-      selectedArray.forEach((id) => {
-        newStates[id] = true;
-      });
-      return newStates;
-    });
+  const handleSendNotification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSending(true);
 
     try {
-      const response = await fetch("/api/admin/notifications/bulk", {
-        method: "PUT",
+      const response = await fetch("/api/admin/notifications/send", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ids: selectedArray,
-          read: true,
+          title: sendFormData.title,
+          body: sendFormData.body,
+          sendToAll: true,
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to mark notifications as read");
+        throw new Error(data.message || "Failed to send notification");
       }
 
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          selectedNotifications.has(notif.id) ? { ...notif, read: true } : notif
-        )
-      );
-      setSelectedNotifications(new Set());
-      toast.success(
-        `${selectedNotifications.size} notifications marked as read.`
-      );
+      toast.success(`Successfully sent ${data.successCount} notifications`);
+      setIsSendModalOpen(false);
+      setSendFormData({ title: "", body: "" });
+      fetchNotifications(); // Refresh list
     } catch (error: any) {
-      console.error("Error marking notifications as read:", error);
-      toast.error(`Failed to mark as read: ${error.message}`);
+      console.error("Error sending notification:", error);
+      toast.error(error.message || "Failed to send notification");
     } finally {
-      setLoadingStates((prev) => {
-        const newStates = { ...prev };
-        selectedArray.forEach((id) => {
-          newStates[id] = false;
-        });
-        return newStates;
+      setIsSending(false);
+    }
+  };
+
+  const handleMarkAsRead = async (id: string) => {
+    setLoadingStates((prev) => ({ ...prev, [id]: true }));
+    try {
+      const response = await fetch(`/api/admin/notifications/${id}/read`, {
+        method: "PUT",
       });
+      if (!response.ok) throw new Error("Failed to mark as read");
+      
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+      toast.success("Notification marked as read");
+    } catch (error) {
+      console.error("Error marking as read:", error);
+      toast.error("Failed to mark as read");
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, [id]: false }));
     }
   };
 
@@ -200,67 +162,72 @@ const AdminNotificationsPage = () => {
       const response = await fetch(`/api/admin/notifications/${id}`, {
         method: "DELETE",
       });
+      if (!response.ok) throw new Error("Failed to delete notification");
 
-      if (!response.ok) {
-        throw new Error("Failed to delete notification");
-      }
-
-      setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
       setSelectedNotifications((prev) => {
         const newSet = new Set(prev);
         newSet.delete(id);
         return newSet;
       });
-      toast.success("Notification deleted.");
-    } catch (error: any) {
+      toast.success("Notification deleted");
+    } catch (error) {
       console.error("Error deleting notification:", error);
-      toast.error(`Failed to delete notification: ${error.message}`);
+      toast.error("Failed to delete notification");
     } finally {
       setLoadingStates((prev) => ({ ...prev, [id]: false }));
     }
   };
 
-  const handleDeleteMultiple = async () => {
-    if (selectedNotifications.size === 0) return;
-
-    const selectedArray = Array.from(selectedNotifications);
-    setLoadingStates((prev) => {
-      const newStates = { ...prev };
-      selectedArray.forEach((id) => {
-        newStates[id] = true;
-      });
-      return newStates;
-    });
-
+  const handleMarkMultipleAsRead = async () => {
     try {
-      const response = await fetch("/api/admin/notifications/bulk", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ids: selectedArray }),
+      const ids = Array.from(selectedNotifications);
+      const response = await fetch("/api/admin/notifications/batch/read", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete notifications");
-      }
+      if (!response.ok) throw new Error("Failed to mark selected as read");
 
       setNotifications((prev) =>
-        prev.filter((notif) => !selectedNotifications.has(notif.id))
+        prev.map((n) => (selectedNotifications.has(n.id) ? { ...n, read: true } : n))
       );
       setSelectedNotifications(new Set());
-      toast.success(`${selectedNotifications.size} notifications deleted.`);
-    } catch (error: any) {
-      console.error("Error deleting notifications:", error);
-      toast.error(`Failed to delete notifications: ${error.message}`);
-    } finally {
-      setLoadingStates((prev) => {
-        const newStates = { ...prev };
-        selectedArray.forEach((id) => {
-          newStates[id] = false;
-        });
-        return newStates;
+      toast.success("Selected notifications marked as read");
+    } catch (error) {
+      console.error("Error batch marking as read:", error);
+      toast.error("Failed to mark selected as read");
+    }
+  };
+
+  const handleDeleteMultiple = async () => {
+    if (!confirm("Are you sure you want to delete selected notifications?")) return;
+
+    try {
+      const ids = Array.from(selectedNotifications);
+      const response = await fetch("/api/admin/notifications/batch/delete", {
+        method: "POST", // Using POST for batch delete usually, or DELETE with body
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
       });
+
+      if (!response.ok) throw new Error("Failed to delete selected notifications");
+
+      setNotifications((prev) => prev.filter((n) => !selectedNotifications.has(n.id)));
+      setSelectedNotifications(new Set());
+      toast.success("Selected notifications deleted");
+    } catch (error) {
+      console.error("Error batch deleting:", error);
+      toast.error("Failed to delete selected notifications");
+    }
+  };
+
+  const selectAll = () => {
+    if (selectedNotifications.size === filteredNotifications.length) {
+      setSelectedNotifications(new Set());
+    } else {
+      setSelectedNotifications(new Set(filteredNotifications.map((n) => n.id)));
     }
   };
 
@@ -276,164 +243,14 @@ const AdminNotificationsPage = () => {
     });
   };
 
-  const selectAll = () => {
-    if (selectedNotifications.size === filteredNotifications.length) {
-      setSelectedNotifications(new Set());
-    } else {
-      setSelectedNotifications(new Set(filteredNotifications.map((n) => n.id)));
-    }
-  };
-
-  const getNotificationIcon = (type?: string) => {
-    switch (type) {
-      case "warning":
-        return "⚠️";
-      case "success":
-        return "✅";
-      case "error":
-        return "❌";
-      default:
-        return "ℹ️";
-    }
-  };
-
   const getTypeColor = (type?: string) => {
     switch (type) {
-      case "warning":
-        return "text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400";
-      case "success":
-        return "text-green-600 bg-green-100 dark:bg-green-900/20 dark:text-green-400";
-      case "error":
-        return "text-red-600 bg-red-100 dark:bg-red-900/20 dark:text-red-400";
-      default:
-        return "text-blue-600 bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400";
+      case "success": return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+      case "warning": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
+      case "error": return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+      default: return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
     }
   };
-
-  // Mobile Card View
-  const NotificationCard = ({
-    notification,
-  }: {
-    notification: Notification;
-  }) => (
-    <Card
-      className={`
-        transition-all duration-200 border-l-4
-        ${
-          notification.read
-            ? "border-l-gray-300 dark:border-l-gray-600 bg-gray-50/50 dark:bg-gray-800/50"
-            : "border-l-blue-500 bg-white dark:bg-gray-800 shadow-sm"
-        }
-        ${
-          selectedNotifications.has(notification.id)
-            ? "ring-2 ring-blue-500 dark:ring-blue-400"
-            : ""
-        }
-      `}
-    >
-      <CardHeader className="p-4 pb-2">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            {/* Selection Checkbox */}
-            <button
-              onClick={() => toggleSelectNotification(notification.id)}
-              className={`w-5 h-5 rounded border-2 mt-1 flex-shrink-0 transition-colors ${
-                selectedNotifications.has(notification.id)
-                  ? "bg-blue-500 border-blue-500"
-                  : "border-gray-300 dark:border-gray-600"
-              }`}
-            >
-              {selectedNotifications.has(notification.id) && (
-                <FiCheckSquare className="w-4 h-4 text-white" />
-              )}
-            </button>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <CardTitle
-                  className={`text-base font-semibold truncate ${
-                    notification.read
-                      ? "text-gray-600 dark:text-gray-400"
-                      : "text-gray-900 dark:text-white"
-                  }`}
-                >
-                  {notification.title}
-                </CardTitle>
-                {notification.type && (
-                  <Badge
-                    variant="secondary"
-                    className={`text-xs px-2 py-0 ${getTypeColor(notification.type)}`}
-                  >
-                    {getNotificationIcon(notification.type)} {notification.type}
-                  </Badge>
-                )}
-              </div>
-              <CardDescription className="text-sm line-clamp-2">
-                {notification.description}
-              </CardDescription>
-            </div>
-          </div>
-
-          {/* Status Indicator */}
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
-            {!notification.read && (
-              <Badge
-                variant="default"
-                className="bg-blue-500 text-white text-xs"
-              >
-                New
-              </Badge>
-            )}
-            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-              {formatDistanceToNow(new Date(notification.createdAt), {
-                addSuffix: true,
-              })}
-            </span>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-4 pt-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-            <FiBell className="w-4 h-4" />
-            <span>{notification.read ? "Read" : "Unread"}</span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            {!notification.read && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleMarkAsRead(notification.id)}
-                disabled={loadingStates[notification.id]}
-                className="h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20"
-              >
-                {loadingStates[notification.id] ? (
-                  <CgSpinner className="w-4 h-4 animate-spin" />
-                ) : (
-                  <FiCheckCircle className="w-4 h-4" />
-                )}
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDeleteNotification(notification.id)}
-              disabled={loadingStates[notification.id]}
-              className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-            >
-              {loadingStates[notification.id] ? (
-                <CgSpinner className="w-4 h-4 animate-spin" />
-              ) : (
-                <FiTrash2 className="w-4 h-4" />
-              )}
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
@@ -448,28 +265,94 @@ const AdminNotificationsPage = () => {
           </p>
         </div>
 
-        {/* Bulk Actions - Desktop */}
-        <div className="hidden sm:flex items-center gap-2">
-          {selectedNotifications.size > 0 && (
-            <>
-              <Button
-                variant="outline"
-                onClick={handleMarkMultipleAsRead}
-                className="flex items-center gap-2"
-              >
-                <FiCheckCircle className="w-4 h-4" />
-                Mark as Read ({selectedNotifications.size})
+        <div className="flex items-center gap-2">
+          <Dialog open={isSendModalOpen} onOpenChange={setIsSendModalOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white">
+                <FiSend className="w-4 h-4" />
+                Send Notification
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleDeleteMultiple}
-                className="flex items-center gap-2 text-red-600 hover:text-red-700"
-              >
-                <FiTrash2 className="w-4 h-4" />
-                Delete ({selectedNotifications.size})
-              </Button>
-            </>
-          )}
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <form onSubmit={handleSendNotification}>
+                <DialogHeader>
+                  <DialogTitle>Send Push Notification</DialogTitle>
+                  <DialogDescription>
+                    Send a notification to all users who have enabled push
+                    notifications.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="title">Title</Label>
+                    <Input
+                      id="title"
+                      value={sendFormData.title}
+                      onChange={(e) =>
+                        setSendFormData({
+                          ...sendFormData,
+                          title: e.target.value,
+                        })
+                      }
+                      placeholder="Notification Title"
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="body">Message</Label>
+                    <Textarea
+                      id="body"
+                      value={sendFormData.body}
+                      onChange={(e) =>
+                        setSendFormData({
+                          ...sendFormData,
+                          body: e.target.value,
+                        })
+                      }
+                      placeholder="Notification Message"
+                      required
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="submit" disabled={isSending}>
+                    {isSending ? (
+                      <>
+                        <CgSpinner className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          {/* Bulk Actions - Desktop */}
+          <div className="hidden sm:flex items-center gap-2">
+            {selectedNotifications.size > 0 && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleMarkMultipleAsRead}
+                  className="flex items-center gap-2"
+                >
+                  <FiCheckCircle className="w-4 h-4" />
+                  Mark as Read ({selectedNotifications.size})
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleDeleteMultiple}
+                  className="flex items-center gap-2 text-red-600 hover:text-red-700"
+                >
+                  <FiTrash2 className="w-4 h-4" />
+                  Delete ({selectedNotifications.size})
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -561,7 +444,7 @@ const AdminNotificationsPage = () => {
               className="hidden sm:flex items-center gap-2"
             >
               <FiCheckSquare className="w-4 h-4" />
-              {selectedNotifications.size === filteredNotifications.length
+              {selectedNotifications.size === filteredNotifications.length && filteredNotifications.length > 0
                 ? "Deselect All"
                 : "Select All"}
             </Button>
@@ -579,7 +462,7 @@ const AdminNotificationsPage = () => {
               className="flex items-center gap-2 text-xs"
             >
               <FiCheckSquare className="w-3 h-3" />
-              {selectedNotifications.size === filteredNotifications.length
+              {selectedNotifications.size === filteredNotifications.length && filteredNotifications.length > 0
                 ? "Deselect All"
                 : "Select All"}
             </Button>
@@ -774,6 +657,12 @@ const AdminNotificationsPage = () => {
               <NotificationCard
                 key={notification.id}
                 notification={notification}
+                isSelected={selectedNotifications.has(notification.id)}
+                onSelect={() => toggleSelectNotification(notification.id)}
+                onMarkAsRead={() => handleMarkAsRead(notification.id)}
+                onDelete={() => handleDeleteNotification(notification.id)}
+                isLoading={loadingStates[notification.id]}
+                getTypeColor={getTypeColor}
               />
             ))}
           </div>
@@ -788,6 +677,114 @@ const AdminNotificationsPage = () => {
           <span>Showing: {filteredNotifications.length}</span>
         </div>
       )}
+    </div>
+  );
+};
+
+const NotificationCard = ({
+  notification,
+  isSelected,
+  onSelect,
+  onMarkAsRead,
+  onDelete,
+  isLoading,
+  getTypeColor,
+}: {
+  notification: Notification;
+  isSelected: boolean;
+  onSelect: () => void;
+  onMarkAsRead: () => void;
+  onDelete: () => void;
+  isLoading?: boolean;
+  getTypeColor: (type?: string) => string;
+}) => {
+  return (
+    <div
+      className={`
+        p-4 rounded-lg border transition-all
+        ${
+          notification.read
+            ? "bg-gray-50/50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700"
+            : "bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 shadow-sm"
+        }
+        ${isSelected ? "ring-2 ring-blue-500" : ""}
+      `}
+    >
+      <div className="flex items-start gap-3">
+        <button
+          onClick={onSelect}
+          className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+            isSelected
+              ? "bg-blue-500 border-blue-500"
+              : "border-gray-300 dark:border-gray-600"
+          }`}
+        >
+          {isSelected && <FiCheckSquare className="w-4 h-4 text-white" />}
+        </button>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <h4
+              className={`text-sm font-medium truncate ${
+                notification.read
+                  ? "text-gray-700 dark:text-gray-300"
+                  : "text-gray-900 dark:text-white"
+              }`}
+            >
+              {notification.title}
+            </h4>
+            <span className="text-xs text-gray-500 whitespace-nowrap">
+              {formatDistanceToNow(new Date(notification.createdAt), {
+                addSuffix: true,
+              })}
+            </span>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
+            {notification.description}
+          </p>
+          <div className="flex items-center justify-between">
+            {notification.type && (
+              <Badge
+                variant="secondary"
+                className={`text-xs ${getTypeColor(notification.type)}`}
+              >
+                {notification.type}
+              </Badge>
+            )}
+            <div className="flex items-center gap-2 ml-auto">
+              {!notification.read && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onMarkAsRead}
+                  disabled={isLoading}
+                  className="h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20"
+                >
+                  {isLoading ? (
+                    <CgSpinner className="animate-spin w-4 h-4" />
+                  ) : (
+                    <span className="text-xs flex items-center gap-1">
+                      <FiCheckCircle className="w-3 h-3" /> Mark Read
+                    </span>
+                  )}
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onDelete}
+                disabled={isLoading}
+                className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
+                {isLoading ? (
+                  <CgSpinner className="animate-spin w-4 h-4" />
+                ) : (
+                  <FiTrash2 className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

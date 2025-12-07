@@ -36,6 +36,7 @@ export async function GET() {
         take: 4,
         include: {
           files: true,
+          images: true,
           category: true,
           architecturalDesign: {
             include: {
@@ -81,6 +82,7 @@ export async function GET() {
             take: 4,
             include: {
                 files: true,
+                images: true,
                 category: true,
                 architecturalDesign: {
                   include: {
@@ -125,6 +127,7 @@ export async function GET() {
       take: 4,
       include: {
         files: true,
+        images: true,
         category: true,
       },
     });

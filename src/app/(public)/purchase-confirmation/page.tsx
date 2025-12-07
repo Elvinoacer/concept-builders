@@ -16,6 +16,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useInvoiceGenerator } from "@/hooks/useInvoiceGenerator";
 
 const PurchaseConfirmationPage = () => {
   const searchParams = useSearchParams();
@@ -24,6 +25,7 @@ const PurchaseConfirmationPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const { generateInvoice } = useInvoiceGenerator();
 
   // Detect screen size
   useEffect(() => {
@@ -315,10 +317,11 @@ const PurchaseConfirmationPage = () => {
               <motion.button
                 whileHover={{ scale: isMobile ? 1.02 : 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => generateInvoice(purchase)}
                 className="flex items-center justify-center gap-2 px-4 py-2 bg-white/80 dark:bg-gray-700/80 border-2 border-blue-300 dark:border-blue-600 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-sm font-medium rounded-xl transition-all duration-200"
               >
                 <Download className="w-4 h-4" />
-                Download Receipt
+                Download Invoice
               </motion.button>
             </div>
           </div>

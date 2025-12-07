@@ -1,42 +1,42 @@
-const { FileType } = require('../src/generated/prisma');
+const { FileType } = require("../src/generated/prisma");
 
 const categoriesData = [
   {
     name: "Bungalows",
-    image: "/images/banner-1.png",
+    image: "/images/banners/banner1.jpg",
   },
   {
     name: "Duplexes",
-    image: "/images/banner-2.png",
+    image: "/images/banners/banner2.jpg",
   },
   {
     name: "Apartments",
-    image: "/images/banner-3.png",
+    image: "/images/banners/banner3.jpg",
   },
   {
     name: "Modern",
-    image: "/images/banner-1.png",
+    image: "/images/banners/banner1.jpg",
   },
   {
     name: "Traditional",
-    image: "/images/banner-2.png",
+    image: "/images/banners/banner2.jpg",
   },
   {
     name: "Luxury",
-    image: "/images/banner-3.png",
+    image: "/images/banners/banner3.jpg",
   },
   {
     name: "Mansion",
-    image: "/images/banner-1.png",
+    image: "/images/banners/banner1.jpg",
   },
   {
     name: "Tiny Homes",
-    image: "/images/banner-2.png",
+    image: "/images/banners/banner2.jpg",
   },
   {
     name: "Farmhouse",
-    image: "/images/banner-3.png",
-  }
+    image: "/images/banners/banner3.jpg",
+  },
 ];
 
 const designsData = [
@@ -104,7 +104,12 @@ const designsData = [
     bathrooms: 10,
     area: 12000,
     floors: 3,
-    planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans", "Smart Home Integration"],
+    planDetails: [
+      "Detailed Floor Plans",
+      "3D Renderings",
+      "Electrical Plans",
+      "Smart Home Integration",
+    ],
     packageOptions: [
       { name: "architecturalPdf", price: 250 },
       { name: "architecturalCad", price: 500 },
@@ -123,7 +128,12 @@ const designsData = [
     bathrooms: 3,
     area: 3500,
     floors: 2,
-    planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans", "Barn and Stable Plans"],
+    planDetails: [
+      "Detailed Floor Plans",
+      "3D Renderings",
+      "Electrical Plans",
+      "Barn and Stable Plans",
+    ],
     packageOptions: [
       { name: "architecturalPdf", price: 70 },
       { name: "structuralPdf", price: 120 },
@@ -141,9 +151,7 @@ const designsData = [
     area: 800,
     floors: 1,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    packageOptions: [
-      { name: "architecturalPdf", price: 30 },
-    ],
+    packageOptions: [{ name: "architecturalPdf", price: 30 }],
   },
   {
     name: "The Weekender",
@@ -156,14 +164,13 @@ const designsData = [
     area: 400,
     floors: 1,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    packageOptions: [
-      { name: "architecturalPdf", price: 20 },
-    ],
+    packageOptions: [{ name: "architecturalPdf", price: 20 }],
   },
   {
     name: "The Gemini",
     category: "Duplexes",
-    description: "A versatile duplex for multi-generational living or rental income.",
+    description:
+      "A versatile duplex for multi-generational living or rental income.",
     basePrice: 1599,
     priceRange: "$1599 - $8999",
     bedrooms: 6,
@@ -176,7 +183,7 @@ const designsData = [
       { name: "structuralPdf", price: 130 },
       { name: "billOfQuantities", price: 110 },
     ],
-  }
+  },
 ];
 
 module.exports = {

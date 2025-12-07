@@ -53,6 +53,17 @@ model User {
   wishlist                 Design[]          @relation("DesignToUser")
   readMessages             Message[]         @relation("ReadMessages")
   paymentAttempts          PaymentAttempt[]
+  deviceTokens             DeviceToken[]
+}
+
+model DeviceToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  platform  String   @default("web")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Cart {
@@ -189,6 +200,20 @@ model Design {
   packageOptions           PackageOption[]
   reviews                  Review[]
   wishlistedBy             User[]           @relation("DesignToUser")
+  inquiries                DesignInquiry[]
+}
+
+model DesignInquiry {
+  id          String   @id @default(cuid())
+  designId    String
+  design      Design   @relation(fields: [designId], references: [id], onDelete: Cascade)
+  name        String
+  email       String
+  phone       String
+  inquiryType String // "GENERAL" | "NEGOTIATION"
+  message     String
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
 }
 
 model DesignDocuments {

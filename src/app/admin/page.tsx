@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { NotificationPermissionModal } from "@/components/notifications/NotificationPermissionModal";
 
 const AdminDashboardPage = () => {
   const [stats, setStats] = useState(null);
@@ -177,6 +178,7 @@ const AdminDashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 min-[375px]:px-5 sm:px-6 lg:px-8">
+      <NotificationPermissionModal />
       <div className="max-w-7xl mx-auto py-6 sm:py-8">
         {/* Header */}
         <motion.header

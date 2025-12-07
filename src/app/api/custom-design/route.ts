@@ -82,6 +82,35 @@ export async function POST(request: NextRequest) {
           icon: "Paperclip",
         },
       });
+
+      // Send Push Notification
+      try {
+        const { getAdminMessaging } = await import("@/lib/firebase-admin");
+        const adminMessaging = getAdminMessaging();
+        
+        const adminTokens = await prisma.deviceToken.findMany({
+          where: { userId: admin.id },
+          select: { token: true },
+        });
+
+        const tokens = adminTokens.map(t => t.token);
+
+        if (tokens.length > 0) {
+          await adminMessaging.sendEachForMulticast({
+            tokens,
+            notification: {
+              title: "New Custom Design Request",
+              body: `${name} submitted a request for ${designType}`,
+            },
+            data: {
+              url: `/admin/custom-design-requests/${customDesignRequest.id}`,
+              requestId: customDesignRequest.id,
+            },
+          });
+        }
+      } catch (pushError) {
+        console.error("Failed to send push notification:", pushError);
+      }
     }
 
     return NextResponse.json(customDesignRequest, { status: 201 });

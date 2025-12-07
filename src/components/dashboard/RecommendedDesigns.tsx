@@ -99,27 +99,31 @@ const RecommendedDesigns = () => {
   return (
     <section className="mt-6 sm:mt-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-5 h-5 text-amber-500" />
-            <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               Recommended for You
             </h3>
           </div>
-          {recommendedDesigns.length > 0 && (
-            <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full">
-              {recommendedDesigns.length}
-            </span>
-          )}
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Curated designs based on your preferences
+          </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {recommendedDesigns.length > 0 && (
+            <span className="hidden sm:inline-flex px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full">
+              {recommendedDesigns.length} New
+            </span>
+          )}
           <motion.button
             onClick={refreshRecommendations}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, rotate: 180 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-200"
+            transition={{ duration: 0.3 }}
+            className="p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl shadow-sm hover:shadow-md transition-all"
             title="Refresh recommendations"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />

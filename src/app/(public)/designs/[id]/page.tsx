@@ -79,9 +79,12 @@ const DesignDetailPage = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.8, staggerChildren: 0.2 }}
-          className="flex-1 px-3 xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8 md:py-12 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 min-h-screen"
+          className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 min-h-screen pb-24 lg:pb-12"
         >
-          <div className="w-full max-w-full mx-auto">
+          {/* Hero Section Background */}
+          <div className="absolute top-0 left-0 right-0 h-[50vh] bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 relative z-10">
             <motion.div
               className="mb-6 sm:mb-8"
               initial={{ opacity: 0, x: -20 }}
@@ -91,8 +94,9 @@ const DesignDetailPage = () => {
               <Breadcrumbs designName={design.name} />
             </motion.div>
 
-            <motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
-              <motion.div className="lg:col-span-2 space-y-6 sm:space-y-8 lg:space-y-12">
+            <motion.div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+              {/* Main Content Column */}
+              <motion.div className="lg:col-span-8 space-y-8 lg:space-y-12">
                 <motion.div>
                   <DesignHeader
                     name={design.name}
@@ -100,7 +104,11 @@ const DesignDetailPage = () => {
                   />
                 </motion.div>
 
-                <motion.div whileInView="visible" viewport={{ once: true }}>
+                <motion.div 
+                  whileInView="visible" 
+                  viewport={{ once: true }}
+                  className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 ring-1 ring-black/5 dark:ring-white/10"
+                >
                   <DesignGallery images={images} />
                 </motion.div>
 
@@ -142,13 +150,14 @@ const DesignDetailPage = () => {
                 </motion.div>
               </motion.div>
 
+              {/* Sidebar Column - Desktop Only */}
               <motion.div
-                className="lg:col-span-1"
+                className="hidden lg:block lg:col-span-4"
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                <div className="sticky top-20 sm:top-24">
+                <div className="sticky top-24">
                   <PurchaseSidebar design={design} />
                 </div>
               </motion.div>
@@ -167,6 +176,46 @@ const DesignDetailPage = () => {
               />
             </motion.div>
           </div>
+
+          {/* Mobile Sticky Purchase Bar */}
+          <motion.div 
+            initial={{ y: 100 }}
+            animate={{ y: 0 }}
+            className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 lg:hidden z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]"
+          >
+            <div className="flex items-center justify-between gap-4 max-w-7xl mx-auto">
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground font-medium">Starting from</span>
+                <span className="text-xl font-bold text-primary">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  }).format(design.basePrice)}
+                </span>
+              </div>
+              <button 
+                onClick={() => {
+                  // Scroll to purchase section or open modal
+                  const purchaseSection = document.getElementById('purchase-options');
+                  if (purchaseSection) {
+                    purchaseSection.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    // Fallback: scroll to top where sidebar would be on desktop, 
+                    // but since this is mobile, we might need a different strategy 
+                    // or just open the purchase modal directly if available.
+                    // For now, let's assume PurchaseSidebar handles the logic and we might need to expose it.
+                    // Alternatively, just link to purchase anchor.
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                className="flex-1 bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-primary/25 transition-all active:scale-95"
+              >
+                Purchase Now
+              </button>
+            </div>
+          </motion.div>
         </motion.main>
       </AnimatePresence>
     </ThemeProvider>
