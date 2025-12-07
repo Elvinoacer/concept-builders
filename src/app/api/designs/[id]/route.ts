@@ -14,6 +14,8 @@ export async function GET(
     const session = await getServerSession(authOptions);
     const isAdmin = session?.user.role === "ADMIN";
     const { id } = await params;
+    
+    console.log(`[Designs API] Fetching design with ID: ${id}, isAdmin: ${isAdmin}`);
 
     const design = await prisma.design.findUnique({
       where: { id },
@@ -54,17 +56,22 @@ export async function GET(
     });
 
     if (!design) {
+      console.log(`[Designs API] Design not found with ID: ${id}`);
       return new NextResponse("Design not found", { status: 404 });
     }
+    
+    console.log(`[Designs API] Design found: ${design.name}`);
 
     if (!isAdmin) {
       const sanitizeFileUrls = (files: any[]) => {
-        if (files) {
+        if (files && Array.isArray(files)) {
           files.forEach((file) => {
             if (file) {
               (file as any).url = null;
             }
           });
+        } else if (files) {
+          console.warn(`[Designs API] Expected array but got:`, typeof files);
         }
       };
 
@@ -90,9 +97,13 @@ export async function GET(
       }
     }
 
+    console.log(`[Designs API] Successfully returning design: ${design.name}`);
     return NextResponse.json(design, { status: 200 });
   } catch (error) {
-    console.error("Error fetching design:", error);
+    console.error("[Designs API] Error fetching design:", error);
+    if (error instanceof Error) {
+      console.error(`[Designs API] Error stack:`, error.stack);
+    }
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

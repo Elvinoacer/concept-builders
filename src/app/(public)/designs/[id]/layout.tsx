@@ -2,7 +2,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import prisma from "@/lib/prisma";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 async function getDesign(id: string) {
@@ -19,7 +19,7 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
   const design = await getDesign(id);
   const newImages = design.images.map((image) => ({
     url: image.url,
