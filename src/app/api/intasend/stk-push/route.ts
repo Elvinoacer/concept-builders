@@ -214,18 +214,21 @@ export async function POST(req: NextRequest) {
     // Convert amount to KES
     const amountKES = calculatedTotal * usdToKesRate;
 
-    console.log("🔧 Initializing IntaSend:", {
+    console.log("🔧 Initializing IntaSend (Live Mode):", {
       publishableKeyStart:
-        process.env.INTASEND_PUBLISHABLE_KEY?.substring(0, 10) + "...",
+        process.env.INTASEND_PUBLISHABLE_KEY?.substring(0, 15) + "...",
+      secretKeyStart:
+        process.env.INTASEND_SECRET_KEY?.substring(0, 20) + "...",
       calculatedTotalUSD: calculatedTotal,
       amountKES: amountKES,
       discountApplied: appliedDiscountAmount
     });
 
+    // Always use live mode (false)
     const intasend = new IntaSend(
       process.env.INTASEND_PUBLISHABLE_KEY!,
       process.env.INTASEND_SECRET_KEY!,
-      false
+      false // Live mode
     );
     // Format phone number
     let formattedPhone = phone_number.trim().replace(/\D/g, "");
@@ -278,10 +281,12 @@ export async function POST(req: NextRequest) {
       });
     } catch (intaSendError: any) {
       console.error("❌ IntaSend API Call Failed:");
+      console.error("Error object:", JSON.stringify(intaSendError, null, 2));
 
       // Enhanced error logging
       if (intaSendError.response) {
         console.error("Response status:", intaSendError.response.status);
+        console.error("Response headers:", intaSendError.response.headers);
 
         try {
           // Try to get the actual error response from IntaSend
@@ -296,26 +301,31 @@ export async function POST(req: NextRequest) {
           } else {
             errorData = intaSendError.response.data;
           }
-          console.error("IntaSend Error Response:", errorData);
+          console.error("IntaSend Error Response:", JSON.stringify(errorData, null, 2));
         } catch (parseError) {
-          console.error("Could not parse IntaSend error response");
+          console.error("Could not parse IntaSend error response", parseError);
         }
       }
 
       console.error("Error details:", {
         message: intaSendError.message,
         code: intaSendError.code,
+        stack: intaSendError.stack,
       });
 
       // Specific error handling
       if (intaSendError.response?.status === 401) {
         throw new APIException(
-          "IntaSend authentication failed. Please check your live credentials and ensure you're not using test mode with live keys.",
+          "IntaSend authentication failed. Your credentials were rejected. Please verify: 1) API keys are correct in .env, 2) Your IntaSend account is approved for LIVE payments, 3) You have sufficient permissions. Check server logs for detailed error response.",
           401,
           {
             gateway: "intasend",
             code: "AUTHENTICATION_FAILED",
-            // environment: testMode ? "TEST" : "LIVE",
+            environment: "LIVE",
+            keysProvided: {
+              publishableKey: !!process.env.INTASEND_PUBLISHABLE_KEY,
+              secretKey: !!process.env.INTASEND_SECRET_KEY,
+            }
           }
         );
       }
