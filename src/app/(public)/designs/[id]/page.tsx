@@ -150,14 +150,14 @@ const DesignDetailPage = () => {
                 </motion.div>
               </motion.div>
 
-              {/* Sidebar Column - Desktop Only */}
+              {/* Sidebar Column - Visible on all devices */}
               <motion.div
-                className="hidden lg:block lg:col-span-4"
+                className="lg:col-span-4"
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                <div className="sticky top-24">
+                <div className="lg:sticky lg:top-24">
                   <PurchaseSidebar design={design} />
                 </div>
               </motion.div>
@@ -181,11 +181,11 @@ const DesignDetailPage = () => {
           <motion.div 
             initial={{ y: 100 }}
             animate={{ y: 0 }}
-            className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 lg:hidden z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]"
+            className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 lg:hidden z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]"
           >
             <div className="flex items-center justify-between gap-4 max-w-7xl mx-auto">
               <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground font-medium">Starting from</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Starting from</span>
                 <span className="text-xl font-bold text-primary">
                   {new Intl.NumberFormat("en-US", {
                     style: "currency",
@@ -197,20 +197,16 @@ const DesignDetailPage = () => {
               </div>
               <button 
                 onClick={() => {
-                  // Scroll to purchase section or open modal
+                  // Scroll to purchase section which has the sidebar with all the logic
                   const purchaseSection = document.getElementById('purchase-options');
                   if (purchaseSection) {
-                    purchaseSection.scrollIntoView({ behavior: 'smooth' });
+                    purchaseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   } else {
-                    // Fallback: scroll to top where sidebar would be on desktop, 
-                    // but since this is mobile, we might need a different strategy 
-                    // or just open the purchase modal directly if available.
-                    // For now, let's assume PurchaseSidebar handles the logic and we might need to expose it.
-                    // Alternatively, just link to purchase anchor.
+                    // Fallback: scroll to top
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }
                 }}
-                className="flex-1 bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-primary/25 transition-all active:scale-95"
+                className="flex-1 bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/80 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-primary/25 dark:shadow-primary/20 transition-all active:scale-95"
               >
                 Purchase Now
               </button>
