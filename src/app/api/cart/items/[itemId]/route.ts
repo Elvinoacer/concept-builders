@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -13,7 +13,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { itemId } = params;
+  const { itemId } = await params;
   if (!itemId) {
     return NextResponse.json({ error: "Item ID is required" }, { status: 400 });
   }
@@ -66,7 +66,7 @@ export async function DELETE(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -74,7 +74,7 @@ export async function PUT(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { itemId } = params;
+  const { itemId } = await params;
   if (!itemId) {
     return NextResponse.json({ error: "Item ID is required" }, { status: 400 });
   }

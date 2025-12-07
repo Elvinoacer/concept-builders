@@ -13,7 +13,7 @@ export async function PUT(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const notificationId = (await params).id;
+  const { id: notificationId } = await params;
 
   try {
     const updatedNotification = await prisma.notification.update({
@@ -43,7 +43,7 @@ export async function DELETE(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const notificationId = (await params).id;
+  const { id: notificationId } = await params;
 
   try {
     await prisma.notification.delete({
