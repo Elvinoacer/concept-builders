@@ -242,7 +242,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Prepare STK payload
+    // Prepare STK payload - Following IntaSend NodeJS SDK documentation
     const apiRef = `cart_${userCart.id}_${Date.now()}`;
 
     const stkPayload = {
@@ -253,9 +253,9 @@ export async function POST(req: NextRequest) {
       phone_number: formattedPhone,
       api_ref: apiRef,
       host: host,
-      currency: "KES",
-      callback_url: `${host}/api/intasend/webhook`,
-      narrative: `Purchase - ${apiRef}`,
+      // Note: IntaSend Node SDK doesn't require 'currency' or 'callback_url' parameters
+      // The currency is automatically set to KES for M-Pesa
+      // Webhooks are configured in your IntaSend account dashboard
     };
 
     // Execute STK Push
