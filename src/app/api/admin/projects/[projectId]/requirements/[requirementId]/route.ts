@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { projectId: string; requirementId: string } }
+  { params }: { params: Promise<{ projectId: string; requirementId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -13,7 +13,7 @@ export async function GET(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, requirementId } = params;
+  const { projectId, requirementId } = await params;
 
   try {
     const requirement = await prisma.projectRequirement.findUnique({
@@ -36,7 +36,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { projectId: string; requirementId: string } }
+  { params }: { params: Promise<{ projectId: string; requirementId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -44,7 +44,7 @@ export async function PUT(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, requirementId } = params;
+  const { projectId, requirementId } = await params;
 
   try {
     const body = await request.json();

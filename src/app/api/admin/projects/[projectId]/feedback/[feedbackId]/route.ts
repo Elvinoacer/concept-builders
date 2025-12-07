@@ -40,7 +40,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { projectId: string; feedbackId: string } }
+  { params }: { params: Promise<{ projectId: string; feedbackId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -48,7 +48,7 @@ export async function PUT(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, feedbackId } = params;
+  const { projectId, feedbackId } = await params;
 
   try {
     const body = await request.json();
@@ -74,7 +74,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { projectId: string; feedbackId: string } }
+  { params }: { params: Promise<{ projectId: string; feedbackId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -82,7 +82,7 @@ export async function DELETE(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, feedbackId } = params;
+  const { projectId, feedbackId } = await params;
 
   try {
     await prisma.projectFeedback.delete({

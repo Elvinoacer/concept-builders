@@ -39,7 +39,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -48,7 +48,7 @@ export async function PUT(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { projectId } = params;
+    const { projectId } = await params;
     const body = await request.json();
     // Assuming body contains fields to update for a project
     // Example: { name: "New Project Name", description: "Updated description" };
@@ -67,7 +67,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -76,7 +76,7 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { projectId } = params;
+    const { projectId } = await params;
 
     await prisma.project.delete({
       where: { id: projectId },

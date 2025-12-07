@@ -6,7 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -15,9 +15,10 @@ export async function GET(
   }
 
   try {
+    const { id } = await params;
     const ongoingProject = await prisma.ongoingProject.findUnique({
       where: {
-        id: params.id,
+        id,
       },
     });
 
@@ -34,7 +35,7 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -43,9 +44,10 @@ export async function DELETE(
   }
 
   try {
+    const { id } = await params;
     await prisma.ongoingProject.delete({
       where: {
-        id: params.id,
+        id,
       },
     });
 

@@ -3,10 +3,10 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { isFeatured } = body; // Expecting a boolean
 
@@ -37,10 +37,10 @@ export async function PUT(
 // write the delete method to delete a design by id
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const deletedDesign = await prisma.design.delete({
       where: { id },

@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { purchaseId: string } }
+  { params }: { params: Promise<{ purchaseId: string }> }
 ) {
-  const { purchaseId } = params;
+  const { purchaseId } = await params;
 
   try {
     const purchase = await prisma.order.findUnique({

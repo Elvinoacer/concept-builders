@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { projectId: string; invoiceId: string } }
+  { params }: { params: Promise<{ projectId: string; invoiceId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -14,7 +14,7 @@ export async function GET(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, invoiceId } = params;
+  const { projectId, invoiceId } = await params;
 
   try {
     const invoice = await prisma.invoice.findUnique({
@@ -40,7 +40,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { projectId: string; invoiceId: string } }
+  { params }: { params: Promise<{ projectId: string; invoiceId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -48,7 +48,7 @@ export async function PUT(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, invoiceId } = params;
+  const { projectId, invoiceId } = await params;
 
   try {
     const body = await request.json();

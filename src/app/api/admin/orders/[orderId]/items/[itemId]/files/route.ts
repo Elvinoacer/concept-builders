@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { orderId: string; itemId: string } }
+  { params }: { params: Promise<{ orderId: string; itemId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -18,7 +18,7 @@ export async function POST(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const { orderId, itemId } = params;
+  const { orderId, itemId } = await params;
 
   try {
     const formData = await req.formData();
