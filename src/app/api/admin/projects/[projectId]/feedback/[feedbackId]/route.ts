@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { projectId: string; feedbackId: string } }
+  { params }: { params: Promise<{ projectId: string; feedbackId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -13,7 +13,7 @@ export async function GET(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, feedbackId } = params;
+  const { projectId, feedbackId } = await params;
 
   try {
     const feedback = await prisma.projectFeedback.findUnique({

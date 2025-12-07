@@ -116,7 +116,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { projectId: string; invoiceId: string } }
+  { params }: { params: Promise<{ projectId: string; invoiceId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -124,7 +124,7 @@ export async function DELETE(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, invoiceId } = params;
+  const { projectId, invoiceId } = await params;
 
   try {
     await prisma.invoice.delete({

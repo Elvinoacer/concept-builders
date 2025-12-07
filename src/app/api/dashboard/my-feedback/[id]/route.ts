@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -12,7 +12,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     }
 
     const userId = session.user.id;
-    const { id } = params;
+    const { id } = await params;
 
     // Ensure the user is deleting their own feedback
     const feedbackToDelete = await prisma.feedback.findUnique({

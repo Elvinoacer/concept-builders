@@ -70,7 +70,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { projectId: string; requirementId: string } }
+  { params }: { params: Promise<{ projectId: string; requirementId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -78,7 +78,7 @@ export async function DELETE(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, requirementId } = params;
+  const { projectId, requirementId } = await params;
 
   try {
     await prisma.projectRequirement.delete({
