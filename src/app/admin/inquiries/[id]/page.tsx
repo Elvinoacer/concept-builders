@@ -15,15 +15,15 @@ import { ArrowLeft, Mail, Phone, ExternalLink } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 interface AdminInquiryDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function AdminInquiryDetailPage({
   params,
 }: AdminInquiryDetailPageProps) {
-  const { id } = params;
+  const { id } = await params;
 
   const inquiry = await prisma.designInquiry.findUnique({
     where: { id },

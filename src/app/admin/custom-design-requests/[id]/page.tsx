@@ -6,7 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Role } from "@/generated/prisma";
 
 interface AdminCustomDesignRequestPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const AdminCustomDesignRequestPage = async ({
@@ -18,8 +18,10 @@ const AdminCustomDesignRequestPage = async ({
     notFound(); // Or redirect to unauthorized page
   }
 
+  const { id } = await params;
+
   const request = await prisma.customDesignRequest.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!request) {

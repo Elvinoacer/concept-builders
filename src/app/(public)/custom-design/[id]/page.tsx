@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface CustomDesignRequestPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const CustomDesignRequestPage = async ({ params }: CustomDesignRequestPageProps) => {
@@ -15,8 +15,10 @@ const CustomDesignRequestPage = async ({ params }: CustomDesignRequestPageProps)
     notFound(); // Or redirect to login
   }
 
+  const { id } = await params;
+
   const request = await prisma.customDesignRequest.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!request || request.email !== session.user.email) {

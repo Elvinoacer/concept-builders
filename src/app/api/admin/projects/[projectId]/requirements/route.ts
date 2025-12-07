@@ -13,7 +13,7 @@ export async function GET(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const projectId = (await params).projectId;
+  const { projectId } = await params;
 
   try {
     const requirements = await prisma.projectRequirement.findMany({
@@ -41,7 +41,7 @@ export async function POST(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const projectId = (await params).projectId;
+  const { projectId } = await params;
 
   try {
     const body = await request.json();
