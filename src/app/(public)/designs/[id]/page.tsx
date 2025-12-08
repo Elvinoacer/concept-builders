@@ -186,7 +186,7 @@ const DesignDetailPage = () => {
             <div className="flex items-center justify-between gap-4 max-w-7xl mx-auto">
               <div className="flex flex-col">
                 <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Starting from</span>
-                <span className="text-xl font-bold text-primary">
+                <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
                   {new Intl.NumberFormat("en-US", {
                     style: "currency",
                     currency: "USD",
@@ -206,7 +206,7 @@ const DesignDetailPage = () => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }
                 }}
-                className="flex-1 bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/80 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-primary/25 dark:shadow-primary/20 transition-all active:scale-95"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-blue-500/25 dark:shadow-blue-400/20 transition-all active:scale-95"
               >
                 Purchase Now
               </button>

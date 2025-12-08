@@ -459,7 +459,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
                 href={`/currency-converter?amount=${totalPrice}`}
-                className="flex items-center justify-center w-full h-11 px-3 text-sm font-medium text-primary border border-primary/20 rounded-md hover:bg-primary/5 transition-colors duration-300"
+                className="flex items-center justify-center w-full h-11 px-3 text-sm font-medium text-blue-600 dark:text-blue-400 border border-blue-600/20 dark:border-blue-400/20 rounded-md hover:bg-blue-600/5 dark:hover:bg-blue-400/10 transition-colors duration-300"
               >
                 <Zap className="w-4 h-4 mr-2" />
                 Currencies
