@@ -128,7 +128,7 @@ export const authOptions: AuthOptions = {
       });
 
       if (isNewUser) {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const referral = cookieStore.get("referral")?.value;
         if (referral) {
           await prisma.user.update({

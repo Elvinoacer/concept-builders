@@ -224,11 +224,12 @@ export async function POST(req: NextRequest) {
       discountApplied: appliedDiscountAmount
     });
 
-    // Always use live mode (false)
+    // Initialize IntaSend SDK
+    // Note: Third parameter is 'test' - set to false for live/production mode
     const intasend = new IntaSend(
       process.env.INTASEND_PUBLISHABLE_KEY!,
       process.env.INTASEND_SECRET_KEY!,
-      false // Live mode
+      false // false = live/production, true = test/sandbox
     );
     // Format phone number
     let formattedPhone = phone_number.trim().replace(/\D/g, "");
