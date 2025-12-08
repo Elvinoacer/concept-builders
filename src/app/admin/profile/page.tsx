@@ -39,6 +39,7 @@ import {
 } from "react-icons/fi";
 import { toast } from "sonner";
 import { NotificationSettings } from "@/components/notifications/NotificationSettings";
+import { NotificationPermissionModal } from "@/components/notifications/NotificationPermissionModal";
 
 const AdminProfilePage = () => {
   const { data: session, status, update } = useSession();
@@ -307,6 +308,7 @@ const AdminProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 md:p-8 max-w-6xl mx-auto">
+      <NotificationPermissionModal />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
         <div>
