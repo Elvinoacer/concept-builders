@@ -1,11 +1,14 @@
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   try {
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         name: true,
@@ -25,38 +28,51 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         reviews: { select: { id: true, rating: true, comment: true } },
         wishlist: { select: { id: true, name: true } },
         folders: { select: { id: true, name: true } },
-        loginHistory: { select: { createdAt: true, ipAddress: true }, orderBy: { createdAt: "desc" }, take: 5 }, // Latest 5 logins
+        loginHistory: {
+          select: { createdAt: true, ipAddress: true },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        }, // Latest 5 logins
       },
     });
     if (!user) {
-      return new NextResponse('Not Found', { status: 404 });
+      return new NextResponse("Not Found", { status: 404 });
     }
     return NextResponse.json(user);
   } catch (error) {
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
-export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   try {
     const data = await request.json();
+
     const updatedUser = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data,
     });
     return NextResponse.json(updatedUser);
   } catch (error) {
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   try {
     await prisma.user.delete({
-      where: { id: params.id },
+      where: { id },
     });
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

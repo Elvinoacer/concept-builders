@@ -21,7 +21,7 @@ export async function POST(
   }
 ) {
   try {
-    const { id: designId } = params;
+    const { id: designId } = await params;
     const { fileIdentifier, fileName, fileType, fileTypeCategory, originalFileName } = await request.json();
 
     if (!fileIdentifier || !fileName || !fileType || !fileTypeCategory || !originalFileName) {
