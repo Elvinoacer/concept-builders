@@ -14,6 +14,9 @@ import {
   Heart,
   List,
   RefreshCw,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -56,7 +59,6 @@ const DashboardPage = () => {
       });
       if (response.ok) {
         setShowPhoneNumberModal(false);
-        // Optionally, you can update the session data here to reflect the change immediately
       } else {
         console.error("Failed to update phone number");
       }
@@ -86,7 +88,7 @@ const DashboardPage = () => {
   // Set default view based on screen size
   useEffect(() => {
     if (isMobile) {
-      setActiveView("list"); // Better for mobile
+      setActiveView("list");
     }
   }, [isMobile]);
 
@@ -145,56 +147,96 @@ const DashboardPage = () => {
   };
 
   const refreshData = async () => {
-    // Implement refresh logic here
     window.location.reload();
   };
 
-  // Default stats if API fails
+  // Enhanced stats with trends
   const defaultStats = [
-    { name: "Purchased Designs", value: "0", icon: "download" },
-    { name: "Active Requests", value: "0", icon: "pending" },
-    { name: "Favorites", value: "0", icon: "favorite" },
-    { name: "Downloads", value: "0", icon: "file_download" },
+    { 
+      name: "Purchased Designs", 
+      value: "0", 
+      icon: "download", 
+      trend: "up", 
+      trendValue: "0%",
+      gradient: "from-blue-500 via-blue-600 to-cyan-500"
+    },
+    { 
+      name: "Active Requests", 
+      value: "0", 
+      icon: "pending", 
+      trend: "neutral", 
+      trendValue: "0%",
+      gradient: "from-purple-500 via-purple-600 to-pink-500"
+    },
+    { 
+      name: "Favorites", 
+      value: "0", 
+      icon: "favorite", 
+      trend: "up", 
+      trendValue: "0%",
+      gradient: "from-rose-500 via-pink-600 to-red-500"
+    },
+    { 
+      name: "Downloads", 
+      value: "0", 
+      icon: "file_download", 
+      trend: "up", 
+      trendValue: "0%",
+      gradient: "from-emerald-500 via-green-600 to-teal-500"
+    },
   ];
 
   const displayStats = stats.length > 0 ? stats : defaultStats;
 
+  // Trend icon component
+  const TrendIcon = ({ trend }: { trend: string }) => {
+    if (trend === "up") return <TrendingUp className="w-3 h-3" />;
+    if (trend === "down") return <TrendingDown className="w-3 h-3" />;
+    return <Minus className="w-3 h-3" />;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/40 dark:from-gray-950 dark:via-slate-900 dark:to-indigo-950/40 relative overflow-hidden">
+      {/* Animated background pattern */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wMiI+PHBhdGggZD0iTTM2IDE2YzAtOC44NC03LjE2LTE2LTE2LTE2cy0xNiA3LjE2LTE2IDE2IDcuMTYgMTYgMTYgMTYgMTYtNy4xNiAxNi0xNnptLTggMGMwIDQuNDItMy41OCA4LTggOHMtOC0zLjU4LTgtOCAzLjU4LTggOC04IDggMy41OCA4IDh6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40 dark:opacity-20" />
+      
       <NotificationPermissionModal />
-      <div className="px-3 xs:px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="px-3 xs:px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-10 relative z-10">
         {/* Header Section */}
         <motion.header
-          className="mb-6 sm:mb-8 lg:mb-12"
+          className="mb-8 sm:mb-10 lg:mb-14"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {/* Welcome Section */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
             <div className="flex-1 min-w-0">
               <motion.div
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-xs font-semibold tracking-wide uppercase mb-4"
+                className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 dark:from-blue-500/20 dark:via-indigo-500/20 dark:to-purple-500/20 border border-blue-200/50 dark:border-blue-700/50 text-blue-700 dark:text-blue-300 text-xs font-bold tracking-wider uppercase mb-5 backdrop-blur-sm"
                 variants={headerVariants}
               >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gradient-to-r from-blue-500 to-indigo-500"></span>
                 </span>
                 Dashboard Overview
               </motion.div>
 
               <motion.h1
                 variants={headerVariants}
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-3 tracking-tight"
+                className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-4 tracking-tight leading-tight"
               >
-                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">{session?.user?.name?.split(" ")[0] || "User"}</span>
+                Welcome back,{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400">
+                  {session?.user?.name?.split(" ")[0] || "User"}
+                </span>
               </motion.h1>
 
               <motion.p
                 variants={headerVariants}
                 transition={{ delay: 0.1 }}
-                className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl"
+                className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl leading-relaxed"
               >
                 Manage your projects, view purchased designs, and explore new architectural possibilities.
               </motion.p>
@@ -212,7 +254,7 @@ const DashboardPage = () => {
                 whileHover={{ scale: 1.05, rotate: 180 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.3 }}
-                className="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl shadow-sm hover:shadow-md transition-all"
+                className="p-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200/60 dark:border-gray-700/60 text-gray-600 hover:text-blue-600 dark:hover:text-blue-400 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 hover:shadow-xl hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30 transition-all"
                 title="Refresh data"
               >
                 <RefreshCw className="w-5 h-5" />
@@ -220,13 +262,13 @@ const DashboardPage = () => {
 
               {/* View Toggle */}
               {!isMobile && (
-                <div className="flex bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 shadow-sm">
+                <div className="flex bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-1.5 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50">
                   <button
                     onClick={() => setActiveView("grid")}
-                    className={`p-2 rounded-lg transition-all duration-200 ${
+                    className={`p-2.5 rounded-xl transition-all duration-200 ${
                       activeView === "grid"
-                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shadow-sm"
-                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/50"
+                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50"
                     }`}
                     title="Grid View"
                   >
@@ -234,10 +276,10 @@ const DashboardPage = () => {
                   </button>
                   <button
                     onClick={() => setActiveView("list")}
-                    className={`p-2 rounded-lg transition-all duration-200 ${
+                    className={`p-2.5 rounded-xl transition-all duration-200 ${
                       activeView === "list"
-                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shadow-sm"
-                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/50"
+                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50"
                     }`}
                     title="List View"
                   >
@@ -248,9 +290,9 @@ const DashboardPage = () => {
             </motion.div>
           </div>
 
-          {/* Stats Grid */}
+          {/* Enhanced Stats Grid */}
           <motion.div
-            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6"
             variants={containerVariants}
           >
             {displayStats.map((stat, index) => (
@@ -258,37 +300,59 @@ const DashboardPage = () => {
                 key={stat.name}
                 variants={itemVariants}
                 whileHover={{
-                  y: -4,
+                  y: -6,
+                  scale: 1.02,
                   transition: { duration: 0.2 },
                 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-lg border-2 border-gray-200/50 dark:border-gray-700/50 hover:border-blue-300/50 dark:hover:border-blue-600/30 hover:shadow-xl transition-all duration-300 group"
+                className="relative group"
               >
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 group-hover:scale-110 transition-transform duration-300 ${
-                      loading ? "animate-pulse" : ""
-                    }`}
-                  >
-                    {loading ? (
-                      <div className="w-6 h-6 bg-white/20 rounded"></div>
-                    ) : (
-                      <span className="material-symbols-outlined text-2xl text-white">
-                        {stat.icon}
-                      </span>
+                {/* Glow effect on hover */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition duration-300 blur-lg ${stat.gradient}" />
+                
+                <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-5 sm:p-7 rounded-3xl shadow-xl shadow-gray-200/60 dark:shadow-gray-900/60 border-2 border-gray-200/60 dark:border-gray-700/60 hover:border-transparent hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-start justify-between mb-4">
+                    <div
+                      className={`p-3.5 rounded-2xl bg-gradient-to-br ${stat.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300 relative overflow-hidden`}
+                    >
+                      {/* Shine effect */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                      
+                      {loading ? (
+                        <div className="w-7 h-7 bg-white/20 rounded animate-pulse"></div>
+                      ) : (
+                        <span className="material-symbols-outlined text-3xl text-white relative z-10">
+                          {stat.icon}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Trend indicator */}
+                    {!loading && stat.trend && (
+                      <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
+                        stat.trend === "up" 
+                          ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
+                          : stat.trend === "down"
+                          ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                          : "bg-gray-100 dark:bg-gray-700/30 text-gray-700 dark:text-gray-400"
+                      }`}>
+                        <TrendIcon trend={stat.trend} />
+                        <span>{stat.trendValue}</span>
+                      </div>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  
+                  <div className="space-y-1">
                     {loading ? (
                       <>
-                        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-2 animate-pulse"></div>
-                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2 animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
                       </>
                     ) : (
                       <>
-                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                        <p className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-1 tracking-tight">
                           {stat.value}
                         </p>
-                        <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                        <p className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-400 tracking-wide">
                           {stat.name}
                         </p>
                       </>
@@ -302,7 +366,7 @@ const DashboardPage = () => {
           {/* Quick Actions for Mobile */}
           {isMobile && (
             <motion.div
-              className="mt-4 flex gap-2 overflow-x-auto pb-2 -mx-2 px-2"
+              className="mt-6 flex gap-2.5 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -312,13 +376,13 @@ const DashboardPage = () => {
                 { icon: Heart, label: "Favorites", color: "pink" },
                 { icon: Clock, label: "Recent", color: "amber" },
                 { icon: Filter, label: "Filters", color: "gray" },
-              ].map((action, index) => (
+              ].map((action) => (
                 <motion.button
                   key={action.label}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-3 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap flex-shrink-0"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border-2 border-gray-200/60 dark:border-gray-700/60 rounded-2xl text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap flex-shrink-0 shadow-lg hover:shadow-xl transition-all"
                 >
-                  <action.icon className="w-3 h-3" />
+                  <action.icon className="w-4 h-4" />
                   {action.label}
                 </motion.button>
               ))}
@@ -328,7 +392,7 @@ const DashboardPage = () => {
 
         {/* Main Content Grid */}
         <motion.div
-          className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
+          className="grid grid-cols-1 xl:grid-cols-4 gap-5 sm:gap-6 lg:gap-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -337,7 +401,7 @@ const DashboardPage = () => {
           <div className="xl:col-span-3 space-y-6 sm:space-y-8">
             <motion.div
               variants={itemVariants}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl sm:rounded-[2rem] border-2 border-gray-200/60 dark:border-gray-700/60 overflow-hidden shadow-2xl shadow-gray-200/60 dark:shadow-gray-900/60"
             >
               <PurchasedDesigns
                 searchQuery={searchQuery}
@@ -347,7 +411,7 @@ const DashboardPage = () => {
 
             <motion.div
               variants={itemVariants}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl sm:rounded-[2rem] border-2 border-gray-200/60 dark:border-gray-700/60 overflow-hidden shadow-2xl shadow-gray-200/60 dark:shadow-gray-900/60"
             >
               <MyRequests />
             </motion.div>
@@ -359,35 +423,38 @@ const DashboardPage = () => {
             <motion.div
               variants={itemVariants}
               transition={{ delay: 0.4 }}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl sm:rounded-[2rem] border-2 border-gray-200/60 dark:border-gray-700/60 overflow-hidden shadow-2xl shadow-gray-200/60 dark:shadow-gray-900/60"
             >
               <RecommendedDesigns />
             </motion.div>
 
-            {/* Notifications - Compact on mobile */}
+            {/* Notifications */}
             <motion.div
               variants={itemVariants}
               transition={{ delay: 0.5 }}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl sm:rounded-[2rem] border-2 border-gray-200/60 dark:border-gray-700/60 overflow-hidden shadow-2xl shadow-gray-200/60 dark:shadow-gray-900/60"
             >
               <Notifications compact={isMobile} />
             </motion.div>
 
-            {/* Quick Stats for Mobile */}
+            {/* Quick Tip for Mobile */}
             {isMobile && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-2 border-blue-200/50 dark:border-blue-700/30 rounded-2xl p-4"
+                className="relative overflow-hidden bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 border-2 border-blue-400/30 rounded-3xl p-5 shadow-xl"
               >
-                <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                  Quick Tip
-                </h3>
-                <p className="text-blue-800 dark:text-blue-200 text-xs leading-relaxed">
-                  Swipe left on designs to access quick actions like download
-                  and favorite.
-                </p>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+                <div className="relative z-10">
+                  <h3 className="text-sm font-black text-white mb-2 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-xl">tips_and_updates</span>
+                    Quick Tip
+                  </h3>
+                  <p className="text-white/90 text-xs leading-relaxed font-medium">
+                    Swipe left on designs to access quick actions like download and favorite.
+                  </p>
+                </div>
               </motion.div>
             )}
           </div>
@@ -400,14 +467,14 @@ const DashboardPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center"
+              className="fixed inset-0 bg-black/30 backdrop-blur-md z-50 flex items-center justify-center"
             >
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-white/90 dark:bg-gray-800/90 p-6 rounded-2xl shadow-2xl border-2 border-gray-200/50 dark:border-gray-700/50"
+                className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border-2 border-gray-200/60 dark:border-gray-700/60"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{
@@ -415,9 +482,9 @@ const DashboardPage = () => {
                       repeat: Infinity,
                       ease: "linear",
                     }}
-                    className="w-6 h-6 border-2 border-blue-200 border-t-blue-600 rounded-full"
+                    className="w-8 h-8 border-4 border-blue-200 dark:border-blue-900 border-t-blue-600 dark:border-t-blue-400 rounded-full"
                   />
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">
+                  <span className="text-gray-700 dark:text-gray-300 font-bold text-lg">
                     Loading your dashboard...
                   </span>
                 </div>
