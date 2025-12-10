@@ -4,9 +4,9 @@ import { getSignedUrlForFiles } from "@/lib/do-spaces";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
-  const { orderId } = params;
+  const { orderId } = await params;
 
   try {
     const order = await prisma.order.findUnique({

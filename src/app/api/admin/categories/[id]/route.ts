@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { searchParams } = request.nextUrl;
     const designPage = parseInt(searchParams.get("designPage") || "1");
     const designLimit = parseInt(searchParams.get("designLimit") || "10");
@@ -24,7 +25,7 @@ export async function GET(
       : {};
 
     const category = await prisma.category.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         designs: {
           where: designWhere,
@@ -67,7 +68,7 @@ export async function GET(
 
     const totalDesignsInCategory = await prisma.design.count({
       where: {
-        categoryId: params.id,
+        categoryId: id,
         ...designWhere,
       },
     });
@@ -87,13 +88,14 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
     const updatedCategory = await prisma.category.update({
-      where: { id: params.id },
+      where: { id },
       data: body,
     });
 
@@ -111,11 +113,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.category.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     revalidatePath("/"); // Revalidate the homepage after deleting a category

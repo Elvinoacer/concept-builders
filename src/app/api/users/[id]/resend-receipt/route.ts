@@ -4,11 +4,11 @@ import { Resend } from "resend";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   try {
-    const { id } = params;
+    const { id } = await params;
     const { purchaseId } = await req.json();
 
     const purchase = await prisma.order.findUnique({

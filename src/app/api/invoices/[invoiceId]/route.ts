@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
-  { params }: { params: { invoiceId: string } }
+  { params }: { params: Promise<{ invoiceId: string }> }
 ) {
-  const { invoiceId } = params;
+  const { invoiceId } = await params;
 
   try {
     // Simulating a database lookup

@@ -6,10 +6,10 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(
   request: Request,
-  { params }: { params: { folderId: string } }
+  { params }: { params: Promise<{ folderId: string }> }
 ) {
   try {
-    const { folderId } = params;
+    const { folderId } = await params;
 
     const folder = await prisma.folder.findUnique({
       where: { id: folderId },
@@ -29,7 +29,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { folderId: string } }
+  { params }: { params: Promise<{ folderId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -38,7 +38,7 @@ export async function PUT(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { folderId } = params;
+    const { folderId } = await params;
     const body = await request.json();
     const { name } = body;
 

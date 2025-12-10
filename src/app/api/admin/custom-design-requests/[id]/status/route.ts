@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { CustomDesignRequestStatus, Role } from "@/generated/prisma";
 import { sendCustomDesignRequestStatusUpdateEmail } from "@/lib/emails";
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -13,6 +13,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const { id } = await params;
     const { status } = await request.json();
 
     if (!status || !Object.values(CustomDesignRequestStatus).includes(status)) {
@@ -20,7 +21,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     const updatedRequest = await prisma.customDesignRequest.update({
-      where: { id: params.id },
+      where: { id },
       data: { status },
     });
 

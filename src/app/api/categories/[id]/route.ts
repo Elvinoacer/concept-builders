@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const search = request.nextUrl.searchParams.get("search") || "";
@@ -87,10 +87,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     console.log("Received PUT request body for category:", body); // Added logging
     const { name, image, isFeatured } = body; // Added image and isFeatured
@@ -130,7 +130,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await prisma.category.delete({

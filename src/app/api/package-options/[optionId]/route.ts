@@ -18,9 +18,9 @@ async function deleteFileFromSpaces(fileUrl: string) {
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { optionId: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ optionId: string }> }) {
   try {
-    const { optionId } = params;
+    const { optionId } = await params;
     const body = await req.json();
     const { name, price, file } = body;
 
@@ -97,9 +97,9 @@ export async function PUT(req: NextRequest, { params }: { params: { optionId: st
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { optionId: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ optionId: string }> }) {
   try {
-    const { optionId } = params;
+    const { optionId } = await params;
 
     const existingOption = await prisma.packageOption.findUnique({
       where: { id: optionId },

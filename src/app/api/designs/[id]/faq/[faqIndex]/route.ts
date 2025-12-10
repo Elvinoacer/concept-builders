@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string; faqIndex: string } }
+  { params }: { params: Promise<{ id: string; faqIndex: string }> }
 ) {
   const { id, faqIndex } = params;
   const { answer } = await req.json();

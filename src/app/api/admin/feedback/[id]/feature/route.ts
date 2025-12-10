@@ -4,7 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -12,7 +12,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const { isFeatured } = await request.json();
 
     if (typeof isFeatured !== 'boolean') {

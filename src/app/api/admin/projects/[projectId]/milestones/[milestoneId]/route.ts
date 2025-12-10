@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { projectId: string; milestoneId: string } }
+  { params }: { params: Promise<{ projectId: string; milestoneId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -13,7 +13,7 @@ export async function GET(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, milestoneId } = params;
+  const { projectId, milestoneId } = await params;
 
   try {
     const milestone = await prisma.projectMilestone.findUnique({
@@ -36,7 +36,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { projectId: string; milestoneId: string } }
+  { params }: { params: Promise<{ projectId: string; milestoneId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -44,7 +44,7 @@ export async function PUT(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, milestoneId } = params;
+  const { projectId, milestoneId } = await params;
 
   try {
     const body = await request.json();
@@ -73,7 +73,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { projectId: string; milestoneId: string } }
+  { params }: { params: Promise<{ projectId: string; milestoneId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -81,7 +81,7 @@ export async function DELETE(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { projectId, milestoneId } = params;
+  const { projectId, milestoneId } = await params;
 
   try {
     await prisma.projectMilestone.delete({

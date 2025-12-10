@@ -218,15 +218,19 @@ export async function POST(request: Request) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
     
-    if (!images || !images.connect || images.connect.length === 0) {
+    // Frontend sends { create: [...] } for images, check if that exists and has items
+    if (!images || !images.create || images.create.length === 0) {
         return new NextResponse("At least one image is required.", { status: 400 });
     }
+
+    // Auto-calculate priceRange if not provided
+    const calculatedPriceRange = priceRange || `${basePrice} - ${basePrice}`;
 
     const designData: any = {
       name,
       description,
       basePrice: parseFloat(basePrice),
-      priceRange,
+      priceRange: calculatedPriceRange,
       bedrooms: bedrooms ? parseInt(bedrooms) : null,
       bathrooms: bathrooms ? parseInt(bathrooms) : null,
       area: area ? parseFloat(area) : null,
@@ -240,15 +244,16 @@ export async function POST(request: Request) {
       billOfQuantitiesPrice: billOfQuantitiesPrice ? parseFloat(billOfQuantitiesPrice) : null,
       billOfQuantitiesPdfPrice: billOfQuantitiesPdfPrice ? parseFloat(billOfQuantitiesPdfPrice) : null,
       
-      images: { connect: images.connect },
+      // Use create for images as sent by frontend
+      images: { create: images.create },
     };
 
-    if (floorPlans?.connect?.length > 0) {
-      designData.floorPlans = { connect: floorPlans.connect };
+    if (floorPlans?.create?.length > 0) {
+      designData.floorPlans = { create: floorPlans.create };
     }
 
-    if (files?.connect?.length > 0) {
-      designData.files = { connect: files.connect };
+    if (files?.create?.length > 0) {
+      designData.files = { create: files.create };
     }
 
     if (packageOptions?.create?.length > 0) {
@@ -256,7 +261,16 @@ export async function POST(request: Request) {
         create: packageOptions.create.map((pkg: any) => ({
           name: pkg.name,
           price: parseFloat(pkg.price),
-          ...(pkg.file?.connect && { file: { connect: { id: pkg.file.connect.id } } }),
+          // Handle nested file creation for package options if present
+          ...(pkg.file?.create && { 
+            file: { 
+              create: {
+                name: pkg.file.create.name,
+                url: pkg.file.create.url,
+                type: pkg.file.create.type
+              } 
+            } 
+          }),
         })),
       };
     }
@@ -266,20 +280,21 @@ export async function POST(request: Request) {
         const { type, pdfFiles, cadFiles, excelFiles } = doc.create;
         const createData: any = { type };
         
-        if (pdfFiles?.connect?.length > 0) {
-            createData.pdfFiles = { connect: pdfFiles.connect };
+        // These are also sent as { create: [...] } from frontend helper fileListPayload
+        if (pdfFiles?.create?.length > 0) {
+            createData.pdfFiles = { create: pdfFiles.create };
         }
-        if (cadFiles?.connect?.length > 0) {
-            createData.cadFiles = { connect: cadFiles.connect };
+        if (cadFiles?.create?.length > 0) {
+            createData.cadFiles = { create: cadFiles.create };
         }
-        if (excelFiles?.connect?.length > 0) {
-            createData.excelFiles = { connect: excelFiles.connect };
+        if (excelFiles?.create?.length > 0) {
+            createData.excelFiles = { create: excelFiles.create };
         }
 
-        if (Object.keys(createData).length > 1) {
-            return { create: createData };
-        }
-        return undefined;
+        // Only add if we have at least one file type or it's just a container (though usually we want files)
+        // The frontend sends empty arrays if no files, so we should check if we actually have content to create
+        // But the structure requires the document type to exist if we are creating it.
+        return { create: createData };
     };
 
     const ad = handleDesignDocument(architecturalDesign);
