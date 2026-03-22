@@ -226,3 +226,4 @@ Successfully deleted design: cmj07cbb10008rqt7ocazqxki
  DELETE /api/designs/cmj07cbb10008rqt7ocazqxki 200 in 4.2s (compile: 120ms, render: 4.1s)
 ✓ Deleted from Spaces: 600x400.jpg
 Background file deletion completed: 1 successful, 0 failed
+[?25h

@@ -1,5 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Noto_Sans, Work_Sans } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  Inter,
+  Noto_Sans,
+  Outfit,
+  Work_Sans,
+} from "next/font/google";
 import Script from "next/script";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -30,6 +36,21 @@ const workSans = Work_Sans({
   display: "swap",
   variable: "--font-work-sans",
   weight: ["400", "500", "700", "900"],
+});
+
+const cormorantGaramond = Cormorant_Garamond({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-cormorant-garamond",
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-outfit",
+  weight: ["300", "400", "500", "600"],
 });
 
 // Viewport configuration for mobile responsiveness
@@ -103,7 +124,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Concept Builders - Build Your Dream Home",
     description: "Transform your vision into reality with Concept Builders.",
-    images: ["https://conceptbuilders.co.ke/images/concept-builders-logo-free-bg.png"],
+    images: [
+      "https://conceptbuilders.co.ke/images/concept-builders-logo-free-bg.png",
+    ],
     creator: "@conceptbuilders",
   },
   icons: {
@@ -140,7 +163,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${notoSans.variable} ${workSans.variable}`}
+      className={`${inter.variable} ${notoSans.variable} ${workSans.variable} ${cormorantGaramond.variable} ${outfit.variable}`}
     >
       <head>
         {/* Preload critical resources */}
@@ -236,18 +259,23 @@ export default function RootLayout({
       </head>
       <body
         className={`
-          ${inter.className}
+          ${outfit.className}
           antialiased
           min-h-screen
-          bg-white
-          dark:bg-gray-950
-          text-gray-900
-          dark:text-gray-100
+          bg-background
+          text-foreground
           overflow-x-hidden
           selection:bg-primary/20
           selection:text-primary-foreground
         `}
       >
+        <div id="cb-cursor" className="cb-cursor hidden" aria-hidden="true" />
+        <div
+          id="cb-cursor-ring"
+          className="cb-cursor-ring hidden"
+          aria-hidden="true"
+        />
+
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -390,6 +418,68 @@ export default function RootLayout({
                 }
                 lastTouchEnd = now;
               }, false);
+            `,
+          }}
+        />
+
+        <Script
+          id="custom-cursor"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                const supportsFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+                if (!supportsFinePointer) return;
+
+                const cursor = document.getElementById('cb-cursor');
+                const ring = document.getElementById('cb-cursor-ring');
+                if (!cursor || !ring) return;
+
+                document.body.classList.add('custom-cursor-enabled');
+                cursor.classList.remove('hidden');
+                ring.classList.remove('hidden');
+
+                let mx = 0;
+                let my = 0;
+                let rx = 0;
+                let ry = 0;
+
+                const animateCursor = () => {
+                  rx += (mx - rx) * 0.15;
+                  ry += (my - ry) * 0.15;
+                  cursor.style.left = mx + 'px';
+                  cursor.style.top = my + 'px';
+                  ring.style.left = rx + 'px';
+                  ring.style.top = ry + 'px';
+                  requestAnimationFrame(animateCursor);
+                };
+
+                document.addEventListener('mousemove', function (event) {
+                  mx = event.clientX;
+                  my = event.clientY;
+                }, { passive: true });
+
+                const onPointerOver = function (event) {
+                  const target = event.target;
+                  if (!(target instanceof Element)) return;
+                  if (target.closest('a, button, input, textarea, select, label, [role="button"], [tabindex]:not([tabindex="-1"])')) {
+                    ring.classList.add('expand');
+                  }
+                };
+
+                const onPointerOut = function (event) {
+                  const target = event.target;
+                  if (!(target instanceof Element)) return;
+                  if (target.closest('a, button, input, textarea, select, label, [role="button"], [tabindex]:not([tabindex="-1"])')) {
+                    ring.classList.remove('expand');
+                  }
+                };
+
+                document.addEventListener('mouseover', onPointerOver, { passive: true });
+                document.addEventListener('mouseout', onPointerOut, { passive: true });
+
+                animateCursor();
+              })();
             `,
           }}
         />
