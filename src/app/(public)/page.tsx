@@ -83,17 +83,38 @@ function useCountUp(target: number, isActive: boolean, duration = 1800) {
 
 export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
+  const [activeBannerIndex, setActiveBannerIndex] = useState(0);
   const [designs, setDesigns] = useState<DesignItem[]>([]);
   const [feedback, setFeedback] = useState<FeaturedFeedback | null>(null);
   const [statsVisible, setStatsVisible] = useState(false);
 
   const statsRef = useRef<HTMLDivElement | null>(null);
 
+  const heroBanners = useMemo(
+    () => [
+      "/images/banners/banner1.jpg",
+      "/images/banners/banner2.jpg",
+      "/images/banners/banner3.jpg",
+      "/images/banners/banner4.jpg",
+      "/images/banners/banner5.jpg",
+      "/images/banners/banner6.jpg",
+    ],
+    [],
+  );
+
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setActiveBannerIndex((prev) => (prev + 1) % heroBanners.length);
+    }, 5200);
+
+    return () => window.clearInterval(interval);
+  }, [heroBanners.length]);
 
   useEffect(() => {
     document.body.classList.add("landing-redesign-active");
@@ -246,14 +267,27 @@ export default function Home() {
       </nav>
 
       <section className="relative flex min-h-screen flex-col justify-end overflow-hidden px-6 pb-20 pt-40 lg:px-[60px]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,9,7,0.3)_0%,rgba(10,9,7,0.15)_40%,rgba(10,9,7,0.85)_80%,var(--ink)_100%),linear-gradient(135deg,rgba(200,137,42,0.04)_0%,transparent_60%)]" />
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-35 transition-transform duration-[8000ms] ease-out"
-          style={{
-            backgroundImage:
-              "url(https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763456171240-A_13%20-%20Photo%20(8).jpg)",
-          }}
-        />
+        <div className="absolute inset-0 bg-[var(--surface)]" />
+        {heroBanners.map((banner, index) => (
+          <div
+            key={banner}
+            className={`absolute inset-0 transition-opacity duration-[1800ms] ease-in-out ${
+              index === activeBannerIndex ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Image
+              src={banner}
+              alt="Concept Builders hero banner"
+              fill
+              priority={index === 0}
+              sizes="100vw"
+              className={`object-cover object-center opacity-40 ${
+                index === activeBannerIndex ? "scale-100" : "scale-105"
+              } transition-transform duration-[5200ms] ease-out`}
+            />
+          </div>
+        ))}
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,9,7,0.44)_0%,rgba(10,9,7,0.24)_35%,rgba(10,9,7,0.86)_78%,var(--ink)_100%),linear-gradient(130deg,rgba(200,137,42,0.1)_0%,rgba(200,137,42,0.02)_38%,transparent_60%),radial-gradient(circle_at_72%_34%,rgba(232,168,74,0.14)_0%,transparent_44%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.04)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:linear-gradient(to_bottom,transparent_0%,rgba(0,0,0,0.4)_30%,rgba(0,0,0,0.4)_70%,transparent_100%)]" />
 
         <div className="relative z-10">
