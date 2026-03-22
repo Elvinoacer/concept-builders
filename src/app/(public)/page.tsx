@@ -210,16 +210,25 @@ export default function Home() {
       >
         <Link
           href="/"
-          className="flex items-center gap-3 text-[22px] font-medium tracking-[0.06em]"
+          className="flex items-center gap-3"
           style={{
             fontFamily:
               'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
           }}
         >
-          <span className="flex h-7 w-7 items-center justify-center border border-gold rotate-45">
-            <span className="h-2 w-2 bg-gold -rotate-45" />
+          <span className="relative h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14">
+            <Image
+              src="/images/concept-builders-logo-free-bg.png"
+              alt="Concept Builders logo"
+              fill
+              priority
+              sizes="(max-width: 640px) 40px, (max-width: 1024px) 48px, 56px"
+              className="object-contain"
+            />
           </span>
-          Concept Builders
+          <span className="text-[20px] font-medium tracking-[0.06em] text-cream sm:text-[22px]">
+            Concept Builders
+          </span>
         </Link>
 
         <ul className="hidden items-center gap-10 lg:flex">
