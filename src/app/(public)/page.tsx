@@ -87,6 +87,7 @@ export default function Home() {
   const [designs, setDesigns] = useState<DesignItem[]>([]);
   const [feedback, setFeedback] = useState<FeaturedFeedback | null>(null);
   const [statsVisible, setStatsVisible] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const statsRef = useRef<HTMLDivElement | null>(null);
 
@@ -273,9 +274,88 @@ export default function Home() {
             </Link>
           </li>
         </ul>
+
+        {/* Mobile hamburger button */}
+        <button
+          className="relative z-[110] flex h-10 w-10 flex-col items-center justify-center gap-[5px] lg:hidden"
+          onClick={() => setMobileMenuOpen((o) => !o)}
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+        >
+          <span
+            className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
+              mobileMenuOpen
+                ? "translate-y-[6.5px] rotate-45"
+                : ""
+            }`}
+          />
+          <span
+            className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
+              mobileMenuOpen ? "opacity-0" : ""
+            }`}
+          />
+          <span
+            className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
+              mobileMenuOpen
+                ? "-translate-y-[6.5px] -rotate-45"
+                : ""
+            }`}
+          />
+        </button>
       </nav>
 
-      <section className="relative flex min-h-screen flex-col justify-end overflow-hidden px-6 pb-20 pt-40 lg:px-[60px]">
+      {/* Mobile menu overlay */}
+      <div
+        className={`fixed inset-0 z-[99] bg-ink/95 backdrop-blur-md transition-all duration-500 lg:pointer-events-none lg:hidden ${
+          mobileMenuOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="flex h-full flex-col items-center justify-center gap-8">
+          {[
+            { href: "/designs", label: "Plans" },
+            { href: "/categories", label: "Categories" },
+            { href: "/design-showcase", label: "Showcase" },
+            { href: "/ongoing-projects", label: "Projects" },
+            { href: "/custom-design", label: "Custom Design" },
+            { href: "/contact", label: "Contact" },
+          ].map((link, i) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`text-[28px] font-light tracking-[0.08em] text-cream transition-all duration-500 hover:text-gold ${
+                mobileMenuOpen
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-4 opacity-0"
+              }`}
+              style={{
+                transitionDelay: mobileMenuOpen ? `${150 + i * 60}ms` : "0ms",
+                fontFamily:
+                  'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <Link
+            href="/custom-design"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`mt-4 border border-gold px-8 py-3 text-[13px] uppercase tracking-[0.16em] text-gold transition-all duration-500 hover:bg-gold hover:text-ink ${
+              mobileMenuOpen
+                ? "translate-y-0 opacity-100"
+                : "translate-y-4 opacity-0"
+            }`}
+            style={{
+              transitionDelay: mobileMenuOpen ? "510ms" : "0ms",
+            }}
+          >
+            Start a Project
+          </Link>
+        </div>
+      </div>
+
+      <section className="relative flex min-h-screen flex-col justify-end overflow-hidden px-5 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-40 lg:px-[60px]">
         <div className="absolute inset-0 bg-[var(--surface)]" />
         {heroBanners.map((banner, index) => (
           <div
@@ -306,7 +386,7 @@ export default function Home() {
           </p>
 
           <h1
-            className="mb-10 text-[clamp(64px,9vw,130px)] font-light leading-[0.92] tracking-[-0.02em]"
+            className="mb-6 text-[clamp(44px,9vw,130px)] font-light leading-[0.92] tracking-[-0.02em] sm:mb-10"
             style={{
               fontFamily:
                 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
@@ -324,23 +404,23 @@ export default function Home() {
             </span>
           </h1>
 
-          <div className="flex items-end justify-between gap-10 max-[900px]:flex-col max-[900px]:items-start animate-[fadeUp_0.8s_ease_1.1s_forwards] opacity-0">
-            <p className="max-w-[380px] text-[15px] leading-[1.7] text-cream-dim">
+          <div className="flex items-end justify-between gap-6 max-[900px]:flex-col max-[900px]:items-start animate-[fadeUp_0.8s_ease_1.1s_forwards] opacity-0 sm:gap-10">
+            <p className="max-w-[380px] text-[13px] leading-[1.7] text-cream-dim sm:text-[15px]">
               We turn visions into liveable reality - exceptional architectural
               designs and bespoke house plans, crafted for the way you want to
               live.
             </p>
-            <div className="flex items-center gap-5 max-[900px]:flex-col max-[900px]:items-start">
+            <div className="flex w-full items-center gap-4 max-[900px]:flex-col max-[900px]:items-stretch sm:w-auto sm:gap-5 max-[900px]:sm:items-start">
               <Link
                 href="/designs"
-                className="group relative overflow-hidden bg-gold px-9 py-4 text-[13px] font-medium uppercase tracking-[0.14em] text-ink"
+                className="group relative overflow-hidden bg-gold px-9 py-4 text-center text-[13px] font-medium uppercase tracking-[0.14em] text-ink"
               >
                 <span className="absolute inset-0 -translate-x-full bg-gold-light transition-transform duration-300 group-hover:translate-x-0" />
                 <span className="relative z-10">Browse House Plans</span>
               </Link>
               <Link
                 href="/custom-design"
-                className="group flex items-center gap-2.5 text-[13px] uppercase tracking-[0.12em] text-cream transition-colors hover:text-gold"
+                className="group flex items-center justify-center gap-2.5 text-[13px] uppercase tracking-[0.12em] text-cream transition-colors hover:text-gold sm:justify-start"
               >
                 Custom Design
                 <svg
@@ -367,7 +447,7 @@ export default function Home() {
       >
         <div className="flex flex-1 flex-col items-center justify-center gap-1.5 border-r border-cb-border py-9 text-center max-[900px]:basis-1/2 max-[900px]:border-b">
           <p
-            className="text-[42px] font-light leading-none"
+            className="text-[32px] font-light leading-none sm:text-[42px]"
             style={{
               fontFamily:
                 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
@@ -381,7 +461,7 @@ export default function Home() {
         </div>
         <div className="flex flex-1 flex-col items-center justify-center gap-1.5 border-r border-cb-border py-9 text-center max-[900px]:basis-1/2 max-[900px]:border-b max-[900px]:border-r-0">
           <p
-            className="text-[42px] font-light leading-none"
+            className="text-[32px] font-light leading-none sm:text-[42px]"
             style={{
               fontFamily:
                 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
@@ -395,7 +475,7 @@ export default function Home() {
         </div>
         <div className="flex flex-1 flex-col items-center justify-center gap-1.5 border-r border-cb-border py-9 text-center max-[900px]:basis-1/2">
           <p
-            className="text-[42px] font-light leading-none"
+            className="text-[32px] font-light leading-none sm:text-[42px]"
             style={{
               fontFamily:
                 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
@@ -409,7 +489,7 @@ export default function Home() {
         </div>
         <div className="flex flex-1 flex-col items-center justify-center gap-1.5 py-9 text-center max-[900px]:basis-1/2">
           <p
-            className="text-[42px] font-light leading-none"
+            className="text-[32px] font-light leading-none sm:text-[42px]"
             style={{
               fontFamily:
                 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
@@ -656,7 +736,7 @@ export default function Home() {
                     sizes="(max-width: 900px) 100vw, 33vw"
                   />
                 </div>
-                <div className="p-8">
+                <div className="p-5 sm:p-8">
                   <span className="mb-4 inline-flex items-center border border-gold/30 bg-gold/10 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-gold">
                     Best Seller
                   </span>
@@ -723,7 +803,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="grid grid-cols-2 items-center gap-24 border-b border-cb-border px-6 py-28 lg:px-[60px] max-[900px]:grid-cols-1 max-[900px]:gap-12 max-[900px]:px-6 max-[900px]:py-16">
+      <section className="grid grid-cols-2 items-center gap-24 border-b border-cb-border px-5 py-16 sm:px-6 sm:py-28 lg:px-[60px] max-[900px]:grid-cols-1 max-[900px]:gap-10">
         <div
           ref={testimonialLeftReveal.ref}
           className={testimonialLeftReveal.className}
@@ -734,13 +814,13 @@ export default function Home() {
             Client Stories
           </p>
           <blockquote
-            className="relative pt-10 text-[clamp(28px,3.5vw,46px)] font-light italic leading-[1.4]"
+            className="relative pt-10 text-[clamp(22px,5vw,46px)] font-light italic leading-[1.4] sm:text-[clamp(28px,3.5vw,46px)]"
             style={{
               fontFamily:
                 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
             }}
           >
-            <span className="absolute -left-4 -top-5 text-[120px] not-italic leading-none text-[rgba(200,137,42,0.15)]">
+            <span className="absolute -left-2 -top-3 text-[80px] not-italic leading-none text-[rgba(200,137,42,0.15)] sm:-left-4 sm:-top-5 sm:text-[120px]">
               &quot;
             </span>
             {feedback?.message ||
@@ -792,14 +872,15 @@ export default function Home() {
                 width={900}
                 height={1100}
                 className="aspect-[4/5] w-full object-cover brightness-75 saturate-[0.8] transition duration-500 hover:brightness-90 hover:saturate-100"
+                sizes="(max-width: 900px) 100vw, 50vw"
               />
             </div>
-            <div className="pointer-events-none absolute bottom-[-20px] left-[20px] right-[-20px] top-[20px] border border-gold/30" />
+            <div className="pointer-events-none absolute bottom-[-10px] left-[10px] right-[-10px] top-[10px] border border-gold/30 sm:bottom-[-20px] sm:left-[20px] sm:right-[-20px] sm:top-[20px]" />
           </div>
         </div>
       </section>
 
-      <section className="relative overflow-hidden px-6 py-28 text-center lg:px-[60px] max-[900px]:px-6 max-[900px]:py-20">
+      <section className="relative overflow-hidden px-5 py-16 text-center sm:px-6 sm:py-20 lg:px-[60px] lg:py-28">
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(200,137,42,0.08)_0%,transparent_70%)]" />
         <div
           ref={ctaReveal.ref}
@@ -810,7 +891,7 @@ export default function Home() {
             Begin Your Journey
           </p>
           <h2
-            className="mb-6 text-[clamp(48px,7vw,96px)] font-light leading-none tracking-[-0.02em]"
+            className="mb-6 text-[clamp(36px,7vw,96px)] font-light leading-none tracking-[-0.02em]"
             style={{
               fontFamily:
                 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
@@ -824,17 +905,17 @@ export default function Home() {
             Join over 1,200 Kenyan homeowners who chose Concept Builders to
             bring their vision to life with precision and craft.
           </p>
-          <div className="flex items-center justify-center gap-6 max-[900px]:flex-col">
+          <div className="flex items-center justify-center gap-5 max-[900px]:flex-col max-[900px]:items-stretch sm:gap-6">
             <Link
               href="/designs"
-              className="group relative overflow-hidden bg-gold px-9 py-4 text-[13px] font-medium uppercase tracking-[0.14em] text-ink"
+              className="group relative overflow-hidden bg-gold px-9 py-4 text-center text-[13px] font-medium uppercase tracking-[0.14em] text-ink"
             >
               <span className="absolute inset-0 -translate-x-full bg-gold-light transition-transform duration-300 group-hover:translate-x-0" />
               <span className="relative z-10">Browse All Plans</span>
             </Link>
             <Link
               href="/custom-design"
-              className="group flex items-center gap-2.5 text-[13px] uppercase tracking-[0.12em] text-cream transition-colors hover:text-gold"
+              className="group flex items-center justify-center gap-2.5 text-[13px] uppercase tracking-[0.12em] text-cream transition-colors hover:text-gold"
             >
               Request Custom Design
               <svg
@@ -855,7 +936,7 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-cb-border bg-card px-6 pb-10 pt-16 lg:px-[60px]">
-        <div className="mb-14 grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-14 max-[900px]:grid-cols-1">
+        <div className="mb-14 grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-14 max-[900px]:grid-cols-2 max-[900px]:gap-8 max-[480px]:grid-cols-1">
           <div>
             <div className="mb-5 flex items-center gap-3">
               <span className="flex h-7 w-7 items-center justify-center border border-gold rotate-45">
