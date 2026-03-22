@@ -305,7 +305,7 @@ export const slides = [
     title: "Your Vision, Our Precision.",
     description:
       "Where Vision Meets Precision. We collaborate with you to achieve a shared vision, ensuring a seamless journey from concept to keys.",
-    image: "images/banners/banner4.jpg",
+    image: "/images/banners/banner4.jpg",
     // "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763456253468-A_13%20-%20Photo.jpg",
   },
   {
