@@ -777,7 +777,7 @@ export default function Home() {
               <Image
                 src={
                   bestSellingPlans[0]?.images?.[0]?.url ||
-                  "https://concept-builders.sfo3.digitaloceanspaces.com/designs/1763456171240-A_13%20-%20Photo%20(8).jpg"
+                  "/images/banners/banner4.jpg"
                 }
                 alt="Concept Builders project"
                 width={900}
