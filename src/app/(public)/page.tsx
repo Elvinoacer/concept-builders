@@ -283,9 +283,7 @@ export default function Home() {
         >
           <span
             className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-              mobileMenuOpen
-                ? "translate-y-[6.5px] rotate-45"
-                : ""
+              mobileMenuOpen ? "translate-y-[6.5px] rotate-45" : ""
             }`}
           />
           <span
@@ -295,9 +293,7 @@ export default function Home() {
           />
           <span
             className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-              mobileMenuOpen
-                ? "-translate-y-[6.5px] -rotate-45"
-                : ""
+              mobileMenuOpen ? "-translate-y-[6.5px] -rotate-45" : ""
             }`}
           />
         </button>
@@ -828,7 +824,7 @@ export default function Home() {
           </blockquote>
           <div className="mt-8 flex items-center gap-4">
             <div
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--gold)_0%,#8b5e1a_100%)] text-[18px] font-semibold text-ink"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--gold)_0%,var(--gold-light)_100%)] text-[18px] font-semibold text-ink"
               style={{
                 fontFamily:
                   'var(--font-cormorant-garamond), "Cormorant Garamond", serif',

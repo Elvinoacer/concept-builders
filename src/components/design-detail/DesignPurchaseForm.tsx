@@ -14,43 +14,43 @@ interface DesignPurchaseFormProps {
 const DesignPurchaseForm: React.FC<DesignPurchaseFormProps> = ({ design }) => {
   return (
     <div className="lg:col-span-1">
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{design.name}</h1>
+      <div className="bg-card p-6 rounded-xl shadow-2xl border border-cb-border">
+        <h1 className="text-3xl font-bold text-cream tracking-tight">{design.name}</h1>
         <div className="flex items-center gap-2 mt-2">
           {design.tags.map((tag, index) => (
             <Badge key={index} variant={tag === 'Best Seller' ? 'default' : 'secondary'}>{tag}</Badge>
           ))}
         </div>
-        <p className="text-2xl font-bold text-primary mt-4">{design.price}</p>
+        <p className="text-2xl font-bold text-gold mt-4">{design.price}</p>
         <div className="mt-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="file-type">File Type</label>
-            <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-white dark:bg-gray-800" id="file-type" name="file-type">
+            <label className="block text-sm font-bold text-cream-dim" htmlFor="file-type">File Type</label>
+            <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-cb-border focus:outline-none focus:ring-gold focus:border-gold sm:text-sm rounded-md bg-surface text-cream" id="file-type" name="file-type">
               <option>PDF</option>
               <option>CAD</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="drawing-set">Drawing Set</label>
-            <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-white dark:bg-gray-800" id="drawing-set" name="drawing-set">
+            <label className="block text-sm font-bold text-cream-dim" htmlFor="drawing-set">Drawing Set</label>
+            <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-cb-border focus:outline-none focus:ring-gold focus:border-gold sm:text-sm rounded-md bg-surface text-cream" id="drawing-set" name="drawing-set">
               <option>Full Set</option>
               <option>Study Set</option>
             </select>
           </div>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-4">
-          <button className="w-full flex items-center justify-center gap-2 rounded-lg h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-opacity-90 transition-all">
+          <button className="w-full flex items-center justify-center gap-2 rounded-lg h-12 px-6 bg-gradient-to-r from-gold to-gold-light text-ink text-base font-bold tracking-wide hover:shadow-gold/20 transition-all shadow-xl">
             Buy Now
           </button>
-          <button className="w-full flex items-center justify-center gap-2 rounded-lg h-12 px-6 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white text-base font-bold tracking-wide hover:bg-gray-300 dark:hover:bg-gray-700 transition-all">
+          <button className="w-full flex items-center justify-center gap-2 rounded-lg h-12 px-6 bg-surface text-cream border border-cb-border text-base font-bold tracking-wide hover:bg-ink transition-all">
             <span className="material-symbols-outlined"> shopping_cart </span>
             Add to Cart
           </button>
         </div>
-        <div className="mt-6 text-center text-sm text-gray-500">
+        <div className="mt-6 text-center text-sm text-muted">
           <p>Secure payment via Stripe & PayPal</p>
         </div>
-        <div className="mt-4 flex justify-center gap-4 text-gray-400">
+        <div className="mt-4 flex justify-center gap-4 text-muted">
           <span className="text-xs font-semibold">100% Price Guarantee</span>
           <span className="text-xs font-semibold">Modification Service</span>
         </div>

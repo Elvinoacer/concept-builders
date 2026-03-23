@@ -7,12 +7,12 @@ const Location = () => {
   return (
     <div className="mt-6 xs:mt-8 sm:mt-10 md:mt-12">
       {/* Header */}
-      <h3 className="text-lg xs:text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text mb-3 xs:mb-4">
+      <h3 className="text-lg xs:text-xl sm:text-2xl font-bold text-gold mb-3 xs:mb-4">
         Our Location
       </h3>
 
       {/* Map Container */}
-      <div className="aspect-video w-full overflow-hidden rounded-lg xs:rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="aspect-video w-full overflow-hidden rounded-lg xs:rounded-xl border border-cb-border shadow-sm">
         <APIProvider apiKey={location.apiKey}>
           <Map
             center={location.position}
@@ -34,7 +34,7 @@ const Location = () => {
           href={location.directionsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 px-4 xs:px-6 py-2.5 xs:py-3 bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 text-white font-semibold rounded-lg xs:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 text-sm xs:text-base min-h-[2.75rem] xs:min-h-[3rem]"
+          className="inline-flex items-center justify-center gap-2 px-4 xs:px-6 py-2.5 xs:py-3 bg-gold hover:bg-gold-light text-ink font-bold rounded-lg xs:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 text-sm xs:text-base min-h-[2.75rem] xs:min-h-[3rem]"
         >
           <svg
             className="w-4 h-4 xs:w-5 xs:h-5"
@@ -55,7 +55,7 @@ const Location = () => {
 
       {/* Address - Mobile Only */}
       <div className="xs:hidden mt-3 text-center">
-        <p className="text-xs text-gray-600 dark:text-gray-400">
+        <p className="text-xs text-cream-dim">
           Tap for directions to our office
         </p>
       </div>

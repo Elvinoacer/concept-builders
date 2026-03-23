@@ -1,21 +1,21 @@
 :root {
-  --editor-bg: #fff;
-  --editor-text: #000;
-  --editor-border: #ccc;
+  --editor-bg: hsl(var(--background));
+  --editor-text: hsl(var(--foreground));
+  --editor-border: hsl(var(--border));
   --editor-button-bg: transparent;
-  --editor-button-hover-bg: #e0e0e0;
-  --editor-button-active-bg: #d0d0d0;
-  --editor-group-border: #ccc;
+  --editor-button-hover-bg: hsl(var(--secondary));
+  --editor-button-active-bg: hsl(var(--accent) / 0.2);
+  --editor-group-border: hsl(var(--border));
 }
 
 [data-theme="dark"] {
-  --editor-bg: #333;
-  --editor-text: #fff;
-  --editor-border: #555;
+  --editor-bg: hsl(var(--background));
+  --editor-text: hsl(var(--foreground));
+  --editor-border: hsl(var(--border));
   --editor-button-bg: transparent;
-  --editor-button-hover-bg: #555;
-  --editor-button-active-bg: #777;
-  --editor-group-border: #555;
+  --editor-button-hover-bg: hsl(var(--secondary));
+  --editor-button-active-bg: hsl(var(--accent) / 0.2);
+  --editor-group-border: hsl(var(--border));
 }
 
 .tiptap .ProseMirror {
@@ -99,7 +99,7 @@
 }
 
 .ProseMirror code {
-  background-color: #eee;
+  background-color: hsl(var(--secondary));
   padding: 2px 4px;
   border-radius: 4px;
   font-family: monospace;
@@ -151,7 +151,7 @@
 
 /* Enhanced MenuBar Styles */
 .menu-bar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--gold) 0%, hsl(var(--chart-4)) 100%);
   border-radius: 16px;
   padding: 16px;
   margin-bottom: 24px;
@@ -182,7 +182,7 @@
   border: none;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.9);
-  color: #2d3748;
+  color: hsl(var(--foreground));
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -193,7 +193,7 @@
 }
 
 .menu-bar button:hover {
-  background: #ffffff;
+  background: hsl(var(--background));
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
@@ -203,7 +203,7 @@
 }
 
 .menu-bar button.is-active {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, hsl(var(--chart-1)), hsl(var(--chart-4)));
   color: white;
   box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
 }
@@ -227,7 +227,7 @@
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
-  background: #1f2937;
+  background: hsl(var(--foreground));
   color: white;
   padding: 6px 12px;
   border-radius: 6px;
@@ -247,7 +247,7 @@
   left: 50%;
   transform: translateX(-50%) translateY(-2px);
   border: 4px solid transparent;
-  border-top-color: #1f2937;
+  border-top-color: hsl(var(--foreground));
   opacity: 0;
   pointer-events: none;
   transition: all 0.3s ease;
@@ -262,16 +262,20 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .menu-bar {
-    background: linear-gradient(135deg, #4c51bf 0%, #7e22ce 100%);
+    background: linear-gradient(
+      135deg,
+      hsl(var(--chart-1)) 0%,
+      hsl(var(--chart-4)) 100%
+    );
   }
 
   .menu-bar button {
     background: rgba(45, 55, 72, 0.9);
-    color: #e2e8f0;
+    color: hsl(var(--foreground));
   }
 
   .menu-bar button:hover {
-    background: #2d3748;
+    background: hsl(var(--secondary));
   }
 }
 
@@ -312,7 +316,7 @@
 
 /* Focus states for accessibility */
 .menu-bar button:focus {
-  outline: 2px solid #4f46e5;
+  outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
 }
 

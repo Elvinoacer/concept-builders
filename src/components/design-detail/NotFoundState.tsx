@@ -33,7 +33,7 @@ const NotFoundState: React.FC = () => {
   }, []);
 
   // Optimized animation variants for different screen sizes
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -44,19 +44,19 @@ const NotFoundState: React.FC = () => {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { opacity: 0, y: isMobile ? 20 : 30 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
         duration: isMobile ? 0.4 : 0.6,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut",
       },
     },
   };
 
-  const iconVariants = {
+  const iconVariants: any = {
     hidden: { scale: 0, rotate: -180 },
     visible: {
       scale: 1,
@@ -87,7 +87,7 @@ const NotFoundState: React.FC = () => {
     },
   };
 
-  const buttonVariants = {
+  const buttonVariants: any = {
     initial: { scale: 1 },
     hover: !isMobile
       ? {
@@ -106,7 +106,7 @@ const NotFoundState: React.FC = () => {
     },
   };
 
-  const searchVariants = {
+  const searchVariants: any = {
     initial: { scale: 1 },
     searching: {
       scale: [1, 1.05, 1],
@@ -133,7 +133,7 @@ const NotFoundState: React.FC = () => {
 
   return (
     <motion.div
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 px-3 xs:px-4 sm:px-6 py-8 sm:py-12 lg:py-16"
+      className="min-h-screen flex items-center justify-center bg-surface px-3 xs:px-4 sm:px-6 py-8 sm:py-12 lg:py-16"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -141,7 +141,7 @@ const NotFoundState: React.FC = () => {
       {/* Background decorative elements - optimized for mobile */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className={`bg-blue-500/5 rounded-full blur-2xl sm:blur-3xl ${
+          className={`bg-gold/5 rounded-full blur-2xl sm:blur-3xl ${
             isMobile
               ? "absolute -top-16 -left-16 w-32 h-32"
               : "absolute -top-32 -left-32 w-64 h-64"
@@ -150,7 +150,7 @@ const NotFoundState: React.FC = () => {
           animate="float"
         />
         <motion.div
-          className={`bg-cyan-500/5 rounded-full blur-2xl sm:blur-3xl ${
+          className={`bg-gold/5 rounded-full blur-2xl sm:blur-3xl ${
             isMobile
               ? "absolute -bottom-16 -right-16 w-32 h-32"
               : "absolute -bottom-32 -right-32 w-64 h-64"
@@ -161,7 +161,7 @@ const NotFoundState: React.FC = () => {
         />
         {!isMobile && (
           <motion.div
-            className="absolute top-1/2 left-1/4 w-32 h-32 bg-primary/5 rounded-full blur-2xl"
+            className="absolute top-1/2 left-1/4 w-32 h-32 bg-gold/5 rounded-full blur-2xl"
             variants={iconVariants}
             animate="float"
             transition={{ delay: 1 }}
@@ -182,25 +182,25 @@ const NotFoundState: React.FC = () => {
           <div className="relative inline-block">
             {/* Outer ring */}
             <motion.div
-              className={`bg-blue-500/10 border-2 border-blue-500/20 backdrop-blur-sm flex items-center justify-center mx-auto rounded-2xl sm:rounded-3xl ${
+              className={`bg-card border-2 border-cb-border backdrop-blur-sm flex items-center justify-center mx-auto rounded-2xl sm:rounded-3xl ${
                 isMobile ? "w-20 h-20" : "w-24 sm:w-32 sm:h-32"
               }`}
             >
               {/* Inner circle */}
               <motion.div
-                className={`bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg sm:shadow-2xl rounded-xl sm:rounded-2xl ${
+                className={`bg-gradient-to-r from-gold to-gold-light flex items-center justify-center shadow-xl rounded-xl sm:rounded-2xl ${
                   isMobile ? "w-16 h-16" : "w-20 sm:w-24 sm:h-24"
                 }`}
                 whileHover={!isMobile ? { scale: 1.1 } : {}}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <Search className="text-white" size={getMainIconSize()} />
+                <Search className="text-ink" size={getMainIconSize()} />
               </motion.div>
             </motion.div>
 
             {/* Floating building icons */}
             <motion.div
-              className={`absolute bg-white dark:bg-gray-800 rounded-full border-2 border-blue-500/30 flex items-center justify-center shadow-lg ${
+              className={`absolute bg-ink rounded-full border-2 border-gold/30 flex items-center justify-center shadow-xl ${
                 isMobile
                   ? "-top-1 -right-1 w-5 h-5"
                   : "-top-2 -right-2 w-6 sm:w-8 sm:h-8"
@@ -208,10 +208,10 @@ const NotFoundState: React.FC = () => {
               variants={iconVariants}
               animate="float"
             >
-              <Building2 className={isMobile ? "w-3 h-3" : "w-4 h-4"} />
+              <Building2 className={isMobile ? "w-3 h-3 text-gold" : "w-4 h-4 text-gold"} />
             </motion.div>
             <motion.div
-              className={`absolute bg-white dark:bg-gray-800 rounded-full border-2 border-cyan-500/30 flex items-center justify-center shadow-lg ${
+              className={`absolute bg-ink rounded-full border-2 border-gold/30 flex items-center justify-center shadow-xl ${
                 isMobile
                   ? "-bottom-1 -left-1 w-5 h-5"
                   : "-bottom-2 -left-2 w-6 sm:w-8 sm:h-8"
@@ -220,7 +220,7 @@ const NotFoundState: React.FC = () => {
               animate="float"
               transition={{ delay: 0.5 }}
             >
-              <Eye className={isMobile ? "w-3 h-3" : "w-4 h-4"} />
+              <Eye className={isMobile ? "w-3 h-3 text-gold" : "w-4 h-4 text-gold"} />
             </motion.div>
           </div>
         </motion.div>
@@ -232,7 +232,7 @@ const NotFoundState: React.FC = () => {
         >
           {/* Title */}
           <motion.h1
-            className={`font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent text-center ${
+            className={`font-black text-gold text-center ${
               isMobile ? "text-2xl" : "text-3xl sm:text-4xl lg:text-5xl"
             }`}
             variants={itemVariants}
@@ -242,16 +242,16 @@ const NotFoundState: React.FC = () => {
 
           {/* Message */}
           <motion.div
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-blue-200/50 dark:border-blue-700/30"
+            className="bg-card/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-cb-border"
             variants={itemVariants}
           >
-            <div className="flex items-center gap-2 sm:gap-3 text-blue-600 dark:text-blue-400 mb-2 sm:mb-3">
+            <div className="flex items-center gap-2 sm:gap-3 text-gold mb-2 sm:mb-3">
               <Compass size={getIconSize()} />
               <span className="font-semibold text-sm sm:text-base">
                 Design Search
               </span>
             </div>
-            <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed text-left">
+            <p className="text-cream-dim text-sm sm:text-base lg:text-lg leading-relaxed text-left">
               {isMobile
                 ? "We couldn't find the design you're looking for. It might have been moved or the link may be outdated."
                 : "We couldn't find the architectural design you're looking for. It might have been moved, or you may have followed an outdated link."}
@@ -271,17 +271,17 @@ const NotFoundState: React.FC = () => {
             >
               <div className="flex items-center gap-2 sm:gap-3 mb-2">
                 <div
-                  className={`rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-800 flex items-center justify-center flex-shrink-0 ${
+                  className={`rounded-lg sm:rounded-xl bg-ink/50 flex items-center justify-center flex-shrink-0 ${
                     isMobile ? "w-7 h-7" : "w-8 h-8"
                   }`}
                 >
-                  <Search className={isMobile ? "w-3 h-3" : "w-4 h-4"} />
+                  <Search className={isMobile ? "w-3 h-3 text-gold" : "w-4 h-4 text-gold"} />
                 </div>
-                <h3 className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base">
+                <h3 className="font-bold text-cream text-sm sm:text-base">
                   Check the URL
                 </h3>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-left">
+              <p className="text-xs sm:text-sm text-cream-dim text-left">
                 Ensure the design URL is correct and try again
               </p>
             </motion.div>
@@ -292,17 +292,17 @@ const NotFoundState: React.FC = () => {
             >
               <div className="flex items-center gap-2 sm:gap-3 mb-2">
                 <div
-                  className={`rounded-lg sm:rounded-xl bg-cyan-100 dark:bg-cyan-800 flex items-center justify-center flex-shrink-0 ${
+                  className={`rounded-lg sm:rounded-xl bg-ink/50 flex items-center justify-center flex-shrink-0 ${
                     isMobile ? "w-7 h-7" : "w-8 h-8"
                   }`}
                 >
-                  <Building2 className={isMobile ? "w-3 h-3" : "w-4 h-4"} />
+                  <Building2 className={isMobile ? "w-3 h-3 text-gold" : "w-4 h-4 text-gold"} />
                 </div>
-                <h3 className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base">
+                <h3 className="font-bold text-cream text-sm sm:text-base">
                   Browse Collection
                 </h3>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-left">
+              <p className="text-xs sm:text-sm text-cream-dim text-left">
                 Explore our complete architectural design portfolio
               </p>
             </motion.div>
@@ -324,7 +324,7 @@ const NotFoundState: React.FC = () => {
             >
               <Link
                 href="/designs"
-                className={`flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group w-full ${
+                className={`flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-gold to-gold-light text-ink font-bold shadow-xl hover:shadow-gold/20 transition-all duration-300 group w-full ${
                   isMobile
                     ? "px-6 py-3 rounded-xl text-base"
                     : "px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-lg"
@@ -332,12 +332,12 @@ const NotFoundState: React.FC = () => {
               >
                 <Building2
                   size={getIconSize()}
-                  className="group-hover:scale-110 transition-transform duration-300"
+                  className="group-hover:scale-110 transition-transform duration-300 text-ink"
                 />
                 {isMobile ? "Explore" : "Explore Designs"}
                 <ArrowRight
                   size={getIconSize()}
-                  className="group-hover:translate-x-1 transition-transform duration-300"
+                  className="group-hover:translate-x-1 transition-transform duration-300 text-ink"
                 />
               </Link>
             </motion.div>
@@ -351,7 +351,7 @@ const NotFoundState: React.FC = () => {
             >
               <Link
                 href="/"
-                className={`flex items-center justify-center gap-2 sm:gap-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group w-full ${
+                className={`flex items-center justify-center gap-2 sm:gap-3 bg-surface border-2 border-cb-border text-cream hover:border-gold/50 hover:text-gold font-bold shadow-xl transition-all duration-300 group w-full ${
                   isMobile
                     ? "px-6 py-3 rounded-xl text-base"
                     : "px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-lg"
@@ -366,10 +366,9 @@ const NotFoundState: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          {/* Search Animation */}
           <motion.div className="pt-4 sm:pt-6" variants={itemVariants}>
             <motion.div
-              className={`inline-flex items-center gap-2 backdrop-blur-sm border border-gray-200/30 dark:border-gray-700/30 text-gray-600 dark:text-gray-400 ${
+              className={`inline-flex items-center gap-2 backdrop-blur-sm border border-cb-border text-muted ${
                 isMobile
                   ? "px-3 py-2 rounded-xl text-xs"
                   : "px-4 py-2 rounded-2xl text-sm"
@@ -378,17 +377,16 @@ const NotFoundState: React.FC = () => {
               initial="initial"
               animate="searching"
             >
-              <Search size={isMobile ? 12 : 16} />
-              <span>
+              <Search size={isMobile ? 12 : 16} className="text-gold" />
+              <span className="font-bold">
                 {isMobile ? "Searching..." : "Searching for designs..."}
               </span>
             </motion.div>
           </motion.div>
         </motion.div>
 
-        {/* Additional Help */}
         <motion.div
-          className={`mt-6 sm:mt-8 backdrop-blur-sm border border-gray-200/30 dark:border-gray-700/30 ${
+          className={`mt-6 sm:mt-8 backdrop-blur-sm border border-cb-border ${
             isMobile ? "p-4 rounded-xl" : "p-6 rounded-2xl"
           }`}
           variants={itemVariants}
@@ -400,15 +398,15 @@ const NotFoundState: React.FC = () => {
           >
             <div className={`text-left ${isMobile ? "text-center" : ""}`}>
               <h4
-                className={`font-semibold text-slate-800 dark:text-white ${
+                className={`font-bold text-cream ${
                   isMobile ? "text-sm mb-1" : "text-base mb-1"
                 }`}
               >
                 Need assistance?
               </h4>
               <p
-                className={`text-gray-600 dark:text-gray-400 ${
-                  isMobile ? "text-xs" : "text-sm"
+                className={`text-muted ${
+                  isMobile ? "text-xs font-bold" : "text-sm font-bold"
                 }`}
               >
                 {isMobile
@@ -423,7 +421,7 @@ const NotFoundState: React.FC = () => {
             >
               <Link
                 href="/contact"
-                className={`inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors duration-300 group ${
+                className={`inline-flex items-center gap-2 text-gold hover:text-gold-light font-bold transition-colors duration-300 group ${
                   isMobile ? "px-4 py-2 text-sm" : "px-6 py-3 text-base"
                 }`}
               >
@@ -437,10 +435,9 @@ const NotFoundState: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Quick Actions for Mobile */}
         {isMobile && (
           <motion.div
-            className="mt-4 p-3 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-200/30 dark:border-gray-700/30"
+            className="mt-4 p-3 bg-ink/30 rounded-xl border border-cb-border"
             variants={itemVariants}
           >
             <p className="text-xs text-gray-600 dark:text-gray-400 text-center mb-2">
@@ -449,23 +446,23 @@ const NotFoundState: React.FC = () => {
             <div className="flex justify-center gap-4">
               <Link
                 href="/designs?category=residential"
-                className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-xs"
+                className="flex items-center gap-1 text-gold text-xs font-bold"
               >
-                <MapPin className="w-3 h-3" />
+                <MapPin className="w-3 h-3 text-gold" />
                 <span>Homes</span>
               </Link>
               <Link
                 href="/designs?category=commercial"
-                className="flex items-center gap-1 text-cyan-600 dark:text-cyan-400 text-xs"
+                className="flex items-center gap-1 text-gold text-xs font-bold"
               >
-                <Building2 className="w-3 h-3" />
+                <Building2 className="w-3 h-3 text-gold" />
                 <span>Commercial</span>
               </Link>
               <Link
                 href="/designs"
-                className="flex items-center gap-1 text-gray-600 dark:text-gray-400 text-xs"
+                className="flex items-center gap-1 text-muted text-xs font-bold"
               >
-                <Globe className="w-3 h-3" />
+                <Globe className="w-3 h-3 text-muted" />
                 <span>All</span>
               </Link>
             </div>

@@ -60,9 +60,9 @@ export function PaginationControls({
       <Button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        variant="outline"
+        variant="ghost"
         size="sm"
-        className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 min-w-[60px] sm:min-w-[70px]"
+        className="text-xs sm:text-sm h-10 px-4 border border-cb-border bg-surface text-cream-dim hover:bg-gold hover:text-ink disabled:opacity-50 disabled:hover:bg-surface disabled:hover:text-cream-dim transition-all duration-300 font-bold"
       >
         Previous
       </Button>
@@ -70,16 +70,20 @@ export function PaginationControls({
       <div className="flex items-center gap-1 sm:gap-2">
         {visiblePages.map((page, index) =>
           page === "..." ? (
-            <span key={index} className="px-2 text-gray-500 text-xs sm:text-sm">
+            <span key={index} className="px-2 text-muted text-xs sm:text-sm">
               ...
             </span>
           ) : (
             <Button
               key={index}
               onClick={() => handlePageChange(page as number)}
-              variant={currentPage === page ? "default" : "outline"}
+              variant="ghost"
               size="sm"
-              className="text-xs sm:text-sm h-8 sm:h-9 w-8 sm:w-9 p-0 min-w-0"
+              className={`text-xs sm:text-sm h-10 w-10 p-0 transition-all duration-300 font-bold ${
+                currentPage === page
+                  ? "bg-gold text-ink shadow-lg shadow-gold/20"
+                  : "border border-cb-border bg-surface text-cream-dim hover:bg-gold/20 hover:text-gold"
+              }`}
             >
               {page}
             </Button>
@@ -90,9 +94,9 @@ export function PaginationControls({
       <Button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        variant="outline"
+        variant="ghost"
         size="sm"
-        className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 min-w-[60px] sm:min-w-[70px]"
+        className="text-xs sm:text-sm h-10 px-4 border border-cb-border bg-surface text-cream-dim hover:bg-gold hover:text-ink disabled:opacity-50 disabled:hover:bg-surface disabled:hover:text-cream-dim transition-all duration-300 font-bold"
       >
         Next
       </Button>

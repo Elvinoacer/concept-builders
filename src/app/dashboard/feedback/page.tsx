@@ -148,28 +148,28 @@ const FeedbackPage = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 flex items-center justify-center px-3 xs:px-4 sm:px-6">
+      <div className="min-h-screen bg-ink flex items-center justify-center px-3 xs:px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
           className="max-w-md w-full text-center"
         >
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+          <div className="bg-card backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-cb-border shadow-xl">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              className="w-16 h-16 bg-emerald-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4"
             >
               <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
             </motion.div>
 
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-cream mb-3">
               Thank You!
             </h1>
 
-            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base leading-relaxed mb-6">
+            <p className="text-cream-dim text-sm sm:text-base leading-relaxed mb-6">
               Your feedback has been received and will help us improve our
               service. We appreciate you taking the time to share your thoughts
               with us.
@@ -180,7 +180,7 @@ const FeedbackPage = () => {
                 onClick={() => setIsSubmitted(false)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
+                className="flex-1 sm:flex-none px-6 py-3 bg-gold hover:bg-gold-light text-ink font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
               >
                 Submit More Feedback
               </motion.button>
@@ -189,7 +189,7 @@ const FeedbackPage = () => {
                 onClick={() => router.back()}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex-1 sm:flex-none px-6 py-3 bg-white/80 dark:bg-gray-700/80 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 font-semibold rounded-xl transition-all duration-200 text-sm sm:text-base"
+                className="flex-1 sm:flex-none px-6 py-3 bg-card border-2 border-cb-border text-cream-dim hover:border-gold/50 hover:text-gold font-semibold rounded-xl transition-all duration-200 text-sm sm:text-base"
               >
                 Go Back
               </motion.button>
@@ -201,7 +201,7 @@ const FeedbackPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
+    <div className="min-h-screen bg-ink">
       <div className="px-3 xs:px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-4xl mx-auto">
         {/* Header */}
         <motion.header
@@ -215,7 +215,7 @@ const FeedbackPage = () => {
               onClick={() => router.back()}
               whileHover={{ scale: 1.05, x: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-200"
+              className="p-2 bg-card backdrop-blur-sm border-2 border-cb-border text-cream-dim hover:border-gold/50 hover:text-gold rounded-xl transition-all duration-200"
             >
               <ArrowLeft className="w-4 h-4" />
             </motion.button>
@@ -223,7 +223,7 @@ const FeedbackPage = () => {
             <div>
               <motion.h1
                 variants={itemVariants}
-                className="text-2xl xs:text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2"
+                className="text-2xl xs:text-3xl sm:text-4xl font-bold text-cream mb-2"
               >
                 Share Your Feedback
               </motion.h1>
@@ -231,7 +231,7 @@ const FeedbackPage = () => {
               <motion.p
                 variants={itemVariants}
                 transition={{ delay: 0.1 }}
-                className="text-gray-600 dark:text-gray-400 text-sm sm:text-base"
+                className="text-cream-dim text-sm sm:text-base"
               >
                 We'd love to hear your thoughts, suggestions, or concerns.
               </motion.p>
@@ -245,9 +245,9 @@ const FeedbackPage = () => {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 p-4 sm:p-6 shadow-sm"
+            className="bg-card backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-cb-border p-4 sm:p-6 shadow-sm"
           >
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6 text-center">
+            <h2 className="text-lg sm:text-xl font-semibold text-cream mb-4 sm:mb-6 text-center">
               How would you rate your experience?
             </h2>
 
@@ -263,8 +263,8 @@ const FeedbackPage = () => {
                   onMouseLeave={() => setHoverRating(0)}
                   className={`text-2xl sm:text-3xl transition-all duration-200 ${
                     star <= (hoverRating || rating)
-                      ? "text-yellow-400 scale-110"
-                      : "text-gray-300 dark:text-gray-600 hover:text-yellow-300"
+                      ? "text-gold scale-110"
+                      : "text-muted hover:text-gold/60"
                   }`}
                 >
                   <Star
@@ -280,7 +280,7 @@ const FeedbackPage = () => {
               <motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center text-sm text-gray-600 dark:text-gray-400"
+                className="text-center text-sm text-cream-dim"
               >
                 {rating === 5 && "Excellent! We're thrilled to hear that! 🎉"}
                 {rating === 4 && "Great! Thanks for the positive feedback! 👍"}
@@ -298,11 +298,11 @@ const FeedbackPage = () => {
             initial="hidden"
             animate="visible"
             onSubmit={handleSubmit}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 p-4 sm:p-6 shadow-sm"
+            className="bg-card backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-cb-border p-4 sm:p-6 shadow-sm"
           >
             {/* Category Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-cream-dim mb-3">
                 Category
               </label>
 
@@ -325,8 +325,8 @@ const FeedbackPage = () => {
                       whileTap={{ scale: 0.95 }}
                       className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-200 ${
                         selectedCategory === category.id
-                          ? "border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-400 shadow-md"
-                          : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:border-gray-500"
+                          ? "border-gold bg-gold/20 text-gold shadow-md"
+                          : "border-cb-border text-cream-dim hover:border-gold/30"
                       }`}
                     >
                       <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 mb-1 sm:mb-2" />
@@ -341,7 +341,7 @@ const FeedbackPage = () => {
 
             {/* Feedback Textarea */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-cream-dim mb-3">
                 Your Feedback
               </label>
 
@@ -351,12 +351,12 @@ const FeedbackPage = () => {
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="Tell us what's on your mind... What did you like? What can we improve?"
                 rows={isMobile ? 4 : 6}
-                className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 resize-none text-sm sm:text-base"
+                className="w-full px-4 py-3 bg-card border-2 border-cb-border rounded-xl focus:border-gold focus:ring-2 focus:ring-gold/20 text-cream placeholder-muted transition-all duration-300 resize-none text-sm sm:text-base"
                 required
               />
 
               <div className="flex justify-between items-center mt-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-muted">
                   {feedback.length}/1000 characters
                 </span>
                 {feedback.length > 800 && (
@@ -372,10 +372,10 @@ const FeedbackPage = () => {
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                  className="mt-1 rounded border-cb-border text-gold focus:ring-gold"
                   required
                 />
-                <span className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                <span className="text-sm text-cream-dim leading-relaxed">
                   I'd like to receive updates about my feedback and other
                   product improvements
                 </span>
@@ -395,7 +395,7 @@ const FeedbackPage = () => {
                     !isSubmitting && feedback.trim() && rating > 0 ? 1.02 : 1,
                 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-md text-sm sm:text-base flex-1"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-gold hover:bg-gold-light text-ink font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-md text-sm sm:text-base flex-1"
               >
                 {isSubmitting ? (
                   <>
@@ -420,7 +420,7 @@ const FeedbackPage = () => {
                 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="px-6 py-3 bg-white/80 dark:bg-gray-700/80 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 font-semibold rounded-xl transition-all duration-200 text-sm sm:text-base"
+                className="px-6 py-3 bg-card border-2 border-cb-border text-cream-dim hover:border-gold/50 hover:text-gold font-semibold rounded-xl transition-all duration-200 text-sm sm:text-base"
               >
                 Clear
               </motion.button>
@@ -431,15 +431,15 @@ const FeedbackPage = () => {
           <motion.div
             variants={itemVariants}
             transition={{ delay: 0.3 }}
-            className="bg-blue-50/50 dark:bg-blue-900/20 border-2 border-blue-200/50 dark:border-blue-700/30 rounded-2xl p-4 sm:p-6"
+            className="bg-gold/10 border-2 border-gold/30 rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-start gap-3 sm:gap-4">
-              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <Info className="w-5 h-5 text-gold mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2 text-sm sm:text-base">
+                <h3 className="font-semibold text-gold mb-2 text-sm sm:text-base">
                   What happens to your feedback?
                 </h3>
-                <p className="text-blue-800 dark:text-blue-300 text-xs sm:text-sm leading-relaxed">
+                <p className="text-cream-dim text-xs sm:text-sm leading-relaxed">
                   Your feedback is reviewed by our team regularly. We use it to
                   prioritize improvements and new features. While we can't
                   respond to every submission, we read them all and appreciate
@@ -456,9 +456,9 @@ const FeedbackPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 p-4 sm:p-6 shadow-sm"
+                className="bg-card backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-cb-border p-4 sm:p-6 shadow-sm"
               >
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-cream mb-4 sm:mb-6">
                   Your Previous Feedback
                 </h2>
 
@@ -469,14 +469,14 @@ const FeedbackPage = () => {
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9 }}
-                      className="bg-gray-50/50 dark:bg-gray-700/50 rounded-xl p-3 sm:p-4 border border-gray-200/50 dark:border-gray-600/50"
+                      className="bg-surface rounded-xl p-3 sm:p-4 border border-cb-border"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full capitalize">
+                          <span className="px-2 py-1 bg-gold/20 text-gold text-xs font-medium rounded-full capitalize">
                             {fb.category.replace("_", " ")}
                           </span>
-                          <div className="flex text-yellow-400 text-sm">
+                          <div className="flex text-gold text-sm">
                             {"★".repeat(fb.rating)}
                             {"☆".repeat(5 - fb.rating)}
                           </div>
@@ -486,17 +486,17 @@ const FeedbackPage = () => {
                           onClick={() => handleDeleteFeedback(fb.id)}
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          className="p-1 text-gray-400 hover:text-red-500 transition-colors duration-200"
+                          className="p-1 text-muted hover:text-destructive transition-colors duration-200"
                         >
                           <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                         </motion.button>
                       </div>
 
-                      <p className="text-gray-700 dark:text-gray-300 text-sm mb-2 line-clamp-2">
+                      <p className="text-cream-dim text-sm mb-2 line-clamp-2">
                         {fb.feedback}
                       </p>
 
-                      <p className="text-gray-500 dark:text-gray-400 text-xs">
+                      <p className="text-muted text-xs">
                         {new Date(fb.createdAt).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
@@ -509,7 +509,7 @@ const FeedbackPage = () => {
 
                 {userFeedback.length > (isMobile ? 3 : 5) && (
                   <div className="mt-4 text-center">
-                    <button className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors duration-200">
+                    <button className="text-gold hover:text-gold-light text-sm font-medium transition-colors duration-200">
                       Show all {userFeedback.length} feedback items
                     </button>
                   </div>

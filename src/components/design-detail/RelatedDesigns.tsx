@@ -47,7 +47,7 @@ const RelatedDesigns = ({
     fetchRelatedDesigns();
   }, [categoryId, currentDesignId]);
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -57,7 +57,7 @@ const RelatedDesigns = ({
     },
   };
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { opacity: 0, y: 50, scale: 0.9 },
     visible: {
       opacity: 1,
@@ -65,7 +65,7 @@ const RelatedDesigns = ({
       scale: 1,
       transition: {
         duration: 0.8,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut",
       },
     },
     hover: {
@@ -78,7 +78,7 @@ const RelatedDesigns = ({
     },
   };
 
-  const imageVariants = {
+  const imageVariants: any = {
     hidden: { opacity: 0, scale: 1.1 },
     visible: {
       opacity: 1,
@@ -107,7 +107,7 @@ const RelatedDesigns = ({
       >
         <div className="text-center mb-8 sm:mb-10 md:mb-12">
           <motion.h2
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-3 sm:mb-4"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-cream mb-3 sm:mb-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -115,7 +115,7 @@ const RelatedDesigns = ({
             Related Designs
           </motion.h2>
           <motion.p
-            className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-cream-dim max-w-2xl mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
@@ -127,14 +127,14 @@ const RelatedDesigns = ({
           {[...Array(6)].map((_, index) => (
             <motion.div
               key={index}
-              className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-5 md:p-6 border-2 border-gray-200/50 dark:border-gray-700/50 animate-pulse"
+              className="bg-card/50 backdrop-blur-sm rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-5 md:p-6 border-2 border-cb-border animate-pulse"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <div className="w-full h-32 sm:h-40 md:h-48 bg-gray-300 dark:bg-gray-600 rounded-lg sm:rounded-xl md:rounded-2xl mb-3 sm:mb-4"></div>
-              <div className="h-3 sm:h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>
-              <div className="h-3 sm:h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4"></div>
+              <div className="w-full h-32 sm:h-40 md:h-48 bg-ink/50 rounded-lg sm:rounded-xl md:rounded-2xl mb-3 sm:mb-4"></div>
+              <div className="h-3 sm:h-4 bg-ink/50 rounded mb-2"></div>
+              <div className="h-3 sm:h-4 bg-ink/50 rounded w-3/4"></div>
             </motion.div>
           ))}
         </div>
@@ -155,11 +155,11 @@ const RelatedDesigns = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Building2 className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-gray-300 dark:text-gray-600 mx-auto mb-4 sm:mb-6" />
-          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
+          <Building2 className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-muted mx-auto mb-4 sm:mb-6" />
+          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-cream-dim mb-3 sm:mb-4">
             No Related Designs Found
           </h3>
-          <p className="text-sm sm:text-base md:text-lg text-gray-500 dark:text-gray-500 max-w-md mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-muted max-w-md mx-auto">
             Explore our complete collection to discover more architectural
             designs that match your style.
           </p>
@@ -170,7 +170,7 @@ const RelatedDesigns = ({
           >
             <Link
               href="/designs"
-              className="inline-flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-primary to-blue-500 text-white rounded-lg sm:rounded-xl md:rounded-2xl font-semibold text-sm sm:text-base md:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              className="inline-flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-gold to-gold-light text-ink rounded-lg sm:rounded-xl md:rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
             >
               Browse All Designs
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -194,13 +194,13 @@ const RelatedDesigns = ({
         variants={containerVariants}
       >
         <motion.h2
-          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-3 sm:mb-4"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-cream mb-3 sm:mb-4"
           variants={itemVariants}
         >
           Related Designs
         </motion.h2>
         <motion.p
-          className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed"
+          className="text-sm sm:text-base md:text-lg lg:text-xl text-cream-dim max-w-2xl mx-auto leading-relaxed"
           variants={itemVariants}
         >
           Discover more architectural designs that complement your style and
@@ -231,9 +231,9 @@ const RelatedDesigns = ({
                 className="group cursor-pointer"
               >
                 <Link href={`/designs/${design.id}`}>
-                  <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl md:rounded-3xl shadow-lg sm:shadow-xl md:shadow-2xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden hover:border-primary/30 transition-all duration-500 h-full flex flex-col">
+                  <div className="bg-card/80 backdrop-blur-sm rounded-xl sm:rounded-2xl md:rounded-3xl shadow-2xl border-2 border-cb-border overflow-hidden hover:border-gold/30 transition-all duration-500 h-full flex flex-col">
                     <motion.div
-                      className="relative overflow-hidden bg-gray-100 dark:bg-gray-900"
+                      className="relative overflow-hidden bg-surface"
                       variants={imageVariants}
                     >
                       {imageUrls.length > 0 ? (
@@ -248,8 +248,8 @@ const RelatedDesigns = ({
                           sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                         />
                       ) : (
-                        <div className="w-full h-40 sm:h-48 md:h-56 lg:h-64 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
-                          <Building2 className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-gray-400 dark:text-gray-600" />
+                        <div className="w-full h-40 sm:h-48 md:h-56 lg:h-64 bg-surface flex items-center justify-center">
+                          <Building2 className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-muted" />
                         </div>
                       )}
 
@@ -264,7 +264,7 @@ const RelatedDesigns = ({
                           whileHover={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg sm:rounded-xl md:rounded-2xl text-slate-800 dark:text-white font-semibold text-xs sm:text-sm">
+                          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-card/90 backdrop-blur-sm rounded-lg sm:rounded-xl md:rounded-2xl text-cream font-bold text-xs sm:text-sm">
                             <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span className="hidden xs:inline">
                               View Details
@@ -274,7 +274,7 @@ const RelatedDesigns = ({
                         </motion.div>
 
                         <motion.button
-                          className="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-lg sm:rounded-xl md:rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-red-500 transition-colors duration-300"
+                          className="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-lg sm:rounded-xl md:rounded-2xl bg-card/90 backdrop-blur-sm flex items-center justify-center text-cream hover:text-red-500 transition-colors duration-300"
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={(e) => {
@@ -287,7 +287,7 @@ const RelatedDesigns = ({
                       </motion.div>
 
                       <motion.div
-                        className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-primary to-blue-500 text-white font-bold text-sm sm:text-base md:text-lg shadow-md sm:shadow-lg"
+                        className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-gold to-gold-light text-ink font-bold text-sm sm:text-base md:text-lg shadow-xl"
                         initial={{ scale: 0.8 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.5 + index * 0.1 }}
@@ -297,7 +297,7 @@ const RelatedDesigns = ({
 
                       {design.rating && (
                         <motion.div
-                          className="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg sm:rounded-xl md:rounded-2xl bg-amber-500/90 backdrop-blur-sm text-white text-xs sm:text-sm font-semibold flex items-center gap-0.5 sm:gap-1"
+                          className="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg sm:rounded-xl md:rounded-2xl bg-gold/90 backdrop-blur-sm text-ink text-xs sm:text-sm font-bold flex items-center gap-0.5 sm:gap-1"
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.7 + index * 0.1 }}
@@ -310,7 +310,7 @@ const RelatedDesigns = ({
 
                     <div className="p-3 sm:p-4 md:p-5 lg:p-6 flex-1 flex flex-col">
                       <motion.h3
-                        className="font-bold text-base sm:text-lg md:text-xl text-slate-800 dark:text-white mb-2 sm:mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-300"
+                        className="font-bold text-base sm:text-lg md:text-xl text-cream mb-2 sm:mb-3 line-clamp-2 group-hover:text-gold transition-colors duration-300"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 + index * 0.1 }}
@@ -319,7 +319,7 @@ const RelatedDesigns = ({
                       </motion.h3>
 
                       <motion.p
-                        className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed flex-1 line-clamp-2 sm:line-clamp-3 mb-3 sm:mb-4"
+                        className="text-xs sm:text-sm md:text-base text-cream-dim leading-relaxed flex-1 line-clamp-2 sm:line-clamp-3 mb-3 sm:mb-4"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 + index * 0.1 }}
@@ -328,12 +328,12 @@ const RelatedDesigns = ({
                       </motion.p>
 
                       <motion.div
-                        className="flex items-center justify-between pt-2 sm:pt-3 md:pt-4 border-t border-gray-200/50 dark:border-gray-700/50"
+                        className="flex items-center justify-between pt-2 sm:pt-3 md:pt-4 border-t border-cb-border"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5 + index * 0.1 }}
                       >
-                        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm text-muted">
                           {design.bedrooms && (
                             <div className="flex items-center gap-0.5 sm:gap-1">
                               <span className="material-symbols-outlined text-xs sm:text-sm">
@@ -383,7 +383,7 @@ const RelatedDesigns = ({
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link
             href="/designs"
-            className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-white rounded-lg sm:rounded-xl md:rounded-2xl font-semibold text-sm sm:text-base md:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-gold to-gold-light text-ink rounded-lg sm:rounded-xl md:rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
           >
             <span className="text-xs sm:text-sm md:text-base">
               Explore Complete Collection

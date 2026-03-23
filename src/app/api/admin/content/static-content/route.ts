@@ -4,7 +4,7 @@ import path from "path";
 
 export async function GET() {
   try {
-    const filePath = path.join(process.cwd(), "PAGES.md");
+    const filePath = path.join(process.cwd(), "docs/routes/PAGES.md");
     const fileContent = await fs.readFile(filePath, "utf-8");
 
     const lines = fileContent.split("\n");
@@ -46,7 +46,7 @@ export async function GET() {
       policyCount: policyPages.length,
     });
   } catch (error) {
-    console.error("Error reading PAGES.md:", error);
+    console.error("Error reading docs/routes/PAGES.md:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

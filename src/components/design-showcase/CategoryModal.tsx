@@ -69,44 +69,44 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.9, y: -20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: -20 }}
-            className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl w-full max-w-xs xs:max-w-sm sm:max-w-md mx-auto p-4 sm:p-6"
+            initial={{ scale: 0.9, y: -20, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.9, y: -20, opacity: 0 }}
+            className="bg-card backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-xs xs:max-w-sm sm:max-w-md mx-auto p-6 sm:p-8 border-2 border-cb-border"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-slate-800 dark:text-white">
+            <h2 className="text-2xl sm:text-3xl font-black mb-4 sm:mb-6 text-gold uppercase tracking-tight">
               Select Categories
             </h2>
             <input
               type="text"
               placeholder="Search categories..."
-              className="w-full rounded-lg sm:rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm h-10 sm:h-12 px-3 sm:px-4 mb-3 sm:mb-4 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+              className="w-full rounded-xl border-2 border-cb-border bg-surface text-cream text-sm h-12 px-4 mb-4 focus:border-gold focus:ring-0 transition-all duration-300 font-medium placeholder:text-muted"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <div className="max-h-48 sm:max-h-64 overflow-y-auto space-y-1 sm:space-y-2 pr-2 scrollbar-thin">
+            <div className="max-h-48 sm:max-h-64 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
               {filteredCategories.map((category) => (
                 <label
                   key={category.id}
-                  className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 hover:border-primary/30 cursor-pointer transition-all duration-300"
+                  className="flex items-center gap-3 p-3 rounded-xl border-2 border-cb-border/30 bg-surface/50 hover:border-gold/30 hover:bg-surface cursor-pointer transition-all duration-300 group"
                 >
                   <input
                     type="checkbox"
-                    className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary w-4 h-4 sm:w-5 sm:h-5"
+                    className="rounded border-2 border-cb-border text-gold focus:ring-gold focus:ring-offset-ink w-5 h-5 bg-ink"
                     checked={selectedCategories.includes(category.name)}
                     onChange={() => handleToggleCategory(category.name)}
                   />
-                  <span className="text-xs sm:text-sm text-slate-800 dark:text-gray-200 font-medium">
+                  <span className="text-xs sm:text-sm text-cream font-bold uppercase tracking-wider group-hover:text-gold transition-colors">
                     {category.name}
                   </span>
                 </label>
               ))}
             </div>
-            <div className="flex justify-end gap-2 sm:gap-4 mt-4 sm:mt-6">
+            <div className="flex justify-end gap-3 sm:gap-4 mt-6 sm:mt-8">
               <motion.button
                 onClick={onClose}
-                className="px-3 sm:px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-slate-800 dark:text-gray-200 text-xs sm:text-sm font-medium transition-all duration-300"
+                className="px-5 py-2.5 rounded-xl bg-surface border-2 border-cb-border text-cream-dim text-xs sm:text-sm font-black uppercase tracking-widest hover:bg-ink transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -114,7 +114,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
               </motion.button>
               <motion.button
                 onClick={handleApply}
-                className="px-3 sm:px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-xs sm:text-sm font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
+                className="px-5 py-2.5 rounded-xl bg-gold text-ink text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg shadow-gold/20 hover:bg-gold-light transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >

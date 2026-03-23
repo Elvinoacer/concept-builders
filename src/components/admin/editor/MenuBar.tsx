@@ -393,14 +393,14 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           >
             <div className="grid grid-cols-4 gap-2">
               {[
-                { color: "#000000", name: "Black" },
-                { color: "#EF4444", name: "Red" },
-                { color: "#10B981", name: "Green" },
-                { color: "#3B82F6", name: "Blue" },
-                { color: "#8B5CF6", name: "Purple" },
-                { color: "#F59E0B", name: "Orange" },
-                { color: "#EC4899", name: "Pink" },
-                { color: "#6B7280", name: "Gray" },
+                { color: "hsl(var(--foreground))", name: "Foreground" },
+                { color: "hsl(var(--destructive))", name: "Destructive" },
+                { color: "hsl(var(--chart-2))", name: "Success" },
+                { color: "hsl(var(--chart-1))", name: "Primary" },
+                { color: "hsl(var(--chart-4))", name: "Accent" },
+                { color: "var(--gold)", name: "Gold" },
+                { color: "hsl(var(--chart-5))", name: "Info" },
+                { color: "hsl(var(--muted-foreground))", name: "Muted" },
               ].map(({ color, name }) => (
                 <button
                   key={color}

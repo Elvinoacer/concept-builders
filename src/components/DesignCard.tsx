@@ -63,7 +63,7 @@ const DesignCard = ({
       if (response.ok) {
         setFavorited(!favorited);
         toast.success(
-          favorited ? "Removed from favorites" : "Added to favorites"
+          favorited ? "Removed from favorites" : "Added to favorites",
         );
       } else {
         toast.error("Failed to update favorites");
@@ -108,7 +108,7 @@ const DesignCard = ({
   const bathrooms = design.bathrooms;
   const area = design.area;
 
-  const cardVariants = {
+  const cardVariants: any = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
@@ -131,7 +131,7 @@ const DesignCard = ({
       initial="hidden"
       animate="visible"
       whileHover={!isMobile ? "hover" : undefined}
-      className="relative w-full h-[300px] xs:h-[320px] sm:h-[350px] rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 hover:border-blue-300/50 dark:hover:border-blue-600/30 transition-all duration-300"
+      className="relative w-full h-[320px] xs:h-[340px] sm:h-[380px] rounded-2xl overflow-hidden cursor-pointer group bg-card backdrop-blur-md border-2 border-cb-border hover:border-gold/50 transition-all duration-500 shadow-xl"
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -140,11 +140,11 @@ const DesignCard = ({
       style={{
         transform:
           isHovered && !isMobile
-            ? `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`
+            ? `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`
             : "none",
         boxShadow: isHovered
-          ? "0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(0, 0, 0, 0.1)"
-          : "0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)",
+          ? "0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.15)"
+          : "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
       }}
     >
       {/* Background Effects */}
@@ -153,13 +153,13 @@ const DesignCard = ({
           <div
             className="absolute inset-0 opacity-100 transition-opacity duration-500 z-0"
             style={{
-              background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 60%)`,
+              background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0) 60%)`,
             }}
           />
           <div
             className="absolute inset-0 opacity-100 transition-opacity duration-300 z-0"
             style={{
-              background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.1) 0%, rgba(0,0,0,0) 60%)`,
+              background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(212, 175, 55, 0.1) 0%, rgba(0,0,0,0) 60%)`,
             }}
           />
         </>
@@ -176,7 +176,7 @@ const DesignCard = ({
             src={imageUrl}
             alt={design.name}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
             sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
@@ -188,57 +188,59 @@ const DesignCard = ({
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex gap-1">
-          <span className="px-2 py-1 bg-blue-500/90 backdrop-blur-md text-white text-xs font-semibold rounded-full shadow-lg flex items-center gap-1">
+          <span className="px-2 py-1 bg-gold/90 backdrop-blur-md text-ink text-xs font-medium rounded-full shadow-lg flex items-center gap-1">
             <Sparkles className="w-3 h-3" />
             Featured
           </span>
-          <span className="px-2 py-1 bg-emerald-500/90 backdrop-blur-md text-white text-xs font-semibold rounded-full shadow-lg">
+          <span className="px-2 py-1 bg-surface/90 backdrop-blur-md text-cream text-xs font-medium rounded-full shadow-lg border border-cb-border">
             New
           </span>
         </div>
 
         {/* Favorite Button */}
         <motion.button
-          className={`absolute top-2 right-2 w-7 h-7 flex items-center justify-center bg-black/40 backdrop-blur-md rounded-full text-white ${favorited ? "hover:bg-gray-500/90" : "hover:bg-red-500/90"} transition-colors duration-300 shadow-lg z-10`}
+          className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center bg-ink/60 backdrop-blur-md rounded-xl text-cream ${favorited ? "text-gold" : "hover:text-gold"} transition-all duration-300 shadow-xl z-20 border border-gold/20`}
           onClick={handleFavorite}
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.1, rotate: 5 }}
           whileTap={{ scale: 0.9 }}
         >
           <Heart
-            className={`w-3.5 h-3.5 ${favorited ? "fill-red-500 text-red-500" : ""}`}
+            className={`w-4 h-4 ${favorited ? "fill-gold text-gold" : ""}`}
           />
         </motion.button>
       </div>
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 xs:p-4 text-white bg-gradient-to-t from-black/95 via-black/80 to-transparent">
+      <div className="absolute bottom-0 left-0 right-0 p-3 xs:p-4 text-cream bg-gradient-to-t from-ink/95 via-ink/80 to-transparent">
         {/* Title and Category */}
-        <div className="mb-2 xs:mb-3">
-          <h3 className="text-base xs:text-lg font-bold mb-1 group-hover:text-blue-300 transition-colors duration-300 line-clamp-1">
+        <div className="mb-3">
+          <h3
+            className="text-lg xs:text-xl font-black mb-1 group-hover:text-gold transition-colors duration-500 line-clamp-1 uppercase tracking-tight"
+          >
             {design.name}
           </h3>
-          <p className="text-xs xs:text-sm text-gray-300 line-clamp-1">
+          <p className="text-xs xs:text-sm text-gold/60 font-bold uppercase tracking-widest line-clamp-1">
             {categoryName}
           </p>
         </div>
 
         {/* Price and Features */}
-        <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center mb-3 gap-2 xs:gap-0">
-          <p className="text-lg xs:text-xl font-bold text-blue-300">
+        <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center mb-4 gap-2 xs:gap-0">
+          <p className="text-xl xs:text-2xl font-black text-gold">
             ${price?.toLocaleString()}
           </p>
-          <div className="flex items-center gap-2 xs:gap-3 text-xs xs:text-sm text-gray-300">
-            <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
-              <BedDouble className="w-3 h-3" />
+          <div className="flex items-center gap-2 xs:gap-3 text-[10px] xs:text-xs text-cream font-bold uppercase tracking-tighter">
+            <div className="flex items-center gap-1.5 backdrop-blur-md bg-surface/50 px-2.5 py-1.5 rounded-lg border border-cb-border shadow-lg">
+              <BedDouble className="w-3 h-3 text-gold" />
               <span>{bedrooms}</span>
             </div>
-            <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
-              <Bath className="w-3 h-3" />
+            <div className="flex items-center gap-1.5 backdrop-blur-md bg-surface/50 px-2.5 py-1.5 rounded-lg border border-cb-border shadow-lg">
+              <Bath className="w-3 h-3 text-gold" />
               <span>{bathrooms}</span>
             </div>
-            <div className="flex items-center gap-1 backdrop-blur-md bg-black/30 px-2 py-1 rounded-full">
-              <Square className="w-3 h-3" />
-              <span>{area} sqft</span>
+            <div className="flex items-center gap-1.5 backdrop-blur-md bg-surface/50 px-2.5 py-1.5 rounded-lg border border-cb-border shadow-lg">
+              <Square className="w-3 h-3 text-gold" />
+              <span>{area} <span className="text-[8px] opacity-60">SQFT</span></span>
             </div>
           </div>
         </div>
@@ -250,17 +252,18 @@ const DesignCard = ({
           animate={{
             height: isHovered || isMobile ? "auto" : 0,
             opacity: isHovered || isMobile ? 1 : 0,
+            marginTop: isHovered || isMobile ? 16 : 0,
           }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.4, ease: "circOut" }}
         >
           <motion.button
             onClick={() => router.push(`/designs/${design.id}`)}
-            className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg text-xs xs:text-sm transition-colors duration-300 flex items-center justify-center gap-2 shadow-lg"
+            className="w-full py-3 bg-gold hover:bg-gold-light text-ink font-black rounded-xl text-xs xs:text-sm transition-all duration-300 flex items-center justify-center gap-3 shadow-xl uppercase tracking-widest"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span>View Details</span>
-            <ArrowRight className="w-3 h-3" />
+            <span>View Architecture</span>
+            <ArrowRight className="w-4 h-4" />
           </motion.button>
         </motion.div>
       </div>
@@ -268,9 +271,9 @@ const DesignCard = ({
       {/* Border Glow Effect */}
       {isHovered && (
         <div
-          className="absolute inset-0 rounded-xl sm:rounded-2xl opacity-100 transition-opacity duration-500 pointer-events-none"
+          className="absolute inset-0 rounded-2xl opacity-100 transition-opacity duration-500 pointer-events-none"
           style={{
-            boxShadow: "inset 0 0 0 2px rgba(59, 130, 246, 0.3)",
+            boxShadow: "inset 0 0 0 2px rgba(212, 175, 55, 0.4)",
           }}
         />
       )}

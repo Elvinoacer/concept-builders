@@ -34,7 +34,7 @@ export default function DashboardLayout({
   return (
     <SearchProvider>
       {/* Using flex instead of grid for better alignment control */}
-      <div className="flex h-screen w-full bg-gray-50 dark:bg-gray-900 overflow-hidden">
+      <div className="flex h-screen w-full bg-ink overflow-hidden">
         {/* Sidebar */}
         <div
           className="h-full flex-shrink-0 transition-all duration-300 ease-in-out"
@@ -59,7 +59,7 @@ export default function DashboardLayout({
             isSidebarOpen={isSidebarOpen}
           />
 
-          <main className="flex-1 overflow-hidden dark:bg-gray-950">
+          <main className="flex-1 overflow-hidden bg-ink">
             <div className="h-full w-full p-4 md:p-6 overflow-y-auto">
               {children}
             </div>

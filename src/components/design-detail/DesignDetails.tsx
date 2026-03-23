@@ -2,21 +2,21 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export function DesignDetails({ description, planDetails, costBreakdown, totalEstimatedCost, faq, drawingSets, reviews }) {
-  const [activeTab, setActiveTab] = useState("description");
+import { designDetailsTabs as tabs } from "@/lib/dummydata";
 
-  import { designDetailsTabs as tabs } from "@/lib/dummydata";
+export function DesignDetails({ description, planDetails, costBreakdown, totalEstimatedCost, faq, drawingSets, reviews }: any) {
+  const [activeTab, setActiveTab] = useState("description");
 
   return (
     <div className="mt-12">
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-cb-border">
         <nav aria-label="Tabs" className="-mb-px flex space-x-8">
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
-                  ? "text-[var(--primary-color)] border-[var(--primary-color)]"
-                  : "text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-500 border-transparent"
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition-colors duration-300 ${activeTab === tab.id
+                  ? "text-gold border-gold"
+                  : "text-muted hover:text-cream hover:border-muted border-transparent"
                 }`}
               onClick={() => setActiveTab(tab.id)}
             >
@@ -35,11 +35,11 @@ export function DesignDetails({ description, planDetails, costBreakdown, totalEs
             exit={{ y: -10, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {activeTab === "description" && <p className="text-gray-600 dark:text-gray-300 max-w-4xl">{description}</p>}
+            {activeTab === "description" && <p className="text-cream-dim max-w-4xl leading-relaxed">{description}</p>}
             {activeTab === "plan-details" && (
               <div>
-                <h3 className="text-xl font-semibold mb-4 dark:text-white">Detailed Specifications</h3>
-                <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-2">
+                <h3 className="text-xl font-bold mb-4 text-cream">Detailed Specifications</h3>
+                <ul className="list-disc pl-5 text-cream-dim space-y-2 leading-relaxed">
                   <li>Total Living Area: {planDetails.totalLivingArea}</li>
                   <li>Bedrooms: {planDetails.bedrooms}</li>
                   <li>Bathrooms: {planDetails.bathrooms}</li>
@@ -53,30 +53,30 @@ export function DesignDetails({ description, planDetails, costBreakdown, totalEs
             )}
             {activeTab === "construction-cost" && (
               <div>
-                <h3 className="text-xl font-semibold mb-4 dark:text-white">Estimated Construction Cost Breakdown</h3>
+                <h3 className="text-xl font-bold mb-4 text-cream">Estimated Construction Cost Breakdown</h3>
                 <div className="space-y-2">
-                  {costBreakdown.map((item, index) => (
-                    <div key={index} className="cost-breakdown flex justify-between items-center text-sm py-3 px-4 border-b border-gray-200 dark:border-gray-700">
-                      <p className="text-gray-600 dark:text-gray-300">{item.item}</p>
-                      <p className="font-medium text-gray-800 dark:text-gray-200">{item.cost}</p>
+                  {costBreakdown.map((item: any, index: number) => (
+                    <div key={index} className="cost-breakdown flex justify-between items-center text-sm py-3 px-4 border-b border-cb-border bg-surface/50 rounded-lg mb-2">
+                      <p className="text-cream-dim">{item.item}</p>
+                      <p className="font-bold text-cream">{item.cost}</p>
                     </div>
                   ))}
                 </div>
-                <div className="mt-6 text-right">
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">Total Estimated Cost:</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalEstimatedCost}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Note: Costs may vary based on location, materials, and labor rates</p>
+                <div className="mt-8 text-right p-6 bg-card rounded-2xl border border-cb-border shadow-2xl">
+                  <p className="text-cream-dim text-sm font-bold">Total Estimated Cost:</p>
+                  <p className="text-4xl font-black text-gold mt-1">{totalEstimatedCost}</p>
+                  <p className="text-xs text-muted mt-3">Note: Costs may vary based on location, materials, and labor rates</p>
                 </div>
               </div>
             )}
             {activeTab === "faq-support" && (
               <div>
-                <h3 className="text-xl font-semibold mb-4 dark:text-white">Frequently Asked Questions</h3>
-                <div className="space-y-4">
-                  {faq.map((item, index) => (
-                    <div key={index}>
-                      <h4 className="font-medium text-gray-800 dark:text-gray-200">{item.question}</h4>
-                      <p className="text-gray-600 dark:text-gray-300 mt-1">{item.answer}</p>
+                <h3 className="text-xl font-bold mb-6 text-cream">Frequently Asked Questions</h3>
+                <div className="space-y-6">
+                  {faq.map((item: any, index: number) => (
+                    <div key={index} className="bg-surface/50 p-6 rounded-2xl border border-cb-border">
+                      <h4 className="font-bold text-cream text-lg mb-2">{item.question}</h4>
+                      <p className="text-cream-dim leading-relaxed">{item.answer}</p>
                     </div>
                   ))}
                 </div>
@@ -84,18 +84,18 @@ export function DesignDetails({ description, planDetails, costBreakdown, totalEs
             )}
             {activeTab === "drawing-sets" && (
               <div>
-                <h3 className="text-xl font-semibold mb-4 dark:text-white">Available Drawing Sets</h3>
+                <h3 className="text-xl font-bold mb-6 text-cream">Available Drawing Sets</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {drawingSets.map((set, index) => (
-                    <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <h4 className="font-bold text-lg dark:text-white">{set.name}</h4>
-                      <p className="text-gray-600 dark:text-gray-300 mt-2">{set.description}</p>
-                      <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 mt-2 space-y-1">
-                        {set.features.map((feature, i) => (
+                  {drawingSets.map((set: any, index: number) => (
+                    <div key={index} className="bg-card border border-cb-border rounded-2xl p-6 shadow-2xl transition-all duration-300 hover:border-gold/30">
+                      <h4 className="font-bold text-xl text-cream mb-2">{set.name}</h4>
+                      <p className="text-cream-dim mb-4 line-clamp-2">{set.description}</p>
+                      <ul className="list-disc pl-5 text-muted mb-4 space-y-1">
+                        {set.features.map((feature: string, i: number) => (
                           <li key={i}>{feature}</li>
                         ))}
                       </ul>
-                      <p className="text-[var(--primary-color)] font-bold mt-3">{set.price}</p>
+                      <p className="text-gold font-black text-2xl">{set.price}</p>
                     </div>
                   ))}
                 </div>
@@ -103,21 +103,21 @@ export function DesignDetails({ description, planDetails, costBreakdown, totalEs
             )}
             {activeTab === "reviews" && (
               <div>
-                <h3 className="text-xl font-semibold mb-4 dark:text-white">Customer Reviews</h3>
+                <h3 className="text-xl font-bold mb-6 text-cream">Customer Reviews</h3>
                 <div className="space-y-6">
-                  {reviews.map((review, index) => (
-                    <div key={index} className="border-b border-gray-200 dark:border-gray-700 pb-6">
-                      <div className="flex items-center mb-2">
-                        <div className="flex text-yellow-400">
+                  {reviews.map((review: any, index: number) => (
+                    <div key={index} className="border-b border-cb-border pb-8 last:border-0">
+                      <div className="flex items-center mb-4">
+                        <div className="flex text-gold">
                           {[...Array(Math.floor(review.rating))].map((_, i) => (
-                            <span key={i} className="material-symbols-outlined">star</span>
+                            <span key={i} className="material-symbols-outlined fill-current">star</span>
                           ))}
                           {review.rating % 1 !== 0 && <span className="material-symbols-outlined">star_half</span>}
                         </div>
-                        <p className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-200">{review.rating} out of 5</p>
+                        <p className="ml-3 text-sm font-bold text-cream-dim">{review.rating} out of 5</p>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-300">{review.text}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">- {review.author}</p>
+                      <p className="text-cream leading-relaxed italic">"{review.text}"</p>
+                      <p className="text-sm text-muted mt-3 font-bold">- {review.author}</p>
                     </div>
                   ))}
                 </div>

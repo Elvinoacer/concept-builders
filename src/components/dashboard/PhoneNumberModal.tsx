@@ -114,17 +114,17 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
               damping: 40,
               duration: 0.3,
             }}
-            className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-md sm:max-w-lg lg:max-w-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col max-h-[90vh] lg:max-h-[85vh]"
+            className="bg-ink rounded-3xl shadow-2xl w-full max-w-md sm:max-w-lg lg:max-w-xl border border-cb-border overflow-hidden flex flex-col max-h-[90vh] lg:max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header Section */}
-            <div className="flex-shrink-0 relative bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-800 dark:to-gray-800 p-4 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex-shrink-0 relative bg-surface p-4 sm:p-6 border-b border-cb-border">
               {/* Close Button */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleClose}
-                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-xl bg-white/80 dark:bg-gray-800/80 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 backdrop-blur-sm transition-all duration-200 hover:bg-white dark:hover:bg-gray-700 shadow-sm border border-gray-200/50 dark:border-gray-600/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-xl bg-card text-cream-dim hover:text-cream backdrop-blur-sm transition-all duration-200 hover:bg-surface shadow-sm border border-cb-border focus:outline-none focus:ring-2 focus:ring-gold/50"
                 aria-label="Close modal"
               >
                 <X className="w-4 h-4" />
@@ -137,9 +137,9 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-                    className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg"
+                    className="w-12 h-12 bg-gold rounded-2xl flex items-center justify-center shadow-lg"
                   >
-                    <Smartphone className="w-6 h-6 text-white" />
+                    <Smartphone className="w-6 h-6 text-ink" />
                   </motion.div>
 
                   {/* Success Checkmark */}
@@ -157,10 +157,10 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+                  <h2 className="text-xl sm:text-2xl font-bold text-cream leading-tight">
                     {isSuccess ? "Number Saved!" : "Add Phone Number"}
                   </h2>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed max-w-sm mx-auto">
+                  <p className="text-sm sm:text-base text-cream-dim leading-relaxed max-w-sm mx-auto">
                     {isSuccess
                       ? "Your phone number has been saved successfully!"
                       : "Stay connected with seamless communication and important updates."}
@@ -177,7 +177,7 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                   <div className="space-y-3">
                     <label
                       htmlFor="phone-input"
-                      className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+                      className="block text-sm font-semibold text-cream-dim"
                     >
                       Phone Number
                     </label>
@@ -210,13 +210,13 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                   </div>
 
                   {/* Security Info */}
-                  <div className="flex items-start gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
-                    <Shield className="w-6 h-6 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex items-start gap-4 p-4 bg-gold/10 rounded-2xl border border-gold/30">
+                    <Shield className="w-6 h-6 text-gold mt-0.5 flex-shrink-0" />
                     <div className="space-y-2">
-                      <p className="text-base font-semibold text-blue-800 dark:text-blue-300">
+                      <p className="text-base font-semibold text-gold">
                         Your privacy matters
                       </p>
-                      <p className="text-sm text-blue-600 dark:text-blue-400/80 leading-relaxed">
+                      <p className="text-sm text-cream-dim leading-relaxed">
                         We'll only use this for important updates and secure
                         communication. Your number is encrypted and protected.
                       </p>
@@ -229,7 +229,7 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                     disabled={isLoading || !phoneNumber}
                     whileHover={{ scale: isLoading ? 1 : 1.02 }}
                     whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:shadow-none disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-blue-500/30 text-lg"
+                    className="w-full bg-gold hover:bg-gold-light disabled:bg-surface text-ink font-semibold py-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:shadow-none disabled:cursor-not-allowed disabled:text-muted focus:outline-none focus:ring-4 focus:ring-gold/30 text-lg"
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center gap-3">
@@ -266,10 +266,10 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                   </motion.div>
 
                   <div className="space-y-4">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h3 className="text-2xl font-bold text-cream">
                       All Set!
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-base leading-relaxed max-w-md">
+                    <p className="text-cream-dim text-base leading-relaxed max-w-md">
                       Your phone number has been verified and saved securely.
                       You'll now receive important updates and notifications.
                     </p>
@@ -279,7 +279,7 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                     onClick={handleClose}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full max-w-xs bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold py-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-500/30 text-lg"
+                    className="w-full max-w-xs bg-gold text-ink font-semibold py-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gold/30 text-lg"
                   >
                     Continue to Dashboard
                   </motion.button>
@@ -289,8 +289,8 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
 
             {/* Footer Note */}
             {!isSuccess && (
-              <div className="flex-shrink-0 px-6 sm:px-8 pb-6 sm:pb-8 border-t border-gray-200/50 dark:border-gray-700/50 pt-5">
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center leading-relaxed">
+              <div className="flex-shrink-0 px-6 sm:px-8 pb-6 sm:pb-8 border-t border-cb-border pt-5">
+                <p className="text-sm text-cream-dim text-center leading-relaxed">
                   You can update this anytime in your account settings. We
                   respect your privacy and will never share your number with
                   third parties.

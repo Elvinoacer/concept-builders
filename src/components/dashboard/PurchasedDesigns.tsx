@@ -263,20 +263,20 @@ const PurchasedDesigns = ({
   };
 
   const getFileIcon = (format: string | undefined) => {
-    if (!format) return <FileText className="w-4 h-4 text-gray-500" />;
+    if (!format) return <FileText className="w-4 h-4 text-cream-dim" />;
     const formatLower = format.toLowerCase();
     if (formatLower.includes("pdf")) return <FileText className="w-4 h-4 text-red-500" />;
-    if (formatLower.includes("cad") || formatLower.includes("dwg")) return <Grid3X3 className="w-4 h-4 text-blue-500" />;
-    if (formatLower.includes("excel") || formatLower.includes("xlsx")) return <FileDown className="w-4 h-4 text-green-500" />;
+    if (formatLower.includes("cad") || formatLower.includes("dwg")) return <Grid3X3 className="w-4 h-4 text-gold" />;
+    if (formatLower.includes("excel") || formatLower.includes("xlsx")) return <FileDown className="w-4 h-4 text-emerald-400" />;
     if (formatLower.includes("jpg") || formatLower.includes("png")) return <ImageIcon className="w-4 h-4 text-purple-500" />;
-    return <FileText className="w-4 h-4 text-gray-500" />;
+    return <FileText className="w-4 h-4 text-cream-dim" />;
   };
 
   if (loading) {
     return (
       <section ref={resultsRef as React.RefObject<HTMLDivElement>}>
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h3 className="text-2xl font-bold text-cream">
             My Purchased Designs
           </h3>
         </div>
@@ -284,7 +284,7 @@ const PurchasedDesigns = ({
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-6 animate-pulse h-48"
+              className="bg-card/80 backdrop-blur-sm rounded-2xl border border-cb-border p-6 animate-pulse h-48"
             />
           ))}
         </div>
@@ -296,10 +296,10 @@ const PurchasedDesigns = ({
     <section ref={resultsRef as React.RefObject<HTMLDivElement>}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+          <h3 className="text-2xl font-bold text-cream mb-1">
             My Purchased Designs
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
+          <p className="text-cream-dim text-sm">
             Manage and download your purchased design packages.
           </p>
         </div>
@@ -311,22 +311,22 @@ const PurchasedDesigns = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="text-center py-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl border border-dashed border-gray-300 dark:border-gray-700"
+            className="text-center py-12 bg-card/50 backdrop-blur-sm rounded-3xl border border-dashed border-cb-border"
           >
-            <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Package className="w-8 h-8 text-blue-500" />
+            <div className="w-16 h-16 bg-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Package className="w-8 h-8 text-gold" />
             </div>
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h4 className="text-lg font-semibold text-cream mb-2">
               No Purchases Yet
             </h4>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-sm mx-auto">
+            <p className="text-cream-dim text-sm mb-6 max-w-sm mx-auto">
               Start your journey by exploring our collection of premium architectural designs.
             </p>
             <motion.a
               href="/designs"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-ink font-medium rounded-xl hover:bg-gold-light transition-colors shadow-lg"
             >
               Browse Designs
               <ArrowRight className="w-4 h-4" />
@@ -343,11 +343,11 @@ const PurchasedDesigns = ({
               <motion.div
                 key={design.id}
                 variants={itemVariants}
-                className="group bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+                className="group bg-card rounded-3xl border border-cb-border shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
               >
                 <div className="flex flex-col lg:flex-row">
                   {/* Image Section */}
-                  <div className="relative w-full lg:w-72 h-48 lg:h-auto flex-shrink-0 bg-gray-100 dark:bg-gray-900">
+                  <div className="relative w-full lg:w-72 h-48 lg:h-auto flex-shrink-0 bg-surface">
                     <Image
                       src={design.images[0]?.url || "/images/category-placeholder.png"}
                       alt={design.name}
@@ -357,7 +357,7 @@ const PurchasedDesigns = ({
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent lg:hidden" />
                     <div className="absolute bottom-4 left-4 lg:hidden">
                       <h4 className="text-white font-bold text-lg line-clamp-1">{design.name}</h4>
-                      <p className="text-gray-200 text-sm">{new Date(design.createdAt).toLocaleDateString()}</p>
+                      <p className="text-cream-dim text-sm">{new Date(design.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>
 
@@ -367,33 +367,33 @@ const PurchasedDesigns = ({
                       <div className="space-y-4 flex-1">
                         <div className="hidden lg:block">
                           <div className="flex items-center justify-between">
-                             <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                             <h4 className="text-2xl font-bold text-cream mb-1">
                             {design.name}
                           </h4>
-                          <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded-full">
+                          <span className="px-3 py-1 bg-emerald-900/30 text-emerald-400 text-xs font-medium rounded-full">
                             Purchased
                           </span>
                           </div>
                          
-                          <p className="text-gray-500 dark:text-gray-400 text-sm">
-                            Order ID: <span className="font-mono text-gray-700 dark:text-gray-300">#{design.orderId.substring(0, 8)}</span> • {new Date(design.createdAt).toLocaleDateString()}
+                          <p className="text-cream-dim text-sm">
+                            Order ID: <span className="font-mono text-cream">#{design.orderId.substring(0, 8)}</span> • {new Date(design.createdAt).toLocaleDateString()}
                           </p>
                         </div>
 
                         {/* Included Items Grid */}
-                        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-4 border border-gray-100 dark:border-gray-800">
-                          <h5 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                        <div className="bg-surface rounded-2xl p-4 border border-cb-border">
+                          <h5 className="text-xs font-semibold text-cream-dim uppercase tracking-wider mb-3">
                             Package Contents
                           </h5>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {design.purchasedFiles.map((file) => (
-                              <div key={file.id} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                              <div key={file.id} className="flex items-center gap-2 text-sm text-cream-dim">
                                 {getFileIcon(file.type)}
                                 <span className="truncate">{file.name}</span>
                               </div>
                             ))}
                             {design.images.length > 0 && (
-                               <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                               <div className="flex items-center gap-2 text-sm text-cream-dim">
                                 <ImageIcon className="w-4 h-4 text-purple-500" />
                                 <span>{design.images.length} High-Res Images</span>
                               </div>
@@ -409,7 +409,7 @@ const PurchasedDesigns = ({
                           disabled={downloadStates[design.id]?.isDownloading}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-gold hover:bg-gold-light text-ink font-semibold rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {downloadStates[design.id]?.isDownloading ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -428,7 +428,7 @@ const PurchasedDesigns = ({
                             onClick={() => handleViewDesign(design.id)}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-surface border border-cb-border text-cream-dim font-medium rounded-xl hover:bg-card transition-colors text-sm"
                           >
                             <Eye className="w-4 h-4" />
                             View
@@ -437,7 +437,7 @@ const PurchasedDesigns = ({
                             onClick={() => handleViewInvoice(design.id)}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-surface border border-cb-border text-cream-dim font-medium rounded-xl hover:bg-card transition-colors text-sm"
                           >
                             <Receipt className="w-4 h-4" />
                             Invoice
@@ -448,9 +448,9 @@ const PurchasedDesigns = ({
 
                     {/* Progress Bar */}
                     {downloadStates[design.id]?.isDownloading && (
-                      <div className="w-full h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div className="w-full h-1 bg-surface rounded-full overflow-hidden">
                         <motion.div
-                          className="h-full bg-blue-500"
+                          className="h-full bg-gold"
                           initial={{ width: 0 }}
                           animate={{ width: `${downloadStates[design.id].progress}%` }}
                           transition={{ duration: 0.2 }}

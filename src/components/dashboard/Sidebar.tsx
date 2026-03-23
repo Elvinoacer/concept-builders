@@ -763,7 +763,7 @@ const Sidebar = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 bg-black/60 dark:bg-black/80 z-40 md:hidden backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm"
           />
         )}
       </AnimatePresence>
@@ -774,26 +774,26 @@ const Sidebar = ({
         variants={sidebarVariants}
         initial="closed"
         animate={isSidebarOpen ? "open" : "closed"}
-        className="h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-50 md:relative md:translate-x-0 fixed top-0 left-0"
+        className="h-full bg-surface border-r border-cb-border z-50 md:relative md:translate-x-0 fixed top-0 left-0"
         style={{ width: sidebarWidth }}
       >
         {/* Width Resize Handle */}
         {!isMobile && isSidebarOpen && (
           <div
             ref={resizeWidthRef}
-            className="absolute top-0 right-0 w-2 h-full cursor-col-resize z-10 hover:bg-blue-300/30 active:bg-blue-400/50 transition-colors group"
+            className="absolute top-0 right-0 w-2 h-full cursor-col-resize z-10 hover:bg-gold/30 active:bg-gold/50 transition-colors group"
             onMouseDown={(e) => {
               e.preventDefault();
               setIsResizingWidth(true);
             }}
           >
-            <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-1 h-8 bg-gray-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-1 h-8 bg-cb-muted rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         )}
 
         <div className="flex flex-col h-full p-4 overflow-hidden">
           {/* Header with Toggle Button - Reduced padding */}
-          <div className="flex items-center justify-between gap-3 text-gray-800 pb-3 border-b border-gray-200 dark:border-gray-700 dark:text-white flex-shrink-0">
+          <div className="flex items-center justify-between gap-3 text-cream pb-3 border-b border-cb-border flex-shrink-0">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <Image
                 src="/images/concept-builders-logo-free-bg.png"
@@ -803,7 +803,7 @@ const Sidebar = ({
                 className="w-8 h-8 flex-shrink-0"
                 priority
               />
-              <h2 className="text-lg font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400 leading-tight truncate">
+              <h2 className="text-lg font-bold tracking-tight text-gold leading-tight truncate">
                 Concept Builders
               </h2>
             </div>
@@ -814,12 +814,12 @@ const Sidebar = ({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={toggleSidebar}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
+                className="p-1.5 rounded-lg hover:bg-card transition-colors flex-shrink-0"
                 title="Collapse sidebar"
               >
                 <ChevronLeft
                   size={18}
-                  className="text-gray-600 dark:text-gray-400"
+                  className="text-cream-dim"
                 />
               </motion.button>
             )}
@@ -831,13 +831,13 @@ const Sidebar = ({
             {!isMobile && isSidebarOpen && (
               <div
                 ref={resizeScrollableRef}
-                className="absolute bottom-0 left-0 right-0 h-2 cursor-row-resize z-10 hover:bg-blue-300/30 active:bg-blue-400/50 transition-colors flex items-center justify-center"
+                className="absolute bottom-0 left-0 right-0 h-2 cursor-row-resize z-10 hover:bg-gold/30 active:bg-gold/50 transition-colors flex items-center justify-center"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   setIsResizingScrollable(true);
                 }}
               >
-                <GripVertical size={14} className="text-gray-400 rotate-90" />
+                <GripVertical size={14} className="text-cb-muted rotate-90" />
               </div>
             )}
 
@@ -846,7 +846,7 @@ const Sidebar = ({
                 <div key={section.title} className="flex flex-col gap-1">
                   <button
                     onClick={() => toggleCategory(section.title)}
-                    className="w-full flex justify-between items-center px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                    className="w-full flex justify-between items-center px-3 py-1.5 text-xs font-semibold text-cream-dim uppercase tracking-wider hover:text-cream transition-colors duration-200 rounded-lg hover:bg-card"
                   >
                     <span>{section.title}</span>
                     <Icon
@@ -877,8 +877,8 @@ const Sidebar = ({
                               onClick={handleLinkClick}
                               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
                                 isActive
-                                  ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-lg shadow-blue-500/25"
-                                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                  ? "bg-gold text-ink shadow-lg shadow-gold/25"
+                                  : "text-cream-dim hover:bg-card hover:text-cream"
                               }`}
                             >
                               <Icon
@@ -892,7 +892,7 @@ const Sidebar = ({
                                 <motion.span
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
-                                  className="w-1.5 h-1.5 bg-white rounded-full"
+                                  className="w-1.5 h-1.5 bg-ink rounded-full"
                                 />
                               )}
                             </Link>
@@ -908,20 +908,20 @@ const Sidebar = ({
 
           {/* Bottom Links - Resizable section */}
           <div
-            className="relative flex flex-col gap-0.5 border-t border-gray-200 dark:border-gray-700 pt-2 flex-shrink-0"
+            className="relative flex flex-col gap-0.5 border-t border-cb-border pt-2 flex-shrink-0"
             style={{ height: bottomSectionHeight }}
           >
             {/* Bottom Section Resize Handle */}
             {!isMobile && isSidebarOpen && (
               <div
                 ref={resizeBottomRef}
-                className="absolute top-0 left-0 right-0 h-2 cursor-row-resize z-10 hover:bg-blue-300/30 active:bg-blue-400/50 transition-colors flex items-center justify-center"
+                className="absolute top-0 left-0 right-0 h-2 cursor-row-resize z-10 hover:bg-gold/30 active:bg-gold/50 transition-colors flex items-center justify-center"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   setIsResizingBottom(true);
                 }}
               >
-                <GripVertical size={14} className="text-gray-400 rotate-90" />
+                <GripVertical size={14} className="text-cb-muted rotate-90" />
               </div>
             )}
 
@@ -935,8 +935,8 @@ const Sidebar = ({
                     onClick={handleLinkClick}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 mb-0.5 ${
                       isActive
-                        ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-lg shadow-blue-500/25"
-                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                        ? "bg-gold text-ink shadow-lg shadow-gold/25"
+                        : "text-cream-dim hover:bg-card hover:text-cream"
                     }`}
                   >
                     <Icon name={link.icon} className="text-lg flex-shrink-0" />
@@ -950,10 +950,10 @@ const Sidebar = ({
           </div>
 
           {/* Logout Button */}
-          <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <div className="mt-2 pt-2 border-t border-cb-border flex-shrink-0">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200 dark:text-gray-300 dark:hover:bg-red-900/20 dark:hover:text-red-400 w-full group"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-cream-dim hover:bg-destructive/10 hover:text-destructive transition-all duration-200 w-full group"
             >
               <Icon name="logout" className="text-lg flex-shrink-0" />
               <span className="leading-tight flex-1 text-left text-sm">
@@ -964,15 +964,15 @@ const Sidebar = ({
 
           {/* Quick Controls */}
           {!isMobile && isSidebarOpen && (
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-cb-border">
               <button
                 onClick={resetSizes}
-                className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
+                className="text-xs text-cream-dim hover:text-cream transition-colors"
                 title="Reset to default sizes"
               >
                 Reset
               </button>
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-cb-muted">
                 {Math.round(scrollableHeight / 100) * 100} /{" "}
                 {Math.round(bottomSectionHeight / 100) * 100}
               </div>
@@ -987,12 +987,12 @@ const Sidebar = ({
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-40 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all md:block hidden"
+          className="fixed top-4 left-4 z-40 p-2 rounded-lg bg-surface border border-cb-border shadow-lg hover:shadow-xl transition-all md:block hidden"
           title="Expand sidebar"
         >
           <ChevronRight
             size={18}
-            className="text-gray-600 dark:text-gray-400"
+            className="text-cream-dim"
           />
         </motion.button>
       )}

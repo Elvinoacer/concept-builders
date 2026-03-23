@@ -22,53 +22,53 @@ const ProjectsPage = () => {
   const getStatusIcon = (status: string) => {
     switch (status?.toLowerCase()) {
       case "completed":
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="w-4 h-4 text-emerald-400" />;
       case "in progress":
-        return <Clock className="w-4 h-4 text-blue-500" />;
+        return <Clock className="w-4 h-4 text-gold" />;
       case "pending":
-        return <Clock className="w-4 h-4 text-yellow-500" />;
+        return <Clock className="w-4 h-4 text-amber-400" />;
       default:
-        return <AlertCircle className="w-4 h-4 text-gray-500" />;
+        return <AlertCircle className="w-4 h-4 text-cream-dim" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case "completed":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800";
+        return "bg-emerald-900/30 text-emerald-300 border-emerald-800";
       case "in progress":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800";
+        return "bg-gold/10 text-gold border-border-gold";
       case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800";
+        return "bg-amber-900/30 text-amber-300 border-amber-800";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700";
+        return "bg-surface text-cream-dim border-cb-border";
     }
   };
 
   const getProgressColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case "completed":
-        return "bg-green-500";
+        return "bg-emerald-500";
       case "in progress":
-        return "bg-blue-500";
+        return "bg-gold";
       case "pending":
-        return "bg-yellow-500";
+        return "bg-amber-500";
       default:
-        return "bg-gray-500";
+        return "bg-cb-muted";
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 min-[375px]:px-5 sm:px-6 md:px-8">
+      <div className="min-h-screen bg-ink px-4 min-[375px]:px-5 sm:px-6 md:px-8">
         <div className="max-w-7xl mx-auto py-6 sm:py-8">
           {/* Skeleton Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64 animate-pulse"></div>
+              <div className="h-8 bg-surface rounded w-48 mb-2 animate-pulse"></div>
+              <div className="h-4 bg-surface rounded w-64 animate-pulse"></div>
             </div>
-            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
+            <div className="h-12 bg-surface rounded w-48 animate-pulse"></div>
           </div>
 
           {/* Skeleton Grid */}
@@ -76,17 +76,17 @@ const ProjectsPage = () => {
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 animate-pulse"
+                className="bg-card rounded-2xl border border-cb-border animate-pulse"
               >
-                <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-t-2xl"></div>
+                <div className="h-48 bg-surface rounded-t-2xl"></div>
                 <div className="p-4 sm:p-6">
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-3"></div>
+                  <div className="h-6 bg-surface rounded mb-3"></div>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+                      <div className="h-4 bg-surface rounded w-16"></div>
+                      <div className="h-4 bg-surface rounded w-12"></div>
                     </div>
-                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    <div className="h-2 bg-surface rounded-full"></div>
                   </div>
                 </div>
               </div>
@@ -99,27 +99,33 @@ const ProjectsPage = () => {
 
   if (projects.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-ink flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md mx-auto"
         >
-          <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-            <FolderOpen className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+          <div className="w-20 h-20 bg-card rounded-full flex items-center justify-center mx-auto mb-6 border border-cb-border">
+            <FolderOpen className="w-10 h-10 text-cream-dim" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+          <h3
+            className="text-2xl font-bold text-cream mb-3"
+            style={{
+              fontFamily:
+                'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+            }}
+          >
             No Projects Yet!
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-            It looks like you haven't started any projects. Explore our designs
+          <p className="text-cream-dim mb-8 leading-relaxed">
+            It looks like you haven&apos;t started any projects. Explore our designs
             and kickstart your dream home today!
           </p>
           <Link href="/design-showcase">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-500 transition-all shadow-sm hover:shadow-md flex items-center gap-2 mx-auto"
+              className="bg-gold text-ink px-8 py-4 rounded-xl font-semibold hover:bg-gold-light transition-all shadow-sm hover:shadow-md flex items-center gap-2 mx-auto"
             >
               <Plus className="w-5 h-5" />
               Explore Designs
@@ -131,7 +137,7 @@ const ProjectsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 min-[375px]:px-5 sm:px-6 md:px-8">
+    <div className="min-h-screen bg-ink px-4 min-[375px]:px-5 sm:px-6 md:px-8">
       <div className="max-w-7xl mx-auto py-6 sm:py-8">
         {/* Header */}
         <motion.header
@@ -140,10 +146,16 @@ const ProjectsPage = () => {
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8"
         >
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl xs:text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+            <h1
+              className="text-3xl xs:text-4xl sm:text-5xl font-bold text-cream leading-tight"
+              style={{
+                fontFamily:
+                  'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+              }}
+            >
               My Projects
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2 text-base sm:text-lg">
+            <p className="text-cream-dim mt-2 text-base sm:text-lg">
               Here are the projects you are currently working on
             </p>
           </div>
@@ -152,7 +164,7 @@ const ProjectsPage = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-500 transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-gold text-ink px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-semibold hover:bg-gold-light transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2"
             >
               <Plus className="w-5 h-5" />
               New Project
@@ -178,7 +190,7 @@ const ProjectsPage = () => {
                 <Link href={`/dashboard/projects/${project.id}`}>
                   <motion.div
                     whileHover={{ y: -4 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-lg"
+                    className="bg-card rounded-2xl border border-cb-border overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-border-gold"
                   >
                     {/* Project Image */}
                     <div className="relative h-48 sm:h-56 overflow-hidden">
@@ -206,21 +218,21 @@ const ProjectsPage = () => {
                     {/* Project Content */}
                     <div className="p-4 sm:p-6">
                       {/* Project Name */}
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 leading-tight">
+                      <h3 className="text-lg sm:text-xl font-bold text-cream mb-3 line-clamp-2 leading-tight">
                         {project.name}
                       </h3>
 
                       {/* Progress Bar */}
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                          <span className="text-sm font-medium text-cream-dim">
                             Progress
                           </span>
-                          <span className="text-sm font-bold text-gray-900 dark:text-white">
+                          <span className="text-sm font-bold text-cream">
                             {project.progress}%
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                        <div className="w-full bg-surface rounded-full h-2.5">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${project.progress}%` }}
@@ -232,14 +244,14 @@ const ProjectsPage = () => {
 
                       {/* Additional Info - Optional */}
                       {(project.description || project.location) && (
-                        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <div className="mt-4 pt-4 border-t border-cb-border">
                           {project.description && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
+                            <p className="text-sm text-cream-dim line-clamp-2 mb-2">
                               {project.description}
                             </p>
                           )}
                           {project.location && (
-                            <p className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1">
+                            <p className="text-xs text-cb-muted flex items-center gap-1">
                               📍 {project.location}
                             </p>
                           )}

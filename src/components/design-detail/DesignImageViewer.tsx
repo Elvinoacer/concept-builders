@@ -14,29 +14,27 @@ const DesignImageViewer: React.FC<DesignImageViewerProps> = ({ images = [] }) =>
   return (
     <div className="lg:col-span-1">
       <div className="relative">
-        <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-lg mb-4">
+        <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-2 border-cb-border mb-4 bg-surface">
           <Image
             src={selectedImage}
             alt="Selected Design Image"
-            layout="fill"
-            objectFit="cover"
-            className="bg-center"
+            fill
+            className="object-cover"
           />
         </div>
         <div className="grid grid-cols-5 gap-2">
           {images.map((image, index) => (
             <div
               key={index}
-              className={`aspect-square rounded-md overflow-hidden cursor-pointer border-2 ${selectedImage === image ? 'border-primary ring-2 ring-primary' : 'border-transparent'}`}
+              className={`aspect-square rounded-xl overflow-hidden cursor-pointer border-2 transition-all duration-300 ${selectedImage === image ? 'border-gold ring-2 ring-gold shadow-gold/20' : 'border-cb-border hover:border-gold/30'}`}
               onClick={() => setSelectedImage(image)}
             >
               <Image
                 src={image}
                 alt={`Design Image ${index + 1}`}
-                width={100}
-                height={100}
-                objectFit="cover"
-                className="w-full h-full bg-center bg-cover"
+                width={150}
+                height={150}
+                className="w-full h-full object-cover"
               />
             </div>
           ))}

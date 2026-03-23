@@ -1,7 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
 
@@ -48,9 +48,8 @@ export async function middleware(req: NextRequest) {
       // Admin/Team trying to access client cart/checkout
       return NextResponse.redirect(new URL("/admin", req.url));
     }
-  }
-  // If the user is not authenticated
-  else {
+  } else {
+    // If the user is not authenticated
     // If they try to access a protected page, redirect to login
     if (isAdminPage || isClientDashboardPage || isCartPage || isCheckoutPage) {
       const url = new URL("/auth", req.url);

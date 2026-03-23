@@ -136,24 +136,24 @@ const ExploreDesigns = () => {
     >
       <div className="flex flex-col lg:flex-row items-center justify-between mb-10 gap-6">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gold mb-3 uppercase tracking-tight">
             Explore Designs
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
-            Discover our complete collection of architectural designs
+          <p className="text-cream-dim text-lg sm:text-xl font-medium">
+            Discover our complete collection of architectural excellence
           </p>
         </div>
         <div className="w-full lg:w-auto flex flex-col md:flex-row items-center gap-4">
-          <div className="relative w-full lg:w-80">
+          <div className="relative w-full lg:w-96">
             <motion.span
-              className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-2xl"
+              className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gold/60 text-2xl"
               animate={{ rotate: isSearching ? 360 : 0 }}
               transition={{ duration: 1, repeat: isSearching ? Infinity : 0 }}
             >
               search
             </motion.span>
             <motion.input
-              className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3.5 pl-12 pr-6 text-base text-slate-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 shadow-lg"
+              className="w-full rounded-2xl border-2 border-cb-border bg-card/80 backdrop-blur-md py-4 pl-12 pr-6 text-base text-cream placeholder:text-muted focus:border-gold focus:ring-0 transition-all duration-300 shadow-xl font-medium"
               placeholder="Search for designs..."
               type="search"
               value={searchTerm}
@@ -163,29 +163,29 @@ const ExploreDesigns = () => {
           </div>
           <div className="w-full lg:w-auto flex items-center gap-3">
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center justify-center gap-2 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 px-5 py-3.5 text-sm font-medium text-slate-800 dark:text-gray-300 hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 shadow-lg"
+              className="flex items-center justify-center gap-3 rounded-2xl bg-card border-2 border-cb-border px-6 py-4 text-sm font-black text-gold uppercase tracking-widest hover:bg-surface transition-all duration-500 shadow-xl"
             >
-              <span className="material-symbols-outlined text-xl">
+              <span className="material-symbols-outlined text-2xl">
                 filter_list
               </span>
               <span>Filters</span>
             </motion.button>
-            <div className="relative flex-1 lg:w-48">
+            <div className="relative flex-1 lg:w-64">
               <motion.select
-                className="appearance-none w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3.5 pl-4 pr-10 text-sm text-slate-800 dark:text-gray-100 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 shadow-lg"
+                className="appearance-none w-full rounded-2xl border-2 border-cb-border bg-card/80 backdrop-blur-md py-4 pl-5 pr-12 text-sm text-cream font-bold cursor-pointer focus:border-gold focus:ring-0 transition-all duration-300 shadow-xl uppercase tracking-widest"
                 value={searchParams.get("sortBy") || "Newest"}
                 onChange={handleSortChange}
                 whileFocus={{ scale: 1.02 }}
               >
-                <option value="Newest">Newest</option>
-                <option value="Popular">Popular</option>
-                <option value="Price (Low to High)">Price (Low to High)</option>
-                <option value="Price (High to Low)">Price (High to Low)</option>
+                <option value="Newest">Newest Arrival</option>
+                <option value="Popular">Most Popular</option>
+                <option value="Price (Low to High)">Price: Low to High</option>
+                <option value="Price (High to Low)">Price: High to Low</option>
               </motion.select>
-              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
+              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gold pointer-events-none text-2xl">
                 expand_more
               </span>
             </div>
@@ -230,16 +230,16 @@ const ExploreDesigns = () => {
               ))
             ) : designs.length === 0 ? (
               <motion.div
-                className="col-span-full text-center py-16"
+                className="col-span-full text-center py-20 sm:py-32"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
-                <div className="text-6xl mb-4">🏛️</div>
-                <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                <div className="text-7xl sm:text-9xl mb-6 opacity-20">🏛️</div>
+                <h3 className="text-2xl sm:text-3xl font-black text-gold mb-4 uppercase tracking-tight">
                   No designs found
                 </h3>
-                <p className="text-gray-500 dark:text-gray-500">
-                  Try adjusting your search criteria or filters
+                <p className="text-cream-dim text-lg font-medium max-w-md mx-auto">
+                  Try adjusting your search criteria or filters to discover other architectural gems.
                 </p>
               </motion.div>
             ) : (

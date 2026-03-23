@@ -42,7 +42,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   };
 
   const getStatusColor = () => {
-    return isOnline ? "bg-green-500" : "bg-gray-400";
+    return isOnline ? "bg-emerald-500" : "bg-muted";
   };
 
   const getStatusText = () => {
@@ -53,7 +53,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-20"
+      className="bg-card border-b border-cb-border sticky top-0 z-20"
     >
       <div className="px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
         {/* Left Section - Back Button and User Info */}
@@ -64,10 +64,10 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleBackClick}
-              className="flex-shrink-0 lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="flex-shrink-0 lg:hidden p-2 rounded-lg hover:bg-surface transition-colors"
               aria-label="Back to conversations"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <ArrowLeft className="w-5 h-5 text-cream-dim" />
             </motion.button>
           )}
 
@@ -83,7 +83,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                 blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                 sizes="(max-width: 640px) 40px, 48px"
               />
-              <AvatarFallback className="text-sm font-medium bg-gradient-to-r from-blue-600 to-cyan-400 text-white">
+              <AvatarFallback className="text-sm font-medium bg-gold text-ink">
                 {otherUser?.name?.charAt(0)?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
@@ -92,7 +92,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className={`absolute bottom-0 right-0 block h-3 w-3 sm:h-4 sm:w-4 rounded-full ring-2 ring-white dark:ring-gray-800 z-10 ${getStatusColor()}`}
+              className={`absolute bottom-0 right-0 block h-3 w-3 sm:h-4 sm:w-4 rounded-full ring-2 ring-card z-10 ${getStatusColor()}`}
             />
           </div>
 
@@ -102,7 +102,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate"
+              className="text-base sm:text-lg font-semibold text-cream truncate"
             >
               {otherUser?.name || "Unknown User"}
             </motion.h2>
@@ -112,8 +112,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               transition={{ delay: 0.2 }}
               className={`text-xs sm:text-sm font-medium flex items-center gap-1.5 ${
                 isOnline
-                  ? "text-green-600 dark:text-green-400"
-                  : "text-gray-500 dark:text-gray-400"
+                  ? "text-emerald-400"
+                  : "text-cream-dim"
               }`}
             >
               <span
@@ -126,38 +126,16 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
 
         {/* Right Section - Actions */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-          {/* More Options Button */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-lg hover:bg-surface transition-colors"
             aria-label="More options"
           >
-            <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <MoreVertical className="w-5 h-5 text-cream-dim" />
           </motion.button>
-
-          {/* Additional actions can be added here */}
-          {/* <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <Phone className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          </button>
-          <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <Video className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          </button> */}
         </div>
       </div>
-
-      {/* Typing Indicator - Can be added later */}
-      {/* {isTyping && (
-        <div className="px-4 pb-2">
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-xs text-gray-500 dark:text-gray-400 italic"
-          >
-            {otherUser?.name?.split(' ')[0]} is typing...
-          </motion.p>
-        </div>
-      )} */}
     </motion.div>
   );
 };

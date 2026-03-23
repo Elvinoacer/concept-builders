@@ -76,13 +76,13 @@ const ProfileSettings = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64 animate-pulse"></div>
+        <div className="h-6 bg-surface rounded w-48 animate-pulse"></div>
+        <div className="h-4 bg-surface rounded w-64 animate-pulse"></div>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="space-y-2">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-4 bg-surface rounded w-24 animate-pulse"></div>
+              <div className="h-12 bg-surface rounded animate-pulse"></div>
             </div>
           ))}
         </div>
@@ -97,14 +97,14 @@ const ProfileSettings = () => {
       transition={{ duration: 0.3 }}
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-          <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <div className="p-2 bg-gold/10 rounded-lg">
+          <User className="w-5 h-5 text-gold" />
         </div>
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-xl sm:text-2xl font-bold text-cream">
             Personal Information
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">
+          <p className="text-cream-dim mt-1 text-sm sm:text-base">
             Update your personal details and contact information
           </p>
         </div>
@@ -115,14 +115,14 @@ const ProfileSettings = () => {
           {/* Full Name */}
           <div>
             <label
-              className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+              className="flex items-center gap-2 text-sm font-medium text-cream-dim mb-3"
               htmlFor="full-name"
             >
               <User className="w-4 h-4" />
               Full Name
             </label>
             <input
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-base h-12 px-4"
+              className="w-full rounded-xl border border-cb-border bg-surface text-cream shadow-sm focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all text-base h-12 px-4"
               id="full-name"
               name="fullName"
               type="text"
@@ -135,14 +135,14 @@ const ProfileSettings = () => {
           {/* Email */}
           <div>
             <label
-              className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+              className="flex items-center gap-2 text-sm font-medium text-cream-dim mb-3"
               htmlFor="email"
             >
               <Mail className="w-4 h-4" />
               Email Address
             </label>
             <input
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-base h-12 px-4"
+              className="w-full rounded-xl border border-cb-border bg-surface text-cream shadow-sm focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all text-base h-12 px-4"
               id="email"
               name="email"
               type="email"
@@ -155,14 +155,14 @@ const ProfileSettings = () => {
           {/* Phone Number */}
           <div>
             <label
-              className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+              className="flex items-center gap-2 text-sm font-medium text-cream-dim mb-3"
               htmlFor="phone-number"
             >
               <Phone className="w-4 h-4" />
               Phone Number
             </label>
             <input
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-base h-12 px-4"
+              className="w-full rounded-xl border border-cb-border bg-surface text-cream shadow-sm focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all text-base h-12 px-4"
               id="phone-number"
               name="phone"
               type="tel"
@@ -178,10 +178,10 @@ const ProfileSettings = () => {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={saving}
-            className="flex items-center justify-center gap-2 rounded-xl h-12 px-8 bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 rounded-xl h-12 px-8 bg-gold text-ink font-semibold shadow-sm hover:bg-gold-light hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
             ) : (
               <Save className="w-5 h-5" />
             )}
@@ -189,8 +189,8 @@ const ProfileSettings = () => {
           </motion.button>
 
           {/* Notification Settings */}
-          <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="pt-6 border-t border-cb-border">
+            <h3 className="text-lg font-semibold text-cream mb-4">
               Notification Preferences
             </h3>
             <NotificationSettings />

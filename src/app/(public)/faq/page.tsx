@@ -86,7 +86,7 @@ const FaqPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
+    <div className="min-h-screen bg-ink">
       <div className="max-w-4xl mx-auto py-6 sm:py-8 md:py-12 lg:py-16 px-3 xs:px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <motion.div
@@ -96,7 +96,7 @@ const FaqPage = () => {
           transition={{ duration: 0.6 }}
         >
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-4 sm:mb-6"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-surface border border-cb-border text-gold text-sm font-medium mb-4 sm:mb-6"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
@@ -105,11 +105,11 @@ const FaqPage = () => {
             Frequently Asked Questions
           </motion.div>
 
-          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-3 sm:mb-4">
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-cream mb-3 sm:mb-4">
             How can we help you?
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
+          <p className="text-base sm:text-lg md:text-xl text-cream-dim max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
             Have questions? We've got answers. If you can't find what you're
             looking for, feel free to contact us.
           </p>
@@ -129,14 +129,14 @@ const FaqPage = () => {
               placeholder="Search questions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-base sm:text-lg"
+              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-card backdrop-blur-sm border-2 border-cb-border rounded-2xl text-cream placeholder-gray-500 focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-300 text-base sm:text-lg"
             />
           </div>
           {searchTerm && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-sm text-gray-500 dark:text-gray-400 mt-3 text-center"
+              className="text-sm text-cream-dim mt-3 text-center"
             >
               Found {filteredFaqs.length}{" "}
               {filteredFaqs.length === 1 ? "result" : "results"}
@@ -156,10 +156,10 @@ const FaqPage = () => {
               <motion.div
                 key={index}
                 variants={itemVariants}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 rounded-2xl overflow-hidden hover:border-blue-300/50 dark:hover:border-blue-600/30 transition-all duration-300"
+                className="bg-card backdrop-blur-sm border-2 border-cb-border rounded-2xl overflow-hidden hover:border-gold/50 transition-all duration-300 shadow-lg"
               >
                 <button
-                  className="w-full flex justify-between items-center p-4 sm:p-6 text-left font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-200 active:scale-95"
+                  className="w-full flex justify-between items-center p-4 sm:p-6 text-left font-semibold text-cream hover:bg-surface transition-colors duration-200 active:scale-95"
                   onClick={() => handleFaqToggle(index)}
                 >
                   <span className="text-base sm:text-lg md:text-xl pr-4 text-left leading-relaxed">
@@ -172,9 +172,9 @@ const FaqPage = () => {
                     className="flex-shrink-0 ml-2"
                   >
                     {openFaq === index ? (
-                      <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 dark:text-gray-400" />
+                      <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-gold" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 dark:text-gray-400" />
+                      <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-gold" />
                     )}
                   </motion.span>
                 </button>
@@ -189,8 +189,8 @@ const FaqPage = () => {
                       className="overflow-hidden"
                     >
                       <div className="px-4 sm:px-6 pb-4 sm:pb-6">
-                        <div className="w-12 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mb-4"></div>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base md:text-lg leading-relaxed">
+                        <div className="w-12 h-1 bg-gold rounded-full mb-4"></div>
+                        <p className="text-cream-dim text-sm sm:text-base md:text-lg leading-relaxed">
                           {item.answer}
                         </p>
                       </div>
@@ -206,20 +206,20 @@ const FaqPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              <div className="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-cream-dim" />
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-cream mb-2">
                 No results found
               </h3>
-              <p className="text-gray-500 dark:text-gray-500 text-sm sm:text-base max-w-md mx-auto">
+              <p className="text-cream-dim text-sm sm:text-base max-w-md mx-auto">
                 We couldn't find any questions matching "{searchTerm}". Try
                 different keywords or browse all questions.
               </p>
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm("")}
-                  className="mt-4 px-6 py-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+                  className="mt-4 px-6 py-2 text-gold hover:text-gold-light font-medium transition-colors duration-200"
                 >
                   Clear search
                 </button>
@@ -235,12 +235,12 @@ const FaqPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
         >
-          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-2 border-blue-200/50 dark:border-blue-700/30 rounded-3xl p-6 sm:p-8 md:p-10">
+          <div className="bg-card border-2 border-cb-border rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-cream mb-3 sm:mb-4">
                 Still have questions?
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed">
+              <p className="text-cream-dim text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed">
                 Can't find the answer you're looking for? Our support team is
                 here to help you.
               </p>
@@ -248,7 +248,7 @@ const FaqPage = () => {
                 onClick={() => router.push('/contact')}
                 whileHover={{ scale: isMobile ? 1.02 : 1.05 }}
                 whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-base sm:text-lg"
+                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gold hover:bg-gold-light text-ink font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-base sm:text-lg"
               >
                 <Mail className="w-4 h-4 sm:w-5 sm:h-h5" />
                 Contact Support
@@ -264,27 +264,27 @@ const FaqPage = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
         >
-          <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/30 dark:border-gray-700/30">
-            <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+          <div className="bg-card backdrop-blur-sm rounded-2xl p-4 border border-cb-border shadow-md">
+            <div className="text-2xl sm:text-3xl font-bold text-gold mb-1">
               {dummyFaqs.length}
             </div>
-            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs sm:text-sm text-cream-dim">
               Questions
             </div>
           </div>
-          <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/30 dark:border-gray-700/30">
-            <div className="text-2xl sm:text-3xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">
+          <div className="bg-card backdrop-blur-sm rounded-2xl p-4 border border-cb-border shadow-md">
+            <div className="text-2xl sm:text-3xl font-bold text-gold mb-1">
               24/7
             </div>
-            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs sm:text-sm text-cream-dim">
               Support
             </div>
           </div>
-          <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/30 dark:border-gray-700/30 col-span-2 md:col-span-1">
-            <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-1">
+          <div className="bg-card backdrop-blur-sm rounded-2xl p-4 border border-cb-border shadow-md col-span-2 md:col-span-1">
+            <div className="text-2xl sm:text-3xl font-bold text-gold mb-1">
               100%
             </div>
-            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs sm:text-sm text-cream-dim">
               Satisfaction
             </div>
           </div>

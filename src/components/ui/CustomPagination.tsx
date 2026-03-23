@@ -2,7 +2,17 @@
 
 import { motion } from "framer-motion";
 
-const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: { totalItems: number, itemsPerPage: number, currentPage: number, onPageChange: (page: number) => void }) => {
+const Pagination = ({
+  totalItems,
+  itemsPerPage,
+  currentPage,
+  onPageChange,
+}: {
+  totalItems: number;
+  itemsPerPage: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+}) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handlePrevious = () => {
@@ -25,13 +35,13 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: { t
           <a
             href="#"
             onClick={() => onPageChange(i)}
-            className={`flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white ${
-              currentPage === i ? "bg-blue-50 text-primary dark:bg-blue-900 dark:text-blue-200" : ""
+            className={`flex items-center justify-center px-3 h-8 leading-tight text-cream-dim bg-card border border-cb-border hover:bg-surface hover:text-cream ${
+              currentPage === i ? "bg-gold/10 text-gold border-gold" : ""
             }`}
           >
             {i}
           </a>
-        </li>
+        </li>,
       );
     }
     return pageNumbers;
@@ -45,18 +55,17 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: { t
       aria-label="Table navigation"
       className="flex items-center justify-between pt-4"
     >
-      <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+      <span className="text-sm font-normal text-cream-dim">
         Showing{" "}
-        <span className="font-semibold text-gray-900 dark:text-white">{`${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}`}</span>{" "}
-        of{" "}
-        <span className="font-semibold text-gray-900 dark:text-white">{totalItems}</span>
+        <span className="font-semibold text-cream">{`${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}`}</span>{" "}
+        of <span className="font-semibold text-cream">{totalItems}</span>
       </span>
       <ul className="inline-flex -space-x-px text-sm h-8">
         <li>
           <a
             href="#"
             onClick={handlePrevious}
-            className="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            className="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-cream-dim bg-card border border-cb-border rounded-l-lg hover:bg-surface hover:text-cream"
           >
             Previous
           </a>
@@ -66,7 +75,7 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: { t
           <a
             href="#"
             onClick={handleNext}
-            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            className="flex items-center justify-center px-3 h-8 leading-tight text-cream-dim bg-card border border-cb-border rounded-r-lg hover:bg-surface hover:text-cream"
           >
             Next
           </a>

@@ -1,11 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Cormorant_Garamond,
-  Inter,
-  Noto_Sans,
-  Outfit,
-  Work_Sans,
-} from "next/font/google";
 import Script from "next/script";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -17,42 +10,6 @@ import { VercelAnalytics } from "@/components/VercelAnalytics";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Providers from "./Providers";
 
-// Optimized font loading with subsets and display swap
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-const notoSans = Noto_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-noto-sans",
-  weight: ["400", "500", "700", "900"],
-});
-
-const workSans = Work_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-work-sans",
-  weight: ["400", "500", "700", "900"],
-});
-
-const cormorantGaramond = Cormorant_Garamond({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-cormorant-garamond",
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-outfit",
-  weight: ["300", "400", "500", "600"],
-});
-
 // Viewport configuration for mobile responsiveness
 export const viewport: Viewport = {
   width: "device-width",
@@ -61,8 +18,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "rgb(15 23 42)" },
   ],
   viewportFit: "cover",
 };
@@ -149,7 +106,7 @@ export const metadata: Metadata = {
   },
   other: {
     "mobile-web-app-capable": "yes",
-    "msapplication-TileColor": "#da532c",
+    "msapplication-TileColor": "rgb(218 83 44)",
     "msapplication-config": "/browserconfig.xml",
   },
 };
@@ -160,11 +117,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${inter.variable} ${notoSans.variable} ${workSans.variable} ${cormorantGaramond.variable} ${outfit.variable}`}
-    >
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Preload critical resources */}
         <link
@@ -246,7 +199,7 @@ export default function RootLayout({
         />
 
         {/* Theme color for different platforms */}
-        <meta name="msapplication-TileColor" content="#0f172a" />
+        <meta name="msapplication-TileColor" content="rgb(15 23 42)" />
         <meta name="msapplication-tap-highlight" content="no" />
 
         {/* Additional responsive meta tags */}
@@ -257,18 +210,7 @@ export default function RootLayout({
         {/* Disable auto-translation on some browsers */}
         <meta name="google" content="notranslate" />
       </head>
-      <body
-        className={`
-          ${outfit.className}
-          antialiased
-          min-h-screen
-          bg-background
-          text-foreground
-          overflow-x-hidden
-          selection:bg-primary/20
-          selection:text-primary-foreground
-        `}
-      >
+      <body className="antialiased min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary-foreground">
         <div id="cb-cursor" className="cb-cursor hidden" aria-hidden="true" />
         <div
           id="cb-cursor-ring"
@@ -278,7 +220,7 @@ export default function RootLayout({
 
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
           storageKey="concept-builders-theme"

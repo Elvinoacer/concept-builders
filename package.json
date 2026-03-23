@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "prisma generate && NODE_OPTIONS='--dns-result-order=ipv4first' next dev",
-    "build": "prisma generate && next build",
+    "build": "BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA=true prisma generate && next build",
     "prebuild": "rm -rf .next",
     "start": "next start",
     "lint": "next lint",

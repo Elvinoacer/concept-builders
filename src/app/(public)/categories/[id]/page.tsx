@@ -103,8 +103,8 @@ export default function CategoryPage({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-        <div className="w-12 h-12 xs:w-16 xs:h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
-        <p className="mt-3 xs:mt-4 text-base xs:text-lg text-gray-600 dark:text-gray-300">
+        <div className="w-12 h-12 xs:w-16 xs:h-16 border-4 border-gold border-dashed rounded-full animate-spin"></div>
+        <p className="mt-3 xs:mt-4 text-base xs:text-lg text-cream-dim">
           Loading category...
         </p>
       </div>
@@ -113,23 +113,23 @@ export default function CategoryPage({
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gray-100 dark:bg-gray-900 text-center px-4 xs:px-6">
-        <div className="bg-white dark:bg-gray-800 p-6 xs:p-8 rounded-2xl shadow-lg max-w-md w-full">
-          <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 xs:mb-6 bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 rounded-full flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-ink text-center px-4 xs:px-6">
+        <div className="bg-card border border-cb-border p-6 xs:p-8 rounded-2xl shadow-lg max-w-md w-full">
+          <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 xs:mb-6 bg-destructive/10 rounded-full flex items-center justify-center">
             <FiAlertTriangle
               size={32}
-              className="xs:w-10 xs:h-10 text-red-500 dark:text-red-400"
+              className="xs:w-10 xs:h-10 text-destructive"
             />
           </div>
-          <h1 className="text-2xl xs:text-3xl font-bold text-gray-800 dark:text-white mb-2 xs:mb-3">
+          <h1 className="text-2xl xs:text-3xl font-bold text-cream mb-2 xs:mb-3">
             An Error Occurred
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base mb-6 xs:mb-8">
+          <p className="text-cream-dim text-sm xs:text-base mb-6 xs:mb-8">
             {error}
           </p>
           <Link
             href="/categories"
-            className="inline-flex items-center justify-center px-6 xs:px-8 py-2.5 xs:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-transform transform hover:scale-105 duration-300 ease-in-out shadow-md text-sm xs:text-base w-full"
+            className="inline-flex items-center justify-center px-6 xs:px-8 py-2.5 xs:py-3 bg-gold hover:bg-gold-light text-ink rounded-lg transition-all duration-300 shadow-md text-sm xs:text-base w-full font-semibold"
           >
             Explore Other Categories
           </Link>
@@ -140,24 +140,24 @@ export default function CategoryPage({
 
   if (!category) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gray-100 dark:bg-gray-900 text-center px-4 xs:px-6">
-        <div className="bg-white dark:bg-gray-800 p-6 xs:p-8 rounded-2xl shadow-lg max-w-md w-full">
-          <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 xs:mb-6 bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30 rounded-full flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-ink text-center px-4 xs:px-6">
+        <div className="bg-card border border-cb-border p-6 xs:p-8 rounded-2xl shadow-lg max-w-md w-full">
+          <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 xs:mb-6 bg-surface rounded-full flex items-center justify-center">
             <FiAlertTriangle
               size={32}
-              className="xs:w-10 xs:h-10 text-red-500 dark:text-red-400"
+              className="xs:w-10 xs:h-10 text-muted"
             />
           </div>
-          <h1 className="text-2xl xs:text-3xl font-bold text-gray-800 dark:text-white mb-2 xs:mb-3">
+          <h1 className="text-2xl xs:text-3xl font-bold text-cream mb-2 xs:mb-3">
             Category Not Found
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base mb-6 xs:mb-8">
+          <p className="text-cream-dim text-sm xs:text-base mb-6 xs:mb-8">
             The category you are looking for does not exist or may have been
             moved.
           </p>
           <Link
             href="/categories"
-            className="inline-flex items-center justify-center px-6 xs:px-8 py-2.5 xs:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-transform transform hover:scale-105 duration-300 ease-in-out shadow-md text-sm xs:text-base w-full"
+            className="inline-flex items-center justify-center px-6 xs:px-8 py-2.5 xs:py-3 bg-gold hover:bg-gold-light text-ink rounded-lg transition-all duration-300 shadow-md text-sm xs:text-base w-full font-semibold"
           >
             Explore Other Categories
           </Link>
@@ -167,7 +167,7 @@ export default function CategoryPage({
   }
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div className="bg-ink min-h-screen">
       {/* Header Section */}
       <header className="relative h-40 xs:h-48 sm:h-56 md:h-64 rounded-b-2xl flex items-center justify-center text-center text-white overflow-hidden">
         <Image
@@ -204,7 +204,7 @@ export default function CategoryPage({
           >
             <div className="relative">
               <FiSearch
-                className="absolute left-3 xs:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 z-10"
+                className="absolute left-3 xs:left-4 top-1/2 transform -translate-y-1/2 text-muted z-10"
                 size={18}
               />
               <input
@@ -213,7 +213,7 @@ export default function CategoryPage({
                 id="search"
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full pl-10 xs:pl-12 pr-4 py-2.5 xs:py-3 text-sm xs:text-base border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl xs:rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full pl-10 xs:pl-12 pr-4 py-2.5 xs:py-3 text-sm xs:text-base border border-cb-border bg-surface rounded-xl xs:rounded-2xl shadow-sm focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 text-cream placeholder:text-muted"
                 placeholder={`Search in ${category.name}...`}
               />
             </div>
@@ -221,7 +221,7 @@ export default function CategoryPage({
 
           {/* Design Count */}
           <div className="flex items-center justify-between xs:justify-end gap-4">
-            <p className="text-sm xs:text-base text-gray-600 dark:text-gray-300 font-medium whitespace-nowrap">
+            <p className="text-sm xs:text-base text-cream-dim font-medium whitespace-nowrap">
               {category._count.designs} design
               {category._count.designs !== 1 ? "s" : ""}
             </p>
@@ -231,17 +231,17 @@ export default function CategoryPage({
         {/* Designs Grid */}
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 xs:gap-6 lg:gap-8">
           {category.designs.length === 0 ? (
-            <div className="text-center text-gray-500 dark:text-gray-400 col-span-full py-12 xs:py-16">
-              <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+            <div className="text-center text-muted col-span-full py-12 xs:py-16">
+              <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 bg-surface rounded-full flex items-center justify-center">
                 <FiSearch
                   size={24}
-                  className="text-gray-400 dark:text-gray-500"
+                  className="text-muted"
                 />
               </div>
-              <h3 className="text-lg xs:text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg xs:text-xl font-semibold text-cream mb-2">
                 No designs found
               </h3>
-              <p className="text-sm xs:text-base max-w-sm mx-auto">
+              <p className="text-sm xs:text-base max-w-sm mx-auto text-cream-dim">
                 {search
                   ? `No results for "${search}" in ${category.name}. Try different keywords.`
                   : `No designs available in ${category.name} yet.`}
@@ -254,7 +254,7 @@ export default function CategoryPage({
                     url.searchParams.delete("search");
                     window.location.href = url.toString();
                   }}
-                  className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm"
+                  className="mt-4 px-4 py-2 bg-gold hover:bg-gold-light text-ink rounded-lg transition-colors text-sm font-semibold"
                 >
                   Clear Search
                 </button>
@@ -281,7 +281,7 @@ export default function CategoryPage({
                       className={`text-xs xs:text-sm p-2 xs:p-3 ${
                         page === 1
                           ? "pointer-events-none opacity-50"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                          : "hover:bg-surface cursor-pointer"
                       }`}
                     />
                   </Link>
@@ -295,7 +295,7 @@ export default function CategoryPage({
                       className={`text-xs xs:text-sm p-2 xs:p-3 ${
                         page === 1
                           ? "pointer-events-none opacity-50"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                          : "hover:bg-surface cursor-pointer"
                       }`}
                     />
                   </Link>
@@ -319,8 +319,8 @@ export default function CategoryPage({
                           isActive={page === p}
                           className={`text-xs xs:text-sm min-w-[2rem] xs:min-w-[2.5rem] ${
                             page === p
-                              ? "bg-blue-600 text-white"
-                              : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                              ? "bg-gold text-ink"
+                              : "hover:bg-surface text-cream-dim hover:text-cream cursor-pointer"
                           }`}
                         >
                           {p}
@@ -339,7 +339,7 @@ export default function CategoryPage({
                       className={`text-xs xs:text-sm p-2 xs:p-3 ${
                         page === totalPages
                           ? "pointer-events-none opacity-50"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                          : "hover:bg-surface cursor-pointer"
                       }`}
                     />
                   </Link>
@@ -353,7 +353,7 @@ export default function CategoryPage({
                       className={`text-xs xs:text-sm p-2 xs:p-3 ${
                         page === totalPages
                           ? "pointer-events-none opacity-50"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                          : "hover:bg-surface cursor-pointer"
                       }`}
                     />
                   </Link>

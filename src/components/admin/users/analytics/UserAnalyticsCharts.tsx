@@ -128,10 +128,10 @@ const UserAnalyticsCharts = ({ data }: UserAnalyticsChartsProps) => {
 
   // Chart color schemes
   const colorSchemes = {
-    spending: "#8884d8",
-    orders: "#82ca9d",
-    designViews: "#ffc658",
-    logins: "#ff7300",
+    spending: "hsl(var(--chart-1))",
+    orders: "hsl(var(--chart-2))",
+    designViews: "hsl(var(--chart-3))",
+    logins: "hsl(var(--chart-4))",
   };
 
   // Mobile-optimized chart configuration
@@ -199,7 +199,7 @@ const UserAnalyticsCharts = ({ data }: UserAnalyticsChartsProps) => {
   const renderChart = (
     chartData: any[],
     dataKeys: string[],
-    colors: string[]
+    colors: string[],
   ) => {
     const commonProps = {
       data: chartData,
@@ -216,14 +216,14 @@ const UserAnalyticsCharts = ({ data }: UserAnalyticsChartsProps) => {
             />
             <XAxis
               dataKey="shortDate"
-              stroke="#888"
+              stroke="hsl(var(--muted-foreground))"
               fontSize={chartConfig.fontSize}
               angle={isMobile ? -45 : 0}
               textAnchor={isMobile ? "end" : "middle"}
               height={isMobile ? 60 : 40}
             />
             <YAxis
-              stroke="#888"
+              stroke="hsl(var(--muted-foreground))"
               fontSize={chartConfig.fontSize}
               width={isMobile ? 30 : 40}
             />
@@ -255,14 +255,14 @@ const UserAnalyticsCharts = ({ data }: UserAnalyticsChartsProps) => {
             />
             <XAxis
               dataKey="shortDate"
-              stroke="#888"
+              stroke="hsl(var(--muted-foreground))"
               fontSize={chartConfig.fontSize}
               angle={isMobile ? -45 : 0}
               textAnchor={isMobile ? "end" : "middle"}
               height={isMobile ? 60 : 40}
             />
             <YAxis
-              stroke="#888"
+              stroke="hsl(var(--muted-foreground))"
               fontSize={chartConfig.fontSize}
               width={isMobile ? 30 : 40}
             />
@@ -296,14 +296,14 @@ const UserAnalyticsCharts = ({ data }: UserAnalyticsChartsProps) => {
             />
             <XAxis
               dataKey="shortDate"
-              stroke="#888"
+              stroke="hsl(var(--muted-foreground))"
               fontSize={chartConfig.fontSize}
               angle={isMobile ? -45 : 0}
               textAnchor={isMobile ? "end" : "middle"}
               height={isMobile ? 60 : 40}
             />
             <YAxis
-              stroke="#888"
+              stroke="hsl(var(--muted-foreground))"
               fontSize={chartConfig.fontSize}
               width={isMobile ? 30 : 40}
             />

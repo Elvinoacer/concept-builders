@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     if (!name || !email || !subject || !message) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -25,15 +25,15 @@ export async function POST(req: Request) {
       to: [adminEmail],
       subject: `New Contact Form Submission: ${subject}`,
       html: `
-        <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333; line-height: 1.6;">
-          <h2 style="color: #0056b3;">New Contact Form Submission</h2>
+        <div style="font-family: Arial, sans-serif; font-size: 14px; color: rgb(51 51 51); line-height: 1.6;">
+          <h2 style="color: rgb(0 86 179);">New Contact Form Submission</h2>
           <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> <a href="mailto:${email}" style="color: #0056b3; text-decoration: none;">${email}</a></p>
+          <p><strong>Email:</strong> <a href="mailto:${email}" style="color: rgb(0 86 179); text-decoration: none;">${email}</a></p>
           <p><strong>Phone:</strong> ${phone || "N/A"}</p>
           <p><strong>Subject:</strong> ${subject}</p>
           <p style="margin-top: 15px;"><strong>Message:</strong></p>
-          <p style="border-left: 4px solid #0056b3; padding-left: 10px; margin-left: 5px; background-color: #f9f9f9;">${message}</p>
-          <p style="margin-top: 20px; font-size: 12px; color: #777;">This message was sent from the Concept Builders contact form.</p>
+          <p style="border-left: 4px solid rgb(0 86 179); padding-left: 10px; margin-left: 5px; background-color: rgb(249 249 249);">${message}</p>
+          <p style="margin-top: 20px; font-size: 12px; color: rgb(119 119 119);">This message was sent from the Concept Builders contact form.</p>
         </div>
       `,
     });
@@ -89,13 +89,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { message: "Email sent successfully!" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error("Contact form submission error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

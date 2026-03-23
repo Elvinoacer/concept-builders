@@ -10,10 +10,10 @@ const ProjectsHeader = ({
 }) => {
   return (
     <div className="mb-4 md:mb-8">
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-cream">
         {title}
       </h1>
-      <p className="mt-0.5 md:mt-1 text-gray-500 dark:text-gray-400">{description}</p>
+      <p className="mt-0.5 md:mt-1 text-cream-dim">{description}</p>
     </div>
   );
 };

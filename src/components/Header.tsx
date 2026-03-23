@@ -74,7 +74,7 @@ const Header = () => {
 
     const children = Array.from(container.children) as HTMLElement[];
     const moreButtonIndex = children.findIndex((child) =>
-      child.contains(moreButtonRef.current)
+      child.contains(moreButtonRef.current),
     );
 
     // Filter out the more button from measurements
@@ -157,7 +157,7 @@ const Header = () => {
   // Simple debounce function
   function debounce<T extends (...args: any[]) => void>(
     func: T,
-    wait: number
+    wait: number,
   ): (...args: Parameters<T>) => void {
     let timeout: NodeJS.Timeout;
     return (...args: Parameters<T>) => {
@@ -174,8 +174,8 @@ const Header = () => {
       <header
         className={`w-full transition-all duration-300 ${
           isScrolled
-            ? "border-b border-gray-200/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-sm"
-            : "border-b border-gray-200 dark:border-gray-800 bg-white/98 dark:bg-gray-900/98 backdrop-blur-md"
+            ? "border-b border-cb-border/50 bg-card/95 backdrop-blur-xl shadow-sm"
+            : "border-b border-cb-border bg-card/98 backdrop-blur-md"
         } py-3 sm:py-4 sticky top-0 z-50`}
       >
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -183,7 +183,7 @@ const Header = () => {
           <div className="flex items-center gap-4 sm:gap-6 md:gap-8 flex-shrink-0">
             <Link
               href="/"
-              className="flex items-center gap-2 sm:gap-3 text-slate-800 hover:opacity-80 transition-opacity flex-shrink-0"
+              className="flex items-center gap-2 sm:gap-3 text-cream hover:opacity-80 transition-opacity flex-shrink-0"
             >
               <Image
                 src="/images/concept-builders-logo-free-bg.png"
@@ -193,7 +193,7 @@ const Header = () => {
                 className="w-10 h-10 sm:w-14 sm:h-14 flex-shrink-0"
                 priority
               />
-              <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text hidden sm:block whitespace-nowrap">
+              <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight bg-gradient-to-r from-gold to-gold-light text-transparent bg-clip-text hidden sm:block whitespace-nowrap">
                 Concept Builders
               </h1>
             </Link>
@@ -209,7 +209,7 @@ const Header = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-slate-600 text-sm lg:text-base font-medium hover:text-blue-600 transition-all dark:text-gray-300 dark:hover:text-cyan-400 whitespace-nowrap px-3 py-2 rounded-xl hover:bg-blue-50 dark:hover:bg-gray-800 flex-shrink-0"
+                  className="text-cream-dim text-sm lg:text-base font-medium hover:text-gold transition-all whitespace-nowrap px-3 py-2 rounded-xl hover:bg-card flex-shrink-0"
                 >
                   {link.label}
                 </Link>
@@ -225,7 +225,7 @@ const Header = () => {
                     onMouseEnter={() => setShowMoreDropdown(true)}
                     onMouseLeave={() => setShowMoreDropdown(false)}
                     onClick={() => setShowMoreDropdown(!showMoreDropdown)}
-                    className="flex items-center gap-1 text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-cyan-400 px-3 py-2 rounded-xl hover:bg-blue-50 dark:hover:bg-gray-800 transition-all flex-shrink-0"
+                    className="flex items-center gap-1 text-cream-dim hover:text-gold px-3 py-2 rounded-xl hover:bg-card transition-all flex-shrink-0"
                   >
                     More{" "}
                     <ChevronDown
@@ -243,14 +243,14 @@ const Header = () => {
                         transition={{ duration: 0.15 }}
                         onMouseEnter={() => setShowMoreDropdown(true)}
                         onMouseLeave={() => setShowMoreDropdown(false)}
-                        className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg z-50 min-w-[180px] backdrop-blur-sm"
+                        className="absolute top-full left-0 mt-2 bg-card border border-cb-border rounded-xl shadow-lg z-50 min-w-[180px] backdrop-blur-sm"
                       >
                         {desktopLinks.overflow.map((link) => (
                           <Link
                             key={link.href}
                             href={link.href}
                             onClick={() => setShowMoreDropdown(false)}
-                            className="block px-4 py-2.5 text-sm text-slate-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 transition-all first:rounded-t-xl last:rounded-b-xl"
+                            className="block px-4 py-2.5 text-sm text-cream hover:text-gold hover:bg-card transition-all first:rounded-t-xl last:rounded-b-xl"
                           >
                             {link.label}
                           </Link>
@@ -270,7 +270,7 @@ const Header = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsSearchModalOpen(true)}
-              className="p-2 rounded-xl text-slate-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
+              className="p-2 rounded-xl text-cream-dim hover:text-gold hover:bg-card focus:outline-none"
               aria-label="Search"
             >
               <Search size={20} />
@@ -285,11 +285,11 @@ const Header = () => {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/cart"
-                className="relative p-2 rounded-xl text-slate-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
+                className="relative p-2 rounded-xl text-cream-dim hover:text-gold hover:bg-card focus:outline-none"
               >
                 <ShoppingCart size={20} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-400 shadow-lg">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold text-ink bg-gradient-to-r from-gold to-gold-light shadow-lg">
                     {cartCount > 9 ? "9+" : cartCount}
                   </span>
                 )}
@@ -300,7 +300,7 @@ const Header = () => {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/dashboard"
-                className="flex items-center p-2 rounded-xl text-slate-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="flex items-center p-2 rounded-xl text-cream-dim hover:text-gold hover:bg-card"
               >
                 {session?.user?.image ? (
                   <Image
@@ -311,7 +311,7 @@ const Header = () => {
                     className="rounded-full w-8 h-8"
                   />
                 ) : session?.user?.name ? (
-                  <span className="w-8 h-8 flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full text-sm">
+                  <span className="w-8 h-8 flex items-center justify-center bg-gradient-to-r from-gold to-gold-light text-ink font-bold rounded-full text-sm">
                     {session.user.name.charAt(0).toUpperCase()}
                   </span>
                 ) : (
@@ -326,7 +326,7 @@ const Header = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 rounded-xl text-slate-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="p-2 rounded-xl text-cream-dim hover:text-gold hover:bg-card"
               >
                 <Menu size={20} />
               </motion.button>
@@ -344,24 +344,24 @@ const Header = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 dark:bg-black/80 z-40 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
             />
             <motion.div
               initial={{ opacity: 0, x: "100%" }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "100%" }}
               transition={{ type: "spring", stiffness: 400, damping: 40 }}
-              className="fixed top-0 right-0 h-full w-full max-w-sm bg-white dark:bg-gray-950 z-50 p-6 shadow-2xl border-l border-gray-200 dark:border-gray-800 overflow-y-auto"
+              className="fixed top-0 right-0 h-full w-full max-w-sm bg-surface border-l border-cb-border z-50 p-6 shadow-2xl overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gold to-gold-light text-transparent bg-clip-text">
                   Menu
                 </h2>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-xl text-slate-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="p-2 rounded-xl text-cream-dim hover:text-gold hover:bg-card"
                 >
                   <XCircle size={20} />
                 </motion.button>
@@ -375,7 +375,7 @@ const Header = () => {
                       key={link.href}
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block text-lg font-medium text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-cyan-400 py-3 px-4 rounded-2xl hover:bg-blue-50 dark:hover:bg-gray-800 transition-all"
+                      className="block text-lg font-medium text-cream-dim hover:text-gold py-3 px-4 rounded-2xl hover:bg-card transition-all"
                     >
                       {link.label}
                     </Link>
@@ -384,12 +384,12 @@ const Header = () => {
               </nav>
 
               {/* Mobile user actions */}
-              <div className="border-t border-gray-200 dark:border-gray-800 pt-6">
+              <div className="border-t border-cb-border pt-6">
                 <nav className="flex flex-col gap-1 mb-6">
                   <Link
                     href="/cart"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 text-lg font-medium text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-cyan-400 py-3 px-4 rounded-2xl hover:bg-blue-50 dark:hover:bg-gray-800 transition-all"
+                    className="flex items-center gap-3 text-lg font-medium text-cream-dim hover:text-gold py-3 px-4 rounded-2xl hover:bg-card transition-all"
                   >
                     <ShoppingCart size={20} />
                     Cart {cartCount > 0 && `(${cartCount})`}
@@ -397,7 +397,7 @@ const Header = () => {
                   <Link
                     href="/dashboard"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 text-lg font-medium text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-cyan-400 py-3 px-4 rounded-2xl hover:bg-blue-50 dark:hover:bg-gray-800 transition-all"
+                    className="flex items-center gap-3 text-lg font-medium text-cream-dim hover:text-gold py-3 px-4 rounded-2xl hover:bg-card transition-all"
                   >
                     <UserCircle2Icon size={20} />
                     Dashboard

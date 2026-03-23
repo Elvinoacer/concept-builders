@@ -16,7 +16,7 @@ import {
   Search,
   Users,
   MoreVertical,
-  CheckCheck
+  CheckCheck,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -80,13 +80,13 @@ const AdminMessagesPage = () => {
           return conv;
         });
         const conversationToMove = updatedConversations.find(
-          (conv) => conv.id === message.conversationId
+          (conv) => conv.id === message.conversationId,
         );
         if (conversationToMove) {
           return [
             conversationToMove,
             ...updatedConversations.filter(
-              (conv) => conv.id !== message.conversationId
+              (conv) => conv.id !== message.conversationId,
             ),
           ];
         }
@@ -255,14 +255,15 @@ const AdminMessagesPage = () => {
                     No conversations yet
                   </h3>
                   <p className="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto leading-relaxed">
-                    Start a new conversation to begin messaging with your clients.
+                    Start a new conversation to begin messaging with your
+                    clients.
                   </p>
                 </div>
               ) : (
                 <div className="p-2 space-y-1">
                   {conversations.map((conversation) => {
                     const otherParticipants = conversation.users.filter(
-                      (user) => user.email !== session?.user?.email
+                      (user) => user.email !== session?.user?.email,
                     );
 
                     let conversationDisplayName = "";
@@ -319,7 +320,7 @@ const AdminMessagesPage = () => {
                               {lastMessage && (
                                 <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500 whitespace-nowrap ml-2">
                                   {new Date(
-                                    lastMessage.createdAt
+                                    lastMessage.createdAt,
                                   ).toLocaleTimeString([], {
                                     hour: "2-digit",
                                     minute: "2-digit",
@@ -442,7 +443,8 @@ const AdminMessagesPage = () => {
                 No conversations
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 max-w-[200px] mx-auto leading-relaxed">
-                Your inbox is empty. Start a new conversation to connect with clients.
+                Your inbox is empty. Start a new conversation to connect with
+                clients.
               </p>
             </div>
           ) : (
@@ -450,7 +452,7 @@ const AdminMessagesPage = () => {
               <AnimatePresence>
                 {conversations.map((conversation, index) => {
                   const otherParticipants = conversation.users.filter(
-                    (user) => user.email !== session?.user?.email
+                    (user) => user.email !== session?.user?.email,
                   );
 
                   let conversationDisplayName = "";
@@ -465,14 +467,16 @@ const AdminMessagesPage = () => {
                     conversationDisplayName = "Self Chat";
                   }
 
-                  const displayAvatarUser = otherParticipants[0] || session?.user;
+                  const displayAvatarUser =
+                    otherParticipants[0] || session?.user;
                   const lastMessage = conversation.messages[0];
                   const isOnline =
                     displayAvatarUser &&
                     session?.user &&
                     onlineUsers.includes(displayAvatarUser.id);
-                  
-                  const isSelected = selectedConversation?.id === conversation.id;
+
+                  const isSelected =
+                    selectedConversation?.id === conversation.id;
 
                   return (
                     <motion.div
@@ -493,7 +497,7 @@ const AdminMessagesPage = () => {
                       {isSelected && (
                         <div className="absolute left-0 top-3 bottom-3 w-1 bg-blue-600 rounded-r-full" />
                       )}
-                      
+
                       <div className="flex items-center gap-3.5 pl-1">
                         <div className="relative flex-shrink-0">
                           <Avatar className="w-12 h-12 ring-2 ring-white dark:ring-gray-900 shadow-sm group-hover:scale-105 transition-transform duration-200">
@@ -514,13 +518,15 @@ const AdminMessagesPage = () => {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <h3 className={`text-sm font-semibold truncate ${isSelected ? 'text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-white'}`}>
+                            <h3
+                              className={`text-sm font-semibold truncate ${isSelected ? "text-blue-700 dark:text-blue-400" : "text-gray-900 dark:text-white"}`}
+                            >
                               {conversationDisplayName}
                             </h3>
                             {lastMessage && (
                               <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500 whitespace-nowrap ml-2">
                                 {new Date(
-                                  lastMessage.createdAt
+                                  lastMessage.createdAt,
                                 ).toLocaleTimeString([], {
                                   hour: "2-digit",
                                   minute: "2-digit",
@@ -529,7 +535,9 @@ const AdminMessagesPage = () => {
                             )}
                           </div>
                           <div className="flex items-center justify-between">
-                            <p className={`text-xs truncate leading-relaxed max-w-[180px] ${isSelected ? 'text-gray-600 dark:text-gray-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                            <p
+                              className={`text-xs truncate leading-relaxed max-w-[180px] ${isSelected ? "text-gray-600 dark:text-gray-300" : "text-gray-500 dark:text-gray-400"}`}
+                            >
                               {lastMessage?.senderId === session?.user?.id && (
                                 <span className="font-medium mr-1">You:</span>
                               )}
@@ -551,9 +559,14 @@ const AdminMessagesPage = () => {
       {/* Chat Window */}
       <div className="flex-1 flex flex-col bg-gray-50/50 dark:bg-gray-900 relative overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05] pointer-events-none" 
-             style={{ backgroundImage: 'radial-gradient(#6b7280 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
-        </div>
+        <div
+          className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05] pointer-events-none"
+          style={{
+            backgroundImage:
+              "radial-gradient(hsl(var(--muted-foreground)) 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        ></div>
 
         {selectedConversation ? (
           <ChatWindow
@@ -577,7 +590,10 @@ const AdminMessagesPage = () => {
             <div className="mt-8 flex gap-4">
               <div className="flex -space-x-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-900"></div>
+                  <div
+                    key={i}
+                    className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-900"
+                  ></div>
                 ))}
               </div>
               <p className="text-sm text-gray-400 dark:text-gray-500 self-center">

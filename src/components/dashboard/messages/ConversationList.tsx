@@ -36,7 +36,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
   const socketContext = useSocket();
   const socket = socketContext?.socket;
 
-  // Filter conversations based on search query
   const filteredConversations = conversations.filter((conversation) => {
     if (!searchQuery.trim()) return true;
 
@@ -172,11 +171,11 @@ const ConversationList: React.FC<ConversationListProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-800">
+    <div className="h-full flex flex-col bg-card">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col gap-3">
+      <div className="p-4 border-b border-cb-border flex flex-col gap-3">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-cream">
             Messages
           </h2>
           <NewConversationModal
@@ -187,7 +186,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
         {/* Search Bar */}
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="material-symbols-outlined text-gray-400 text-lg">
+            <span className="material-symbols-outlined text-muted text-lg">
               search
             </span>
           </div>
@@ -196,7 +195,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+            className="w-full pl-10 pr-4 py-2 bg-surface border border-cb-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent text-cream placeholder-muted"
           />
         </div>
       </div>
@@ -205,29 +204,29 @@ const ConversationList: React.FC<ConversationListProps> = ({
       <div className="flex-1 overflow-hidden">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-full p-8">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
+            <div className="w-8 h-8 border-4 border-gold border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-cream-dim text-sm">
               Loading conversations...
             </p>
           </div>
         ) : filteredConversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-              <span className="material-symbols-outlined text-gray-400 text-2xl">
+            <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-muted text-2xl">
                 chat
               </span>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 text-lg font-medium mb-2">
+            <p className="text-cream-dim text-lg font-medium mb-2">
               {searchQuery ? "No conversations found" : "No conversations yet"}
             </p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm max-w-xs">
+            <p className="text-muted text-sm max-w-xs">
               {searchQuery
                 ? "Try adjusting your search terms"
                 : "Start a new conversation to begin messaging"}
             </p>
           </div>
         ) : (
-          <div className="overflow-y-auto h-full custom-scrollbar">
+          <div className="overflow-y-auto h-full styled-scrollbar">
             <AnimatePresence>
               {filteredConversations.map((conversation, index) => {
                 const otherUser = conversation.users?.find(
@@ -242,9 +241,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2, delay: index * 0.03 }}
                     onClick={() => onSelectConversation(conversation)}
-                    className={`p-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer transition-colors ${
+                    className={`p-3 border-b border-cb-border hover:bg-surface cursor-pointer transition-colors ${
                       selectedConversation?.id === conversation.id
-                        ? "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-blue-600"
+                        ? "bg-gold/10 border-l-4 border-l-gold"
                         : ""
                     }`}
                   >
@@ -263,28 +262,28 @@ const ConversationList: React.FC<ConversationListProps> = ({
                             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                             sizes="(max-width: 640px) 48px, 56px"
                           />
-                          <AvatarFallback className="text-sm font-medium bg-gradient-to-r from-blue-600 to-cyan-400 text-white">
+                          <AvatarFallback className="text-sm font-medium bg-gold text-ink">
                             {otherUser?.name?.charAt(0)?.toUpperCase() || "U"}
                           </AvatarFallback>
                         </Avatar>
                         {otherUser && onlineUsers.includes(otherUser.id) && (
-                          <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-800"></span>
+                          <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-emerald-500 border-2 border-card"></span>
                         )}
                       </div>
 
                       {/* Conversation Details */}
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base truncate">
+                          <h3 className="font-semibold text-cream text-sm sm:text-base truncate">
                             {otherUser?.name || "Unknown User"}
                           </h3>
                           {conversation.messages && conversation.messages[0]?.createdAt && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 whitespace-nowrap">
+                            <p className="text-xs text-cream-dim flex-shrink-0 whitespace-nowrap">
                               {formatTime(conversation.messages[0].createdAt)}
                             </p>
                           )}
                         </div>
-                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate leading-tight">
+                        <p className="text-xs sm:text-sm text-cream-dim truncate leading-tight">
                           {getLastMessagePreview(conversation)}
                         </p>
                       </div>
@@ -296,29 +295,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
           </div>
         )}
       </div>
-
-      {/* Custom Scrollbar Styles */}
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e0;
-          border-radius: 2px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #a0aec0;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #4a5568;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #718096;
-        }
-      `}</style>
     </div>
   );
 };

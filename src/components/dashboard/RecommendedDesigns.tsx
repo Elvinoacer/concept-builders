@@ -103,18 +103,18 @@ const RecommendedDesigns = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-5 h-5 text-amber-500" />
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+            <h3 className="text-xl sm:text-2xl font-bold text-cream">
               Recommended for You
             </h3>
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-cream-dim">
             Curated designs based on your preferences
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           {recommendedDesigns.length > 0 && (
-            <span className="hidden sm:inline-flex px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full">
+            <span className="hidden sm:inline-flex px-3 py-1 bg-gold/10 text-gold text-xs font-medium rounded-full">
               {recommendedDesigns.length} New
             </span>
           )}
@@ -123,7 +123,7 @@ const RecommendedDesigns = () => {
             whileHover={{ scale: 1.05, rotate: 180 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl shadow-sm hover:shadow-md transition-all"
+            className="p-2 bg-surface border border-cb-border text-cream-dim hover:text-gold rounded-xl shadow-sm hover:shadow-md transition-all"
             title="Refresh recommendations"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -137,11 +137,11 @@ const RecommendedDesigns = () => {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className={`${getCardWidth()} bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border-2 border-gray-200/50 dark:border-gray-700/50 p-4 animate-pulse`}
+              className={`${getCardWidth()} bg-card/80 backdrop-blur-sm rounded-2xl border-2 border-cb-border p-4 animate-pulse`}
             >
-              <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4"></div>
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+              <div className="h-40 bg-surface rounded-xl mb-4"></div>
+              <div className="h-6 bg-surface rounded mb-2"></div>
+              <div className="h-4 bg-surface rounded w-3/4"></div>
             </div>
           ))}
         </div>
@@ -190,11 +190,11 @@ const RecommendedDesigns = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={() => scroll("left")}
-                className="absolute top-1/2 -translate-y-1/2 -left-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-3 rounded-full shadow-xl z-10 hover:bg-white dark:hover:bg-gray-900 border-2 border-gray-200/50 dark:border-gray-700/50 transition-all duration-300"
+                className="absolute top-1/2 -translate-y-1/2 -left-4 bg-card/90 backdrop-blur-sm p-3 rounded-full shadow-xl z-10 hover:bg-card border-2 border-cb-border transition-all duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <ChevronLeft className="w-5 h-5 text-cream" />
               </motion.button>
             )}
           </AnimatePresence>
@@ -206,11 +206,11 @@ const RecommendedDesigns = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={() => scroll("right")}
-                className="absolute top-1/2 -translate-y-1/2 -right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-3 rounded-full shadow-xl z-10 hover:bg-white dark:hover:bg-gray-900 border-2 border-gray-200/50 dark:border-gray-700/50 transition-all duration-300"
+                className="absolute top-1/2 -translate-y-1/2 -right-4 bg-card/90 backdrop-blur-sm p-3 rounded-full shadow-xl z-10 hover:bg-card border-2 border-cb-border transition-all duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <ChevronRight className="w-5 h-5 text-cream" />
               </motion.button>
             )}
           </AnimatePresence>
@@ -222,7 +222,7 @@ const RecommendedDesigns = () => {
                 {[1, 2, 3].map((dot) => (
                   <div
                     key={dot}
-                    className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"
+                    className="w-2 h-2 bg-muted rounded-full"
                   />
                 ))}
               </div>
@@ -236,15 +236,15 @@ const RecommendedDesigns = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 p-6 sm:p-8 text-center"
+          className="bg-card/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-cb-border p-6 sm:p-8 text-center"
         >
-          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+          <div className="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="w-8 h-8 text-muted" />
           </div>
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h4 className="text-lg font-semibold text-cream mb-2">
             No Recommendations Yet
           </h4>
-          <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 max-w-sm mx-auto">
+          <p className="text-cream-dim text-sm mb-4 max-w-sm mx-auto">
             Browse more designs to get personalized recommendations based on
             your interests.
           </p>
@@ -252,7 +252,7 @@ const RecommendedDesigns = () => {
             onClick={() => (window.location.href = "/designs")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gold hover:bg-gold-light text-ink font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm"
           >
             Explore Designs
           </motion.button>

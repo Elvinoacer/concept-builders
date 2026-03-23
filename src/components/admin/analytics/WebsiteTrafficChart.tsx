@@ -193,7 +193,7 @@ const WebsiteTrafficChart = ({ data }: { data: any[] }) => {
                 r: 4,
                 stroke: "hsl(var(--chart-1))",
                 strokeWidth: 2,
-                fill: "#ffffff",
+                fill: "hsl(var(--background))",
               }}
             />
           </AreaChart>

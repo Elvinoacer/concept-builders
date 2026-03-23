@@ -7,17 +7,17 @@ export const staticStyles = `
 }
 
 :root {
-    --primary: #2c3e50;
-    --secondary: #3498db;
-    --accent: #e74c3c;
-    --light: #ecf0f1;
-    --dark: #2c3e50;
-    --text: #34495e;
+    --primary: rgb(44 62 80);
+    --secondary: rgb(52 152 219);
+    --accent: rgb(231 76 60);
+    --light: rgb(236 240 241);
+    --dark: rgb(44 62 80);
+    --text: rgb(52 73 94);
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 body {
-    background-color: #f5f7fa;
+    background-color: rgb(245 247 250);
     color: var(--text);
     line-height: 1.6;
     padding: 0;
@@ -48,7 +48,7 @@ body {
     flex-wrap: wrap;
     gap: 15px;
     font-size: 0.9rem;
-    color: #7f8c8d;
+    color: rgb(127 140 141);
     margin-bottom: 20px;
 }
 
@@ -117,7 +117,7 @@ body {
 .caption {
     font-style: italic;
     font-size: 0.85rem;
-    color: #7f8c8d;
+    color: rgb(127 140 141);
     text-align: center;
     margin-top: 5px;
 }
@@ -285,34 +285,34 @@ body {
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --primary: #d1d5db;
-        --secondary: #3b82f6;
-        --accent: #ef4444;
-        --light: #374151;
-        --dark: #f9fafb;
-        --text: #d1d5db;
+        --primary: rgb(209 213 219);
+        --secondary: rgb(59 130 246);
+        --accent: rgb(239 68 68);
+        --light: rgb(55 65 81);
+        --dark: rgb(249 250 251);
+        --text: rgb(209 213 219);
         --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
     }
 
     body {
-        background-color: #111827;
+        background-color: rgb(17 24 39);
     }
 
     .article-content, .sidebar {
-        background: #1f2937;
-        border: 1px solid #374151;
+        background: rgb(31 41 55);
+        border: 1px solid rgb(55 65 81);
     }
 
     .sidebar {
-        background: #1f2937;
+        background: rgb(31 41 55);
     }
 
     .article-meta, .caption {
-        color: #9ca3af;
+        color: rgb(156 163 175);
     }
 
     .quote {
-        background: linear-gradient(to right, #1f2937, #111827);
+        background: linear-gradient(to right, rgb(31 41 55), rgb(17 24 39));
         border-left-color: var(--secondary);
         color: var(--text);
     }

@@ -190,22 +190,22 @@ const ReferralTrendsChart = ({ data }: ReferralTrendsChartProps) => {
   // Extract all unique source keys from the data
   const allSources = Array.from(
     new Set(
-      data.flatMap((item) => Object.keys(item).filter((key) => key !== "date"))
-    )
+      data.flatMap((item) => Object.keys(item).filter((key) => key !== "date")),
+    ),
   );
 
   // Enhanced color palette with better contrast
   const colors = [
-    "#3b82f6",
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#8b5cf6",
-    "#06b6d4",
-    "#84cc16",
-    "#f97316",
-    "#6366f1",
-    "#ec4899",
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+    "hsl(var(--chart-1) / 0.8)",
+    "hsl(var(--chart-2) / 0.8)",
+    "hsl(var(--chart-3) / 0.8)",
+    "hsl(var(--chart-4) / 0.8)",
+    "hsl(var(--chart-5) / 0.8)",
   ];
 
   // Format X-axis ticks based on screen size
@@ -240,16 +240,16 @@ const ReferralTrendsChart = ({ data }: ReferralTrendsChartProps) => {
         >
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#e5e7eb"
+            stroke="hsl(var(--border))"
             className="dark:stroke-gray-700"
             vertical={window.innerWidth > 640} // Hide vertical grid on mobile
           />
           <XAxis
             dataKey="date"
-            stroke="#6b7280"
+            stroke="hsl(var(--muted-foreground))"
             className="text-xs"
             tick={{
-              fill: "#6b7280",
+              fill: "hsl(var(--muted-foreground))",
               fontSize: window.innerWidth < 640 ? 10 : 12,
             }}
             tickFormatter={formatXAxisTick}
@@ -259,10 +259,10 @@ const ReferralTrendsChart = ({ data }: ReferralTrendsChartProps) => {
             interval={window.innerWidth < 640 ? "preserveStartEnd" : 0}
           />
           <YAxis
-            stroke="#6b7280"
+            stroke="hsl(var(--muted-foreground))"
             className="text-xs"
             tick={{
-              fill: "#6b7280",
+              fill: "hsl(var(--muted-foreground))",
               fontSize: window.innerWidth < 640 ? 10 : 12,
             }}
             width={window.innerWidth < 640 ? 30 : 40}

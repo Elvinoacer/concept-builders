@@ -4,6 +4,8 @@ import { Post } from "@/generated/prisma";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import GlassCard from "@/components/ui-premium/glass-card";
+import { motion } from "framer-motion";
 
 const PopularPosts = () => {
   const [popularPosts, setPopularPosts] = useState<Post[]>([]);
@@ -34,89 +36,78 @@ const PopularPosts = () => {
   }
 
   return (
-    <div className="rounded-lg border bg-card p-3 sm:p-4 lg:p-6 shadow-sm w-full">
-      <h3 className="font-heading mb-3 sm:mb-4 lg:mb-6 text-base sm:text-lg lg:text-xl font-bold tracking-tight text-foreground leading-tight">
-        Popular Posts
+    <GlassCard className="p-8" hover={false}>
+      <h3 className="text-xl font-black text-gold uppercase tracking-tight mb-8">
+        Trending Stories
       </h3>
       {popularPosts.length > 0 ? (
-        <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-          {popularPosts.map((post) => (
-            <Link
+        <div className="space-y-8">
+          {popularPosts.map((post, index) => (
+            <motion.div
               key={post.id}
-              href={`/blog/${post.id}`}
-              className="group flex items-start gap-3 sm:gap-4 lg:gap-5 w-full p-2 sm:p-3 rounded-lg hover:bg-accent/50 transition-all duration-200"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
             >
-              <div className="flex-shrink-0 relative">
-                <Image
-                  src={post.image || ""}
-                  alt={post.title}
-                  width={56}
-                  height={56}
-                  className="aspect-square rounded-md object-cover min-w-[56px] sm:min-w-[64px] lg:min-w-[72px]"
-                  placeholder="blur"
-                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-                  sizes="(max-width: 640px) 56px, (max-width: 1024px) 64px, 72px"
-                />
-              </div>
-              <div className="flex-1 min-w-0 space-y-1">
-                <p className="font-semibold leading-tight text-foreground group-hover:text-primary line-clamp-2 text-sm sm:text-base lg:text-[15px]">
-                  {post.title}
-                </p>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-none">
-                  {new Date(post.createdAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </p>
-              </div>
-            </Link>
+              <Link
+                href={`/blog/${post.id}`}
+                className="group flex items-start gap-5 w-full"
+              >
+                <div className="flex-shrink-0 relative w-20 h-20 overflow-hidden rounded-xl border-2 border-cb-border group-hover:border-gold/50 transition-colors">
+                  <Image
+                    src={post.image || ""}
+                    alt={post.title}
+                    fill
+                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110"
+                    placeholder="blur"
+                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+                    sizes="80px"
+                  />
+                </div>
+                <div className="flex-1 min-w-0 py-1">
+                  <p className="font-bold text-white text-sm leading-tight group-hover:text-gold transition-colors duration-300 line-clamp-2 uppercase tracking-tight mb-2">
+                    {post.title}
+                  </p>
+                  <p className="text-[10px] font-black text-gold/40 uppercase tracking-[0.2em]">
+                    {new Date(post.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
       ) : (
-        <p className="text-sm sm:text-base text-muted-foreground text-center py-4 sm:py-6">
-          No popular posts found.
+        <p className="text-xs font-black text-cream-dim/40 uppercase tracking-widest text-center py-4">
+          No stories yet.
         </p>
       )}
-    </div>
+    </GlassCard>
   );
 };
 
 export const PopularPostsSkeleton = () => {
   return (
-    <div className="rounded-lg border bg-card p-3 sm:p-4 lg:p-6 shadow-sm w-full">
-      {/* Skeleton Title */}
-      <div className="mb-3 sm:mb-4 lg:mb-6 h-5 sm:h-6 lg:h-7 w-2/3 sm:w-1/2 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
-        <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+    <div className="rounded-3xl border-2 border-cb-border bg-card p-8 shadow-xl w-full animate-pulse">
+      <div className="mb-8 h-6 w-1/2 bg-surface rounded-md relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
       </div>
 
-      {/* Skeleton Posts */}
-      <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+      <div className="space-y-8">
         {[...Array(3)].map((_, i) => (
-          <div
-            key={i}
-            className="flex items-start gap-3 sm:gap-4 lg:gap-5 w-full p-2 sm:p-3"
-          >
-            {/* Skeleton Image */}
-            <div className="h-14 w-14 sm:h-16 sm:w-16 lg:h-18 lg:w-18 flex-shrink-0 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
-              <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+          <div key={i} className="flex items-start gap-5 w-full">
+            <div className="h-20 w-20 flex-shrink-0 bg-surface rounded-xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
             </div>
-
-            {/* Skeleton Text Content */}
-            <div className="flex-1 min-w-0 space-y-2 py-1">
-              {/* Title Line 1 */}
-              <div className="h-3 sm:h-4 w-full relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
-                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+            <div className="flex-1 space-y-3 py-1">
+              <div className="h-4 w-full bg-surface rounded relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
               </div>
-
-              {/* Title Line 2 */}
-              <div className="h-3 sm:h-4 w-4/5 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
-                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-              </div>
-
-              {/* Date */}
-              <div className="h-3 w-1/3 relative overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mt-2">
-                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+              <div className="h-3 w-1/3 bg-surface rounded relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
               </div>
             </div>
           </div>

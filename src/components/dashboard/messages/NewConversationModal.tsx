@@ -115,13 +115,13 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
   const getAdminBadgeColor = (role: string) => {
     switch (role?.toLowerCase()) {
       case "super admin":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+        return "bg-destructive/20 text-destructive";
       case "admin":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
+        return "bg-gold/20 text-gold";
       case "support":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+        return "bg-emerald-900/30 text-emerald-400";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+        return "bg-surface text-cream-dim";
     }
   };
 
@@ -129,7 +129,7 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
-          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+          className="w-full sm:w-auto bg-gold hover:bg-gold-light text-ink font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
           size="sm"
         >
           <span className="material-symbols-outlined mr-2 text-lg">add</span>
@@ -137,20 +137,20 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col p-0">
-        <DialogHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+        <DialogHeader className="px-6 py-4 border-b border-cb-border">
+          <DialogTitle className="text-xl font-bold text-cream">
             Start New Conversation
           </DialogTitle>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-cream-dim mt-1">
             Choose an admin to start chatting with
           </p>
         </DialogHeader>
 
         {/* Search Bar */}
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="px-6 py-4 border-b border-cb-border">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="material-symbols-outlined text-gray-400 text-lg">
+              <span className="material-symbols-outlined text-muted text-lg">
                 search
               </span>
             </div>
@@ -159,7 +159,7 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
               placeholder="Search admins..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              className="w-full pl-10 pr-4 py-3 bg-surface border border-cb-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent text-cream placeholder-muted"
             />
           </div>
         </div>
@@ -168,15 +168,15 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {filteredAdmins.length === 0 ? (
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-gray-400 text-2xl">
+              <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="material-symbols-outlined text-muted text-2xl">
                   person_search
                 </span>
               </div>
-              <p className="text-gray-500 dark:text-gray-400 font-medium mb-2">
+              <p className="text-cream-dim font-medium mb-2">
                 No admins found
               </p>
-              <p className="text-gray-400 dark:text-gray-500 text-sm">
+              <p className="text-muted text-sm">
                 {searchQuery
                   ? "Try adjusting your search"
                   : "No admins available at the moment"}
@@ -195,8 +195,8 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
                     onClick={() => setSelectedAdmin(admin)}
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                       selectedAdmin?.id === admin.id
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-sm"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        ? "border-gold bg-gold/10 shadow-sm"
+                        : "border-cb-border hover:border-gold/50 hover:bg-surface"
                     }`}
                   >
                     <div className="flex items-center gap-4">
@@ -206,7 +206,7 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
                           src={admin.image || ""}
                           alt={admin.name || "Admin"}
                         />
-                        <AvatarFallback className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold text-sm">
+                        <AvatarFallback className="bg-gold text-ink font-semibold text-sm">
                           {admin.name?.charAt(0)?.toUpperCase() || "A"}
                         </AvatarFallback>
                       </Avatar>
@@ -214,7 +214,7 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
                       {/* Admin Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+                          <h3 className="font-semibold text-cream text-sm truncate">
                             {admin.name}
                           </h3>
                           {admin.adminRole && (
@@ -226,7 +226,7 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                        <p className="text-xs text-cream-dim truncate">
                           {admin.email}
                         </p>
                       </div>
@@ -235,8 +235,8 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
                       <div
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                           selectedAdmin?.id === admin.id
-                            ? "border-blue-500 bg-blue-500"
-                            : "border-gray-300 dark:border-gray-600"
+                            ? "border-gold bg-gold"
+                            : "border-cb-border"
                         }`}
                       >
                         {selectedAdmin?.id === admin.id && (
@@ -254,7 +254,7 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <div className="px-6 py-4 border-t border-cb-border bg-surface">
           <div className="flex gap-3">
             <Button
               variant="outline"
@@ -267,7 +267,7 @@ const NewConversationModal: React.FC<NewConversationModalProps> = ({
             <Button
               onClick={handleStartConversation}
               disabled={!selectedAdmin || loading}
-              className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 text-white font-semibold"
+              className="flex-1 bg-gold hover:bg-gold-light text-ink font-semibold"
             >
               {loading ? (
                 <>

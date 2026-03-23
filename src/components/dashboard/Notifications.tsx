@@ -104,10 +104,10 @@ const Notifications = ({ compact = false }) => {
   // Get background color based on notification type
   const getIconBgColor = (type: string) => {
     const colorMap = {
-      success: "from-green-500 to-green-600",
+      success: "from-emerald-500 to-emerald-600",
       warning: "from-amber-500 to-amber-600",
       error: "from-red-500 to-red-600",
-      info: "from-blue-500 to-cyan-400",
+      info: "from-gold to-gold-light",
       default: "from-gray-500 to-gray-600",
     };
     return colorMap[type] || colorMap.default;
@@ -151,20 +151,20 @@ const Notifications = ({ compact = false }) => {
       <section className={`${compact ? "mb-6" : "mt-6 sm:mt-8"}`}>
         <div className="flex items-center justify-between mb-4">
           <h3
-            className={`font-bold text-gray-900 dark:text-white ${
+            className={`font-bold text-cream ${
               compact ? "text-lg" : "text-2xl sm:text-3xl"
             }`}
           >
             Notifications
           </h3>
         </div>
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-4 sm:p-6">
+        <div className="bg-card/80 backdrop-blur-sm border-2 border-cb-border rounded-2xl p-4 sm:p-6">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center gap-4 p-3 animate-pulse">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-surface rounded-full"></div>
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                <div className="h-4 bg-surface rounded w-3/4"></div>
+                <div className="h-3 bg-surface rounded w-1/2"></div>
               </div>
             </div>
           ))}
@@ -178,13 +178,13 @@ const Notifications = ({ compact = false }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3
-          className={`font-bold text-gray-900 dark:text-white ${
+          className={`font-bold text-cream ${
             compact ? "text-lg" : "text-2xl sm:text-3xl"
           }`}
         >
           Notifications
           {notifications.length > 0 && (
-            <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full">
+            <span className="ml-2 px-2 py-1 bg-gold/20 text-gold text-xs font-medium rounded-full">
               {notifications.length}
             </span>
           )}
@@ -196,7 +196,7 @@ const Notifications = ({ compact = false }) => {
               onClick={clearAll}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+              className="p-2 text-cream-dim hover:text-cream transition-colors duration-200"
               title="Clear all"
             >
               <X className="w-4 h-4" />
@@ -206,7 +206,7 @@ const Notifications = ({ compact = false }) => {
             onClick={refreshNotifications}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+            className="p-2 text-cream-dim hover:text-cream transition-colors duration-200"
             title="Refresh"
           >
             <RefreshCw className="w-4 h-4" />
@@ -215,7 +215,7 @@ const Notifications = ({ compact = false }) => {
       </div>
 
       {/* Notifications Container */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-lg overflow-hidden">
+      <div className="bg-card/80 backdrop-blur-sm border-2 border-cb-border rounded-2xl shadow-lg overflow-hidden">
         <AnimatePresence>
           {displayedNotifications.length === 0 ? (
             <motion.div
@@ -223,13 +223,13 @@ const Notifications = ({ compact = false }) => {
               animate={{ opacity: 1 }}
               className="text-center py-8 sm:py-12"
             >
-              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Bell className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              <div className="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Bell className="w-8 h-8 text-muted" />
               </div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
+              <p className="text-cream-dim text-sm sm:text-base">
                 No notifications yet
               </p>
-              <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
+              <p className="text-muted text-xs mt-1">
                 We'll notify you when something important happens
               </p>
             </motion.div>
@@ -238,14 +238,14 @@ const Notifications = ({ compact = false }) => {
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="divide-y divide-gray-200/50 dark:divide-gray-700/50"
+              className="divide-y divide-cb-border"
             >
               {displayedNotifications.map((notification, index) => (
                 <motion.div
                   key={notification.id}
                   variants={itemVariants}
                   exit="exit"
-                  className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-200 group"
+                  className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 hover:bg-surface/50 transition-colors duration-200 group"
                 >
                   {/* Icon */}
                   <div
@@ -258,17 +258,17 @@ const Notifications = ({ compact = false }) => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <p className="text-gray-900 text-base sm:text-lg font-semibold dark:text-white leading-tight mb-1">
+                        <p className="text-cream text-base sm:text-lg font-semibold leading-tight mb-1">
                           {notification.title}
                         </p>
-                        <p className="text-gray-600 text-sm sm:text-base dark:text-gray-400 leading-relaxed">
+                        <p className="text-cream-dim text-sm sm:text-base leading-relaxed">
                           {notification.description}
                         </p>
                       </div>
 
                       {/* Time and Actions */}
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        <span className="text-xs text-muted whitespace-nowrap">
                           {formatDistanceToNow(
                             new Date(notification.createdAt),
                             { addSuffix: true }
@@ -278,7 +278,7 @@ const Notifications = ({ compact = false }) => {
                           onClick={() => markAsRead(notification.id)}
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200"
+                          className="opacity-0 group-hover:opacity-100 p-1 text-muted hover:text-cream transition-all duration-200"
                           title="Mark as read"
                         >
                           <X className="w-3 h-3" />
@@ -292,7 +292,7 @@ const Notifications = ({ compact = false }) => {
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors duration-200"
+                          className="px-3 py-1.5 bg-gold hover:bg-gold-light text-ink text-xs font-medium rounded-lg transition-colors duration-200"
                           onClick={() =>
                             (window.location.href = notification.actionUrl)
                           }
@@ -310,10 +310,10 @@ const Notifications = ({ compact = false }) => {
 
         {/* Show More/Less for compact mode */}
         {compact && notifications.length > 3 && (
-          <div className="border-t border-gray-200/50 dark:border-gray-700/50 p-4">
+          <div className="border-t border-cb-border p-4">
             <button
               onClick={() => setShowAll(!showAll)}
-              className="w-full text-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors duration-200"
+              className="w-full text-center text-gold hover:text-gold-light text-sm font-medium transition-colors duration-200"
             >
               {showAll ? "Show Less" : `Show All (${notifications.length})`}
             </button>
@@ -327,7 +327,7 @@ const Notifications = ({ compact = false }) => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm font-medium transition-colors duration-200"
+            className="inline-flex items-center gap-2 text-cream-dim hover:text-cream text-sm font-medium transition-colors duration-200"
           >
             <Settings className="w-4 h-4" />
             Notification Settings

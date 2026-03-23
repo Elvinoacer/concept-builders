@@ -29,15 +29,15 @@ const WishlistSkeleton = () => (
     {[...Array(8)].map((_, index) => (
       <div
         key={index}
-        className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden animate-pulse"
+        className="bg-card rounded-2xl shadow-sm border border-cb-border overflow-hidden animate-pulse"
       >
-        <div className="relative h-48 bg-gray-300 dark:bg-gray-700"></div>
+        <div className="relative h-48 bg-surface"></div>
         <div className="p-4 sm:p-6">
-          <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-          <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+          <div className="h-5 bg-surface rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-surface rounded w-1/2 mb-4"></div>
           <div className="flex flex-col sm:flex-row gap-2 mt-4">
-            <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
-            <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+            <div className="h-10 bg-surface rounded w-full"></div>
+            <div className="h-10 bg-surface rounded w-full"></div>
           </div>
         </div>
       </div>
@@ -115,7 +115,6 @@ const WishlistPage = () => {
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Sort the filtered results
     switch (sortBy) {
       case "newest":
         filtered.sort(
@@ -156,11 +155,11 @@ const WishlistPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 min-[375px]:px-5 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-ink px-4 min-[375px]:px-5 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto py-6 sm:py-8">
           <header className="mb-6 sm:mb-8">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64 animate-pulse"></div>
+            <div className="h-8 bg-surface rounded w-48 mb-2 animate-pulse"></div>
+            <div className="h-4 bg-surface rounded w-64 animate-pulse"></div>
           </header>
           <WishlistSkeleton />
         </div>
@@ -170,27 +169,33 @@ const WishlistPage = () => {
 
   if (wishlist.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-ink flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md mx-auto"
         >
-          <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Heart className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+          <div className="w-20 h-20 bg-card rounded-full flex items-center justify-center mx-auto mb-6 border border-cb-border">
+            <Heart className="w-10 h-10 text-cream-dim" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+          <h2
+            className="text-2xl font-bold text-cream mb-3"
+            style={{
+              fontFamily:
+                'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+            }}
+          >
             Your Wishlist is Empty
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-            You haven't added any designs yet. Explore our collection and save
+          <p className="text-cream-dim mb-8 leading-relaxed">
+            You haven&apos;t added any designs yet. Explore our collection and save
             your favorites to build your dream home!
           </p>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => router.push("/designs")}
-            className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-8 py-4 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all"
+            className="bg-gold text-ink px-8 py-4 rounded-xl font-semibold shadow-sm hover:shadow-md hover:bg-gold-light transition-all"
           >
             Explore Designs
           </motion.button>
@@ -200,7 +205,7 @@ const WishlistPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 min-[375px]:px-5 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-ink px-4 min-[375px]:px-5 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto py-6 sm:py-8">
         {/* Header */}
         <motion.header
@@ -209,14 +214,20 @@ const WishlistPage = () => {
           className="mb-6 sm:mb-8"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-              <Heart className="w-6 h-6 text-red-600 dark:text-red-400" />
+            <div className="p-2 bg-gold/10 rounded-lg">
+              <Heart className="w-6 h-6 text-gold" />
             </div>
             <div>
-              <h1 className="text-3xl xs:text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1
+                className="text-3xl xs:text-4xl sm:text-5xl font-bold text-cream leading-tight"
+                style={{
+                  fontFamily:
+                    'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+                }}
+              >
                 My Wishlist
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2 text-base sm:text-lg">
+              <p className="text-cream-dim mt-2 text-base sm:text-lg">
                 Your saved designs for future projects
               </p>
             </div>
@@ -224,22 +235,22 @@ const WishlistPage = () => {
 
           {/* Stats Summary */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 text-center">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <div className="bg-card rounded-2xl p-4 border border-cb-border text-center">
+              <p className="text-2xl font-bold text-cream">
                 {wishlist.length}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-cream-dim">
                 Total Items
               </p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 text-center">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <div className="bg-card rounded-2xl p-4 border border-cb-border text-center">
+              <p className="text-2xl font-bold text-cream">
                 $
                 {wishlist
                   .reduce((total, item) => total + item.basePrice, 0)
                   .toFixed(2)}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-cream-dim">
                 Total Value
               </p>
             </div>
@@ -250,11 +261,11 @@ const WishlistPage = () => {
         <div className="mb-6 sm:mb-8 space-y-4">
           {/* Search Bar */}
           <div className="relative max-w-2xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cb-muted w-5 h-5" />
             <input
               type="text"
               placeholder="Search your wishlist..."
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-cb-border bg-surface text-cream placeholder-cb-muted focus:outline-none focus:ring-2 focus:ring-gold transition-shadow"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -264,7 +275,7 @@ const WishlistPage = () => {
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-cb-muted hover:text-cream p-1"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -276,7 +287,7 @@ const WishlistPage = () => {
             {/* Mobile Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="sm:hidden flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="sm:hidden flex items-center gap-2 px-4 py-2 bg-card border border-cb-border rounded-xl text-sm font-medium text-cream-dim"
             >
               <Filter className="w-4 h-4" />
               Filters
@@ -289,7 +300,7 @@ const WishlistPage = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 bg-surface border border-cb-border rounded-xl text-sm text-cream focus:outline-none focus:ring-2 focus:ring-gold"
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
@@ -300,7 +311,7 @@ const WishlistPage = () => {
 
             {/* Results Count */}
             <div
-              className={`text-sm text-gray-600 dark:text-gray-400 ${showFilters ? "block" : "hidden sm:block"}`}
+              className={`text-sm text-cream-dim ${showFilters ? "block" : "hidden sm:block"}`}
             >
               Showing {currentItems.length} of{" "}
               {filteredAndSortedWishlist.length} items
@@ -315,18 +326,24 @@ const WishlistPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-12 sm:py-16"
           >
-            <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+            <div className="w-20 h-20 bg-card rounded-full flex items-center justify-center mx-auto mb-6 border border-cb-border">
+              <Search className="w-10 h-10 text-cream-dim" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3
+              className="text-xl font-semibold text-cream mb-2"
+              style={{
+                fontFamily:
+                  'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+              }}
+            >
               No Results Found
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              No designs in your wishlist match "{searchTerm}".
+            <p className="text-cream-dim mb-6">
+              No designs in your wishlist match &quot;{searchTerm}&quot;.
             </p>
             <button
               onClick={() => setSearchTerm("")}
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+              className="text-gold hover:text-gold-light font-medium"
             >
               Clear search
             </button>
@@ -343,7 +360,7 @@ const WishlistPage = () => {
                     exit={{ opacity: 0, y: -20, height: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
                     layout
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden group hover:shadow-md transition-all duration-300 flex flex-col"
+                    className="bg-card rounded-2xl shadow-sm border border-cb-border overflow-hidden group hover:shadow-md hover:border-border-gold transition-all duration-300 flex flex-col"
                   >
                     {/* Image */}
                     <div className="relative h-48 sm:h-56 w-full overflow-hidden">
@@ -364,7 +381,7 @@ const WishlistPage = () => {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => handleRemoveFromWishlist(design.id)}
-                        className="absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 p-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        className="absolute top-3 right-3 bg-card/90 p-2 rounded-full text-cream-dim hover:text-destructive shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200"
                         aria-label="Remove from wishlist"
                       >
                         <X className="w-4 h-4" />
@@ -373,10 +390,10 @@ const WishlistPage = () => {
 
                     {/* Content */}
                     <div className="p-4 sm:p-6 flex flex-col flex-grow">
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight mb-2">
+                      <h3 className="text-lg font-bold text-cream line-clamp-2 leading-tight mb-2">
                         {design.name}
                       </h3>
-                      <p className="text-blue-600 dark:text-blue-400 font-semibold text-lg mb-4">
+                      <p className="text-gold font-semibold text-lg mb-4">
                         ${design.basePrice.toFixed(2)}
                       </p>
 
@@ -386,7 +403,7 @@ const WishlistPage = () => {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => router.push(`/designs/${design.id}`)}
-                          className="w-full flex items-center justify-center gap-2 rounded-xl py-3 px-4 bg-gradient-to-r from-blue-600 to-cyan-400 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all"
+                          className="w-full flex items-center justify-center gap-2 rounded-xl py-3 px-4 bg-gold text-ink text-sm font-semibold shadow-sm hover:shadow-md hover:bg-gold-light transition-all"
                         >
                           <Eye className="w-4 h-4" />
                           <span>View Details</span>
@@ -400,8 +417,8 @@ const WishlistPage = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-cb-border">
+                <p className="text-sm text-cream-dim">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
                   {Math.min(
                     currentPage * itemsPerPage,
@@ -415,7 +432,7 @@ const WishlistPage = () => {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-cb-border text-cream-dim shadow-sm hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span className="hidden xs:block">Previous</span>
@@ -437,8 +454,8 @@ const WishlistPage = () => {
                             onClick={() => paginate(pageNumber)}
                             className={`w-10 h-10 rounded-xl text-sm font-medium transition-colors ${
                               currentPage === pageNumber
-                                ? "bg-blue-600 text-white"
-                                : "bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                ? "bg-gold text-ink"
+                                : "bg-card border border-cb-border text-cream-dim hover:bg-surface"
                             }`}
                           >
                             {pageNumber}
@@ -449,7 +466,7 @@ const WishlistPage = () => {
                         pageNumber === currentPage + 2
                       ) {
                         return (
-                          <span key={pageNumber} className="px-2 text-gray-500">
+                          <span key={pageNumber} className="px-2 text-cb-muted">
                             ...
                           </span>
                         );
@@ -463,7 +480,7 @@ const WishlistPage = () => {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => paginate(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-cb-border text-cream-dim shadow-sm hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <span className="hidden xs:block">Next</span>
                     <ChevronRight className="w-4 h-4" />

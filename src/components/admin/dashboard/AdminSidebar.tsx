@@ -97,7 +97,7 @@ const AdminSidebar = ({
   const pathname = usePathname();
   const sidebar = useRef<any>(null);
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(
-    {}
+    {},
   );
   const [isHovered, setIsHovered] = useState(false);
 
@@ -191,7 +191,7 @@ const AdminSidebar = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 dark:bg-black/80 z-40 md:hidden backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -203,7 +203,7 @@ const AdminSidebar = ({
         variants={sidebarVariants}
         initial="closed"
         animate={sidebarOpen || !isMobile ? "open" : "closed"}
-        className={`fixed left-0 top-0 z-50 flex h-screen flex-col overflow-y-auto bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 transition-all duration-300 ease-in-out md:relative md:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-screen flex-col overflow-y-auto bg-surface border-r border-cb-border transition-all duration-300 ease-in-out md:relative md:translate-x-0 ${
           isDesktopSidebarOpen ? "w-80" : "w-20"
         } ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
         style={{
@@ -214,13 +214,10 @@ const AdminSidebar = ({
         onMouseLeave={() => !isMobile && setIsHovered(false)}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 min-[375px]:p-5 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-          <Link
-            href="/"
-            className="flex items-center gap-3 min-[375px]:gap-4"
-          >
+        <div className="flex items-center justify-between p-4 min-[375px]:p-5 sm:p-6 border-b border-cb-border flex-shrink-0">
+          <Link href="/" className="flex items-center gap-3 min-[375px]:gap-4">
             <h1
-              className={`text-gray-900 dark:text-white text-xl min-[375px]:text-2xl font-bold transition-all duration-300 ${
+              className={`text-cream text-xl min-[375px]:text-2xl font-bold transition-all duration-300 ${
                 !isDesktopSidebarOpen && !isHovered
                   ? "opacity-0 w-0"
                   : "opacity-100 w-auto"
@@ -235,12 +232,12 @@ const AdminSidebar = ({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
-            className="hidden md:flex items-center justify-center w-8 h-8 min-[375px]:w-9 min-[375px]:h-9 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="hidden md:flex items-center justify-center w-8 h-8 min-[375px]:w-9 min-[375px]:h-9 rounded-lg bg-card hover:bg-surface transition-colors duration-200 focus:outline-none"
             aria-label={
               isDesktopSidebarOpen ? "Collapse sidebar" : "Expand sidebar"
             }
           >
-            <span className="material-symbols-outlined text-gray-600 dark:text-gray-300 text-lg min-[375px]:text-xl">
+            <span className="material-symbols-outlined text-cream-dim text-lg min-[375px]:text-xl">
               {isDesktopSidebarOpen ? "chevron_left" : "chevron_right"}
             </span>
           </motion.button>
@@ -256,7 +253,7 @@ const AdminSidebar = ({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   onClick={() => toggleCategory(category.title)}
-                  className={`w-full flex justify-between items-center text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 px-2 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200 ${
+                  className={`w-full flex justify-between items-center text-xs font-semibold uppercase text-cream-dim px-2 py-2 rounded-lg hover:text-cream hover:bg-card transition-colors duration-200 ${
                     !isDesktopSidebarOpen && !isHovered && !isMobile
                       ? "hidden"
                       : "flex"
@@ -298,8 +295,8 @@ const AdminSidebar = ({
                             onClick={handleLinkClick}
                             className={`flex items-center gap-3 min-[375px]:gap-4 px-3 py-2.5 min-[375px]:py-3 rounded-lg text-sm min-[375px]:text-base font-medium transition-all duration-200 group relative ${
                               isActive
-                                ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-lg shadow-blue-500/25"
-                                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                ? "bg-gold text-ink shadow-lg shadow-gold/25"
+                                : "text-cream-dim hover:text-cream hover:bg-card"
                             } ${showLabel ? "justify-start" : "justify-center"}`}
                             title={!showLabel ? link.label : undefined}
                           >
@@ -321,7 +318,7 @@ const AdminSidebar = ({
                               <motion.span
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-full"
+                                className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gold rounded-full"
                               />
                             )}
                           </Link>
@@ -337,7 +334,7 @@ const AdminSidebar = ({
 
         {/* Logout Button */}
         <div
-          className={`p-4 min-[375px]:p-5 sm:p-6 border-t border-gray-200 dark:border-gray-700 mt-auto flex-shrink-0 ${
+          className={`p-4 min-[375px]:p-5 sm:p-6 border-t border-cb-border mt-auto flex-shrink-0 ${
             !isDesktopSidebarOpen && !isHovered && !isMobile
               ? "hidden"
               : "block"
@@ -347,7 +344,7 @@ const AdminSidebar = ({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleLogout}
-            className="flex items-center gap-3 min-[375px]:gap-4 w-full px-3 py-2.5 min-[375px]:py-3 rounded-lg text-sm min-[375px]:text-base font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200 dark:text-gray-300 dark:hover:bg-red-900/20 dark:hover:text-red-400 group"
+            className="flex items-center gap-3 min-[375px]:gap-4 w-full px-3 py-2.5 min-[375px]:py-3 rounded-lg text-sm min-[375px]:text-base font-medium text-cream-dim hover:bg-destructive/10 hover:text-destructive transition-all duration-200 group"
           >
             <span className="material-symbols-outlined text-xl min-[375px]:text-2xl flex-shrink-0">
               logout

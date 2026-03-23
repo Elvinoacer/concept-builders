@@ -3,19 +3,24 @@ import { motion } from "framer-motion";
 const DesignCardSkeleton = ({ index }: { index: number }) => {
   return (
     <motion.div
-      className="group overflow-hidden rounded-lg bg-white dark:bg-gray-900 shadow-md"
-      initial={{ opacity: 0, y: 50 }}
+      className="group relative overflow-hidden rounded-2xl bg-card border-2 border-cb-border shadow-xl w-full"
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
     >
-      <div className="relative">
-        <div className="w-full h-32 sm:h-36 md:h-40 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+      <div className="relative h-48 sm:h-56 w-full bg-surface animate-pulse overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
       </div>
-      <div className="p-3 xs:p-4">
-        <div className="h-5 xs:h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
-        <div className="h-3 xs:h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-        <div className="h-3 xs:h-4 w-5/6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mt-1"></div>
-        <div className="h-8 w-1/2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mt-3 xs:mt-4"></div>
+      <div className="p-5 xs:p-6">
+        <div className="h-6 xs:h-7 w-3/4 bg-surface rounded-lg animate-pulse mb-3 opacity-60"></div>
+        <div className="space-y-2">
+          <div className="h-4 w-full bg-surface rounded-md animate-pulse opacity-40"></div>
+          <div className="h-4 w-5/6 bg-surface rounded-md animate-pulse opacity-40"></div>
+        </div>
+        <div className="flex justify-between items-center mt-6">
+          <div className="h-10 w-1/3 bg-surface rounded-xl animate-pulse opacity-50"></div>
+          <div className="h-10 w-1/3 bg-surface rounded-xl animate-pulse opacity-50"></div>
+        </div>
       </div>
     </motion.div>
   );

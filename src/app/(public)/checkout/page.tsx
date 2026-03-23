@@ -59,9 +59,9 @@ const CheckoutPage = () => {
       default:
         return (
           <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-surface rounded-full flex items-center justify-center">
               <svg
-                className="w-8 h-8 text-gray-400"
+                className="w-8 h-8 text-cream-dim"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -74,7 +74,7 @@ const CheckoutPage = () => {
                 />
               </svg>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm xs:text-base">
+            <p className="text-cream-dim text-sm sm:text-base">
               Please select a payment method to continue
             </p>
           </div>
@@ -83,16 +83,22 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-200 min-h-screen">
-      <div className="container mx-auto px-3 xs:px-4 sm:px-6 py-4 xs:py-6 sm:py-8">
+    <div className="bg-ink text-cream min-h-screen">
+      <div className="container mx-auto px-6 py-8">
         {/* Header */}
-        <header className="text-center mb-6 xs:mb-8">
-          <h1 className="text-2xl xs:text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+        <header className="text-center mb-8">
+          <h1
+            className="text-3xl sm:text-4xl font-light text-cream leading-tight"
+            style={{
+              fontFamily:
+                'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+            }}
+          >
             Secure Checkout
           </h1>
-          <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 font-medium mt-2 xs:mt-3 text-sm xs:text-base">
+          <div className="flex items-center justify-center gap-2 text-gold font-medium mt-3 text-sm sm:text-base">
             <svg
-              className="w-4 h-4 xs:w-5 xs:h-5 flex-shrink-0"
+              className="w-5 h-5 flex-shrink-0"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -107,53 +113,47 @@ const CheckoutPage = () => {
         </header>
 
         {/* Progress Indicators - Hidden on mobile, visible on larger screens */}
-        <div className="hidden sm:flex justify-center mb-6 xs:mb-8">
-          <div className="flex items-center gap-2 xs:gap-4 text-sm xs:text-base">
+        <div className="hidden sm:flex justify-center mb-8">
+          <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 xs:w-8 xs:h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs xs:text-sm font-bold">
+              <div className="w-8 h-8 bg-gold text-ink rounded-full flex items-center justify-center text-sm font-medium">
                 1
               </div>
-              <span className="font-medium text-gray-900 dark:text-white">
-                Cart
-              </span>
+              <span className="font-medium text-cream">Cart</span>
             </div>
-            <div className="w-8 xs:w-12 h-0.5 bg-blue-600"></div>
+            <div className="w-12 h-0.5 bg-gold"></div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 xs:w-8 xs:h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs xs:text-sm font-bold">
+              <div className="w-8 h-8 bg-gold text-ink rounded-full flex items-center justify-center text-sm font-medium">
                 2
               </div>
-              <span className="font-medium text-gray-900 dark:text-white">
-                Checkout
-              </span>
+              <span className="font-medium text-cream">Checkout</span>
             </div>
-            <div className="w-8 xs:w-12 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
+            <div className="w-12 h-0.5 bg-cb-border"></div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 xs:w-8 xs:h-8 bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 rounded-full flex items-center justify-center text-xs xs:text-sm font-bold">
+              <div className="w-8 h-8 bg-surface text-cream-dim rounded-full flex items-center justify-center text-sm font-medium border border-cb-border">
                 3
               </div>
-              <span className="text-gray-500 dark:text-gray-400">
-                Confirmation
-              </span>
+              <span className="text-cream-dim">Confirmation</span>
             </div>
           </div>
         </div>
 
         {/* Mobile Progress Bar */}
-        <div className="sm:hidden mb-4 xs:mb-6">
-          <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-2">
+        <div className="sm:hidden mb-6">
+          <div className="flex items-center justify-between text-xs text-cream-dim mb-2">
             <span>Step 2 of 3</span>
             <span>Checkout</span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div className="bg-blue-600 h-2 rounded-full w-2/3"></div>
+          <div className="w-full bg-surface rounded-full h-2">
+            <div className="bg-gold h-2 rounded-full w-2/3"></div>
           </div>
         </div>
 
         {/* Main Content Grid */}
-        <div className="flex flex-col lg:flex-row gap-4 xs:gap-6 lg:gap-8">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Order Summary - Comes first on mobile for better UX */}
           <div className="lg:w-1/2 xl:w-2/5 2xl:w-2/5 order-2 lg:order-1">
-            <div className="bg-white dark:bg-gray-800 rounded-xl xs:rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 p-4 xs:p-5 sm:p-6">
+            <div className="bg-card rounded-2xl shadow-lg border border-cb-border p-5 sm:p-6">
               <OrderSummary
                 items={cart}
                 isLoading={isLoading}
@@ -166,11 +166,11 @@ const CheckoutPage = () => {
             </div>
 
             {/* Trust Indicators - Mobile Only */}
-            <div className="sm:hidden mt-4 xs:mt-6">
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
-                <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-3 flex items-center gap-2">
+            <div className="sm:hidden mt-6">
+              <div className="bg-surface/50 rounded-xl p-4 border border-cb-border">
+                <h3 className="font-medium text-cream text-sm mb-3 flex items-center gap-2">
                   <svg
-                    className="w-4 h-4 text-green-500"
+                    className="w-4 h-4 text-gold"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -182,21 +182,21 @@ const CheckoutPage = () => {
                   </svg>
                   Secure & Protected
                 </h3>
-                <div className="grid grid-cols-2 gap-3 text-xs text-gray-600 dark:text-gray-400">
+                <div className="grid grid-cols-2 gap-3 text-xs text-cream-dim">
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-gold rounded-full"></div>
                     <span>SSL Encrypted</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-gold rounded-full"></div>
                     <span>24/7 Support</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-gold rounded-full"></div>
                     <span>Money Back</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-gold rounded-full"></div>
                     <span>Instant Delivery</span>
                   </div>
                 </div>
@@ -206,7 +206,7 @@ const CheckoutPage = () => {
 
           {/* Payment Section */}
           <div className="lg:w-1/2 xl:w-3/5 2xl:w-3/5 order-1 lg:order-2">
-            <div className="bg-white dark:bg-gray-800 rounded-xl xs:rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 p-4 xs:p-5 sm:p-6">
+            <div className="bg-card rounded-2xl shadow-lg border border-cb-border p-5 sm:p-6">
               {/* Payment Method Selector */}
               <PaymentMethodSelector
                 selectedMethod={paymentMethod}
@@ -214,20 +214,20 @@ const CheckoutPage = () => {
               />
 
               {/* Payment Method Render */}
-              <div className="mt-4 xs:mt-6">{renderPaymentMethod()}</div>
+              <div className="mt-6">{renderPaymentMethod()}</div>
             </div>
 
             {/* Additional Trust Indicators - Desktop Only */}
-            <div className="hidden sm:block mt-4 xs:mt-6">
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 xs:p-5 border border-gray-200 dark:border-gray-600">
-                <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-3">
+            <div className="hidden sm:block mt-6">
+              <div className="bg-surface/50 rounded-xl p-5 border border-cb-border">
+                <h3 className="font-medium text-cream text-sm mb-3">
                   Why shop with us?
                 </h3>
-                <div className="grid grid-cols-2 xs:grid-cols-4 gap-3 text-xs text-gray-600 dark:text-gray-400">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-cream-dim">
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-1">
+                    <div className="w-8 h-8 bg-gold/10 rounded-full flex items-center justify-center mb-1">
                       <svg
-                        className="w-4 h-4 text-green-600 dark:text-green-400"
+                        className="w-4 h-4 text-gold"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -243,9 +243,9 @@ const CheckoutPage = () => {
                     <span>Secure Payment</span>
                   </div>
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-1">
+                    <div className="w-8 h-8 bg-gold/10 rounded-full flex items-center justify-center mb-1">
                       <svg
-                        className="w-4 h-4 text-blue-600 dark:text-blue-400"
+                        className="w-4 h-4 text-gold"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -261,9 +261,9 @@ const CheckoutPage = () => {
                     <span>Money Back</span>
                   </div>
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mb-1">
+                    <div className="w-8 h-8 bg-gold/10 rounded-full flex items-center justify-center mb-1">
                       <svg
-                        className="w-4 h-4 text-purple-600 dark:text-purple-400"
+                        className="w-4 h-4 text-gold"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -279,9 +279,9 @@ const CheckoutPage = () => {
                     <span>SSL Encrypted</span>
                   </div>
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mb-1">
+                    <div className="w-8 h-8 bg-gold/10 rounded-full flex items-center justify-center mb-1">
                       <svg
-                        className="w-4 h-4 text-orange-600 dark:text-orange-400"
+                        className="w-4 h-4 text-gold"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -303,9 +303,9 @@ const CheckoutPage = () => {
         </div>
 
         {/* Mobile Footer Assistance */}
-        <div className="sm:hidden mt-6 xs:mt-8">
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-            <h4 className="font-semibold text-blue-900 dark:text-blue-100 text-sm mb-2 flex items-center gap-2">
+        <div className="sm:hidden mt-8">
+          <div className="bg-gold/10 rounded-xl p-4 border border-gold/30">
+            <h4 className="font-medium text-gold text-sm mb-2 flex items-center gap-2">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -315,19 +315,19 @@ const CheckoutPage = () => {
               </svg>
               Need Help?
             </h4>
-            <p className="text-blue-800 dark:text-blue-200 text-xs mb-3">
+            <p className="text-cream-dim text-xs mb-3">
               Our support team is here to help you complete your purchase.
             </p>
             <div className="flex gap-2">
               <a
                 href="tel:+254700000000"
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-2 px-3 rounded-lg text-center transition-colors"
+                className="flex-1 bg-gold hover:bg-gold-light text-ink text-xs font-medium py-2 px-3 rounded-lg text-center transition-colors"
               >
                 Call Support
               </a>
               <a
                 href="mailto:support@conceptbuilders.com"
-                className="flex-1 bg-white hover:bg-gray-50 text-blue-600 text-xs font-medium py-2 px-3 rounded-lg border border-blue-600 text-center transition-colors"
+                className="flex-1 bg-transparent hover:bg-gold/10 text-gold text-xs font-medium py-2 px-3 rounded-lg border border-gold text-center transition-colors"
               >
                 Email Us
               </a>

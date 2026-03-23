@@ -41,7 +41,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
     const newFiles = Array.from(e.target.files);
 
-    // Check file size (max 10MB per file)
     const oversizedFiles = newFiles.filter(
       (file) => file.size > 10 * 1024 * 1024
     );
@@ -52,7 +51,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
       return;
     }
 
-    // Check total files (max 5 files)
     if (attachedFiles.length + newFiles.length > 5) {
       toast.error("Maximum 5 files allowed");
       return;
@@ -76,7 +74,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
     });
     setFilePreviews((prev) => [...prev, ...newPreviews]);
 
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -235,11 +232,11 @@ const MessageInput: React.FC<MessageInputProps> = ({
       case "pdf":
         return <FileText className="w-4 h-4 text-red-500" />;
       case "document":
-        return <FileText className="w-4 h-4 text-blue-500" />;
+        return <FileText className="w-4 h-4 text-gold" />;
       case "image":
-        return <ImageIcon className="w-4 h-4 text-green-500" />;
+        return <ImageIcon className="w-4 h-4 text-emerald-500" />;
       default:
-        return <FileText className="w-4 h-4 text-gray-500" />;
+        return <FileText className="w-4 h-4 text-cream-dim" />;
     }
   };
 
@@ -266,7 +263,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="relative flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl p-2 pr-8 border border-gray-100 dark:border-gray-700 shadow-sm min-w-[160px] max-w-[200px]"
+                  className="relative flex items-center bg-surface rounded-xl p-2 pr-8 border border-cb-border shadow-sm min-w-[160px] max-w-[200px]"
                 >
                   {preview.type === "image" ? (
                     <img
@@ -275,22 +272,22 @@ const MessageInput: React.FC<MessageInputProps> = ({
                       className="w-10 h-10 object-cover rounded-lg flex-shrink-0 mr-3"
                     />
                   ) : (
-                    <div className="w-10 h-10 flex items-center justify-center bg-white dark:bg-gray-700 rounded-lg mr-3 flex-shrink-0 shadow-sm">
+                    <div className="w-10 h-10 flex items-center justify-center bg-card rounded-lg mr-3 flex-shrink-0 shadow-sm">
                       {getFileIcon(preview.type)}
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
+                    <p className="text-xs font-medium text-cream truncate">
                       {preview.file.name}
                     </p>
-                    <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                    <p className="text-[10px] text-cream-dim">
                       {(preview.file.size / 1024 / 1024).toFixed(1)}MB
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleRemoveFile(preview.file)}
-                    className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-full text-xs hover:bg-red-500 hover:text-white transition-colors"
+                    className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-surface text-cream-dim rounded-full text-xs hover:bg-destructive hover:text-white transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -308,8 +305,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
         className={`
           relative flex items-center gap-2 p-1.5 rounded-[2rem] transition-all duration-300
           ${isFocused 
-            ? "bg-white dark:bg-gray-800 shadow-[0_0_0_2px_rgba(59,130,246,0.5)] ring-4 ring-blue-500/10" 
-            : "bg-gray-100 dark:bg-gray-800/50 border border-transparent hover:bg-white hover:shadow-md hover:border-gray-200 dark:hover:bg-gray-800 dark:hover:border-gray-700"
+            ? "bg-card shadow-[0_0_0_2px_rgba(200,137,42,0.5)] ring-4 ring-gold/10" 
+            : "bg-surface border border-transparent hover:bg-card hover:shadow-md hover:border-cb-border"
           }
         `}
       >
@@ -318,7 +315,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           htmlFor="file-upload"
           className={`
             flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full cursor-pointer transition-all duration-200
-            ${attachedFiles.length > 0 ? "bg-blue-100 text-blue-600" : "text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"}
+            ${attachedFiles.length > 0 ? "bg-gold/10 text-gold" : "text-cream-dim hover:text-gold hover:bg-gold/10"}
           `}
           title="Attach files"
         >
@@ -343,7 +340,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           onKeyPress={handleKeyPress}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="flex-1 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 px-2 py-3 text-base placeholder:text-gray-400 dark:placeholder:text-gray-500"
+          className="flex-1 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 px-2 py-3 text-base placeholder:text-muted"
           disabled={loading}
           autoComplete="off"
         />
@@ -356,14 +353,14 @@ const MessageInput: React.FC<MessageInputProps> = ({
             w-10 h-10 rounded-full transition-all duration-300 shadow-sm
             ${
               !content.trim() && attachedFiles.length === 0
-                ? "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
+                ? "bg-surface text-muted cursor-not-allowed"
+                : "bg-gold hover:bg-gold-light text-ink hover:scale-105"
             }
           `}
           disabled={loading || (!content.trim() && attachedFiles.length === 0)}
         >
           {loading ? (
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-ink/30 border-t-ink rounded-full animate-spin" />
           ) : (
             <Send className={`w-4 h-4 ${content.trim() || attachedFiles.length > 0 ? "ml-0.5" : ""}`} />
           )}

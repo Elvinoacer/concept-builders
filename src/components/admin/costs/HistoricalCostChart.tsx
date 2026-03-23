@@ -1,4 +1,3 @@
-
 "use client";
 
 import { motion } from "framer-motion";
@@ -52,19 +51,27 @@ const HistoricalCostChart = ({ historicalCosts, timePeriod, loading }) => {
           <AreaChart data={formattedData}>
             <defs>
               <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
+                <stop
+                  offset="5%"
+                  stopColor="hsl(var(--chart-1))"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="hsl(var(--chart-2))"
+                  stopOpacity={0}
+                />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="month"
-              stroke="#888888"
+              stroke="hsl(var(--muted-foreground))"
               fontSize={12}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              stroke="#888888"
+              stroke="hsl(var(--muted-foreground))"
               fontSize={12}
               tickLine={false}
               axisLine={false}
@@ -72,15 +79,15 @@ const HistoricalCostChart = ({ historicalCosts, timePeriod, loading }) => {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "rgba(255, 255, 255, 0.8)",
-                border: "1px solid #ccc",
+                backgroundColor: "hsl(var(--background) / 0.92)",
+                border: "1px solid hsl(var(--border))",
                 borderRadius: "8px",
               }}
             />
             <Area
               type="monotone"
               dataKey="total"
-              stroke="#2563eb"
+              stroke="hsl(var(--chart-1))"
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#colorTotal)"
@@ -93,4 +100,3 @@ const HistoricalCostChart = ({ historicalCosts, timePeriod, loading }) => {
 };
 
 export default HistoricalCostChart;
-

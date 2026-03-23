@@ -9,24 +9,24 @@ const ProjectProgress = ({
   estimatedCompletion: string;
 }) => {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+    <div className="rounded-lg border border-cb-border bg-card p-6 shadow-sm">
       <div className="flex items-center justify-between mb-2 md:mb-4">
-        <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">
+        <h2 className="text-base md:text-lg font-semibold text-cream">
           Construction Progress
         </h2>
-        <span className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400">
+        <span className="text-xl md:text-2xl font-bold text-gold">
           {progress}%
         </span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+      <div className="w-full bg-surface rounded-full h-2.5">
         <div
-          className="h-2.5 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400"
+          className="h-2.5 rounded-full bg-gold"
           style={{ width: `${progress}%` }}
         ></div>
       </div>
-      <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+      <p className="mt-3 text-sm text-cream-dim">
         Estimated Completion:{" "}
-        <span className="font-medium text-gray-700 dark:text-gray-300">
+        <span className="font-medium text-cream">
           {estimatedCompletion}
         </span>
       </p>

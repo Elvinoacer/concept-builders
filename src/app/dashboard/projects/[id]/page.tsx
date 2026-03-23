@@ -140,31 +140,31 @@ const ProjectDetailPage = () => {
   }, [projectId, fetchProject]);
 
   const getStatusColorClass = (
-    status: ProjectStatus | MilestoneStatus | RequirementStatus | InvoiceStatus
+    status: ProjectStatus | MilestoneStatus | RequirementStatus | InvoiceStatus,
   ) => {
     switch (status) {
       case ProjectStatus.PLANNING:
       case MilestoneStatus.PENDING:
       case RequirementStatus.PENDING:
       case InvoiceStatus.PENDING:
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800";
+        return "bg-gold/20 text-gold border-gold/30";
       case ProjectStatus.IN_PROGRESS:
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800";
+        return "bg-amber-900/30 text-amber-400 border-amber-800";
       case ProjectStatus.COMPLETED:
       case MilestoneStatus.COMPLETED:
       case RequirementStatus.MET:
       case InvoiceStatus.PAID:
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800";
+        return "bg-emerald-900/30 text-emerald-400 border-emerald-800";
       case ProjectStatus.ON_HOLD:
       case MilestoneStatus.OVERDUE:
       case InvoiceStatus.OVERDUE:
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800";
+        return "bg-orange-900/30 text-orange-400 border-orange-800";
       case ProjectStatus.CANCELLED:
       case RequirementStatus.NOT_MET:
       case InvoiceStatus.CANCELLED:
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-800";
+        return "bg-destructive/20 text-destructive border-destructive/30";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700";
+        return "bg-surface text-cream-dim border-cb-border";
     }
   };
 
@@ -191,37 +191,37 @@ const ProjectDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 min-[375px]:px-5 sm:px-6 md:px-8">
+      <div className="min-h-screen bg-ink px-4 min-[375px]:px-5 sm:px-6 md:px-8">
         <div className="max-w-7xl mx-auto py-6 sm:py-8">
           {/* Skeleton Header */}
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+            <div className="w-10 h-10 bg-surface rounded-lg animate-pulse"></div>
             <div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-2 animate-pulse"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
+              <div className="h-8 bg-surface rounded w-64 mb-2 animate-pulse"></div>
+              <div className="h-4 bg-surface rounded w-48 animate-pulse"></div>
             </div>
           </div>
 
           {/* Skeleton Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 animate-pulse">
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-4"></div>
-              <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+            <div className="lg:col-span-2 bg-card rounded-2xl p-6 border border-cb-border animate-pulse">
+              <div className="h-6 bg-surface rounded w-32 mb-4"></div>
+              <div className="h-48 bg-surface rounded-lg mb-4"></div>
               <div className="space-y-3">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-surface rounded w-full"></div>
+                <div className="h-4 bg-surface rounded w-3/4"></div>
               </div>
             </div>
             <div className="space-y-6">
               {[...Array(4)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 animate-pulse"
+                  className="bg-card rounded-2xl p-6 border border-cb-border animate-pulse"
                 >
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-4"></div>
+                  <div className="h-6 bg-surface rounded w-24 mb-4"></div>
                   <div className="space-y-3">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                    <div className="h-4 bg-surface rounded w-full"></div>
+                    <div className="h-4 bg-surface rounded w-2/3"></div>
                   </div>
                 </div>
               ))}
@@ -234,29 +234,29 @@ const ProjectDetailPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-ink flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md"
         >
-          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400" />
+          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-destructive" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-xl font-semibold text-cream mb-2">
             Unable to Load Project
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
+          <p className="text-cream-dim mb-6">{error}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={fetchProject}
-              className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              className="bg-gold text-ink px-6 py-3 rounded-xl font-semibold hover:bg-gold-light transition-colors"
             >
               Try Again
             </button>
             <button
               onClick={() => router.push("/dashboard/projects")}
-              className="px-6 py-3 text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="px-6 py-3 text-cream-dim bg-surface border border-cb-border rounded-xl font-semibold hover:bg-card transition-colors"
             >
               Back to Projects
             </button>
@@ -269,24 +269,24 @@ const ProjectDetailPage = () => {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-ink flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Info className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+          <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
+            <Info className="w-8 h-8 text-muted" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-xl font-semibold text-cream mb-2">
             Project Not Found
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-cream-dim mb-6">
             The project you're looking for doesn't exist.
           </p>
           <button
             onClick={() => router.push("/dashboard/projects")}
-            className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+            className="bg-gold text-ink px-6 py-3 rounded-xl font-semibold hover:bg-gold-light transition-colors"
           >
             Back to Projects
           </button>
@@ -298,7 +298,7 @@ const ProjectDetailPage = () => {
 
   // Mobile Tabs Component
   const MobileTabs = () => (
-    <div className="lg:hidden sticky top-0 bg-gray-50 dark:bg-gray-900 z-10 pt-4 pb-2 -mx-4 px-4 border-b border-gray-200 dark:border-gray-700">
+    <div className="lg:hidden sticky top-0 bg-ink z-10 pt-4 pb-2 -mx-4 px-4 border-b border-cb-border">
       <div className="flex gap-1 overflow-x-auto pb-2 custom-scrollbar">
         {[
           { id: "overview", label: "Overview", count: null },
@@ -316,8 +316,8 @@ const ProjectDetailPage = () => {
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === tab.id
-                ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm border border-gray-200 dark:border-gray-700"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                ? "bg-card text-cream shadow-sm border border-cb-border"
+                : "text-cream-dim hover:text-cream"
             }`}
           >
             {tab.label}
@@ -325,8 +325,8 @@ const ProjectDetailPage = () => {
               <span
                 className={`px-1.5 py-0.5 text-xs rounded-full ${
                   activeTab === tab.id
-                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                    : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                    ? "bg-gold/20 text-gold"
+                    : "bg-surface text-cream-dim"
                 }`}
               >
                 {tab.count}
@@ -375,7 +375,7 @@ const ProjectDetailPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-ink">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.header
@@ -388,15 +388,15 @@ const ProjectDetailPage = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.back()}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0"
+              className="p-2 rounded-lg hover:bg-surface transition-colors flex-shrink-0"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <ArrowLeft className="w-5 h-5 text-cream-dim" />
             </motion.button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-3xl xs:text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight truncate">
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl font-bold text-cream leading-tight truncate">
                 {project.name}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">
+              <p className="text-cream-dim mt-1 text-sm sm:text-base">
                 Client: {project.user.name} • {project.user.email}
               </p>
             </div>
@@ -448,17 +448,17 @@ const ProjectDetailPage = () => {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e0;
+          background: var(--border-color);
           border-radius: 2px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #a0aec0;
+          background: var(--muted);
         }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #4a5568;
+          background: hsl(var(--border));
         }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #718096;
+          background: hsl(var(--muted-foreground));
         }
       `}</style>
     </div>
@@ -476,11 +476,9 @@ const OverviewSection = ({
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700"
+    className="bg-card rounded-2xl p-6 border border-cb-border"
   >
-    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-      Project Overview
-    </h3>
+    <h3 className="text-xl font-bold text-cream mb-4">Project Overview</h3>
 
     {project.imageUrl && (
       <div className="relative w-full h-48 sm:h-64 mb-6 rounded-xl overflow-hidden">
@@ -497,16 +495,14 @@ const OverviewSection = ({
     )}
 
     {project.description && (
-      <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+      <p className="text-cream-dim mb-6 leading-relaxed">
         {project.description}
       </p>
     )}
 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-          Status
-        </span>
+        <span className="text-sm font-medium text-cream-dim">Status</span>
         <span
           className={`px-3 py-1 text-sm font-semibold rounded-full border ${getStatusColorClass(project.status)} flex items-center gap-2`}
         >
@@ -516,14 +512,12 @@ const OverviewSection = ({
 
       <div>
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-            Progress
-          </span>
-          <span className="text-sm font-bold text-gray-900 dark:text-white">
+          <span className="text-sm font-medium text-cream-dim">Progress</span>
+          <span className="text-sm font-bold text-cream">
             {project.progress}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+        <div className="w-full bg-surface rounded-full h-2.5">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${project.progress}%` }}
@@ -536,28 +530,26 @@ const OverviewSection = ({
       </div>
 
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-          Total Cost
-        </span>
-        <span className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <span className="text-sm font-medium text-cream-dim">Total Cost</span>
+        <span className="text-lg font-bold text-cream flex items-center gap-2">
           <DollarSign className="w-5 h-5" />
           {project.totalCost.toFixed(2)}
         </span>
       </div>
 
       {project.completionRemarks && (
-        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div className="pt-4 border-t border-cb-border">
+          <p className="text-sm font-medium text-cream mb-2">
             Completion Remarks:
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          <p className="text-sm text-cream-dim leading-relaxed">
             {project.completionRemarks}
           </p>
         </div>
       )}
 
       {project.declaration && (
-        <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+        <div className="flex items-center gap-2 text-emerald-400">
           <CheckCircle className="w-5 h-5" />
           <span className="text-sm font-medium">Project declared complete</span>
         </div>
@@ -583,18 +575,16 @@ const MilestonesSection = ({
       {project.milestones.map((milestone) => (
         <li
           key={milestone.id}
-          className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600"
+          className="bg-surface p-4 rounded-xl border border-cb-border"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900 dark:text-white mb-1">
-                {milestone.name}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <p className="font-medium text-cream mb-1">{milestone.name}</p>
+              <p className="text-xs text-muted mb-1">
                 Due: {format(new Date(milestone.dueDate), "MMM dd, yyyy")}
               </p>
               {milestone.description && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                <p className="text-sm text-cream-dim line-clamp-2">
                   {milestone.description}
                 </p>
               )}
@@ -622,18 +612,16 @@ const CostsSection = ({ project }: { project: Project }) => (
       {project.costs.map((cost) => (
         <li
           key={cost.id}
-          className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600"
+          className="bg-surface p-4 rounded-xl border border-cb-border"
         >
           <div className="flex justify-between items-start gap-3">
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900 dark:text-white mb-1">
-                {cost.description}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="font-medium text-cream mb-1">{cost.description}</p>
+              <p className="text-xs text-muted">
                 {format(new Date(cost.dateIncurred), "MMM dd, yyyy")}
               </p>
             </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap">
+            <span className="text-lg font-bold text-cream whitespace-nowrap">
               ${cost.amount.toFixed(2)}
             </span>
           </div>
@@ -654,12 +642,10 @@ const FeedbackSection = ({ project }: { project: Project }) => (
       {project.feedback.map((fb) => (
         <li
           key={fb.id}
-          className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600"
+          className="bg-surface p-4 rounded-xl border border-cb-border"
         >
-          <p className="font-medium text-gray-900 dark:text-white mb-2">
-            {fb.message}
-          </p>
-          <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+          <p className="font-medium text-cream mb-2">{fb.message}</p>
+          <div className="flex justify-between items-center text-xs text-muted">
             <span>From: {fb.client.name}</span>
             <span>
               {formatDistanceToNow(new Date(fb.createdAt), { addSuffix: true })}
@@ -667,9 +653,7 @@ const FeedbackSection = ({ project }: { project: Project }) => (
           </div>
           {fb.rating && (
             <div className="flex items-center gap-1 mt-2">
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                Rating:
-              </span>
+              <span className="text-xs text-muted">Rating:</span>
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} filled={i < fb.rating!} />
@@ -700,14 +684,14 @@ const InvoicesSection = ({
       {project.invoices.map((invoice) => (
         <li
           key={invoice.id}
-          className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600"
+          className="bg-surface p-4 rounded-xl border border-cb-border"
         >
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900 dark:text-white mb-1">
+              <p className="font-medium text-cream mb-1">
                 Invoice #{invoice.invoiceNumber}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted">
                 Due: {format(new Date(invoice.dueDate), "MMM dd, yyyy")}
               </p>
             </div>
@@ -724,7 +708,7 @@ const InvoicesSection = ({
                   href={invoice.documentUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 p-1"
+                  className="text-emerald-400 hover:text-emerald-300 p-1"
                   title="Download Invoice"
                 >
                   <Download className="w-4 h-4" />
@@ -734,20 +718,18 @@ const InvoicesSection = ({
           </div>
 
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <span className="text-sm font-medium text-cream-dim">
               Total Amount
             </span>
-            <span className="text-lg font-bold text-gray-900 dark:text-white">
+            <span className="text-lg font-bold text-cream">
               ${invoice.totalAmount.toFixed(2)}
             </span>
           </div>
 
           {invoice.invoiceItems.length > 0 && (
-            <div className="pt-3 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Items:
-              </p>
-              <ul className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
+            <div className="pt-3 border-t border-cb-border">
+              <p className="text-sm font-medium text-cream mb-2">Items:</p>
+              <ul className="space-y-1 text-xs text-cream-dim">
                 {invoice.invoiceItems.map((item) => (
                   <li key={item.id} className="flex justify-between">
                     <span className="flex-1 truncate">
@@ -784,20 +766,20 @@ const Section = ({
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700"
+    className="bg-card rounded-2xl p-6 border border-cb-border"
   >
-    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+    <h3 className="text-xl font-bold text-cream mb-4 flex items-center gap-2">
       {icon}
       <span>{title}</span>
       {count > 0 && (
-        <span className="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 rounded-full">
+        <span className="px-2 py-1 text-xs font-semibold bg-gold/20 text-gold rounded-full">
           {count}
         </span>
       )}
     </h3>
 
     {count === 0 ? (
-      <div className="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400">
+      <div className="flex flex-col items-center justify-center py-8 text-muted">
         <Info className="w-8 h-8 mb-3" />
         <p className="text-sm text-center">{emptyMessage}</p>
       </div>
@@ -810,7 +792,7 @@ const Section = ({
 // Star Rating Component
 const Star = ({ filled }: { filled: boolean }) => (
   <svg
-    className={`w-3 h-3 ${filled ? "text-yellow-500 fill-current" : "text-gray-300 dark:text-gray-600"}`}
+    className={`w-3 h-3 ${filled ? "text-yellow-500 fill-current" : "text-muted"}`}
     fill="currentColor"
     viewBox="0 0 20 20"
   >

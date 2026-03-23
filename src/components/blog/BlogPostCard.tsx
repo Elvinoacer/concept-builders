@@ -3,88 +3,96 @@
 import { Post } from "@/generated/prisma";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import GlassCard from "@/components/ui-premium/glass-card";
+import { Calendar, ArrowRight } from "lucide-react";
 
-export const BlogPostCard = ({ post }: { post: Post }) => {
+export const BlogPostCard = ({ post, index = 0 }: { post: Post; index?: number }) => {
   const description =
     post.content
       .replace(/<[^>]*>?/gm, "")
       .trim()
-      .substring(0, 100) + "...";
+      .substring(0, 120) + "...";
 
   return (
-    <Link href={`/blog/${post.id}`} className="block w-full h-full">
-      <div className="group flex flex-col overflow-hidden rounded-lg xs:rounded-xl sm:rounded-2xl border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-lg dark:hover:shadow-white/10 h-full min-h-0">
-        {/* Image Container */}
-        <div className="overflow-hidden relative aspect-video w-full">
-          <Image
-            src={post.image || ""}
-            alt={post.title}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-            sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 25vw"
-          />
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="h-full"
+    >
+      <Link href={`/blog/${post.id}`} className="block h-full">
+        <GlassCard className="p-0 sm:p-0 md:p-0 h-full flex flex-col group" hover>
+          {/* Image Container */}
+          <div className="relative aspect-[16/10] w-full overflow-hidden">
+            <Image
+              src={post.image || ""}
+              alt={post.title}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent" />
+          </div>
 
-        {/* Content Container */}
-        <div className="flex flex-1 flex-col p-3 xs:p-4 sm:p-5 lg:p-6 min-h-0">
-          {/* Title */}
-          <h3 className="font-heading text-base xs:text-lg sm:text-xl lg:text-2xl font-bold leading-tight xs:leading-tight sm:leading-tight tracking-tight text-foreground group-hover:text-primary line-clamp-2 mb-2 xs:mb-3">
-            {post.title}
-          </h3>
+          {/* Content Container */}
+          <div className="flex flex-1 flex-col p-6 sm:p-8">
+            {/* Meta */}
+            <div className="flex items-center gap-3 mb-4 text-[10px] font-black text-gold uppercase tracking-widest bg-gold/5 w-fit px-2 py-1 rounded border border-gold/10">
+              <Calendar className="w-3 h-3" />
+              {new Date(post.createdAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </div>
 
-          {/* Description */}
-          <p className="flex-1 text-sm xs:text-sm sm:text-base text-muted-foreground line-clamp-2 xs:line-clamp-3 mb-3 xs:mb-4 leading-relaxed">
-            {description}
-          </p>
+            {/* Title */}
+            <h3 className="text-xl sm:text-2xl font-black text-white mb-4 leading-tight uppercase tracking-tight group-hover:text-gold transition-colors duration-300 line-clamp-2">
+              {post.title}
+            </h3>
 
-          {/* Date */}
-          <p className="text-xs xs:text-sm text-muted-foreground leading-none mt-auto">
-            {new Date(post.createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
-        </div>
-      </div>
-    </Link>
+            {/* Description */}
+            <p className="flex-1 text-sm sm:text-base text-cream-dim line-clamp-3 mb-8 font-medium leading-relaxed">
+              {description}
+            </p>
+
+            {/* Footer Action */}
+            <div className="flex items-center gap-2 text-[10px] font-black text-gold uppercase tracking-[0.2em] transform transition-transform duration-300 group-hover:translate-x-2">
+              <span>Read Full Story</span>
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </div>
+        </GlassCard>
+      </Link>
+    </motion.div>
   );
 };
 
-export const BlogPostCardSkeleton = () => {
+export const BlogPostCardSkeleton = ({ index = 0 }: { index?: number }) => {
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg xs:rounded-xl sm:rounded-2xl border bg-card shadow-sm h-full min-h-0">
+    <div className="flex flex-col overflow-hidden rounded-3xl border-2 border-cb-border bg-card shadow-xl h-full animate-pulse">
       {/* Image Skeleton */}
-      <div className="aspect-video w-full relative overflow-hidden bg-gray-200 dark:bg-gray-700">
-        <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+      <div className="aspect-[16/10] w-full relative overflow-hidden bg-surface">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
       </div>
 
       {/* Content Skeleton */}
-      <div className="flex flex-1 flex-col p-3 xs:p-4 sm:p-5 lg:p-6 min-h-0 space-y-2 xs:space-y-3">
-        {/* Title Skeleton */}
-        <div className="h-5 xs:h-6 sm:h-7 lg:h-8 w-4/5 relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
-          <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+      <div className="flex flex-1 flex-col p-6 sm:p-8 space-y-4">
+        <div className="h-5 w-24 bg-surface rounded"></div>
+        <div className="space-y-2">
+          <div className="h-8 w-full bg-surface rounded-lg"></div>
+          <div className="h-8 w-4/5 bg-surface rounded-lg"></div>
         </div>
-
-        {/* Description Skeleton Lines */}
-        <div className="space-y-1 xs:space-y-2 flex-1">
-          <div className="h-3 xs:h-4 sm:h-4 w-full relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
-            <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-          </div>
-          <div className="h-3 xs:h-4 sm:h-4 w-5/6 relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
-            <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-          </div>
-          <div className="h-3 xs:h-4 sm:h-4 w-4/5 relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700 hidden xs:block">
-            <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-          </div>
+        <div className="space-y-2 flex-grow">
+          <div className="h-4 w-full bg-surface rounded"></div>
+          <div className="h-4 w-full bg-surface rounded"></div>
+          <div className="h-4 w-3/4 bg-surface rounded"></div>
         </div>
-
-        {/* Date Skeleton */}
-        <div className="h-3 xs:h-4 w-1/3 relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700 mt-auto">
-          <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-        </div>
+        <div className="h-4 w-32 bg-surface rounded mt-auto"></div>
       </div>
     </div>
   );

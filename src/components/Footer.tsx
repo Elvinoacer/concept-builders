@@ -46,7 +46,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#F3F4F6] text-[#0B2545] dark:bg-gray-900 dark:text-gray-200 w-full">
+    <footer className="w-full border-t border-cb-border bg-surface text-cream">
       <div className="mx-auto w-full max-w-7xl px-4 min-[375px]:px-5 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-8 min-[375px]:py-10 sm:py-12 md:py-16 lg:py-20">
         {/* Main Footer Content - Improved responsive grid */}
         <div className="grid grid-cols-1 gap-8 min-[375px]:gap-10 sm:gap-12 md:grid-cols-4 lg:gap-16 xl:gap-20">
@@ -61,18 +61,18 @@ const Footer = () => {
                 className="w-14 h-14 min-[375px]:w-16 min-[375px]:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex-shrink-0"
                 priority
               />
-              <span className="text-xl min-[375px]:text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 text-transparent bg-clip-text leading-tight">
+              <span className="text-xl min-[375px]:text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gold to-gold-light text-transparent bg-clip-text leading-tight">
                 Concept Builders
               </span>
             </div>
-            <p className="text-[#6B7280] text-sm min-[375px]:text-base sm:text-lg md:text-base lg:text-lg dark:text-gray-400 leading-relaxed sm:leading-loose">
+            <p className="text-cb-muted text-sm min-[375px]:text-base sm:text-lg md:text-base lg:text-lg leading-relaxed sm:leading-loose">
               Your partner in building the future. Discover, purchase, and
               actualize your dream home with us.
             </p>
 
             {/* Newsletter Subscription */}
             <div className="mt-4 min-[375px]:mt-5 sm:mt-6 lg:mt-8">
-              <h4 className="text-lg min-[375px]:text-xl sm:text-2xl md:text-xl lg:text-2xl font-semibold mb-3 min-[375px]:mb-4 sm:mb-5 dark:text-white leading-tight">
+              <h4 className="text-lg min-[375px]:text-xl sm:text-2xl md:text-xl lg:text-2xl font-semibold mb-3 min-[375px]:mb-4 sm:mb-5 text-cream leading-tight">
                 Stay Updated
               </h4>
               <form
@@ -82,7 +82,7 @@ const Footer = () => {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full px-4 min-[375px]:px-5 py-3 min-[375px]:py-3.5 sm:py-4 rounded-xl border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-3 focus:ring-blue-500/50 dark:bg-gray-800 dark:text-white text-base min-[375px]:text-lg placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all duration-300 hover:border-blue-300 dark:hover:border-gray-600"
+                  className="w-full px-4 min-[375px]:px-5 py-3 min-[375px]:py-3.5 sm:py-4 rounded-xl border border-cb-border focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold bg-card text-cream text-base min-[375px]:text-lg placeholder:text-cb-muted transition-all duration-300 hover:border-gold/60"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -90,7 +90,7 @@ const Footer = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full px-6 py-3 min-[375px]:py-3.5 sm:py-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold hover:from-blue-700 hover:to-cyan-500 transition-all duration-300 text-base min-[375px]:text-lg sm:text-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0 focus:ring-3 focus:ring-blue-500/50 focus:outline-none"
+                  className="w-full px-6 py-3 min-[375px]:py-3.5 sm:py-4 rounded-xl bg-gold text-ink font-semibold hover:bg-gold-light transition-all duration-300 text-base min-[375px]:text-lg sm:text-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0 focus:ring-2 focus:ring-gold/40 focus:outline-none"
                   disabled={loading}
                 >
                   {loading ? (
@@ -110,7 +110,7 @@ const Footer = () => {
           <div className="grid grid-cols-1 min-[375px]:grid-cols-2 gap-8 min-[375px]:gap-10 sm:gap-12 md:col-span-3 md:grid-cols-3 md:gap-8 lg:gap-12 xl:gap-16">
             {/* About Us */}
             <div>
-              <h4 className="text-lg min-[375px]:text-xl sm:text-2xl md:text-xl lg:text-2xl font-semibold mb-4 min-[375px]:mb-5 sm:mb-6 dark:text-white leading-tight">
+              <h4 className="text-lg min-[375px]:text-xl sm:text-2xl md:text-xl lg:text-2xl font-semibold mb-4 min-[375px]:mb-5 sm:mb-6 text-cream leading-tight">
                 About Us
               </h4>
               <ul className="space-y-3 min-[375px]:space-y-3.5 sm:space-y-4">
@@ -118,7 +118,7 @@ const Footer = () => {
                   <li key={index}>
                     <Link
                       href={link.href}
-                      className="text-[#6B7280] hover:text-blue-600 transition-all duration-300 dark:text-gray-400 dark:hover:text-cyan-400 text-base min-[375px]:text-lg sm:text-xl md:text-base lg:text-lg py-2 min-[375px]:py-2.5 block hover:translate-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded-lg px-2"
+                      className="text-cb-muted hover:text-gold transition-all duration-300 text-base min-[375px]:text-lg sm:text-xl md:text-base lg:text-lg py-2 min-[375px]:py-2.5 block hover:translate-x-2 focus:outline-none focus:ring-2 focus:ring-gold/40 rounded-lg px-2"
                     >
                       {link.label}
                     </Link>
@@ -129,7 +129,7 @@ const Footer = () => {
 
             {/* Legal & Policy */}
             <div>
-              <h4 className="text-lg min-[375px]:text-xl sm:text-2xl md:text-xl lg:text-2xl font-semibold mb-4 min-[375px]:mb-5 sm:mb-6 dark:text-white leading-tight">
+              <h4 className="text-lg min-[375px]:text-xl sm:text-2xl md:text-xl lg:text-2xl font-semibold mb-4 min-[375px]:mb-5 sm:mb-6 text-cream leading-tight">
                 Legal & Policy
               </h4>
               <ul className="space-y-3 min-[375px]:space-y-3.5 sm:space-y-4">
@@ -137,7 +137,7 @@ const Footer = () => {
                   <li key={index}>
                     <Link
                       href={link.href}
-                      className="text-[#6B7280] hover:text-blue-600 transition-all duration-300 dark:text-gray-400 dark:hover:text-cyan-400 text-base min-[375px]:text-lg sm:text-xl md:text-base lg:text-lg py-2 min-[375px]:py-2.5 block hover:translate-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded-lg px-2"
+                      className="text-cb-muted hover:text-gold transition-all duration-300 text-base min-[375px]:text-lg sm:text-xl md:text-base lg:text-lg py-2 min-[375px]:py-2.5 block hover:translate-x-2 focus:outline-none focus:ring-2 focus:ring-gold/40 rounded-lg px-2"
                     >
                       {link.label}
                     </Link>
@@ -148,7 +148,7 @@ const Footer = () => {
 
             {/* Contact Us */}
             <div className="min-[375px]:col-span-2 md:col-span-1">
-              <h4 className="text-lg min-[375px]:text-xl sm:text-2xl md:text-xl lg:text-2xl font-semibold mb-4 min-[375px]:mb-5 sm:mb-6 dark:text-white leading-tight">
+              <h4 className="text-lg min-[375px]:text-xl sm:text-2xl md:text-xl lg:text-2xl font-semibold mb-4 min-[375px]:mb-5 sm:mb-6 text-cream leading-tight">
                 Contact Us
               </h4>
               <ul className="space-y-3 min-[375px]:space-y-3.5 sm:space-y-4">
@@ -156,7 +156,7 @@ const Footer = () => {
                   <li key={index}>
                     <Link
                       href={link.href}
-                      className="flex items-start gap-3 min-[375px]:gap-4 text-[#6B7280] hover:text-blue-600 transition-all duration-300 dark:text-gray-400 dark:hover:text-cyan-400 text-base min-[375px]:text-lg sm:text-xl md:text-base lg:text-lg py-2 min-[375px]:py-2.5 group focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded-lg px-2"
+                      className="flex items-start gap-3 min-[375px]:gap-4 text-cb-muted hover:text-gold transition-all duration-300 text-base min-[375px]:text-lg sm:text-xl md:text-base lg:text-lg py-2 min-[375px]:py-2.5 group focus:outline-none focus:ring-2 focus:ring-gold/40 rounded-lg px-2"
                     >
                       <span className="material-symbols-outlined text-xl min-[375px]:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-300 mt-0.5">
                         {link.icon}
@@ -173,8 +173,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section - Improved stacking */}
-        <div className="mt-10 min-[375px]:mt-12 sm:mt-16 border-t border-gray-300 dark:border-gray-800 pt-6 min-[375px]:pt-8 sm:pt-10 flex flex-col min-[375px]:flex-row items-center justify-between gap-4 min-[375px]:gap-6 sm:gap-8">
-          <p className="text-[#6B7280] text-sm min-[375px]:text-base sm:text-lg dark:text-gray-400 text-center min-[375px]:text-left order-2 min-[375px]:order-1">
+        <div className="mt-10 min-[375px]:mt-12 sm:mt-16 border-t border-cb-border pt-6 min-[375px]:pt-8 sm:pt-10 flex flex-col min-[375px]:flex-row items-center justify-between gap-4 min-[375px]:gap-6 sm:gap-8">
+          <p className="text-cb-muted text-sm min-[375px]:text-base sm:text-lg text-center min-[375px]:text-left order-2 min-[375px]:order-1">
             © {new Date().getFullYear()} Concept Builders. All rights reserved.
           </p>
 
@@ -184,8 +184,8 @@ const Footer = () => {
               <Link
                 key={index}
                 href={link.href}
-                className="text-[#6B7280] hover:text-blue-600 transition-all duration-300 dark:text-gray-400 dark:hover:text-cyan-400 p-2 min-[375px]:p-2.5 sm:p-3 rounded-xl hover:bg-white/70 dark:hover:bg-gray-800/70 transform hover:scale-110 focus:outline-none focus:ring-3 focus:ring-blue-500/50"
-                aria-label={link.name}
+                className="text-cb-muted hover:text-gold transition-all duration-300 p-2 min-[375px]:p-2.5 sm:p-3 rounded-xl hover:bg-card/70 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gold/40"
+                aria-label={`Social link ${index + 1}`}
               >
                 <link.icon className="h-5 w-5 min-[375px]:h-6 min-[375px]:w-6 sm:h-7 sm:w-7" />
               </Link>

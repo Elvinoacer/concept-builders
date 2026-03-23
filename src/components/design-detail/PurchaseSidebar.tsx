@@ -24,7 +24,7 @@ import CostCalculatorModal from "@/components/cost-calculator/CostCalculatorModa
 import { Button } from "../ui/button";
 import DesignInquiryModal from "./DesignInquiryModal";
 
-const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
+const PurchaseSidebar: React.FC<{ design: any }> = ({ design }) => {
   const { cart, addToCart } = useCart();
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -269,17 +269,17 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
       id="purchase-options"
     >
       <motion.div
-        className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 lg:p-8 rounded-2xl shadow-xl border border-gray-200/60 dark:border-gray-700/60 ring-1 ring-black/5 dark:ring-white/5"
+        className="bg-card/80 backdrop-blur-xl p-6 lg:p-8 rounded-2xl shadow-xl border border-cb-border"
         variants={itemVariants}
       >
         <motion.div
           className="text-center mb-8"
           variants={itemVariants}
         >
-          <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent leading-tight mb-2">
+          <h2 className="text-2xl lg:text-3xl font-bold text-cream leading-tight mb-2" style={{ fontFamily: 'var(--font-cormorant-garamond), "Cormorant Garamond", serif' }}>
             Purchase Options
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+          <p className="text-cream-dim leading-relaxed">
             Customize your package and get instant access
           </p>
         </motion.div>
@@ -289,9 +289,9 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
           variants={itemVariants}
         >
           <motion.fieldset variants={itemVariants} className="space-y-4">
-            <legend className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-primary/10">
-                <Building2 className="w-5 h-5 text-primary" />
+            <legend className="text-lg font-bold text-cream mb-4 flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-gold/10">
+                <Building2 className="w-5 h-5 text-gold" />
               </div>
               Architectural Plans
             </legend>
@@ -313,9 +313,9 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
           </motion.fieldset>
 
           <motion.fieldset variants={itemVariants} className="space-y-4">
-            <legend className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-primary/10">
-                <Shield className="w-5 h-5 text-primary" />
+            <legend className="text-lg font-bold text-cream mb-4 flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-gold/10">
+                <Shield className="w-5 h-5 text-gold" />
               </div>
               Structural Plans
             </legend>
@@ -337,9 +337,9 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
           </motion.fieldset>
 
           <motion.fieldset variants={itemVariants} className="space-y-4">
-            <legend className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-primary/10">
-                <FileText className="w-5 h-5 text-primary" />
+            <legend className="text-lg font-bold text-cream mb-4 flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-gold/10">
+                <FileText className="w-5 h-5 text-gold" />
               </div>
               Additional Documents
             </legend>
@@ -363,21 +363,21 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
 
         {design.packageOptions && design.packageOptions.length > 0 && (
           <motion.div
-            className="mt-8 pt-6 border-t border-gray-200/50 dark:border-gray-700/50"
+            className="mt-8 pt-6 border-t border-cb-border"
             variants={itemVariants}
           >
             <h3
-              className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+              className="text-lg font-bold text-cream mb-4 flex items-center gap-2 cursor-pointer hover:text-gold transition-colors"
               onClick={() => setIsCustomizationsExpanded(!isCustomizationsExpanded)}
             >
-              <div className="p-1.5 rounded-lg bg-primary/10">
-                <PlusCircle className="w-5 h-5 text-primary" />
+              <div className="p-1.5 rounded-lg bg-gold/10">
+                <PlusCircle className="w-5 h-5 text-gold" />
               </div>
               Customizations
               {isCustomizationsExpanded ? (
-                <FiChevronUp className="w-5 h-5 text-gray-500 ml-auto" />
+                <FiChevronUp className="w-5 h-5 text-cream-dim ml-auto" />
               ) : (
-                <FiChevronDown className="w-5 h-5 text-gray-500 ml-auto" />
+                <FiChevronDown className="w-5 h-5 text-cream-dim ml-auto" />
               )}
             </h3>
             <AnimatePresence>
@@ -409,15 +409,15 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
         )}
 
         <motion.div
-          className="mt-8 pt-6 border-t border-gray-200/50 dark:border-gray-700/50"
+          className="mt-8 pt-6 border-t border-cb-border"
           variants={itemVariants}
         >
           <div className="flex justify-between items-end mb-6">
             <div className="min-w-0 flex-1 pr-4">
-              <p className="text-lg font-semibold text-slate-900 dark:text-white leading-tight mb-1">
+              <p className="text-lg font-semibold text-cream leading-tight mb-1 font-bold">
                 Total Amount
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-cream-dim font-medium">
                 Including all selected items
               </p>
             </div>
@@ -428,13 +428,13 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
                   variants={priceVariants}
                   initial="initial"
                   animate="updated"
-                  className="text-4xl font-extrabold text-slate-900 dark:text-white leading-none tracking-tight"
+                  className="text-4xl font-extrabold text-gold leading-none tracking-tight"
                 >
                   ${totalPrice.toLocaleString()}
                 </motion.p>
               </AnimatePresence>
               <motion.p
-                className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium"
+                className="text-sm text-cream-dim mt-2 font-bold"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -449,8 +449,8 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
           <div className="grid grid-cols-2 gap-3 mb-6">
             <CostCalculatorModal>
               <Button
-                variant="outline"
-                className="w-full h-11 text-sm font-medium border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                variant="ghost"
+                className="w-full h-11 text-sm font-bold border border-cb-border bg-surface text-cream hover:bg-gold hover:text-ink transition-all duration-300"
               >
                 <Calculator className="w-4 h-4 mr-2" />
                 Calculator
@@ -459,7 +459,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
                 href={`/currency-converter?amount=${totalPrice}`}
-                className="flex items-center justify-center w-full h-11 px-3 text-sm font-medium text-blue-600 dark:text-blue-400 border border-blue-600/20 dark:border-blue-400/20 rounded-md hover:bg-blue-600/5 dark:hover:bg-blue-400/10 transition-colors duration-300"
+                className="flex items-center justify-center w-full h-11 px-3 text-sm font-bold text-gold border border-gold/20 rounded-md bg-gold/5 hover:bg-gold/10 transition-colors duration-300"
               >
                 <Zap className="w-4 h-4 mr-2" />
                 Currencies
@@ -472,7 +472,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleBuyNow}
-              className="w-full flex items-center justify-center gap-3 rounded-xl h-14 px-6 bg-gradient-to-r from-primary to-blue-600 text-white text-lg font-bold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 group"
+              className="w-full flex items-center justify-center gap-3 rounded-xl h-14 px-6 bg-gold text-ink text-lg font-bold shadow-lg shadow-gold/20 hover:bg-gold-light transition-all duration-300 group"
             >
               <Zap className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
               Purchase Now
@@ -483,7 +483,7 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
               whileTap={{ scale: 0.98 }}
               onClick={handleAddToCart}
               disabled={!!cartItem}
-              className="w-full flex items-center justify-center gap-3 rounded-xl h-14 px-6 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-slate-900 dark:text-white text-lg font-bold hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:bg-white"
+              className="w-full flex items-center justify-center gap-3 rounded-xl h-14 px-6 bg-surface border-2 border-cb-border text-cream text-lg font-bold hover:border-gold/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {cartItem ? (
                 <>
@@ -508,17 +508,17 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
         variants={containerVariants}
       >
         <motion.div
-          className="bg-green-50/50 dark:bg-green-900/10 backdrop-blur-sm p-4 rounded-xl border border-green-200/50 dark:border-green-700/30"
+          className="bg-surface backdrop-blur-sm p-4 rounded-xl border border-cb-border"
           variants={itemVariants}
           whileHover={{ y: -2, scale: 1.01 }}
         >
           <div className="flex items-center gap-3">
-            <Shield className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+            <Shield className="w-5 h-5 text-emerald-400 flex-shrink-0" />
             <div className="min-w-0">
-              <h4 className="font-semibold text-slate-900 dark:text-white text-sm leading-tight">
+              <h4 className="font-semibold text-cream text-sm leading-tight">
                 Secure Purchase
               </h4>
-              <p className="text-green-700 dark:text-green-300 text-xs mt-0.5">
+              <p className="text-emerald-400/80 text-xs mt-0.5">
                 256-bit SSL encryption
               </p>
             </div>
@@ -526,17 +526,17 @@ const PurchaseSidebar: React.FC<{ design: Design }> = ({ design }) => {
         </motion.div>
 
         <motion.div
-          className="bg-blue-50/50 dark:bg-blue-900/10 backdrop-blur-sm p-4 rounded-xl border border-blue-200/50 dark:border-blue-700/30"
+          className="bg-surface backdrop-blur-sm p-4 rounded-xl border border-cb-border"
           variants={itemVariants}
           whileHover={{ y: -2, scale: 1.01 }}
         >
           <div className="flex items-center gap-3">
-            <Download className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <Download className="w-5 h-5 text-gold flex-shrink-0" />
             <div className="min-w-0">
-              <h4 className="font-semibold text-slate-900 dark:text-white text-sm leading-tight">
+              <h4 className="font-semibold text-cream text-sm leading-tight">
                 Instant Access
               </h4>
-              <p className="text-blue-700 dark:text-blue-300 text-xs mt-0.5">
+              <p className="text-gold/80 text-xs mt-0.5">
                 Download immediately
               </p>
             </div>
@@ -557,8 +557,8 @@ const DocumentOption: React.FC<{
     htmlFor={option.key}
     className={`relative flex items-start gap-4 rounded-xl p-4 cursor-pointer transition-all duration-300 border group ${
       isChecked
-        ? "border-primary bg-primary/5 shadow-md shadow-primary/5"
-        : "border-gray-200/60 dark:border-gray-700/60 bg-white/50 dark:bg-gray-800/50 hover:border-primary/50 hover:bg-white dark:hover:bg-gray-800"
+        ? "border-gold bg-gold/5 shadow-md shadow-gold/5"
+        : "border-cb-border bg-surface hover:border-gold/50 hover:bg-gold/5"
     }`}
     whileHover={{ y: -2 }}
     whileTap={{ scale: 0.99 }}
@@ -576,8 +576,8 @@ const DocumentOption: React.FC<{
     <motion.div
       className={`flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center mt-0.5 transition-all duration-300 ${
         isChecked
-          ? "bg-primary border-primary"
-          : "border-gray-300 dark:border-gray-600 group-hover:border-primary"
+          ? "bg-gold border-gold"
+          : "border-cb-border group-hover:border-gold"
       }`}
     >
       {isChecked && (
@@ -586,15 +586,15 @@ const DocumentOption: React.FC<{
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 500 }}
         >
-          <CheckCircle className="w-3.5 h-3.5 text-white" />
+          <CheckCircle className="w-3.5 h-3.5 text-ink" />
         </motion.div>
       )}
     </motion.div>
 
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-2 mb-1">
-        <IconComponent className={`w-4 h-4 flex-shrink-0 ${isChecked ? 'text-primary' : 'text-gray-500'}`} />
-        <span className="font-semibold text-slate-900 dark:text-white text-base truncate">
+        <IconComponent className={`w-4 h-4 flex-shrink-0 ${isChecked ? 'text-gold' : 'text-cream-dim'}`} />
+        <span className="font-semibold text-cream text-base truncate">
           {option.label}
         </span>
         {option.isAvailable && (
@@ -603,12 +603,12 @@ const DocumentOption: React.FC<{
           </span>
         )}
       </div>
-      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed line-clamp-2">
+      <p className="text-cream-dim text-sm leading-relaxed line-clamp-2">
         {option.description}
       </p>
       {!option.isAvailable && (
-        <p className="text-blue-600 dark:text-blue-400 text-xs mt-1.5 font-medium flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+        <p className="text-gold text-xs mt-1.5 font-medium flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
           Available in 3 days
         </p>
       )}
@@ -617,7 +617,7 @@ const DocumentOption: React.FC<{
     <motion.div
       className="flex flex-col items-end justify-start ml-2"
     >
-      <span className="font-bold text-slate-900 dark:text-white text-base">
+      <span className="font-bold text-cream text-base">
         +${option.price.toLocaleString()}
       </span>
     </motion.div>
@@ -632,8 +632,8 @@ const ExtraOption: React.FC<{
   <motion.div
     className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-300 group ${
       isChecked
-        ? "border-primary bg-primary/5 shadow-md shadow-primary/5"
-        : "border-gray-200/60 dark:border-gray-700/60 bg-white/50 dark:bg-gray-800/50 hover:border-primary/50 hover:bg-white dark:hover:bg-gray-800"
+        ? "border-gold bg-gold/5 shadow-md shadow-gold/5"
+        : "border-cb-border bg-surface hover:border-gold/50 hover:bg-gold/5"
     }`}
     onClick={() => onToggle(option)}
     whileHover={{ y: -2 }}
@@ -643,8 +643,8 @@ const ExtraOption: React.FC<{
       <motion.div
         className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
           isChecked
-            ? "bg-primary border-primary"
-            : "border-gray-300 dark:border-gray-600 group-hover:border-primary"
+            ? "bg-gold border-gold"
+            : "border-cb-border group-hover:border-gold"
         }`}
       >
         {isChecked && (
@@ -653,22 +653,22 @@ const ExtraOption: React.FC<{
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 500 }}
           >
-            <CheckCircle className="w-3.5 h-3.5 text-white" />
+            <CheckCircle className="w-3.5 h-3.5 text-ink" />
           </motion.div>
         )}
       </motion.div>
       <div className="flex flex-col">
-        <span className="font-semibold text-slate-900 dark:text-white text-base truncate">
+        <span className="font-semibold text-cream text-base truncate">
           {option.name}
         </span>
         {option.file && (
-          <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+          <span className="text-xs text-emerald-400 font-medium">
             Instant Download
           </span>
         )}
       </div>
     </div>
-    <span className="font-bold text-slate-900 dark:text-white text-base ml-4">
+    <span className="font-bold text-cream text-base ml-4">
       +${option.price.toLocaleString()}
     </span>
   </motion.div>

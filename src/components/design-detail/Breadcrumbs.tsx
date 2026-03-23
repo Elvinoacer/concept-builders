@@ -20,7 +20,7 @@ const Breadcrumbs = ({ designName }: { designName: string }) => {
           <motion.div whileHover={{ scale: 1.05 }}>
             <Link
               href="/designs"
-              className="flex items-center gap-1 sm:gap-2 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors duration-300 group font-medium px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-primary/5"
+              className="flex items-center gap-1 sm:gap-2 text-cream-dim hover:text-gold transition-colors duration-300 group font-medium px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-gold/5"
             >
               <span className="material-symbols-outlined text-lg sm:text-xl transition-transform duration-300 group-hover:-translate-x-0.5">
                 arrow_back
@@ -37,7 +37,7 @@ const Breadcrumbs = ({ designName }: { designName: string }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
-          <div className="flex items-center text-gray-300 dark:text-gray-600 mx-1 sm:mx-2">
+          <div className="flex items-center text-cb-border mx-1 sm:mx-2">
             <span className="material-symbols-outlined text-base sm:text-lg">
               chevron_right
             </span>
@@ -50,11 +50,11 @@ const Breadcrumbs = ({ designName }: { designName: string }) => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
         >
-          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-primary/10 rounded-lg sm:rounded-xl border border-primary/20">
-            <span className="material-symbols-outlined text-primary text-base sm:text-lg">
+          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-gold/10 rounded-lg sm:rounded-xl border border-gold/20">
+            <span className="material-symbols-outlined text-gold text-base sm:text-lg">
               design_services
             </span>
-            <span className="text-slate-800 dark:text-white font-semibold max-w-[120px] xs:max-w-[180px] sm:max-w-[250px] truncate text-xs sm:text-sm">
+            <span className="text-cream font-semibold max-w-[120px] xs:max-w-[180px] sm:max-w-[250px] truncate text-xs sm:text-sm">
               {designName}
             </span>
           </div>

@@ -1,56 +1,72 @@
 import { contactInfo } from "@/lib/dummydata";
+import GlassCard from "@/components/ui-premium/glass-card";
+import { Mail, Phone, MessageSquare, MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const iconMap: Record<string, any> = {
+  "chat": MessageSquare,
+  "phone_in_talk": Phone,
+  "mail": Mail,
+  "location_on": MapPin
+};
 
 const ContactInfo = () => {
   return (
-    <div className="space-y-4 xs:space-y-5 sm:space-y-6 md:space-y-8">
-      {contactInfo.map((item, index) => (
-        <div
-          key={index}
-          className="flex items-start gap-3 xs:gap-4 group hover:bg-gray-50 dark:hover:bg-gray-800/50 p-3 xs:p-4 rounded-xl transition-colors duration-200"
-        >
-          {/* Icon Container */}
-          <div className="flex size-8 xs:size-10 sm:size-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 text-white group-hover:scale-110 transition-transform duration-200 shadow-sm">
-            <span className="material-symbols-outlined text-lg xs:text-xl">
-              {item.icon}
-            </span>
-          </div>
+    <div className="space-y-6">
+      {contactInfo.map((item, index) => {
+        const Icon = iconMap[item.icon] || MessageSquare;
+        
+        return (
+          <GlassCard 
+            key={index} 
+            className="p-6 transition-all duration-500 group"
+            hover
+          >
+            <div className="flex items-start gap-6">
+              {/* Icon Container */}
+              <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gold border border-gold/50 text-ink shadow-xl shadow-gold/20 group-hover:scale-110 transition-transform duration-500">
+                <Icon className="w-6 h-6" />
+              </div>
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base xs:text-lg font-semibold text-gray-800 dark:text-white mb-1 xs:mb-2">
-              {item.title}
-            </h3>
-            {item.title === "Live Chat" ? (
-              <a
-                href="https://wa.me/254741360865"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors text-sm xs:text-base break-words"
-              >
-                {item.value}
-              </a>
-            ) : item.title === "Phone" ? (
-              <a
-                href="tel:254741360865"
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors text-sm xs:text-base"
-              >
-                {item.value}
-              </a>
-            ) : item.title === "Email" ? (
-              <a
-                href="mailto:support@conceptbuilders.com"
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors text-sm xs:text-base break-words"
-              >
-                {item.value}
-              </a>
-            ) : (
-              <p className="text-gray-600 dark:text-gray-400 text-sm xs:text-base leading-relaxed">
-                {item.value}
-              </p>
-            )}
-          </div>
-        </div>
-      ))}
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xs font-black text-gold uppercase tracking-[0.2em] mb-2">
+                  {item.title}
+                </h3>
+                
+                {item.title === "Live Chat" ? (
+                  <a
+                    href="https://wa.me/254741360865"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xl font-black text-white hover:text-gold transition-colors duration-300 break-words tracking-tight"
+                  >
+                    {item.value}
+                  </a>
+                ) : item.title === "Phone" ? (
+                  <a
+                    href="tel:254741360865"
+                    className="text-xl font-black text-white hover:text-gold transition-colors duration-300 tracking-tight"
+                  >
+                    {item.value}
+                  </a>
+                ) : item.title === "Email" ? (
+                  <a
+                    href="mailto:support@conceptbuilders.com"
+                    className="text-xl font-black text-white hover:text-gold transition-colors duration-300 break-words tracking-tight"
+                  >
+                    {item.value}
+                  </a>
+                ) : (
+                  <p className="text-xl font-black text-white leading-tight tracking-tight">
+                    {item.value}
+                  </p>
+                )}
+              </div>
+            </div>
+          </GlassCard>
+        );
+      })}
     </div>
   );
 };

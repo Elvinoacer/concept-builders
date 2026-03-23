@@ -4,8 +4,8 @@ import Image from "next/image";
 
 const ProjectImages = ({ images }: { images: string[] }) => {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-      <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-2 md:mb-4 dark:text-white">
+    <div className="rounded-lg border border-cb-border bg-card p-6 shadow-sm">
+      <h2 className="text-base md:text-lg font-semibold text-cream mb-2 md:mb-4">
         Project Images
       </h2>
       <div className="grid grid-cols-2 gap-4">
@@ -23,13 +23,13 @@ const ProjectImages = ({ images }: { images: string[] }) => {
             />
           </div>
         ))}
-        <div className="w-full flex items-center justify-center bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer dark:bg-gray-700 dark:hover:bg-gray-600">
-          <span className="material-symbols-outlined text-gray-500 dark:text-gray-400">
+        <div className="w-full flex items-center justify-center bg-surface rounded-lg hover:bg-surface/70 transition-colors cursor-pointer">
+          <span className="material-symbols-outlined text-cream-dim">
             add_photo_alternate
           </span>
         </div>
       </div>
-      <button className="mt-2 md:mt-4 w-full flex items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+      <button className="mt-2 md:mt-4 w-full flex items-center justify-center gap-2 rounded-md border border-cb-border bg-surface px-4 py-2 text-sm font-semibold text-cream-dim shadow-sm hover:bg-card transition-colors">
         View All Images
       </button>
     </div>

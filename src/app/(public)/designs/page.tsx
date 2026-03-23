@@ -108,17 +108,18 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
   const wishlist = user?.wishlist || [];
 
   return (
-    <div
-      className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden"
-      style={{
-        fontFamily: '"Work Sans", "Noto Sans", sans-serif',
-      }}
-    >
+    <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden bg-ink">
       <div className="layout-container flex h-full grow flex-col">
-        <main className="flex-1 px-3 xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8 md:py-12 bg-gray-50 dark:bg-gray-900">
-          <div className="w-full max-w-full mx-auto">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-3 sm:gap-4">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight dark:text-white">
+        <main className="flex-1 px-6 md:px-12 py-12 bg-ink">
+          <div className="w-full max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+              <h1
+                className="text-2xl sm:text-3xl md:text-4xl font-light text-cream tracking-tight"
+                style={{
+                  fontFamily:
+                    'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+                }}
+              >
                 {designsPageData.pageTitle}
               </h1>
               <FilterControls
@@ -140,14 +141,18 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
             </div>
 
             {designs.length === 0 && (
-              <div className="text-center py-12 sm:py-16 md:py-20">
-                <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">
-                  🏗️
-                </div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+              <div className="text-center py-16 md:py-20">
+                <div className="text-6xl mb-4">🏗️</div>
+                <h3
+                  className="text-xl md:text-2xl font-light text-cream mb-2"
+                  style={{
+                    fontFamily:
+                      'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+                  }}
+                >
                   No designs found
                 </h3>
-                <p className="text-sm sm:text-base text-gray-500 dark:text-gray-500">
+                <p className="text-sm sm:text-base text-cream-dim">
                   Try adjusting your filters or search terms
                 </p>
               </div>

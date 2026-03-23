@@ -56,33 +56,33 @@ const FeaturedDesigns = () => {
       transition={{ duration: 0.8 }}
       className="mb-12 sm:mb-16 md:mb-20"
     >
-      <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between mb-6 sm:mb-8 gap-4">
+      <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between mb-8 sm:mb-12 gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gold mb-3 uppercase tracking-tight">
             Featured Designs
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base md:text-lg">
-            Curated selection of exceptional architectural designs
+          <p className="text-cream-dim text-base sm:text-lg md:text-xl font-medium max-w-2xl">
+            A curated selection of our most exceptional and innovative architectural concepts.
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-2">
+        <div className="hidden sm:flex items-center gap-3">
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.1, x: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => scroll(-400)}
-            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-card backdrop-blur-md border-2 border-cb-border text-gold hover:bg-surface transition-all duration-300 shadow-xl"
           >
-            <span className="material-symbols-outlined text-xl sm:text-2xl">
+            <span className="material-symbols-outlined text-2xl sm:text-3xl">
               chevron_left
             </span>
           </motion.button>
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.1, x: 5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => scroll(400)}
-            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-card backdrop-blur-md border-2 border-cb-border text-gold hover:bg-surface transition-all duration-300 shadow-xl"
           >
-            <span className="material-symbols-outlined text-xl sm:text-2xl">
+            <span className="material-symbols-outlined text-2xl sm:text-3xl">
               chevron_right
             </span>
           </motion.button>
@@ -125,12 +125,13 @@ const FeaturedDesigns = () => {
           </AnimatePresence>
         </motion.div>
 
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-24 sm:w-32 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-24 sm:w-48 h-1.5 bg-surface rounded-full overflow-hidden border border-cb-border">
           <motion.div
-            className="h-full bg-primary"
+            className="h-full bg-gold"
             animate={{
               width: loading ? "100%" : "0%",
-              transition: { duration: 2, repeat: loading ? Infinity : 0 },
+              x: loading ? ["-100%", "100%"] : 0,
+              transition: { duration: 1.5, repeat: loading ? Infinity : 0, ease: "easeInOut" },
             }}
           />
         </div>

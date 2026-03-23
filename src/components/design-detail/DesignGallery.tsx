@@ -12,19 +12,19 @@ const DesignGallery = ({
   if (!images || images.length === 0) {
     return (
       <motion.div
-        className="aspect-video sm:aspect-[4/3] rounded-xl sm:rounded-2xl md:rounded-3xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700"
+        className="aspect-video sm:aspect-[4/3] rounded-xl sm:rounded-2xl md:rounded-3xl bg-card flex items-center justify-center border-2 border-dashed border-cb-border"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
       >
         <div className="text-center">
-          <span className="material-symbols-outlined text-4xl sm:text-5xl md:text-6xl text-gray-400 dark:text-gray-600 mb-2 sm:mb-4">
+          <span className="material-symbols-outlined text-4xl sm:text-5xl md:text-6xl text-muted mb-2 sm:mb-4">
             photo_library
           </span>
-          <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base md:text-lg font-medium">
+          <p className="text-cream-dim text-sm sm:text-base md:text-lg font-medium">
             No images available
           </p>
-          <p className="text-gray-400 dark:text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">
+          <p className="text-muted text-xs sm:text-sm mt-1 sm:mt-2">
             Design visuals coming soon
           </p>
         </div>
@@ -84,7 +84,7 @@ const DesignGallery = ({
     setIsPlaying(false);
   };
 
-  const slideVariants = {
+  const slideVariants: any = {
     enter: (direction: number) => ({
       x: direction > 0 ? 1000 : -1000,
       opacity: 0,
@@ -96,7 +96,7 @@ const DesignGallery = ({
       scale: 1,
       transition: {
         duration: 0.6,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut",
       },
     },
     exit: (direction: number) => ({
@@ -105,7 +105,7 @@ const DesignGallery = ({
       scale: 0.9,
       transition: {
         duration: 0.6,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut",
       },
     }),
   };
@@ -117,7 +117,7 @@ const DesignGallery = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
     >
-      <div className="relative aspect-video sm:aspect-[4/3] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden shadow-lg sm:shadow-xl md:shadow-2xl bg-gray-100 dark:bg-gray-800">
+      <div className="relative aspect-video sm:aspect-[4/3] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl bg-surface">
         <AnimatePresence mode="popLayout" custom={direction}>
           <motion.div
             key={selectedImage.url}
@@ -145,7 +145,7 @@ const DesignGallery = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-all duration-500">
           <button
             onClick={handlePrevious}
-            className="absolute left-2 sm:left-3 md:left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl md:rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
+            className="absolute left-2 sm:left-3 md:left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl md:rounded-2xl bg-card/90 backdrop-blur-sm text-cream hover:bg-gold hover:text-ink hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl border border-cb-border"
           >
             <span className="material-symbols-outlined text-lg sm:text-xl md:text-2xl">
               chevron_left
@@ -154,7 +154,7 @@ const DesignGallery = ({
 
           <button
             onClick={handleNext}
-            className="absolute right-2 sm:right-3 md:right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl md:rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
+            className="absolute right-2 sm:right-3 md:right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl md:rounded-2xl bg-card/90 backdrop-blur-sm text-cream hover:bg-gold hover:text-ink hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl border border-cb-border"
           >
             <span className="material-symbols-outlined text-lg sm:text-xl md:text-2xl">
               chevron_right
@@ -163,7 +163,7 @@ const DesignGallery = ({
 
           <div className="absolute bottom-2 sm:bottom-3 md:bottom-4 left-1/2 -translate-x-1/2">
             <motion.button
-              className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-xl md:rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-primary hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
+              className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-xl md:rounded-2xl bg-card/90 backdrop-blur-sm text-gold hover:bg-gold hover:text-ink transition-all duration-300 shadow-lg hover:shadow-xl border border-cb-border"
               onClick={handlePlayPauseClick}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -178,13 +178,13 @@ const DesignGallery = ({
             </motion.button>
           </div>
 
-          <div className="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 px-2 sm:px-3 py-1 sm:py-2 rounded-lg sm:rounded-xl md:rounded-2xl bg-black/50 backdrop-blur-sm text-white text-xs sm:text-sm font-medium">
+          <div className="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 px-2 sm:px-3 py-1 sm:py-2 rounded-lg sm:rounded-xl md:rounded-2xl bg-ink/50 backdrop-blur-sm text-white text-xs sm:text-sm font-medium">
             {images.findIndex((img) => img.url === selectedImage.url) + 1} /{" "}
             {images.length}
           </div>
 
           {selectedImage.type === "3d" && (
-            <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 px-2 sm:px-3 py-1 sm:py-2 rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs sm:text-sm font-medium backdrop-blur-sm flex items-center gap-1 sm:gap-2">
+            <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 px-2 sm:px-3 py-1 sm:py-2 rounded-lg sm:rounded-xl md:rounded-2xl bg-gold text-ink text-xs sm:text-sm font-bold backdrop-blur-sm flex items-center gap-1 sm:gap-2">
               <span className="material-symbols-outlined text-base sm:text-lg">
                 3d_rotation
               </span>
@@ -205,8 +205,8 @@ const DesignGallery = ({
             key={index}
             className={`relative aspect-square rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 group/thumb border-2 ${
               selectedImage.url === image.url
-                ? "border-primary ring-2 sm:ring-4 ring-primary/20 shadow-lg sm:shadow-xl md:shadow-2xl scale-105"
-                : "border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:shadow-md"
+                ? "border-gold ring-2 sm:ring-4 ring-gold/20 shadow-xl scale-105"
+                : "border-cb-border hover:border-gold/50 hover:shadow-md"
             }`}
             onClick={() => handleThumbnailClick(image)}
             whileHover={{
@@ -228,7 +228,7 @@ const DesignGallery = ({
 
             {selectedImage.url === image.url && (
               <motion.div
-                className="absolute inset-0 bg-primary/20"
+                className="absolute inset-0 bg-gold/20"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
@@ -236,8 +236,8 @@ const DesignGallery = ({
             )}
 
             {image.type === "3d" && (
-              <div className="absolute bottom-1 right-1 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 rounded-full bg-blue-600 flex items-center justify-center">
-                <span className="material-symbols-outlined text-white text-xs sm:text-sm">
+              <div className="absolute bottom-1 right-1 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 rounded-full bg-gold flex items-center justify-center">
+                <span className="material-symbols-outlined text-ink text-xs sm:text-sm">
                   3d_rotation
                 </span>
               </div>
@@ -254,7 +254,7 @@ const DesignGallery = ({
 
       {isPlaying && (
         <motion.div
-          className="absolute -bottom-1 sm:-bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/20"
+          className="absolute -bottom-1 sm:-bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-gold/10 backdrop-blur-sm border border-gold/20"
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -262,13 +262,13 @@ const DesignGallery = ({
             {[1, 2, 3].map((dot) => (
               <motion.div
                 key={dot}
-                className="w-1 h-1 bg-primary rounded-full"
+                className="w-1 h-1 bg-gold rounded-full"
                 animate={{ scale: [1, 1.5, 1] }}
                 transition={{ duration: 1, repeat: Infinity, delay: dot * 0.2 }}
               />
             ))}
           </div>
-          <span className="text-xs text-primary font-medium">Auto-playing</span>
+          <span className="text-xs text-gold font-bold">Auto-playing</span>
         </motion.div>
       )}
     </motion.div>

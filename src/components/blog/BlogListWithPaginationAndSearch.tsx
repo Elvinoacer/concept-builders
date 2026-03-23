@@ -13,12 +13,16 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
+import FeaturedPost, { FeaturedPostSkeleton } from "./FeaturedPost";
+import { AlertCircle, Search, Loader2 } from "lucide-react";
+
 const ITEMS_PER_PAGE = 6;
 
 const BlogListWithPaginationAndSearch = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  if (!searchParams) return null;
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +30,7 @@ const BlogListWithPaginationAndSearch = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("search") || ""
+    searchParams?.get("search") || ""
   );
 
   const fetchPosts = useCallback(async () => {
@@ -58,9 +62,9 @@ const BlogListWithPaginationAndSearch = () => {
   }, [currentPage, searchQuery]);
 
   useEffect(() => {
-    const pageParam = parseInt(searchParams.get("page") || "1", 10);
+    const pageParam = parseInt(searchParams?.get("page") || "1", 10);
     setCurrentPage(pageParam);
-    setSearchQuery(searchParams.get("search") || "");
+    setSearchQuery(searchParams?.get("search") || "");
   }, [searchParams]);
 
   useEffect(() => {
@@ -68,14 +72,14 @@ const BlogListWithPaginationAndSearch = () => {
   }, [fetchPosts]);
 
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", page.toString());
     router.push(`${pathname}?${params.toString()}`);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || "");
     if (e.target.value) {
       params.set("search", e.target.value);
     } else {
@@ -189,87 +193,83 @@ const BlogListWithPaginationAndSearch = () => {
   };
 
   return (
-    <main className="col-span-full lg:col-span-8 xl:col-span-9 2xl:col-span-8 w-full min-w-0">
-      {/* Search Input */}
-      <div className="mb-6 sm:mb-8 lg:mb-10">
-        <input
-          type="text"
-          placeholder="Search blog posts..."
-          className="w-full rounded-lg xs:rounded-xl border border-gray-300 dark:border-gray-600 px-3 xs:px-4 sm:px-5 py-2.5 sm:py-3 lg:py-3.5 text-sm xs:text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-      </div>
-
-      {/* Loading State */}
+    <div className="w-full">
+      {/* Feed Content */}
       {loading ? (
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {[...Array(6)].map((_, index) => (
-            <BlogPostCardSkeleton key={index} />
-          ))}
+        <div className="space-y-12">
+          {/* Featured Skeleton */}
+          <FeaturedPostSkeleton />
+          {/* Grid Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            {[...Array(4)].map((_, index) => (
+              <BlogPostCardSkeleton key={index} index={index} />
+            ))}
+          </div>
         </div>
       ) : error ? (
-        // Error State
-        <div
-          className="bg-red-50 border border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-4 sm:py-6 rounded-lg text-center"
-          role="alert"
-        >
-          <span className="block text-sm sm:text-base">{error}</span>
+        <div className="py-20 text-center space-y-8 max-w-md mx-auto">
+          <AlertCircle className="w-20 h-20 text-red-500 mx-auto" />
+          <h2 className="text-3xl font-black text-gold uppercase">Feed Error</h2>
+          <p className="text-cream-dim text-lg leading-relaxed">{error}</p>
           <button
             onClick={fetchPosts}
-            className="mt-3 sm:mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors duration-200"
+            className="px-10 py-4 bg-gold text-ink font-black uppercase tracking-widest rounded-xl hover:bg-gold-light transition-all"
           >
-            Try Again
+            Retry Fetch
           </button>
         </div>
       ) : posts.length === 0 ? (
-        // Empty State
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed bg-card p-6 sm:p-8 lg:p-12 text-center shadow-sm">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mb-4 sm:mb-6 text-muted-foreground/50">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+        <div className="py-24 text-center space-y-8 max-w-lg mx-auto">
+          <div className="relative w-32 h-32 mx-auto">
+            <Search className="w-full h-full text-gold/10" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 border-2 border-dashed border-gold/20 rounded-full animate-[spin_10s_linear_infinite]" />
+            </div>
           </div>
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-foreground mb-2 sm:mb-3">
-            No Posts Found
-          </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto leading-relaxed">
+          <h2 className="text-4xl font-black text-white uppercase tracking-tight">Empty Archives</h2>
+          <p className="text-cream-dim text-lg leading-relaxed">
             {searchQuery
-              ? `No results found for "${searchQuery}". Try adjusting your search terms.`
-              : "No blog posts available yet. Check back soon!"}
+              ? `No chronicles match the query "${searchQuery}". Try broadening your search.`
+              : "Our scribes are currently crafting new stories. Check back soon for fresh insights."}
           </p>
           {searchQuery && (
             <button
               onClick={() => {
                 setSearchQuery("");
-                const params = new URLSearchParams(searchParams.toString());
+                const params = new URLSearchParams(searchParams?.toString() || "");
                 params.delete("search");
                 params.set("page", "1");
                 router.push(`${pathname}?${params.toString()}`);
               }}
-              className="mt-4 sm:mt-6 px-4 sm:px-6 py-2.5 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200"
+              className="px-10 py-4 border-2 border-gold text-gold font-black uppercase tracking-widest rounded-xl hover:bg-gold/10 transition-all"
             >
               Clear Search
             </button>
           )}
         </div>
       ) : (
-        // Posts Grid
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {posts.map((post) => (
-            <BlogPostCard key={post.id} post={post} />
-          ))}
+        <div className="space-y-12 sm:space-y-20">
+          {/* First post is featured only on Page 1 if no search */}
+          {currentPage === 1 && !searchQuery && posts[0] && (
+            <FeaturedPost post={posts[0]} />
+          )}
+
+          {/* Grid of remaining posts */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-stretch">
+            {(currentPage === 1 && !searchQuery ? posts.slice(1) : posts).map((post, index) => (
+              <BlogPostCard key={post.id} post={post} index={index} />
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && !loading && renderPagination()}
-    </main>
+      {/* Pagination Container */}
+      {totalPages > 1 && !loading && (
+        <div className="mt-16 sm:mt-24 pt-12 border-t border-cb-border flex justify-center">
+          {renderPagination()}
+        </div>
+      )}
+    </div>
   );
 };
 

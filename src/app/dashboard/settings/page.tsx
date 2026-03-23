@@ -41,7 +41,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 min-[375px]:px-5 sm:px-6 md:px-8">
+    <div className="min-h-screen bg-ink px-4 min-[375px]:px-5 sm:px-6 md:px-8">
       <div className="max-w-4xl mx-auto py-6 sm:py-8">
         {/* Header */}
         <motion.header
@@ -50,14 +50,20 @@ const SettingsPage = () => {
           className="mb-6 sm:mb-8"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Settings className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-gold/10 rounded-lg">
+              <Settings className="w-6 h-6 text-gold" />
             </div>
             <div>
-              <h1 className="text-3xl xs:text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1
+                className="text-3xl xs:text-4xl sm:text-5xl font-bold text-cream leading-tight"
+                style={{
+                  fontFamily:
+                    'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+                }}
+              >
                 Settings
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2 text-base sm:text-lg">
+              <p className="text-cream-dim mt-2 text-base sm:text-lg">
                 Manage your account settings and preferences
               </p>
             </div>
@@ -65,7 +71,7 @@ const SettingsPage = () => {
         </motion.header>
 
         {/* Main Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="bg-card rounded-2xl border border-cb-border overflow-hidden">
           {/* Tabs */}
           <SettingsTabs activeTab={activeTab} setActiveTab={handleTabChange} />
 

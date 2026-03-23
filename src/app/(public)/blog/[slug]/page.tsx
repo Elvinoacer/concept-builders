@@ -1,12 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Post } from "@/generated/prisma";
+import PageSection from "@/components/ui-premium/page-section";
+import GlassCard from "@/components/ui-premium/glass-card";
+import GoldButton from "@/components/ui-premium/gold-button";
+import SectionHeading from "@/components/ui-premium/section-heading";
+import { ArrowLeft, User, Calendar, Loader2, AlertCircle } from "lucide-react";
 
 const BlogPostPage = () => {
-  const { slug } = useParams();
+  const params = useParams();
+  const slug = params?.slug as string;
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,53 +43,44 @@ const BlogPostPage = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950 px-4 py-8">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 font-medium">
-            Loading blog post...
+      <PageSection variant="ink" className="min-h-[70vh] flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <Loader2 className="w-16 h-16 text-gold animate-spin mx-auto" />
+          <p className="text-xl text-cream-dim font-black uppercase tracking-widest">
+            Fetching Story...
           </p>
         </div>
-      </div>
+      </PageSection>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950 px-4 py-8">
-        <div className="text-center max-w-md mx-auto space-y-4">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-red-500">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            Error Loading Post
+      <PageSection variant="ink" className="min-h-[70vh] flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto space-y-6">
+          <AlertCircle className="w-20 h-20 text-red-500 mx-auto" />
+          <h2 className="text-3xl font-black text-gold uppercase">
+            Access Error
           </h2>
-          <p className="text-red-600 dark:text-red-400 text-base sm:text-lg">
+          <p className="text-cream-dim font-medium">
             {error}
           </p>
-          <button
+          <GoldButton
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm sm:text-base"
+            className="mt-4"
           >
-            Try Again
-          </button>
+            Retry Access
+          </GoldButton>
         </div>
-      </div>
+      </PageSection>
     );
   }
 
   if (!post) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950 px-4 py-8">
-        <div className="text-center max-w-md mx-auto space-y-4">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-gray-400">
+      <PageSection variant="ink" className="min-h-[70vh] flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto space-y-6">
+          <div className="w-20 h-20 mx-auto text-cream-dim/20">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -92,141 +90,102 @@ const BlogPostPage = () => {
               />
             </svg>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            Post Not Found
+          <h2 className="text-3xl font-black text-gold uppercase">
+            Not Found
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg">
-            The blog post you're looking for doesn't exist.
+          <p className="text-cream-dim font-medium">
+            The article you seek has moved or does not exist.
           </p>
-          <button
+          <GoldButton
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm sm:text-base"
+            className="mt-4"
           >
-            Go Back
-          </button>
+            Return to Blog
+          </GoldButton>
         </div>
-      </div>
+      </PageSection>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-4 sm:py-6 lg:py-8">
-      <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-2xl lg:max-w-4xl xl:max-w-5xl">
-        <article className="bg-white dark:bg-gray-900 rounded-lg xs:rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
-          {/* Featured Image */}
-          {post.image && (
-            <div className="relative w-full aspect-video sm:aspect-[21/9] lg:aspect-[16/6]">
-              <Image
-                src={post.image}
-                alt={post.title}
-                fill
-                className="object-cover"
-                placeholder="blur"
-                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, (max-width: 1280px) 80vw, 70vw"
-                priority
-              />
-            </div>
-          )}
+    <PageSection variant="ink" className="pt-8 sm:pt-12">
+      <div className="max-w-4xl mx-auto">
+        <motion.article
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <GlassCard className="p-0 sm:p-0 md:p-0 overflow-hidden" hover={false}>
+            {/* Featured Image */}
+            {post.image && (
+              <div className="relative w-full aspect-video lg:aspect-[21/9]">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+                  sizes="(max-width: 1024px) 100vw, 1200px"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-transparent" />
+              </div>
+            )}
 
-          {/* Content */}
-          <div className="p-4 xs:p-5 sm:p-6 lg:p-8 xl:p-10">
-            {/* Title */}
-            <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 leading-tight tracking-tight">
-              {post.title}
-            </h1>
-
-            {/* Meta Information */}
-            <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 lg:mb-10">
-              {post.author && (
+            {/* Content Container */}
+            <div className="p-6 sm:p-10 lg:p-14">
+              {/* Meta Top */}
+              <div className="flex flex-wrap items-center gap-6 mb-8 text-xs sm:text-sm font-black text-gold uppercase tracking-[0.2em]">
+                {post.author && (
+                  <span className="flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    {post.author}
+                  </span>
+                )}
                 <span className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                  By {post.author}
+                  <Calendar className="w-4 h-4" />
+                  {new Date(post.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
                 </span>
-              )}
-              <span className="flex items-center gap-2">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                {new Date(post.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
+              </div>
 
-            {/* Content Body */}
-            <div
-              className="prose prose-sm xs:prose-base sm:prose-lg lg:prose-xl dark:prose-invert max-w-none
-                         prose-headings:font-bold prose-headings:tracking-tight
-                         prose-h1:text-2xl xs:prose-h1:text-3xl sm:prose-h1:text-4xl
-                         prose-h2:text-xl xs:prose-h2:text-2xl sm:prose-h2:text-3xl
-                         prose-h3:text-lg xs:prose-h3:text-xl sm:prose-h3:text-2xl
-                         prose-p:leading-relaxed prose-p:my-4
-                         prose-img:rounded-lg xs:prose-img:rounded-xl
-                         prose-blockquote:border-l-4 prose-blockquote:border-blue-500
-                         prose-blockquote:pl-4 xs:prose-blockquote:pl-6
-                         prose-ul:my-4 prose-ol:my-4
-                         prose-li:my-1
-                         prose-a:text-blue-600 dark:prose-a:text-blue-400
-                         prose-a:no-underline hover:prose-a:underline
-                         prose-strong:font-bold prose-strong:text-gray-900 dark:prose-strong:text-white
-                         prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-                         prose-code:bg-gray-100 dark:prose-code:bg-gray-800
-                         prose-pre:bg-gray-900 dark:prose-pre:bg-gray-800
-                         prose-pre:rounded-lg xs:prose-pre:rounded-xl"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-          </div>
-        </article>
+              {/* Title */}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-10 leading-tight uppercase tracking-tight">
+                {post.title}
+              </h1>
 
-        {/* Back to Blog Link */}
-        <div className="mt-6 sm:mt-8 lg:mt-10 text-center">
-          <button
-            onClick={() => window.history.back()}
-            className="inline-flex items-center gap-2 px-4 xs:px-6 py-2.5 xs:py-3 text-sm xs:text-base font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-200"
-          >
-            <svg
-              className="w-4 h-4 xs:w-5 xs:h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              {/* Content Body */}
+              <div
+                className="prose prose-invert max-w-none
+                           prose-headings:font-black prose-headings:text-gold prose-headings:uppercase prose-headings:tracking-widest
+                           prose-p:text-cream-dim prose-p:leading-relaxed prose-p:text-lg
+                           prose-img:rounded-2xl prose-img:border-2 prose-img:border-cb-border
+                           prose-blockquote:border-l-4 prose-blockquote:border-gold prose-blockquote:bg-surface prose-blockquote:p-8 prose-blockquote:rounded-r-2xl prose-blockquote:italic
+                           prose-a:text-gold prose-a:font-black prose-a:no-underline hover:prose-a:underline
+                           prose-strong:text-gold prose-strong:font-black
+                           prose-code:text-gold prose-code:bg-surface prose-code:px-2 prose-code:rounded
+                           prose-pre:bg-ink prose-pre:border-2 prose-pre:border-cb-border prose-pre:rounded-2xl"
+                dangerouslySetInnerHTML={{ __html: post.content }}
               />
-            </svg>
-            Back to Blog
-          </button>
+            </div>
+          </GlassCard>
+        </motion.article>
+
+        {/* Back to Blog Button */}
+        <div className="mt-12 text-center">
+          <GoldButton
+            onClick={() => window.history.back()}
+            icon={<ArrowLeft className="w-5 h-5" />}
+          >
+            Back to Insights
+          </GoldButton>
         </div>
       </div>
-    </div>
+    </PageSection>
   );
 };
 

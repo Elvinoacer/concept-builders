@@ -71,7 +71,7 @@ const DesignHeader = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
@@ -83,26 +83,26 @@ const DesignHeader = ({
     },
   };
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut",
       },
     },
   };
 
-  const descriptionVariants = {
+  const descriptionVariants: any = {
     collapsed: {
       height: "6rem", // Increased slightly for better readability
-      transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+      transition: { duration: 0.5, ease: "easeInOut" },
     },
     expanded: {
       height: "auto",
-      transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+      transition: { duration: 0.5, ease: "easeInOut" },
     },
   };
 
@@ -116,7 +116,7 @@ const DesignHeader = ({
       animate="visible"
     >
       <motion.div
-        className="absolute -top-10 -left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl"
+        className="absolute -top-10 -left-10 w-32 h-32 bg-gold/5 rounded-full blur-3xl"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5, duration: 1 }}
@@ -124,10 +124,11 @@ const DesignHeader = ({
 
       <div className="relative">
         <motion.h1
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-[1.1]"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold tracking-tight mb-6 leading-[1.1]"
           variants={itemVariants}
+          style={{ fontFamily: 'var(--font-cormorant-garamond), "Cormorant Garamond", serif' }}
         >
-          <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
+          <span className="text-cream">
             {name}
           </span>
         </motion.h1>
@@ -146,13 +147,13 @@ const DesignHeader = ({
                 : "expanded"
             }
           >
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 leading-relaxed font-light tracking-wide">
+            <p className="text-lg sm:text-xl text-cream-dim leading-relaxed font-light tracking-wide">
               {description}
             </p>
 
             {shouldTruncate && !isExpanded && (
               <motion.div
-                className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent dark:from-gray-900 dark:via-gray-900/90"
+                className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-ink via-ink/95 to-transparent"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
@@ -163,7 +164,7 @@ const DesignHeader = ({
           {shouldTruncate && (
             <motion.button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-2 mt-4 text-primary hover:text-primary/80 transition-colors duration-300 group font-medium"
+              className="flex items-center gap-2 mt-4 text-gold hover:text-gold-light transition-colors duration-300 group font-medium"
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -187,13 +188,13 @@ const DesignHeader = ({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.6 }}
         >
-          <div className="px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-slate-700">
+          <div className="px-4 py-1.5 rounded-full bg-surface text-cream-dim text-sm font-medium border border-cb-border">
             Architectural Design
           </div>
-          <div className="px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-slate-700">
+          <div className="px-4 py-1.5 rounded-full bg-surface text-cream-dim text-sm font-medium border border-cb-border">
             Premium Quality
           </div>
-          <div className="px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-slate-700">
+          <div className="px-4 py-1.5 rounded-full bg-surface text-cream-dim text-sm font-medium border border-cb-border">
             Instant Download
           </div>
         </motion.div>

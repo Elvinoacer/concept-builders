@@ -45,12 +45,8 @@ module.exports = {
         "border-gold": "var(--border-gold)",
         primary: {
           DEFAULT: "hsl(var(--primary))",
-          dark: "#0f82bd",
           foreground: "hsl(var(--primary-foreground))",
         },
-        "background-light": "#f6f7f8",
-        "background-dark": "#101c22",
-        "dark-blue": "#0B2545",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

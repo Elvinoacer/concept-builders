@@ -32,7 +32,7 @@ const FloorPlan = ({
     setIsZoomed(!isZoomed);
   };
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0, y: 50 },
     visible: {
       opacity: 1,
@@ -40,12 +40,12 @@ const FloorPlan = ({
       transition: {
         duration: 0.8,
         delay: index * 0.3,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut",
       },
     },
   };
 
-  const imageVariants = {
+  const imageVariants: any = {
     hidden: { scale: 0.8, opacity: 0 },
     visible: {
       scale: 1,
@@ -80,10 +80,10 @@ const FloorPlan = ({
           transition={{ duration: 0.6, delay: 0.4 + index * 0.3 }}
         >
           <div className="min-w-0">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 sm:mb-2">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-cream mb-1 sm:mb-2">
               {designDetailPageData.floorPlan.previewTitle}
             </h2>
-            <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 line-clamp-2">
+            <p className="text-xs sm:text-sm md:text-base text-cream-dim line-clamp-2">
               Detailed architectural floor plan with measurements and
               annotations
             </p>
@@ -97,7 +97,7 @@ const FloorPlan = ({
           >
             <motion.button
               onClick={toggleZoom}
-              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl md:rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-all duration-300 shadow-md sm:shadow-lg hover:shadow-lg sm:hover:shadow-xl text-xs sm:text-sm"
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl md:rounded-2xl bg-card/80 backdrop-blur-sm border border-cb-border text-cream hover:bg-gold hover:border-gold hover:text-ink transition-all duration-300 shadow-xl text-xs sm:text-sm font-bold"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -112,7 +112,7 @@ const FloorPlan = ({
         </motion.div>
 
         <motion.div
-          className="relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl md:rounded-3xl shadow-lg sm:shadow-xl md:shadow-2xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden group"
+          className="relative bg-card rounded-xl sm:rounded-2xl md:rounded-3xl shadow-2xl border-2 border-cb-border overflow-hidden group"
           variants={imageVariants}
           whileHover={{ y: -2, scale: 1.01 }}
           transition={{ duration: 0.3 }}
@@ -127,7 +127,7 @@ const FloorPlan = ({
               >
                 <div className="text-center">
                   <motion.div
-                    className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 border-4 border-primary/20 border-t-primary rounded-full mb-2 sm:mb-3 md:mb-4 mx-auto"
+                    className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 border-4 border-gold/20 border-t-gold rounded-full mb-2 sm:mb-3 md:mb-4 mx-auto"
                     animate={{ rotate: 360 }}
                     transition={{
                       duration: 1,
@@ -167,7 +167,7 @@ const FloorPlan = ({
           </AnimatePresence>
 
           <motion.div
-            className={`relative w-full h-[250px] xs:h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] xl:h-[600px] bg-gray-100 dark:bg-gray-900 cursor-${isZoomed ? "zoom-out" : "zoom-in"} transition-all duration-500`}
+            className={`relative w-full h-[250px] xs:h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] xl:h-[600px] bg-surface cursor-${isZoomed ? "zoom-out" : "zoom-in"} transition-all duration-500`}
             variants={zoomVariants}
             initial="initial"
             animate={isZoomed ? "zoomed" : "initial"}
@@ -228,49 +228,49 @@ const FloorPlan = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 + index * 0.3 }}
         >
-          <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl md:rounded-2xl bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-700/30">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-800 flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-blue-600 dark:text-blue-400 text-sm sm:text-base">
+          <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl md:rounded-2xl bg-gold/5 border border-gold/20">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
+              <span className="material-symbols-outlined text-gold text-sm sm:text-base">
                 square_foot
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-cream-dim">
                 Total Area
               </p>
-              <p className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base">
+              <p className="font-bold text-cream text-sm sm:text-base">
                 {design.area} sq ft
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl md:rounded-2xl bg-green-50/50 dark:bg-green-900/20 border border-green-200/50 dark:border-green-700/30">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-green-100 dark:bg-green-800 flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-sm sm:text-base">
+          <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl md:rounded-2xl bg-gold/5 border border-gold/20">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
+              <span className="material-symbols-outlined text-gold text-sm sm:text-base">
                 door_front
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-cream-dim">
                 Bedrooms
               </p>
-              <p className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base">
+              <p className="font-bold text-cream text-sm sm:text-base">
                 {design.bedrooms}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl md:rounded-2xl bg-amber-50/50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-700/30">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-amber-100 dark:bg-amber-800 flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-sm sm:text-base">
+          <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl md:rounded-2xl bg-gold/5 border border-gold/20">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
+              <span className="material-symbols-outlined text-gold text-sm sm:text-base">
                 bathtub
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-cream-dim">
                 Bathrooms
               </p>
-              <p className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base">
+              <p className="font-bold text-cream text-sm sm:text-base">
                 {design.bathrooms}
               </p>
             </div>
@@ -278,39 +278,39 @@ const FloorPlan = ({
         </motion.div>
 
         <motion.div
-          className="mt-4 sm:mt-6 md:mt-8 p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl md:rounded-2xl bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50"
+          className="mt-4 sm:mt-6 md:mt-8 p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl md:rounded-2xl bg-surface/80 backdrop-blur-sm border border-cb-border"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1 + index * 0.3 }}
         >
-          <h4 className="text-base sm:text-lg md:text-xl font-bold text-slate-800 dark:text-white mb-2 sm:mb-3 md:mb-4 flex items-center gap-1 sm:gap-2">
-            <span className="material-symbols-outlined text-primary text-sm sm:text-base">
+          <h4 className="text-base sm:text-lg md:text-xl font-bold text-cream mb-2 sm:mb-3 md:mb-4 flex items-center gap-1 sm:gap-2">
+            <span className="material-symbols-outlined text-gold text-sm sm:text-base">
               precision_manufacturing
             </span>
             Technical Specifications
           </h4>
           <div className="grid grid-cols-2 xs:grid-cols-4 gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm">
             <div>
-              <p className="text-gray-600 dark:text-gray-400">Scale</p>
-              <p className="font-semibold text-slate-800 dark:text-white">
+              <p className="text-cream-dim">Scale</p>
+              <p className="font-bold text-cream">
                 1:100
               </p>
             </div>
             <div>
-              <p className="text-gray-600 dark:text-gray-400">Format</p>
-              <p className="font-semibold text-slate-800 dark:text-white">
+              <p className="text-cream-dim">Format</p>
+              <p className="font-bold text-cream">
                 Vector PDF
               </p>
             </div>
             <div>
-              <p className="text-gray-600 dark:text-gray-400">Dimensions</p>
-              <p className="font-semibold text-slate-800 dark:text-white">
+              <p className="text-cream-dim">Dimensions</p>
+              <p className="font-bold text-cream">
                 A1 Size
               </p>
             </div>
             <div>
-              <p className="text-gray-600 dark:text-gray-400">Resolution</p>
-              <p className="font-semibold text-slate-800 dark:text-white">
+              <p className="text-cream-dim">Resolution</p>
+              <p className="font-bold text-cream">
                 300 DPI
               </p>
             </div>

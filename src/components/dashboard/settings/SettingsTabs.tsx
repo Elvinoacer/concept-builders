@@ -19,9 +19,9 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
   ];
 
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+    <div className="border-b border-cb-border bg-surface">
       <nav
-        className="flex space-x-1 p-2 overflow-x-auto whitespace-nowrap custom-scrollbar"
+        className="flex space-x-1 p-2 overflow-x-auto whitespace-nowrap styled-scrollbar"
         role="tablist"
         aria-label="Settings Tabs"
       >
@@ -37,8 +37,8 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
               onClick={() => setActiveTab(tab.id)}
               className={`relative flex items-center gap-2 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 ${
                 activeTab === tab.id
-                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-700/50"
+                  ? "bg-card text-cream shadow-sm"
+                  : "text-cream-dim hover:text-cream hover:bg-card/50"
               }`}
             >
               <IconComponent className="w-4 h-4 flex-shrink-0" />
@@ -48,7 +48,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
               {activeTab === tab.id && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 border-2 border-blue-500 rounded-xl"
+                  className="absolute inset-0 border-2 border-gold rounded-xl"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
@@ -56,29 +56,6 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
           );
         })}
       </nav>
-
-      {/* Custom Scrollbar Styles */}
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          height: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e0;
-          border-radius: 2px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #a0aec0;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #4a5568;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #718096;
-        }
-      `}</style>
     </div>
   );
 };

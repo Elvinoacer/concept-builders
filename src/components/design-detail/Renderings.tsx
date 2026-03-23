@@ -49,7 +49,7 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
         transition={{ duration: 0.8 }}
       >
         <motion.h2
-          className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4 sm:mb-6 text-center sm:text-left"
+          className="text-2xl sm:text-3xl lg:text-4xl font-black text-gold mb-4 sm:mb-6 text-center sm:text-left"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -57,18 +57,18 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
           {designDetailPageData.renderings.title}
         </motion.h2>
         <motion.div
-          className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 text-center border-2 border-gray-200/50 dark:border-gray-700/50 max-w-4xl mx-auto"
+          className="bg-card/80 backdrop-blur-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 text-center border-2 border-cb-border max-w-4xl mx-auto"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gray-200 dark:bg-gray-700 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
-            <Eye className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-gray-400 dark:text-gray-600" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-surface rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-4 sm:mb-6 border border-cb-border">
+            <Eye className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-gold/40" />
           </div>
-          <h3 className="text-xl sm:text-2xl lg:text-2xl font-bold text-gray-600 dark:text-gray-400 mb-2 sm:mb-3">
+          <h3 className="text-xl sm:text-2xl lg:text-2xl font-black text-cream-dim mb-2 sm:mb-3">
             No Renderings Available
           </h3>
-          <p className="text-gray-500 dark:text-gray-500 text-base sm:text-lg lg:text-lg max-w-md mx-auto leading-relaxed">
+          <p className="text-muted text-base sm:text-lg lg:text-lg max-w-md mx-auto leading-relaxed font-medium">
             3D visualizations and renderings will be available soon for this
             design.
           </p>
@@ -144,7 +144,7 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { opacity: 0, y: 30, scale: 0.9 },
     visible: {
       opacity: 1,
@@ -152,7 +152,7 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
       scale: 1,
       transition: {
         duration: 0.6,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut",
       },
     },
     hover: {
@@ -165,14 +165,14 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
     },
   };
 
-  const modalVariants = {
+  const modalVariants: any = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,
       scale: 1,
       transition: {
         duration: 0.5,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut",
       },
     },
     exit: {
@@ -204,15 +204,15 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
           variants={itemVariants}
         >
           <div className="text-center sm:text-left">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gold mb-2">
               {designDetailPageData.renderings.title}
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg lg:text-lg">
+            <p className="text-cream-dim text-base sm:text-lg lg:xl font-medium">
               High-quality 3D visualizations and architectural renderings
             </p>
           </div>
           <motion.div
-            className="px-3 sm:px-4 py-2 rounded-xl sm:rounded-2xl bg-primary/10 text-primary font-semibold text-sm sm:text-base text-center sm:text-right mx-auto sm:mx-0 w-fit"
+            className="px-3 sm:px-4 py-2 rounded-xl sm:rounded-2xl bg-gold/10 text-gold border border-gold/20 font-bold text-sm sm:text-base text-center sm:text-right mx-auto sm:mx-0 w-fit"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
@@ -232,7 +232,7 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
               key={index}
               variants={itemVariants}
               whileHover={!isMobile ? "hover" : undefined} // Disable hover effects on mobile
-              className="group relative cursor-pointer bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg sm:shadow-2xl border-2 border-gray-200/50 dark:border-gray-700/50 hover:border-primary/30 transition-all duration-500 active:scale-95"
+              className="group relative cursor-pointer bg-card/80 backdrop-blur-md rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border-2 border-cb-border hover:border-gold/30 transition-all duration-500 active:scale-95"
               onClick={() => openRendering(index)}
             >
               {/* Rendering Image */}
@@ -262,15 +262,15 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
                     whileHover={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl sm:rounded-2xl text-slate-800 dark:text-white font-semibold text-xs sm:text-sm">
-                      <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-card/90 backdrop-blur-sm rounded-xl sm:rounded-2xl text-cream font-bold text-xs sm:text-sm border border-cb-border shadow-2xl">
+                      <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-gold" />
                       View Full Screen
                     </div>
                   </motion.div>
 
                   {/* Rendering Number */}
                   <motion.div
-                    className="absolute top-3 sm:top-4 left-3 sm:left-4 px-2 sm:px-3 py-1 rounded-xl sm:rounded-2xl bg-black/50 backdrop-blur-sm text-white text-xs sm:text-sm font-medium"
+                    className="absolute top-3 sm:top-4 left-3 sm:left-4 px-2 sm:px-3 py-1 rounded-xl sm:rounded-2xl bg-ink/60 backdrop-blur-sm text-gold border border-gold/20 text-xs sm:text-sm font-bold"
                     initial={{ opacity: 0, scale: 0.8 }}
                     whileHover={{ opacity: 1, scale: 1 }}
                   >
@@ -287,10 +287,10 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
                 transition={{ delay: 0.2 + index * 0.1 }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">
+                  <span className="text-xs sm:text-sm text-cream-dim font-bold">
                     3D Visualization
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-500 hidden sm:block">
+                  <span className="text-xs text-muted hidden sm:block font-medium">
                     Click to view
                   </span>
                 </div>
@@ -305,57 +305,57 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
           variants={containerVariants}
         >
           <motion.div
-            className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-700/30"
+            className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl bg-card border border-cb-border shadow-xl"
             variants={itemVariants}
           >
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-800 flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-blue-600 dark:text-blue-400 text-xl sm:text-2xl">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-surface flex items-center justify-center flex-shrink-0 border border-cb-border">
+              <span className="material-symbols-outlined text-gold text-xl sm:text-2xl">
                 high_quality
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base">
+              <p className="font-bold text-cream text-sm sm:text-base">
                 4K Resolution
               </p>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+              <p className="text-xs sm:text-sm text-cream-dim truncate font-medium">
                 Ultra-high definition
               </p>
             </div>
           </motion.div>
 
           <motion.div
-            className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl bg-green-50/50 dark:bg-green-900/20 border border-green-200/50 dark:border-green-700/30"
+            className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl bg-card border border-cb-border shadow-xl"
             variants={itemVariants}
           >
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-green-100 dark:bg-green-800 flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-xl sm:text-2xl">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-surface flex items-center justify-center flex-shrink-0 border border-cb-border">
+              <span className="material-symbols-outlined text-gold text-xl sm:text-2xl">
                 light_mode
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base">
+              <p className="font-bold text-cream text-sm sm:text-base">
                 Realistic Lighting
               </p>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+              <p className="text-xs sm:text-sm text-cream-dim truncate font-medium">
                 Natural light simulation
               </p>
             </div>
           </motion.div>
 
           <motion.div
-            className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl bg-purple-50/50 dark:bg-purple-900/20 border border-purple-200/50 dark:border-purple-700/30"
+            className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl bg-card border border-cb-border shadow-xl"
             variants={itemVariants}
           >
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-purple-100 dark:bg-purple-800 flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-purple-600 dark:text-purple-400 text-xl sm:text-2xl">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-surface flex items-center justify-center flex-shrink-0 border border-cb-border">
+              <span className="material-symbols-outlined text-gold text-xl sm:text-2xl">
                 texture
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base">
+              <p className="font-bold text-cream text-sm sm:text-base">
                 HD Textures
               </p>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+              <p className="text-xs sm:text-sm text-cream-dim truncate font-medium">
                 Photorealistic materials
               </p>
             </div>
@@ -371,15 +371,15 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            variants={modalVariants}
+            variants={modalVariants as any}
           >
             {/* Navigation Arrows - Hidden on very small screens, smaller on mobile */}
             {!isMobile && (
               <>
                 <motion.button
                   onClick={previousRendering}
-                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center justify-center z-10"
-                  whileHover={{ scale: 1.1, x: -2 }}
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-14 sm:h-14 rounded-2xl sm:rounded-3xl bg-surface/50 backdrop-blur-md border border-cb-border text-gold hover:bg-surface/80 transition-all duration-300 flex items-center justify-center z-10"
+                  whileHover={{ scale: 1.1, x: -5 }}
                   whileTap={{ scale: 0.9 }}
                   aria-label="Previous image"
                 >
@@ -388,8 +388,8 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
 
                 <motion.button
                   onClick={nextRendering}
-                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center justify-center z-10"
-                  whileHover={{ scale: 1.1, x: 2 }}
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-14 sm:h-14 rounded-2xl sm:rounded-3xl bg-surface/50 backdrop-blur-md border border-cb-border text-gold hover:bg-surface/80 transition-all duration-300 flex items-center justify-center z-10"
+                  whileHover={{ scale: 1.1, x: 5 }}
                   whileTap={{ scale: 0.9 }}
                   aria-label="Next image"
                 >
@@ -401,7 +401,7 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
             {/* Close Button */}
             <motion.button
               onClick={closeRendering}
-              className="absolute top-2 sm:top-3 lg:top-4 right-2 sm:right-3 lg:right-4 w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center justify-center z-10"
+              className="absolute top-2 sm:top-3 lg:top-4 right-2 sm:right-3 lg:right-4 w-10 h-10 sm:w-14 sm:h-14 rounded-2xl sm:rounded-3xl bg-surface/50 backdrop-blur-md border border-cb-border text-gold hover:bg-surface/80 transition-all duration-300 flex items-center justify-center z-10"
               whileHover={{ scale: 1.1, rotate: 90 }}
               whileTap={{ scale: 0.9 }}
               aria-label="Close viewer"
@@ -412,7 +412,7 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
             {/* Zoom Control */}
             <motion.button
               onClick={() => setIsZoomed(!isZoomed)}
-              className="absolute top-2 sm:top-3 lg:top-4 left-2 sm:left-3 lg:left-4 w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center justify-center z-10"
+              className="absolute top-2 sm:top-3 lg:top-4 left-2 sm:left-3 lg:left-4 w-10 h-10 sm:w-14 sm:h-14 rounded-2xl sm:rounded-3xl bg-surface/50 backdrop-blur-md border border-cb-border text-gold hover:bg-surface/80 transition-all duration-300 flex items-center justify-center z-10"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               aria-label={isZoomed ? "Zoom out" : "Zoom in"}
@@ -426,7 +426,7 @@ const Renderings = ({ renderings }: { renderings: { url: string }[] }) => {
 
             {/* Image Counter */}
             <motion.div
-              className="absolute top-2 sm:top-3 lg:top-4 left-1/2 -translate-x-1/2 px-3 sm:px-4 py-1 sm:py-2 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold text-xs sm:text-sm"
+              className="absolute top-2 sm:top-3 lg:top-4 left-1/2 -translate-x-1/2 px-3 sm:px-6 py-1 sm:py-3 rounded-2xl sm:rounded-3xl bg-surface/50 backdrop-blur-md border border-cb-border text-gold font-bold text-xs sm:text-sm"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}

@@ -56,10 +56,10 @@ const Charts = ({ stats, monthlySales, clientAcquisition }) => {
 
   const totalClients = clientAcquisition.reduce(
     (acc, curr) => acc + curr.count,
-    0
+    0,
   );
   const maxClientCount = Math.max(
-    ...clientAcquisition.map((source) => source.count)
+    ...clientAcquisition.map((source) => source.count),
   );
 
   return (
@@ -105,7 +105,7 @@ const Charts = ({ stats, monthlySales, clientAcquisition }) => {
               <Line
                 type="monotone"
                 dataKey="sales"
-                stroke="#8884d8"
+                stroke="hsl(var(--chart-1))"
                 activeDot={{ r: 8 }}
               />
             </LineChart>

@@ -92,16 +92,16 @@ const ReferralSettings = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64 animate-pulse"></div>
+        <div className="h-6 bg-surface rounded w-48 animate-pulse"></div>
+        <div className="h-4 bg-surface rounded w-64 animate-pulse"></div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="bg-gray-200 dark:bg-gray-700 rounded-xl p-4 animate-pulse"
+              className="bg-surface rounded-xl p-4 animate-pulse"
             >
-              <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-20 mb-2"></div>
-              <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-16"></div>
+              <div className="h-4 bg-ink rounded w-20 mb-2"></div>
+              <div className="h-6 bg-ink rounded w-16"></div>
             </div>
           ))}
         </div>
@@ -112,18 +112,18 @@ const ReferralSettings = () => {
   if (!referralInfo) {
     return (
       <div className="text-center py-8">
-        <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Users className="w-8 h-8 text-red-500 dark:text-red-400" />
+        <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Users className="w-8 h-8 text-destructive" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-lg font-semibold text-cream mb-2">
           Failed to Load
         </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-cream-dim mb-4">
           Unable to load referral information
         </p>
         <button
           onClick={fetchReferralInfo}
-          className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-6 py-2 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+          className="bg-gold text-ink px-6 py-2 rounded-xl font-semibold hover:bg-gold-light transition-all"
         >
           Try Again
         </button>
@@ -138,14 +138,14 @@ const ReferralSettings = () => {
       transition={{ duration: 0.3 }}
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-          <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <div className="p-2 bg-gold/10 rounded-lg">
+          <Users className="w-5 h-5 text-gold" />
         </div>
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-xl sm:text-2xl font-bold text-cream">
             Referral Program
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">
+          <p className="text-cream-dim mt-1 text-sm sm:text-base">
             Share your referral code and earn rewards with friends
           </p>
         </div>
@@ -153,8 +153,8 @@ const ReferralSettings = () => {
 
       <div className="space-y-6">
         {/* Referral Code */}
-        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+        <div className="bg-gold/5 rounded-2xl p-6 border border-border-gold">
+          <h3 className="text-lg font-semibold text-cream mb-3">
             Your Referral Code
           </h3>
           <div className="flex flex-col sm:flex-row gap-3">
@@ -163,14 +163,14 @@ const ReferralSettings = () => {
                 type="text"
                 readOnly
                 value={referralInfo.referralCode}
-                className="w-full rounded-xl border border-blue-300 dark:border-blue-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-lg font-bold h-14 px-4"
+                className="w-full rounded-xl border border-border-gold bg-surface text-cream font-mono text-lg font-bold h-14 px-4"
               />
             </div>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleCopy}
-              className="flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold shadow-sm hover:shadow-md transition-all min-w-[120px]"
+              className="flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-gold text-ink font-semibold shadow-sm hover:bg-gold-light hover:shadow-md transition-all min-w-[120px]"
             >
               {copied ? (
                 <Check className="w-5 h-5" />
@@ -182,7 +182,7 @@ const ReferralSettings = () => {
           </div>
 
           {referralInfo.referredByCode && (
-            <p className="text-sm text-blue-700 dark:text-blue-300 mt-3">
+            <p className="text-sm text-gold mt-3">
               You were referred by:{" "}
               <strong>{referralInfo.referredByCode}</strong>
             </p>
@@ -191,38 +191,38 @@ const ReferralSettings = () => {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600 text-center">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mx-auto mb-3">
-              <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="bg-card rounded-xl p-4 border border-cb-border text-center">
+            <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <Users className="w-5 h-5 text-gold" />
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-cream">
               {referralInfo._count.referredUsers}
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-cream-dim">
               Referred Users
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600 text-center">
-            <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mx-auto mb-3">
-              <Gift className="w-5 h-5 text-green-600 dark:text-green-400" />
+          <div className="bg-card rounded-xl p-4 border border-cb-border text-center">
+            <div className="w-10 h-10 bg-emerald-900/30 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <Gift className="w-5 h-5 text-emerald-400" />
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-cream">
               Ksh {referralInfo.referralBonus.toFixed(2)}
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-cream-dim">
               Pending Bonus
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600 text-center">
-            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mx-auto mb-3">
-              <DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+          <div className="bg-card rounded-xl p-4 border border-cb-border text-center">
+            <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <DollarSign className="w-5 h-5 text-gold" />
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-cream">
               Ksh {referralInfo.referralBonusConverted.toFixed(2)}
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-cream-dim">
               Converted Bonus
             </p>
           </div>
@@ -230,8 +230,8 @@ const ReferralSettings = () => {
 
         {/* Apply Referral Code */}
         {!referralInfo.referredByCode && (
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+          <div className="bg-surface rounded-2xl p-6 border border-cb-border">
+            <h3 className="text-lg font-semibold text-cream mb-3">
               Have a referral code?
             </h3>
             <form
@@ -244,7 +244,7 @@ const ReferralSettings = () => {
                   placeholder="Enter referral code"
                   value={refereeCodeInput}
                   onChange={(e) => setRefereeCodeInput(e.target.value)}
-                  className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-base h-12 px-4"
+                  className="w-full rounded-xl border border-cb-border bg-card text-cream shadow-sm focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all text-base h-12 px-4"
                   disabled={applyingCode}
                   required
                 />
@@ -254,7 +254,7 @@ const ReferralSettings = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={applyingCode}
-                className="flex items-center justify-center gap-2 rounded-xl h-12 px-6 bg-gradient-to-r from-green-600 to-emerald-400 text-white font-semibold shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                className="flex items-center justify-center gap-2 rounded-xl h-12 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
               >
                 {applyingCode ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -268,21 +268,21 @@ const ReferralSettings = () => {
         )}
 
         {/* Information */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
-          <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">
+        <div className="bg-gold/5 rounded-2xl p-6 border border-border-gold">
+          <h3 className="text-lg font-semibold text-cream mb-3">
             How it Works
           </h3>
-          <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
+          <ul className="text-sm text-cream-dim space-y-2">
             <li className="flex items-start gap-3">
-              <TrendingUp className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <TrendingUp className="w-4 h-4 mt-0.5 flex-shrink-0 text-gold" />
               Share your referral code with friends and family
             </li>
             <li className="flex items-start gap-3">
-              <Gift className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <Gift className="w-4 h-4 mt-0.5 flex-shrink-0 text-gold" />
               Earn bonuses when they make purchases
             </li>
             <li className="flex items-start gap-3">
-              <DollarSign className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <DollarSign className="w-4 h-4 mt-0.5 flex-shrink-0 text-gold" />
               Bonuses convert to KES after purchase completion
             </li>
           </ul>

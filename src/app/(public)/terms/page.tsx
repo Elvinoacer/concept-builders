@@ -1,19 +1,18 @@
 "use client";
 import { terms } from "@/lib/terms-data";
-import { motion } from "framer-motion";
-import {
-  FileText,
-  Calendar,
-  Scale,
-  ArrowLeft,
-  Download,
-  Mail,
-  Shield,
-  CheckCircle2,
-  AlertTriangle,
+import { motion, AnimatePresence, Variants } from "framer-motion";
+import { 
+  FileText, Calendar, Scale, ArrowLeft, Download, 
+  Mail, Shield, CheckCircle2, AlertTriangle 
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import PageSection from "@/components/ui-premium/page-section";
+import SectionHeading from "@/components/ui-premium/section-heading";
+import GlassCard from "@/components/ui-premium/glass-card";
+import GoldButton from "@/components/ui-premium/gold-button";
+import OutlineButton from "@/components/ui-premium/outline-button";
+import { cn } from "@/lib/utils";
 
 const TermsPage = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -71,7 +70,7 @@ const TermsPage = () => {
   };
 
   // Animation variants
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -81,7 +80,7 @@ const TermsPage = () => {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: isMobile ? 10 : 20 },
     visible: {
       opacity: 1,
@@ -93,7 +92,7 @@ const TermsPage = () => {
     },
   };
 
-  const headerVariants = {
+  const headerVariants: Variants = {
     hidden: { opacity: 0, y: -20 },
     visible: {
       opacity: 1,
@@ -123,7 +122,7 @@ const TermsPage = () => {
     return content.split("\n\n").map((paragraph, pIndex) => (
       <motion.p
         key={pIndex}
-        className="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4"
+        className="text-base leading-relaxed text-cream-dim mb-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 * pIndex }}
@@ -134,58 +133,37 @@ const TermsPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
-      <div className="px-3 xs:px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-4xl mx-auto">
-        {/* Back Navigation */}
-        <motion.div
-          className="mb-6 sm:mb-8"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 hover:border-teal-500/50 hover:text-teal-600 dark:hover:text-teal-400 rounded-2xl font-medium transition-all duration-300 group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
-            Back to Home
-          </Link>
-        </motion.div>
-
+    <PageSection variant="ink" className="pt-8 sm:pt-12">
+      <div className="max-w-4xl mx-auto">
         {/* Header Section */}
-        <motion.div
-          className="mb-8 sm:mb-12 text-center"
-          variants={headerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="mb-12 sm:mb-20 text-center">
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-700/30 text-teal-600 dark:text-teal-400 text-sm font-medium mb-4 sm:mb-6"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-[10px] font-black uppercase tracking-[0.2em] mb-8"
           >
             <Scale className="w-4 h-4" />
-            Terms of Service
+            Legal Framework
           </motion.div>
 
-          <motion.h1
-            className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-teal-900 bg-clip-text text-transparent dark:from-slate-200 dark:to-teal-400 mb-3 sm:mb-4"
-            variants={headerVariants}
-          >
-            Terms of Service
-          </motion.h1>
+          <SectionHeading
+            title="Terms of Service"
+            subtitle="Please review our operational guidelines and legal agreements carefully."
+            align="center"
+            gradient
+            level={1}
+          />
 
           <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm sm:text-base text-gray-600 dark:text-gray-400"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
+            className="flex flex-wrap items-center justify-center gap-6 mt-8 text-xs font-black text-gold/60 uppercase tracking-widest"
           >
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               <span>
-                Last updated:{" "}
+                Updated:{" "}
                 {new Date().toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
@@ -195,297 +173,192 @@ const TermsPage = () => {
             </div>
             <div className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              <span>{terms.length} sections</span>
+              <span>{terms.length} Governance Articles</span>
             </div>
           </motion.div>
-        </motion.div>
+        </div>
 
         {/* Important Notice */}
         {!hasAccepted && (
           <motion.div
-            className="mb-8 bg-amber-50/80 dark:bg-amber-900/20 border-2 border-amber-200/50 dark:border-amber-700/30 rounded-2xl p-4 sm:p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            className="mb-12"
           >
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <h3 className="text-amber-900 dark:text-amber-100 font-semibold mb-2">
-                  Important Legal Notice
-                </h3>
-                <p className="text-amber-800 dark:text-amber-200 text-sm leading-relaxed">
-                  Please read these terms carefully before using our services.
-                  By accessing or using Concept Builders, you agree to be bound
-                  by these terms and our Privacy Policy.
-                </p>
+            <GlassCard className="p-6 border-gold/30 bg-gold/5" hover={false}>
+              <div className="flex items-start gap-4">
+                <AlertTriangle className="w-6 h-6 text-gold flex-shrink-0" />
+                <div>
+                  <h3 className="text-gold font-black uppercase tracking-tight mb-2">
+                    Critical Agreement
+                  </h3>
+                  <p className="text-cream text-sm leading-relaxed font-medium">
+                    By engaging with Concept Builders, you enter into a binding legal contract. 
+                    Ensure full comprehension of these articles before proceeding.
+                  </p>
+                </div>
               </div>
-            </div>
+            </GlassCard>
           </motion.div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Navigation - Desktop */}
-          {!isMobile && (
-            <motion.div
-              className="lg:w-64 flex-shrink-0"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <div className="sticky top-24 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-200/50 dark:border-gray-700/50">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          {/* Quick Nav - Desktop */}
+          <aside className="hidden lg:block lg:w-72 flex-shrink-0">
+            <div className="sticky top-32">
+              <GlassCard className="p-8" hover={false}>
+                <h3 className="text-sm font-black text-gold uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
                   <FileText className="w-4 h-4" />
-                  Quick Navigation
+                  Index
                 </h3>
-                <nav className="space-y-2">
+                <nav className="space-y-3">
                   {terms.map((section, index) => (
                     <button
                       key={index}
                       onClick={() => scrollToSection(index)}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      className={cn(
+                        "w-full text-left px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border-2",
                         activeSection === index
-                          ? "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-700"
-                          : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
-                      }`}
+                          ? "bg-gold/10 text-gold border-gold/30"
+                          : "text-cream-dim border-transparent hover:border-cb-border hover:text-white"
+                      )}
                     >
                       {section.title}
                     </button>
                   ))}
                 </nav>
 
-                {/* Acceptance Button */}
                 {!hasAccepted && (
-                  <motion.button
+                  <GoldButton
                     onClick={handleAcceptTerms}
-                    className="w-full mt-6 flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-colors duration-200 text-sm"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="w-full mt-10"
+                    icon={<CheckCircle2 className="w-4 h-4" />}
                   >
-                    <CheckCircle2 className="w-4 h-4" />I Accept Terms
-                  </motion.button>
+                    Accept
+                  </GoldButton>
                 )}
-              </div>
-            </motion.div>
-          )}
+              </GlassCard>
+            </div>
+          </aside>
 
           {/* Main Content */}
-          <motion.div
-            className="flex-1"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 shadow-sm border-2 border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex-1 space-y-12">
+            <GlassCard className="p-8 sm:p-12 lg:p-16" hover={false}>
               {/* Introduction */}
-              <motion.section className="mb-8 sm:mb-12" variants={itemVariants}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+              <section className="mb-16">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-gold" />
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
-                    Welcome to Concept Builders
+                  <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+                    Article I: introduction
                   </h2>
                 </div>
-                <div className="text-base sm:text-lg leading-relaxed text-gray-700 dark:text-gray-300 space-y-4">
+                <div className="prose prose-invert max-w-none prose-p:text-cream prose-p:text-lg prose-p:leading-relaxed">
                   <p>
-                    These Terms of Service govern your use of Concept Builders'
-                    website, services, and applications. By accessing or using
-                    our services, you agree to be bound by these terms.
-                  </p>
-                  <p>
-                    Please read these terms carefully as they contain important
-                    information about your legal rights, remedies, and
-                    obligations.
+                    These Terms of Service govern your relationship with Concept Builders. 
+                    Your use of this site confirms your unconditional acceptance of these protocols.
                   </p>
                 </div>
-              </motion.section>
+              </section>
 
-              {/* Terms Sections */}
-              <div className="space-y-8 sm:space-y-12">
+              {/* Sections */}
+              <div className="space-y-16">
                 {terms.map((section, index) => (
-                  <motion.section
+                  <section
                     key={index}
                     id={`section-${index}`}
-                    className="scroll-mt-24"
-                    variants={itemVariants}
+                    className="scroll-mt-32"
                   >
-                    {/* Section Header */}
-                    <div className="flex items-start gap-4 mb-6">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg">
-                        <span className="text-white font-bold text-sm">
+                    <div className="flex items-start gap-6 mb-8 group">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gold border border-gold/50 flex items-center justify-center shadow-xl shadow-gold/10 group-hover:scale-110 transition-transform">
+                        <span className="text-ink font-black text-base italic">
                           {index + 1}
                         </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-900 to-teal-900 bg-clip-text text-transparent dark:from-slate-200 dark:to-teal-400 leading-tight">
+                      <div className="flex-1">
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tight group-hover:text-gold transition-colors duration-500">
                           {section.title}
                         </h2>
-
-                        {/* Progress indicator for mobile */}
-                        {isMobile && (
-                          <div className="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                            <div className="flex-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-teal-500 rounded-full transition-all duration-300"
-                                style={{
-                                  width: `${((index + 1) / terms.length) * 100}%`,
-                                }}
-                              />
-                            </div>
-                            <span>
-                              {index + 1} of {terms.length}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     </div>
 
-                    {/* Section Content */}
-                    <div className="text-base leading-relaxed text-gray-700 dark:text-gray-300 space-y-4 ml-14">
+                    <div className="prose prose-invert max-w-none ml-0 sm:ml-18
+                                    prose-p:text-cream-dim prose-p:text-lg prose-p:leading-relaxed
+                                    prose-strong:text-gold prose-strong:font-black
+                                    prose-ul:marker:text-gold">
                       {formatContent(section.content)}
                     </div>
 
-                    {/* Section Separator */}
                     {index < terms.length - 1 && (
-                      <motion.div
-                        className="pt-6 sm:pt-8 border-t border-gray-200/50 dark:border-gray-700/50 mt-6 sm:mt-8"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                      />
+                      <div className="mt-16 pt-8 border-t border-cb-border/50" />
                     )}
-                  </motion.section>
+                  </section>
                 ))}
               </div>
 
-              {/* Acceptance Section for Mobile */}
-              {isMobile && !hasAccepted && (
-                <motion.div
-                  className="mt-8 bg-teal-50/80 dark:bg-teal-900/20 border-2 border-teal-200/50 dark:border-teal-700/30 rounded-2xl p-6"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  <h3 className="text-lg font-semibold text-teal-900 dark:text-teal-100 mb-3 text-center">
-                    Ready to Continue?
+              {/* Final Acceptance */}
+              {!hasAccepted && (
+                <div className="mt-20 p-8 rounded-3xl bg-gold/5 border-2 border-dashed border-gold/20 text-center">
+                  <h3 className="text-xl font-black text-gold uppercase tracking-widest mb-4">
+                    Acknowledgement
                   </h3>
-                  <p className="text-teal-800 dark:text-teal-200 text-sm text-center mb-4 leading-relaxed">
-                    By accepting our terms, you can fully access all features
-                    and services.
+                  <p className="text-cream font-medium mb-8 max-w-md mx-auto leading-relaxed">
+                    Accessing our premium services requires your formal agreement to these articles.
                   </p>
-                  <motion.button
+                  <GoldButton
                     onClick={handleAcceptTerms}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-colors duration-200 text-base"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="mx-auto"
+                    icon={<CheckCircle2 className="w-5 h-5" />}
                   >
-                    <CheckCircle2 className="w-5 h-5" />I Accept Terms &
-                    Conditions
-                  </motion.button>
-                </motion.div>
-              )}
-
-              {/* Confirmation Message */}
-              {hasAccepted && (
-                <motion.div
-                  className="mt-8 bg-green-50/80 dark:bg-green-900/20 border-2 border-green-200/50 dark:border-green-700/30 rounded-2xl p-6 text-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                >
-                  <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400 mx-auto mb-3" />
-                  <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
-                    Terms Accepted
-                  </h3>
-                  <p className="text-green-800 dark:text-green-200 text-sm">
-                    Thank you for accepting our Terms of Service. You're all set
-                    to use our platform.
-                  </p>
-                </motion.div>
-              )}
-
-              {/* Contact Section */}
-              <motion.section
-                className="mt-12 sm:mt-16"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-              >
-                <div className="bg-gradient-to-r from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 border-2 border-teal-200/50 dark:border-teal-700/30 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">
-                    Questions About Our Terms?
-                  </h3>
-                  <p className="text-gray-700 dark:text-gray-300 text-center mb-6 max-w-2xl mx-auto leading-relaxed">
-                    If you have any questions about these Terms of Service,
-                    please don't hesitate to contact our legal team for
-                    clarification.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <motion.a
-                      href="/contact"
-                      whileHover={{ scale: isMobile ? 1.02 : 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-2xl transition-colors duration-200 text-sm sm:text-base"
-                    >
-                      <Mail className="w-4 h-4" />
-                      Contact Legal Team
-                    </motion.a>
-                    <motion.button
-                      whileHover={{ scale: isMobile ? 1.02 : 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-white/80 dark:bg-gray-700/80 border-2 border-teal-300 dark:border-teal-600 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/30 font-semibold rounded-2xl transition-all duration-200 text-sm sm:text-base"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download Terms
-                    </motion.button>
-                  </div>
+                    Sign Agreement
+                  </GoldButton>
                 </div>
-              </motion.section>
+              )}
+
+              {/* Success State */}
+              <AnimatePresence>
+                {hasAccepted && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mt-12 p-8 rounded-3xl bg-emerald-500/5 border-2 border-emerald-500/20 text-center"
+                  >
+                    <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-black text-emerald-400 uppercase tracking-widest mb-2">
+                      Governance Accepted
+                    </h3>
+                    <p className="text-emerald-400/70 font-medium">
+                      Your clearance has been updated. Access granted.
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </GlassCard>
+
+            {/* Contact Footer */}
+            <div className="mt-12">
+              <GlassCard className="p-10 text-center" hover>
+                <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-4">
+                  Legal Inquiry
+                </h3>
+                <p className="text-cream-dim mb-10 max-w-xl mx-auto font-medium leading-relaxed">
+                  Direct any specific queries regarding these protocols to our specialist console of legal advisors.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <GoldButton icon={<Mail className="w-5 h-5" />}>
+                    Legal Consultant
+                  </GoldButton>
+                  <OutlineButton icon={<Download className="w-5 h-5" />}>
+                    Protocol PDF
+                  </OutlineButton>
+                </div>
+              </GlassCard>
             </div>
-          </motion.div>
-        </div>
-
-        {/* Back to Top for mobile */}
-        {isMobile && (
-          <motion.button
-            className="fixed bottom-6 right-6 w-12 h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl shadow-lg flex items-center justify-center z-50"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 10l7-7m0 0l7 7m-7-7v18"
-              />
-            </svg>
-          </motion.button>
-        )}
-
-        {/* Reading Progress Bar for mobile */}
-        {isMobile && (
-          <div className="fixed top-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 z-40">
-            <motion.div
-              className="h-full bg-gradient-to-r from-teal-500 to-teal-600"
-              initial={{ width: "0%" }}
-              animate={{
-                width: `${(window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100}%`,
-              }}
-              transition={{ duration: 0.1 }}
-            />
           </div>
-        )}
+        </div>
       </div>
-    </main>
+    </PageSection>
   );
 };
 

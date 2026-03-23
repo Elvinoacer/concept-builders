@@ -43,7 +43,7 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
   const prevTestimonial = () => {
     setDirection(-1);
     setIndex(
-      (prev) => (prev - 1 + featuredFeedback.length) % featuredFeedback.length
+      (prev) => (prev - 1 + featuredFeedback.length) % featuredFeedback.length,
     );
   };
 
@@ -87,12 +87,12 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
 
   if (loading) {
     return (
-      <div className="relative py-8 xs:py-10 sm:py-12 md:py-14 lg:py-16 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 rounded-2xl sm:rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-md sm:shadow-lg">
+      <div className="relative py-8 xs:py-10 sm:py-12 md:py-14 lg:py-16 bg-gradient-to-b from-surface to-ink rounded-2xl sm:rounded-3xl border border-cb-border shadow-md sm:shadow-lg">
         <div className="container mx-auto px-3 xs:px-4 sm:px-5 md:px-6 lg:px-8">
           <div className="text-center">
             <div className="animate-pulse">
-              <div className="h-6 xs:h-7 sm:h-8 bg-gray-300 dark:bg-gray-700 rounded-lg w-48 xs:w-56 sm:w-64 mx-auto mb-3 xs:mb-4"></div>
-              <div className="h-3 xs:h-4 bg-gray-200 dark:bg-gray-800 rounded w-64 xs:w-72 sm:w-80 mx-auto mb-8 xs:mb-10 sm:mb-12"></div>
+              <div className="h-6 xs:h-7 sm:h-8 bg-cb-muted rounded-lg w-48 xs:w-56 sm:w-64 mx-auto mb-3 xs:mb-4"></div>
+              <div className="h-3 xs:h-4 bg-cb-border rounded w-64 xs:w-72 sm:w-80 mx-auto mb-8 xs:mb-10 sm:mb-12"></div>
             </div>
           </div>
         </div>
@@ -107,11 +107,11 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
   const currentFeedback = featuredFeedback[index];
 
   return (
-    <div className="relative bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 2xl:p-12 border border-gray-200/50 dark:border-gray-700/50 shadow-md sm:shadow-lg overflow-hidden">
+    <div className="relative bg-gradient-to-br from-surface to-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 2xl:p-12 border border-cb-border shadow-md sm:shadow-lg overflow-hidden">
       {/* Background Elements - Responsive scaling */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-6 xs:top-8 sm:top-10 -left-4 xs:-left-6 sm:-left-8 w-40 h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-full blur-2xl xs:blur-3xl"></div>
-        <div className="absolute bottom-6 xs:bottom-8 sm:bottom-10 -right-4 xs:-right-6 sm:-right-8 w-40 h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 bg-gradient-to-r from-cyan-400/10 to-blue-500/10 rounded-full blur-2xl xs:blur-3xl"></div>
+        <div className="absolute top-6 xs:top-8 sm:top-10 -left-4 xs:-left-6 sm:-left-8 w-40 h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 bg-gradient-to-r from-gold/10 to-gold-light/10 rounded-full blur-2xl xs:blur-3xl"></div>
+        <div className="absolute bottom-6 xs:bottom-8 sm:bottom-10 -right-4 xs:-right-6 sm:-right-8 w-40 h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 bg-gradient-to-r from-gold-light/10 to-gold/10 rounded-full blur-2xl xs:blur-3xl"></div>
       </div>
 
       <div className="container mx-auto px-3 xs:px-4 sm:px-5 md:px-6 lg:px-8">
@@ -133,10 +133,10 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
                 }}
                 className="absolute w-full h-full flex items-center justify-center px-3 xs:px-4 sm:px-5"
               >
-                <div className="relative bg-white dark:bg-gray-800 p-5 xs:p-6 sm:p-7 md:p-8 lg:p-10 xl:p-12 rounded-xl xs:rounded-2xl lg:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200/60 dark:border-gray-700/50 w-full max-w-full lg:max-w-2xl">
+                <div className="relative bg-card p-5 xs:p-6 sm:p-7 md:p-8 lg:p-10 xl:p-12 rounded-xl xs:rounded-2xl lg:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-cb-border w-full max-w-full lg:max-w-2xl">
                   {/* Quote Icon - Responsive sizing */}
-                  <div className="absolute -top-3 xs:-top-4 -left-3 xs:-left-4 w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-lg xs:rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
-                    <span className="material-symbols-outlined text-white text-lg xs:text-xl sm:text-2xl">
+                  <div className="absolute -top-3 xs:-top-4 -left-3 xs:-left-4 w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-gold to-gold-light rounded-lg xs:rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                    <span className="material-symbols-outlined text-ink text-lg xs:text-xl sm:text-2xl">
                       format_quote
                     </span>
                   </div>
@@ -162,7 +162,7 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-gray-700 dark:text-gray-300 text-sm xs:text-base sm:text-lg md:text-xl leading-relaxed text-center mb-6 xs:mb-7 sm:mb-8 italic font-light line-clamp-4 xs:line-clamp-5 sm:line-clamp-6"
+                    className="text-cream-dim text-sm xs:text-base sm:text-lg md:text-xl leading-relaxed text-center mb-6 xs:mb-7 sm:mb-8 italic font-light line-clamp-4 xs:line-clamp-5 sm:line-clamp-6"
                   >
                     "{currentFeedback.feedback}"
                   </motion.p>
@@ -182,22 +182,22 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
                         }
                         alt={currentFeedback.user?.name || "Anonymous"}
                         fill
-                        className="rounded-lg xs:rounded-xl object-cover border-3 xs:border-4 border-white dark:border-gray-800 shadow-lg"
+                        className="rounded-lg xs:rounded-xl object-cover border-3 xs:border-4 border-ink shadow-lg"
                         sizes="(max-width: 320px) 64px, (max-width: 480px) 72px, 80px"
                         placeholder="blur"
                         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
                       />
                       {/* Online Indicator */}
-                      <div className="absolute bottom-0 right-0 w-2.5 h-2.5 xs:w-3 xs:h-3 bg-green-500 rounded-full border-1.5 xs:border-2 border-white dark:border-gray-800"></div>
+                      <div className="absolute bottom-0 right-0 w-2.5 h-2.5 xs:w-3 xs:h-3 bg-green-500 rounded-full border-1.5 xs:border-2 border-ink"></div>
                     </div>
                     <div>
-                      <p className="font-bold text-lg xs:text-xl sm:text-2xl text-gray-900 dark:text-white mb-0.5 xs:mb-1 line-clamp-1">
+                      <p className="font-bold text-lg xs:text-xl sm:text-2xl text-cream mb-0.5 xs:mb-1 line-clamp-1">
                         {currentFeedback.user?.name || "Anonymous"}
                       </p>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm xs:text-base sm:text-lg mb-1 xs:mb-2 line-clamp-1">
+                      <p className="text-cream-dim text-sm xs:text-base sm:text-lg mb-1 xs:mb-2 line-clamp-1">
                         {currentFeedback.category}
                       </p>
-                      <div className="flex items-center justify-center xs:justify-start text-xs xs:text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-center xs:justify-start text-xs xs:text-sm text-cb-muted">
                         <span className="material-symbols-outlined text-xs xs:text-sm mr-1">
                           schedule
                         </span>
@@ -219,18 +219,18 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
             {/* Navigation Arrows - Responsive positioning and sizing */}
             <button
               onClick={prevTestimonial}
-              className="absolute left-1 xs:left-2 sm:left-3 md:-left-16 lg:-left-20 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-2 xs:p-2.5 sm:p-3 md:p-4 rounded-lg xs:rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-600/50 hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105 sm:hover:scale-110 z-20 group touch-manipulation"
+              className="absolute left-1 xs:left-2 sm:left-3 md:-left-16 lg:-left-20 top-1/2 -translate-y-1/2 bg-card/80 backdrop-blur-md p-2 xs:p-2.5 sm:p-3 md:p-4 rounded-lg xs:rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl border border-cb-border hover:bg-surface transition-all duration-300 hover:scale-105 sm:hover:scale-110 z-20 group touch-manipulation"
             >
-              <span className="material-symbols-outlined text-lg xs:text-xl sm:text-2xl text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-cyan-400">
+              <span className="material-symbols-outlined text-lg xs:text-xl sm:text-2xl text-cream-dim group-hover:text-gold">
                 chevron_left
               </span>
             </button>
 
             <button
               onClick={nextTestimonial}
-              className="absolute right-1 xs:right-2 sm:right-3 md:-right-16 lg:-right-20 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-2 xs:p-2.5 sm:p-3 md:p-4 rounded-lg xs:rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-600/50 hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105 sm:hover:scale-110 z-20 group touch-manipulation"
+              className="absolute right-1 xs:right-2 sm:right-3 md:-right-16 lg:-right-20 top-1/2 -translate-y-1/2 bg-card/80 backdrop-blur-md p-2 xs:p-2.5 sm:p-3 md:p-4 rounded-lg xs:rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl border border-cb-border hover:bg-surface transition-all duration-300 hover:scale-105 sm:hover:scale-110 z-20 group touch-manipulation"
             >
-              <span className="material-symbols-outlined text-lg xs:text-xl sm:text-2xl text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-cyan-400">
+              <span className="material-symbols-outlined text-lg xs:text-xl sm:text-2xl text-cream-dim group-hover:text-gold">
                 chevron_right
               </span>
             </button>
@@ -238,7 +238,7 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
 
           {/* Enhanced Pagination Dots - Responsive sizing */}
           <div className="flex justify-center mt-8 xs:mt-10 sm:mt-12">
-            <div className="flex items-center space-x-2 xs:space-x-3 sm:space-x-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-lg xs:rounded-xl sm:rounded-2xl px-3 xs:px-4 sm:px-5 md:px-6 py-2 xs:py-2.5 sm:py-3 md:py-4 shadow-lg border border-gray-200/50 dark:border-gray-600/50">
+            <div className="flex items-center space-x-2 xs:space-x-3 sm:space-x-4 bg-card/80 backdrop-blur-md rounded-lg xs:rounded-xl sm:rounded-2xl px-3 xs:px-4 sm:px-5 md:px-6 py-2 xs:py-2.5 sm:py-3 md:py-4 shadow-lg border border-cb-border">
               {featuredFeedback.map((_, i) => (
                 <button
                   key={i}
@@ -252,8 +252,8 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
                   <div
                     className={`w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                       index === i
-                        ? "bg-gradient-to-r from-blue-500 to-cyan-400 shadow-md xs:shadow-lg"
-                        : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
+                        ? "bg-gradient-to-r from-gold to-gold-light shadow-md xs:shadow-lg"
+                        : "bg-cb-muted hover:bg-cream-dim"
                     }`}
                   />
 
@@ -273,15 +273,10 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
             transition={{ delay: 0.6 }}
             className="text-center mt-6 xs:mt-7 sm:mt-8"
           >
-            <div className="inline-flex items-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-lg xs:rounded-xl sm:rounded-2xl px-3 xs:px-4 sm:px-5 md:px-6 py-2 xs:py-2.5 sm:py-3 shadow-lg border border-gray-200/50 dark:border-gray-600/50">
-              <span className="text-gray-700 dark:text-gray-300 font-semibold text-sm xs:text-base">
-                <span className="text-blue-600 dark:text-cyan-400">
-                  {index + 1}
-                </span>
-                <span className="text-gray-500 dark:text-gray-400">
-                  {" "}
-                  / {featuredFeedback.length}
-                </span>
+            <div className="inline-flex items-center bg-card/80 backdrop-blur-md rounded-lg xs:rounded-xl sm:rounded-2xl px-3 xs:px-4 sm:px-5 md:px-6 py-2 xs:py-2.5 sm:py-3 shadow-lg border border-cb-border">
+              <span className="text-cream-dim font-semibold text-sm xs:text-base">
+                <span className="text-gold">{featuredFeedback.length}+</span>{" "}
+                Happy Clients
               </span>
             </div>
           </motion.div>

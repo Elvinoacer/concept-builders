@@ -41,7 +41,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 
       newSocket.on("userOffline", (userId: string) => {
         setOnlineUsers((prevUsers) =>
-          prevUsers.filter((user) => user !== userId)
+          prevUsers.filter((user) => user !== userId),
         );
       });
 
@@ -76,15 +76,15 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           toastOptions={{
             style: {
               borderRadius: "8px",
-              border: "1px solid #e5e7eb",
+              border: "1px solid var(--border-color)",
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
             },
             classNames: {
-              toast: "bg-white dark:bg-gray-800 text-gray-900 dark:text-white",
+              toast: "bg-card text-cream",
               title: "text-sm font-semibold",
               description: "text-sm",
-              actionButton: "bg-blue-500 text-white",
-              cancelButton: "bg-gray-500 text-white",
+              actionButton: "bg-gold text-ink",
+              cancelButton: "bg-muted text-cream",
             },
           }}
         />

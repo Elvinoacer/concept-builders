@@ -164,7 +164,7 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 dark:from-gray-900 dark:via-blue-950/20 dark:to-cyan-950/10">
+    <div className="min-h-screen bg-ink">
       {/* Header */}
       <header className="relative h-40 xs:h-48 sm:h-56 md:h-64 rounded-b-2xl flex items-center justify-center text-center text-white overflow-hidden">
         <Image
@@ -202,8 +202,8 @@ export default function CategoriesPage() {
               <FiSearch
                 className={`absolute left-3 xs:left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-200 z-10 ${
                   isSearchFocused
-                    ? "text-blue-600 dark:text-blue-400"
-                    : "text-gray-400 dark:text-gray-500"
+                    ? "text-gold"
+                    : "text-muted"
                 }`}
                 size={18}
               />
@@ -216,20 +216,20 @@ export default function CategoriesPage() {
                 }}
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setIsSearchFocused(false)}
-                className="pl-10 xs:pl-12 pr-4 py-2.5 xs:py-3 text-base border-2 border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl xs:rounded-2xl shadow-sm hover:shadow-md focus:shadow-lg transition-all duration-300 focus:border-blue-500 dark:focus:border-blue-400 w-full"
+                className="pl-10 xs:pl-12 pr-4 py-2.5 xs:py-3 text-base border-2 border-cb-border bg-surface backdrop-blur-sm rounded-xl xs:rounded-2xl shadow-sm hover:shadow-md focus:shadow-lg transition-all duration-300 focus:border-gold w-full text-cream placeholder:text-muted"
               />
             </div>
           </div>
 
           {/* View Mode Toggle */}
           <div className="flex items-center justify-end xs:justify-start gap-2">
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-1 flex">
+            <div className="bg-surface rounded-xl border border-cb-border p-1 flex">
               <button
                 onClick={() => setViewMode("grid")}
                 className={`p-2 rounded-lg transition-all duration-200 ${
                   viewMode === "grid"
-                    ? "bg-blue-500 text-white shadow-sm"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    ? "bg-gold text-ink shadow-sm"
+                    : "text-muted hover:text-cream"
                 }`}
               >
                 <FiGrid size={18} />
@@ -238,8 +238,8 @@ export default function CategoriesPage() {
                 onClick={() => setViewMode("list")}
                 className={`p-2 rounded-lg transition-all duration-200 ${
                   viewMode === "list"
-                    ? "bg-blue-500 text-white shadow-sm"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    ? "bg-gold text-ink shadow-sm"
+                    : "text-muted hover:text-cream"
                 }`}
               >
                 <FiList size={18} />
@@ -251,21 +251,21 @@ export default function CategoriesPage() {
         {/* Error State */}
         {error && (
           <div className="text-center py-8">
-            <div className="max-w-md mx-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 xs:p-6">
-              <div className="w-10 h-10 xs:w-12 xs:h-12 mx-auto mb-3 xs:mb-4 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center">
-                <span className="text-red-600 dark:text-red-400 text-lg xs:text-xl">
+            <div className="max-w-md mx-auto bg-destructive/10 border border-destructive/20 rounded-xl p-4 xs:p-6">
+              <div className="w-10 h-10 xs:w-12 xs:h-12 mx-auto mb-3 xs:mb-4 bg-destructive/20 rounded-full flex items-center justify-center">
+                <span className="text-destructive text-lg xs:text-xl">
                   ⚠️
                 </span>
               </div>
-              <h3 className="text-base xs:text-lg font-semibold text-red-800 dark:text-red-300 mb-2">
+              <h3 className="text-base xs:text-lg font-semibold text-destructive mb-2">
                 Error Loading Categories
               </h3>
-              <p className="text-red-600 dark:text-red-400 text-xs xs:text-sm mb-3 xs:mb-4">
+              <p className="text-destructive/80 text-xs xs:text-sm mb-3 xs:mb-4">
                 {error}
               </p>
               <button
                 onClick={fetchCategories}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 text-xs xs:text-sm"
+                className="px-4 py-2 bg-gold hover:bg-gold-light text-ink rounded-lg transition-colors duration-200 text-xs xs:text-sm font-semibold"
               >
                 Try Again
               </button>
@@ -278,12 +278,12 @@ export default function CategoriesPage() {
           <div className="flex flex-col items-center justify-center h-48 xs:h-56 sm:h-64 gap-3 xs:gap-4">
             <div className="relative">
               <CgSpinner
-                className="animate-spin text-blue-600 dark:text-blue-400"
+                className="animate-spin text-gold"
                 size={40}
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-400 blur-lg opacity-20 animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-gold to-gold-light blur-lg opacity-20 animate-pulse"></div>
             </div>
-            <p className="text-gray-600 dark:text-gray-300 text-base xs:text-lg font-medium">
+            <p className="text-cream-dim text-base xs:text-lg font-medium">
               Discovering categories...
             </p>
           </div>
@@ -293,16 +293,16 @@ export default function CategoriesPage() {
         {!isLoading && !error && categories.length === 0 && (
           <div className="text-center py-12 xs:py-16">
             <div className="max-w-xs xs:max-w-sm sm:max-w-md mx-auto">
-              <div className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 mx-auto mb-4 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 mx-auto mb-4 bg-surface rounded-full flex items-center justify-center">
                 <FiSearch
                   size={24}
-                  className="text-gray-500 dark:text-gray-400"
+                  className="text-muted"
                 />
               </div>
-              <h3 className="text-lg xs:text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg xs:text-xl font-semibold text-cream mb-2">
                 No categories found
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base mb-4 xs:mb-6">
+              <p className="text-cream-dim text-sm xs:text-base mb-4 xs:mb-6">
                 {searchQuery
                   ? `No results found for "${searchQuery}". Try adjusting your search terms.`
                   : "No categories available at the moment."}
@@ -310,7 +310,7 @@ export default function CategoriesPage() {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="px-5 xs:px-6 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 text-sm xs:text-base"
+                  className="px-5 xs:px-6 py-2 bg-gold hover:bg-gold-light text-ink rounded-lg transition-colors duration-200 text-sm xs:text-base font-semibold"
                 >
                   Clear search
                 </button>
@@ -333,8 +333,8 @@ export default function CategoriesPage() {
                 <div
                   className={`group cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl rounded-xl xs:rounded-2xl overflow-hidden ${
                     viewMode === "grid"
-                      ? "bg-white dark:bg-gray-800 shadow-md hover:shadow-2xl"
-                      : "bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg flex flex-col sm:flex-row items-stretch"
+                      ? "bg-card border border-cb-border shadow-md hover:shadow-2xl"
+                      : "bg-card border border-cb-border shadow-sm hover:shadow-lg flex flex-col sm:flex-row items-stretch"
                   }`}
                 >
                   <div
@@ -376,7 +376,7 @@ export default function CategoriesPage() {
                   >
                     <div className="flex-1">
                       <h2
-                        className={`font-bold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 ${
+                        className={`font-bold text-cream transition-colors duration-300 group-hover:text-gold ${
                           viewMode === "grid"
                             ? "text-xl xs:text-2xl mb-2"
                             : "text-lg xs:text-xl mb-2 sm:mb-0"
@@ -386,7 +386,7 @@ export default function CategoriesPage() {
                       </h2>
 
                       {viewMode === "list" && (
-                        <p className="text-gray-600 dark:text-gray-300 text-sm xs:text-base line-clamp-2 hidden sm:block">
+                        <p className="text-cream-dim text-sm xs:text-base line-clamp-2 hidden sm:block">
                           {category.description ||
                             `Explore ${category._count?.designs || 0} amazing designs`}
                         </p>
@@ -400,10 +400,10 @@ export default function CategoriesPage() {
                           : ""
                       }`}
                     >
-                      <div className="text-sm xs:text-base text-gray-500 dark:text-gray-400">
+                       <div className="text-sm xs:text-base text-muted">
                         {category._count?.designs || 0} designs
                       </div>
-                      <div className="flex items-center text-blue-600 dark:text-blue-400 font-semibold transition-all duration-300 group-hover:translate-x-1 text-sm xs:text-base">
+                      <div className="flex items-center text-gold font-semibold transition-all duration-300 group-hover:translate-x-1 text-sm xs:text-base">
                         <span>Explore</span>
                         <span className="ml-1 transition-transform duration-300 group-hover:translate-x-1">
                           →
@@ -429,7 +429,7 @@ export default function CategoriesPage() {
                     className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
                       currentPage === 1
                         ? "pointer-events-none opacity-50"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                        : "hover:bg-surface"
                     }`}
                   />
                 </PaginationItem>
@@ -440,7 +440,7 @@ export default function CategoriesPage() {
                     className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
                       currentPage === 1
                         ? "pointer-events-none opacity-50"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                        : "hover:bg-surface"
                     }`}
                   />
                 </PaginationItem>
@@ -461,8 +461,8 @@ export default function CategoriesPage() {
                         isActive={currentPage === page}
                         className={`cursor-pointer text-xs xs:text-sm min-w-[2rem] xs:min-w-[2.5rem] ${
                           currentPage === page
-                            ? "bg-blue-600 text-white"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                            ? "bg-gold text-ink"
+                            : "hover:bg-surface text-cream-dim hover:text-cream"
                         }`}
                       >
                         {page}
@@ -478,7 +478,7 @@ export default function CategoriesPage() {
                     className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
                       totalPages === currentPage
                         ? "pointer-events-none opacity-50"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                        : "hover:bg-surface"
                     }`}
                   />
                 </PaginationItem>
@@ -489,7 +489,7 @@ export default function CategoriesPage() {
                     className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
                       totalPages === currentPage
                         ? "pointer-events-none opacity-50"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                        : "hover:bg-surface"
                     }`}
                   />
                 </PaginationItem>

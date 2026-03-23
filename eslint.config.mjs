@@ -20,6 +20,20 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  {
+    rules: {
+      // Warn on inline hex color usage in JSX style props
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector:
+            "JSXAttribute[name.name='style'] ObjectExpression Property[key.name='color'][value.type='Literal'][value.value=/^#/]",
+          message:
+            "Use a CSS variable token instead of a hardcoded hex color in style prop.",
+        },
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;

@@ -5,8 +5,9 @@ import { Printer, Download, Send } from "lucide-react";
 import Image from "next/image";
 
 const InvoicePage = () => {
-  const { invoiceId } = useParams();
-  const [invoice, setInvoice] = useState(null);
+  const params = useParams();
+  const invoiceId = params?.invoiceId as string;
+  const [invoice, setInvoice] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,19 +34,19 @@ const InvoicePage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex justify-center items-center h-screen bg-ink">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gold"></div>
       </div>
     );
   }
 
   if (!invoice) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen bg-gray-50 dark:bg-gray-900 text-center">
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
+      <div className="flex flex-col justify-center items-center h-screen bg-ink text-center">
+        <h2 className="text-2xl font-semibold text-cream mb-4">
           Invoice Not Found
         </h2>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-cream-dim">
           The invoice you are looking for does not exist or could not be
           retrieved.
         </p>
@@ -58,26 +59,26 @@ const InvoicePage = () => {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="bg-ink min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Invoice Actions */}
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl sm:text-4xl font-bold text-cream">
             Invoice
           </h1>
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 bg-gold text-ink px-4 py-2 rounded-lg hover:bg-gold-light transition-colors"
             >
               <Printer className="w-4 h-4" />
               <span>Print</span>
             </button>
-            <button className="flex items-center gap-2 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+            <button className="flex items-center gap-2 bg-surface text-cream px-4 py-2 rounded-lg hover:bg-card transition-colors">
               <Download className="w-4 h-4" />
               <span>Download PDF</span>
             </button>
-            <button className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            <button className="flex items-center gap-2 bg-surface text-cream-dim px-4 py-2 rounded-lg hover:bg-card transition-colors">
               <Send className="w-4 h-4" />
               <span>Send via Email</span>
             </button>
@@ -87,10 +88,10 @@ const InvoicePage = () => {
         {/* Invoice */}
         <div
           id="invoice-content"
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 md:p-12"
+          className="bg-card rounded-2xl shadow-lg p-8 md:p-12"
         >
           {/* Header */}
-          <div className="flex justify-between items-start pb-8 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-start pb-8 border-b border-cb-border">
             <div>
               <Image
                 src="/images/concept-builders-logo-free-bg.png"
@@ -99,15 +100,15 @@ const InvoicePage = () => {
                 height={40}
                 className="dark:invert"
               />
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-sm text-muted mt-2">
                 123 Design Lane, Archville, 12345
               </p>
             </div>
             <div className="text-right">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+              <h2 className="text-2xl font-bold text-cream">
                 INVOICE
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-muted">
                 # {invoice.invoiceNumber}
               </p>
             </div>
@@ -116,25 +117,25 @@ const InvoicePage = () => {
           {/* Billing Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8">
             <div>
-              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">
+              <h3 className="text-sm font-semibold text-muted uppercase mb-3">
                 Billed To
               </h3>
-              <p className="font-medium text-gray-800 dark:text-white">
+              <p className="font-medium text-cream">
                 {invoice.user.name}
               </p>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-cream-dim">
                 {invoice.user.email}
               </p>
             </div>
             <div className="text-left md:text-right">
-              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">
+              <h3 className="text-sm font-semibold text-muted uppercase mb-3">
                 Invoice Details
               </h3>
-              <p className="text-gray-800 dark:text-white">
+              <p className="text-cream">
                 <span className="font-medium">Date of Issue:</span>{" "}
                 {new Date(invoice.date).toLocaleDateString()}
               </p>
-              <p className="text-gray-800 dark:text-white">
+              <p className="text-cream">
                 <span className="font-medium">Due Date:</span>{" "}
                 {new Date(invoice.dueDate).toLocaleDateString()}
               </p>
@@ -154,17 +155,17 @@ const InvoicePage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50 dark:bg-gray-800">
-                  <th className="p-4 text-sm font-semibold text-gray-600 dark:text-gray-300 rounded-l-lg">
+                <tr className="bg-surface">
+                  <th className="p-4 text-sm font-semibold text-cream-dim rounded-l-lg">
                     Item
                   </th>
-                  <th className="p-4 text-sm font-semibold text-gray-600 dark:text-gray-300 text-center">
+                  <th className="p-4 text-sm font-semibold text-cream-dim text-center">
                     Qty
                   </th>
-                  <th className="p-4 text-sm font-semibold text-gray-600 dark:text-gray-300 text-right">
+                  <th className="p-4 text-sm font-semibold text-cream-dim text-right">
                     Rate
                   </th>
-                  <th className="p-4 text-sm font-semibold text-gray-600 dark:text-gray-300 text-right rounded-r-lg">
+                  <th className="p-4 text-sm font-semibold text-cream-dim text-right rounded-r-lg">
                     Amount
                   </th>
                 </tr>
@@ -173,23 +174,23 @@ const InvoicePage = () => {
                 {invoice.items.map((item) => (
                   <tr
                     key={item.id}
-                    className="border-b border-gray-100 dark:border-gray-800"
+                    className="border-b border-cb-border"
                   >
                     <td className="p-4">
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <p className="font-medium text-cream">
                         {item.name}
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-cream-dim">
                         {item.description}
                       </p>
                     </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-gray-300">
+                    <td className="p-4 text-center text-cream-dim">
                       {item.quantity}
                     </td>
-                    <td className="p-4 text-right text-gray-700 dark:text-gray-300">
+                    <td className="p-4 text-right text-cream-dim">
                       ${item.rate.toFixed(2)}
                     </td>
-                    <td className="p-4 text-right font-medium text-gray-900 dark:text-white">
+                    <td className="p-4 text-right font-medium text-cream">
                       ${(item.quantity * item.rate).toFixed(2)}
                     </td>
                   </tr>
@@ -202,27 +203,27 @@ const InvoicePage = () => {
           <div className="flex justify-end pt-8">
             <div className="w-full max-w-xs">
               <div className="flex justify-between py-2">
-                <span className="text-gray-600 dark:text-gray-300">
+                <span className="text-cream-dim">
                   Subtotal
                 </span>
-                <span className="text-gray-800 dark:text-white">
+                <span className="text-cream">
                   ${invoice.subtotal.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between py-2">
-                <span className="text-gray-600 dark:text-gray-300">
+                <span className="text-cream-dim">
                   Tax ({invoice.taxRate * 100}%)
                 </span>
-                <span className="text-gray-800 dark:text-white">
+                <span className="text-cream">
                   ${invoice.tax.toFixed(2)}
                 </span>
               </div>
-              <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+              <div className="border-t border-cb-border my-2"></div>
               <div className="flex justify-between py-2">
-                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                <span className="text-lg font-bold text-cream">
                   Total
                 </span>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                <span className="text-lg font-bold text-cream">
                   ${invoice.total.toFixed(2)}
                 </span>
               </div>
@@ -230,11 +231,11 @@ const InvoicePage = () => {
           </div>
 
           {/* Footer */}
-          <div className="text-center pt-8 mt-8 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-center pt-8 mt-8 border-t border-cb-border">
+            <p className="text-sm text-cream-dim">
               Thank you for your business!
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+            <p className="text-xs text-muted mt-1">
               Concept Builders | www.conceptbuilders.com |
               support@conceptbuilders.com
             </p>

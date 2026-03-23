@@ -45,46 +45,46 @@ const FaqForm: React.FC<FaqFormProps> = ({ designId, onFaqSubmitted }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="mt-6 sm:mt-8"
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="mt-6 sm:mt-10 p-6 sm:p-8 rounded-2xl bg-card border-2 border-cb-border shadow-2xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
         <div>
           <label
             htmlFor="question"
-            className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="block text-xs sm:text-sm font-bold text-gold uppercase tracking-widest mb-3"
           >
-            Ask a Question
+            Ask a Architectural Question
           </label>
           <div className="mt-1">
             <textarea
               id="question"
               name="question"
-              rows={3}
-              className="block w-full rounded-lg sm:rounded-md border border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white text-xs sm:text-sm p-2 sm:p-3 resize-y min-h-[80px] sm:min-h-[100px]"
+              rows={4}
+              className="block w-full rounded-xl border-2 border-cb-border shadow-inner focus:border-gold focus:ring-gold bg-surface text-cream text-sm sm:text-base p-4 sm:p-5 resize-y min-h-[120px] sm:min-h-[150px] placeholder:text-muted transition-all duration-300 font-medium"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Type your question here..."
+              placeholder="How can we help you with this specific design? Ask about modifications, materials, or structural details..."
             />
           </div>
         </div>
-        <div>
+        <div className="flex justify-end">
           <motion.button
             type="submit"
-            className="inline-flex justify-center rounded-lg sm:rounded-md border border-transparent bg-indigo-600 py-2 px-3 sm:py-2 sm:px-4 text-xs sm:text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed min-h-[36px] sm:min-h-[40px]"
+            className="inline-flex items-center justify-center rounded-xl border border-transparent bg-gold py-3 px-8 sm:py-4 sm:px-10 text-sm sm:text-base font-black text-ink shadow-2xl shadow-gold/20 hover:bg-gold-light focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
             disabled={isSubmitting}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
           >
             {isSubmitting ? (
               <span className="flex items-center">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-3 h-3 border-2 border-white border-t-transparent rounded-full mr-2"
+                  className="w-5 h-5 border-2 border-ink border-t-transparent rounded-full mr-3"
                 />
-                Submitting...
+                Processing Inquiry...
               </span>
             ) : (
               "Submit Question"

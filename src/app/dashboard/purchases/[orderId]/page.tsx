@@ -45,8 +45,8 @@ const UserPurchaseDetailPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
-        <CgSpinner className="animate-spin text-blue-500 text-4xl" />
-        <p className="ml-3 text-gray-600 dark:text-gray-400">Loading purchase details...</p>
+        <CgSpinner className="animate-spin text-gold text-4xl" />
+        <p className="ml-3 text-cream-dim">Loading purchase details...</p>
       </div>
     );
   }
@@ -62,7 +62,7 @@ const UserPurchaseDetailPage = () => {
   if (!order) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
-        <p className="text-gray-600 dark:text-gray-400">Purchase not found.</p>
+        <p className="text-cream-dim">Purchase not found.</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ const UserPurchaseDetailPage = () => {
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Purchase Details #{order.id}</h1>
+        <h1 className="text-3xl font-bold text-cream">Purchase Details #{order.id}</h1>
         <Button variant="outline" onClick={() => window.history.back()}>
           <FiArrowLeft className="mr-2" /> Back to Purchases
         </Button>
@@ -79,38 +79,38 @@ const UserPurchaseDetailPage = () => {
       <Card className="mb-8 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
-            <FiPackage className="text-blue-500" /> Order Summary
+            <FiPackage className="text-gold" /> Order Summary
           </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
-          <p className="flex items-center gap-2"><FiHash className="text-gray-500" /> <strong>Order ID:</strong> {order.id}</p>
-          <p className="flex items-center gap-2"><FiUser className="text-gray-500" /> <strong>Customer:</strong> {order.user?.name || "N/A"} ({order.user?.email || "N/A"})</p>
-          <p className="flex items-center gap-2"><FiCalendar className="text-gray-500" /> <strong>Order Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
-          <p className="flex items-center gap-2"><FiDollarSign className="text-gray-500" /> <strong>Total Amount:</strong> ${order.amount.toFixed(2)}</p>
-          <p className="flex items-center gap-2"><FiCreditCard className="text-gray-500" /> <strong>Payment Gateway:</strong> {order.paymentGateway}</p>
-          <p className="flex items-center gap-2"><FiHash className="text-gray-500" /> <strong>Payment ID:</strong> {order.paymentId}</p>
-          <p className="flex items-center gap-2"><FiTag className="text-gray-500" /> <strong>Discount:</strong> {order.discountCode || "None"} ({order.discountAmount ? `$${order.discountAmount.toFixed(2)}` : "N/A"})</p>
-          <p className="flex items-center gap-2"><FiPackage className="text-gray-500" /> <strong>Status:</strong> {order.status}</p>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-cream-dim">
+          <p className="flex items-center gap-2"><FiHash className="text-muted" /> <strong>Order ID:</strong> {order.id}</p>
+          <p className="flex items-center gap-2"><FiUser className="text-muted" /> <strong>Customer:</strong> {order.user?.name || "N/A"} ({order.user?.email || "N/A"})</p>
+          <p className="flex items-center gap-2"><FiCalendar className="text-muted" /> <strong>Order Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
+          <p className="flex items-center gap-2"><FiDollarSign className="text-muted" /> <strong>Total Amount:</strong> ${order.amount.toFixed(2)}</p>
+          <p className="flex items-center gap-2"><FiCreditCard className="text-muted" /> <strong>Payment Gateway:</strong> {order.paymentGateway}</p>
+          <p className="flex items-center gap-2"><FiHash className="text-muted" /> <strong>Payment ID:</strong> {order.paymentId}</p>
+          <p className="flex items-center gap-2"><FiTag className="text-muted" /> <strong>Discount:</strong> {order.discountCode || "None"} ({order.discountAmount ? `$${order.discountAmount.toFixed(2)}` : "N/A"})</p>
+          <p className="flex items-center gap-2"><FiPackage className="text-muted" /> <strong>Status:</strong> {order.status}</p>
         </CardContent>
       </Card>
 
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
-            <FiFileText className="text-green-500" /> Purchased Items & Files
+            <FiFileText className="text-emerald-400" /> Purchased Items & Files
           </CardTitle>
         </CardHeader>
         <CardContent>
           {order.items.map((item: any) => (
-            <div key={item.id} className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 dark:bg-gray-800">
-              <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">{item.design?.name || "Design Name N/A"} (Qty: {item.quantity})</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Item ID: {item.id}</p>
+            <div key={item.id} className="mb-6 p-4 border rounded-lg shadow-sm bg-surface">
+              <h3 className="text-lg font-semibold mb-2 text-cream">{item.design?.name || "Design Name N/A"} (Qty: {item.quantity})</h3>
+              <p className="text-sm text-cream-dim mb-3">Item ID: {item.id}</p>
 
               <Separator className="my-4" />
 
               <div className="space-y-4">
-                <h4 className="font-medium text-gray-700 dark:text-gray-300">Selected File Types:</h4>
-                <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400">
+                <h4 className="font-medium text-cream-dim">Selected File Types:</h4>
+                <ul className="list-disc list-inside text-sm text-cream-dim">
                   {item.selectedFileTypes.length > 0 ? (
                     item.selectedFileTypes.map((fileType: string) => (
                       <li key={fileType}>{fileType}</li>
@@ -122,8 +122,8 @@ const UserPurchaseDetailPage = () => {
 
                 {item.selectedExtras && Object.keys(item.selectedExtras).length > 0 && (
                   <>
-                    <h4 className="font-medium text-gray-700 dark:text-gray-300 mt-4">Selected Extras:</h4>
-                    <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400">
+                    <h4 className="font-medium text-cream-dim mt-4">Selected Extras:</h4>
+                    <ul className="list-disc list-inside text-sm text-cream-dim">
                       {Object.entries(item.selectedExtras).map(([key, value]: [string, any]) => (
                         <li key={key}><strong>{key}:</strong> {JSON.stringify(value)}</li>
                       ))}
@@ -131,18 +131,18 @@ const UserPurchaseDetailPage = () => {
                   </>
                 )}
 
-                <h4 className="font-medium text-gray-700 dark:text-gray-300 mt-4">Your Files:</h4>
+                <h4 className="font-medium text-cream-dim mt-4">Your Files:</h4>
                 {item.deliveredFiles && item.deliveredFiles.length > 0 ? (
-                  <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400">
+                  <ul className="list-disc list-inside text-sm text-cream-dim">
                     {item.deliveredFiles.map((deliveredFile: any) => (
                       <li key={deliveredFile.id} className="flex items-center justify-between">
                         <span>{deliveredFile.file?.name || "Unknown File"} ({deliveredFile.file?.type})</span>
-                        <a href={deliveredFile.file?.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Download</a>
+                        <a href={deliveredFile.file?.url} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">Download</a>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">No files available yet for this item. Please check back later (typically within 3 business days for custom files).</p>
+                  <p className="text-sm text-cream-dim">No files available yet for this item. Please check back later (typically within 3 business days for custom files).</p>
                 )}
               </div>
             </div>

@@ -1,4 +1,4 @@
-I have a reference HTML file saved at landing_page.html that contains a complete
+I have a reference HTML file saved at public/reference/landing_page.html that contains a complete
 landing page redesign for Concept Builders. Your job is to:
 
 ---

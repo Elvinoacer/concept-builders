@@ -1,0 +1,128 @@
+
+> concept-builders-web@0.1.0 prebuild
+> rm -rf .next
+
+
+> concept-builders-web@0.1.0 build
+> BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA=true prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.16.2) to ./src/generated/prisma in 2.35s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.7 (Turbopack)
+   - Environments: .env
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Turbopack build encountered 1 warnings:
+[next]/internal/font/google/d0b60be57f16ee32-s.woff2
+Error while requesting resource
+Connection timed out when requesting https://fonts.gstatic.com/s/cormorantgaramond/v21/co3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C.woff2
+
+
+
+> Build error occurred
+Error: Turbopack build failed with 4 errors:
+[next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:206:9
+Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
+[0m [90m 204 |[39m   font[33m-[39mdisplay[33m:[39m swap[33m;[39m
+ [90m 205 |[39m   src[33m:[39m url([33m@[39mvercel[33m/[39mturbopack[33m-[39mnext[33m/[39minternal[33m/[39mfont[33m/[39mgoogle[35m/font?{%22url%22:%22https:/[39m[33m/[39mfonts[33m.[39mgstatic[33m.[39mcom[33m/[39ms[33m/[39mcormorantgaramond[33m/[39mv21[33m/[39mco3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C[33m.[39mwoff2[33m%[39m[35m22[39m[33m,[39m[33m%[39m[35m22[39mpreload[33m%[39m[35m22[39m[33m:[39m[36mfalse[39m[33m,[39m[33m%[39m[35m22[39mhas_size_adjust[33m%[39m[35m22[39m[33m:[39m[36mtrue[39m}) format([32m'woff2'[39m)[33m;[39m
+[31m[1m>[22m[39m[90m 206 |[39m   unicode[33m-[39mrange[33m:[39m [33mU[39m[33m+[39m[35m0102[39m[33m-[39m[35m0103[39m[33m,[39m [33mU[39m[33m+[39m[35m0110[39m[33m-[39m[35m0111[39m[33m,[39m [33mU[39m[33m+[39m[35m0128[39m[33m-[39m[35m0129[39m[33m,[39m [33mU[39m[33m+[39m[35m0168[39m[33m-[39m[35m0169[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mA0[39m[33m-[39m[35m01[39m[33mA1[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mAF[39m[33m-[39m[35m01[39m[33mB0[39m[33m,[39m [33mU[39m[33m+[39m[35m0300[39m[33m-[39m[35m0301[39m[33m,[39m [33mU[39m[33m+[39m[35m0303[39m[33m-[39m[35m0304[39m[33m,[39m [33mU[39m[33m+[39m[35m0308[39m[33m-[39m[35m0309[39m[33m,[39m [33mU[39m[33m+[39m[35m0323[39m[33m,[39m [33mU[39m[33m+[39m[35m0329[39m[33m,[39m [33mU[39m[33m+[39m[35m1[39m[33mEA0[39m[33m-[39m[35m1[39m[33mEF9[39m[33m,[39m [33mU[39m[33m+[39m[35m20[39m[33mAB[39m[33m;[39m
+ [90m     |[39m         [31m[1m^[22m[39m
+ [90m 207 |[39m }
+ [90m 208 |[39m [90m/* latin-ext */[39m
+ [90m 209 |[39m [33m@[39mfont[33m-[39mface {[0m
+
+Import map: Resolved by import map
+
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/cormorant_garamond_1dd82d55.module.css
+    [next]/internal/font/google/cormorant_garamond_1dd82d55.js
+    ./src/app/layout.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:251:9
+Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
+[0m [90m 249 |[39m   font[33m-[39mdisplay[33m:[39m swap[33m;[39m
+ [90m 250 |[39m   src[33m:[39m url([33m@[39mvercel[33m/[39mturbopack[33m-[39mnext[33m/[39minternal[33m/[39mfont[33m/[39mgoogle[35m/font?{%22url%22:%22https:/[39m[33m/[39mfonts[33m.[39mgstatic[33m.[39mcom[33m/[39ms[33m/[39mcormorantgaramond[33m/[39mv21[33m/[39mco3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C[33m.[39mwoff2[33m%[39m[35m22[39m[33m,[39m[33m%[39m[35m22[39mpreload[33m%[39m[35m22[39m[33m:[39m[36mfalse[39m[33m,[39m[33m%[39m[35m22[39mhas_size_adjust[33m%[39m[35m22[39m[33m:[39m[36mtrue[39m}) format([32m'woff2'[39m)[33m;[39m
+[31m[1m>[22m[39m[90m 251 |[39m   unicode[33m-[39mrange[33m:[39m [33mU[39m[33m+[39m[35m0102[39m[33m-[39m[35m0103[39m[33m,[39m [33mU[39m[33m+[39m[35m0110[39m[33m-[39m[35m0111[39m[33m,[39m [33mU[39m[33m+[39m[35m0128[39m[33m-[39m[35m0129[39m[33m,[39m [33mU[39m[33m+[39m[35m0168[39m[33m-[39m[35m0169[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mA0[39m[33m-[39m[35m01[39m[33mA1[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mAF[39m[33m-[39m[35m01[39m[33mB0[39m[33m,[39m [33mU[39m[33m+[39m[35m0300[39m[33m-[39m[35m0301[39m[33m,[39m [33mU[39m[33m+[39m[35m0303[39m[33m-[39m[35m0304[39m[33m,[39m [33mU[39m[33m+[39m[35m0308[39m[33m-[39m[35m0309[39m[33m,[39m [33mU[39m[33m+[39m[35m0323[39m[33m,[39m [33mU[39m[33m+[39m[35m0329[39m[33m,[39m [33mU[39m[33m+[39m[35m1[39m[33mEA0[39m[33m-[39m[35m1[39m[33mEF9[39m[33m,[39m [33mU[39m[33m+[39m[35m20[39m[33mAB[39m[33m;[39m
+ [90m     |[39m         [31m[1m^[22m[39m
+ [90m 252 |[39m }
+ [90m 253 |[39m [90m/* latin-ext */[39m
+ [90m 254 |[39m [33m@[39mfont[33m-[39mface {[0m
+
+Import map: Resolved by import map
+
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/cormorant_garamond_1dd82d55.module.css
+    [next]/internal/font/google/cormorant_garamond_1dd82d55.js
+    ./src/app/layout.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:296:9
+Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
+[0m [90m 294 |[39m   font[33m-[39mdisplay[33m:[39m swap[33m;[39m
+ [90m 295 |[39m   src[33m:[39m url([33m@[39mvercel[33m/[39mturbopack[33m-[39mnext[33m/[39minternal[33m/[39mfont[33m/[39mgoogle[35m/font?{%22url%22:%22https:/[39m[33m/[39mfonts[33m.[39mgstatic[33m.[39mcom[33m/[39ms[33m/[39mcormorantgaramond[33m/[39mv21[33m/[39mco3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C[33m.[39mwoff2[33m%[39m[35m22[39m[33m,[39m[33m%[39m[35m22[39mpreload[33m%[39m[35m22[39m[33m:[39m[36mfalse[39m[33m,[39m[33m%[39m[35m22[39mhas_size_adjust[33m%[39m[35m22[39m[33m:[39m[36mtrue[39m}) format([32m'woff2'[39m)[33m;[39m
+[31m[1m>[22m[39m[90m 296 |[39m   unicode[33m-[39mrange[33m:[39m [33mU[39m[33m+[39m[35m0102[39m[33m-[39m[35m0103[39m[33m,[39m [33mU[39m[33m+[39m[35m0110[39m[33m-[39m[35m0111[39m[33m,[39m [33mU[39m[33m+[39m[35m0128[39m[33m-[39m[35m0129[39m[33m,[39m [33mU[39m[33m+[39m[35m0168[39m[33m-[39m[35m0169[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mA0[39m[33m-[39m[35m01[39m[33mA1[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mAF[39m[33m-[39m[35m01[39m[33mB0[39m[33m,[39m [33mU[39m[33m+[39m[35m0300[39m[33m-[39m[35m0301[39m[33m,[39m [33mU[39m[33m+[39m[35m0303[39m[33m-[39m[35m0304[39m[33m,[39m [33mU[39m[33m+[39m[35m0308[39m[33m-[39m[35m0309[39m[33m,[39m [33mU[39m[33m+[39m[35m0323[39m[33m,[39m [33mU[39m[33m+[39m[35m0329[39m[33m,[39m [33mU[39m[33m+[39m[35m1[39m[33mEA0[39m[33m-[39m[35m1[39m[33mEF9[39m[33m,[39m [33mU[39m[33m+[39m[35m20[39m[33mAB[39m[33m;[39m
+ [90m     |[39m         [31m[1m^[22m[39m
+ [90m 297 |[39m }
+ [90m 298 |[39m [90m/* latin-ext */[39m
+ [90m 299 |[39m [33m@[39mfont[33m-[39mface {[0m
+
+Import map: Resolved by import map
+
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/cormorant_garamond_1dd82d55.module.css
+    [next]/internal/font/google/cormorant_garamond_1dd82d55.js
+    ./src/app/layout.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:341:9
+Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
+[0m [90m 339 |[39m   font[33m-[39mdisplay[33m:[39m swap[33m;[39m
+ [90m 340 |[39m   src[33m:[39m url([33m@[39mvercel[33m/[39mturbopack[33m-[39mnext[33m/[39minternal[33m/[39mfont[33m/[39mgoogle[35m/font?{%22url%22:%22https:/[39m[33m/[39mfonts[33m.[39mgstatic[33m.[39mcom[33m/[39ms[33m/[39mcormorantgaramond[33m/[39mv21[33m/[39mco3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C[33m.[39mwoff2[33m%[39m[35m22[39m[33m,[39m[33m%[39m[35m22[39mpreload[33m%[39m[35m22[39m[33m:[39m[36mfalse[39m[33m,[39m[33m%[39m[35m22[39mhas_size_adjust[33m%[39m[35m22[39m[33m:[39m[36mtrue[39m}) format([32m'woff2'[39m)[33m;[39m
+[31m[1m>[22m[39m[90m 341 |[39m   unicode[33m-[39mrange[33m:[39m [33mU[39m[33m+[39m[35m0102[39m[33m-[39m[35m0103[39m[33m,[39m [33mU[39m[33m+[39m[35m0110[39m[33m-[39m[35m0111[39m[33m,[39m [33mU[39m[33m+[39m[35m0128[39m[33m-[39m[35m0129[39m[33m,[39m [33mU[39m[33m+[39m[35m0168[39m[33m-[39m[35m0169[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mA0[39m[33m-[39m[35m01[39m[33mA1[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mAF[39m[33m-[39m[35m01[39m[33mB0[39m[33m,[39m [33mU[39m[33m+[39m[35m0300[39m[33m-[39m[35m0301[39m[33m,[39m [33mU[39m[33m+[39m[35m0303[39m[33m-[39m[35m0304[39m[33m,[39m [33mU[39m[33m+[39m[35m0308[39m[33m-[39m[35m0309[39m[33m,[39m [33mU[39m[33m+[39m[35m0323[39m[33m,[39m [33mU[39m[33m+[39m[35m0329[39m[33m,[39m [33mU[39m[33m+[39m[35m1[39m[33mEA0[39m[33m-[39m[35m1[39m[33mEF9[39m[33m,[39m [33mU[39m[33m+[39m[35m20[39m[33mAB[39m[33m;[39m
+ [90m     |[39m         [31m[1m^[22m[39m
+ [90m 342 |[39m }
+ [90m 343 |[39m [90m/* latin-ext */[39m
+ [90m 344 |[39m [33m@[39mfont[33m-[39mface {[0m
+
+Import map: Resolved by import map
+
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/cormorant_garamond_1dd82d55.module.css
+    [next]/internal/font/google/cormorant_garamond_1dd82d55.js
+    ./src/app/layout.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> ([next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:206:9)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> ([next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:251:9)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> ([next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:296:9)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> ([next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:341:9)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
