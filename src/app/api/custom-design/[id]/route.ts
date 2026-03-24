@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { sendCustomDesignRequestEmail, sendCustomDesignUpdateRequestEmail } from "@/lib/emails";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Role } from "@/generated/prisma/client";
-
-const s3Client = new S3Client({
-  endpoint: "https://sfo3.digitaloceanspaces.com", // Change to your region
-  region: "sfo3", // Change to your region
-  credentials: {
-    accessKeyId: process.env.DO_SPACES_ACCESS_KEY as string,
-    secretAccessKey: process.env.DO_SPACES_SECRET_KEY as string,
-  },
-});
+import {
+  s3Client,
+  getDoSpacesPublicUrl,
+  DO_SPACES_BUCKET_NAME,
+} from "@/lib/do-spaces";
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -53,7 +49,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         const fileName = `${uuidv4()}.${fileExtension}`;
 
         const command = new PutObjectCommand({
-          Bucket: process.env.DO_SPACES_BUCKET as string,
+          Bucket: DO_SPACES_BUCKET_NAME,
           Key: fileName,
           Body: buffer,
           ContentType: file.type,
@@ -61,7 +57,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         });
 
         await s3Client.send(command);
-        const fileUrl = `https://sfo3.digitaloceanspaces.com/${process.env.DO_SPACES_BUCKET}/${fileName}`;
+        const fileUrl = getDoSpacesPublicUrl(fileName);
         uploadedFileUrls.push(fileUrl);
       }
     }

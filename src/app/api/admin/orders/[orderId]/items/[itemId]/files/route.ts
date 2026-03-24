@@ -3,7 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { FileType } from "@/generated/prisma/client";
-import { s3Client } from "@/lib/do-spaces";
+import {
+  s3Client,
+  getDoSpacesPublicUrl,
+  DO_SPACES_BUCKET_NAME,
+} from "@/lib/do-spaces";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
@@ -45,7 +49,7 @@ export async function POST(
     // Upload file to DigitalOcean Spaces
     const fileKey = `order-files/${orderId}/${itemId}/${uuidv4()}-${file.name}`;
     const uploadCommand = new PutObjectCommand({
-      Bucket: process.env.DO_SPACES_BUCKET,
+      Bucket: DO_SPACES_BUCKET_NAME,
       Key: fileKey,
       Body: Buffer.from(await file.arrayBuffer()),
       ContentType: file.type,
@@ -53,7 +57,7 @@ export async function POST(
     });
 
     await s3Client.send(uploadCommand);
-    const fileUrl = `https://${process.env.DO_SPACES_BUCKET}.${process.env.DO_SPACES_REGION}.digitaloceanspaces.com/${fileKey}`;
+    const fileUrl = getDoSpacesPublicUrl(fileKey);
 
     // Create File record
     const newFile = await prisma.file.create({

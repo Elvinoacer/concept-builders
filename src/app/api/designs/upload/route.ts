@@ -1,22 +1,18 @@
 import { NextResponse } from "next/server";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
+import {
+  s3Client,
+  getDoSpacesPublicUrl,
+  DO_SPACES_BUCKET_NAME,
+} from "@/lib/do-spaces";
 
 if (!process.env.DO_SPACES_ACCESS_KEY || !process.env.DO_SPACES_SECRET_KEY) {
   throw new Error(
     "Missing DigitalOcean Spaces credentials in environment variables"
   );
 }
-
-const s3Client = new S3Client({
-  endpoint: "https://sfo3.digitaloceanspaces.com", // Change to your region
-  region: "sfo3", // Change to your region
-  credentials: {
-    accessKeyId: process.env.DO_SPACES_ACCESS_KEY,
-    secretAccessKey: process.env.DO_SPACES_SECRET_KEY,
-  },
-});
 
 export async function POST(request: Request) {
   try {
@@ -75,7 +71,7 @@ export async function POST(request: Request) {
     const key = `${uuidv4()}.${fileExtension}`;
 
     const command = new PutObjectCommand({
-      Bucket: process.env.DO_SPACES_BUCKET,
+      Bucket: DO_SPACES_BUCKET_NAME,
       Key: key,
       ContentType: fileType,
       ACL: "public-read",
@@ -85,7 +81,7 @@ export async function POST(request: Request) {
       expiresIn: 3600,
     });
 
-    const url = `https://sfo3.digitaloceanspaces.com/${process.env.DO_SPACES_BUCKET}/${key}`;
+    const url = getDoSpacesPublicUrl(key);
 
     return NextResponse.json({ presignedUrl, url, originalFileName: fileName }, { status: 200 });
   } catch (error) {

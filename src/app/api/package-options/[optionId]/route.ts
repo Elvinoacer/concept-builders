@@ -1,14 +1,18 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { s3Client } from '@/lib/do-spaces';
+import {
+  s3Client,
+  getDoSpacesKeyFromUrl,
+  DO_SPACES_BUCKET_NAME,
+} from '@/lib/do-spaces';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 async function deleteFileFromSpaces(fileUrl: string) {
   try {
-    const key = new URL(fileUrl).pathname.substring(1);
+    const key = getDoSpacesKeyFromUrl(fileUrl);
     const command = new DeleteObjectCommand({
-      Bucket: process.env.DO_SPACES_BUCKET!,
+      Bucket: DO_SPACES_BUCKET_NAME,
       Key: key,
     });
     await s3Client.send(command);

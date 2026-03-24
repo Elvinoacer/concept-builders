@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-const s3Client = new S3Client({
-  endpoint: "https://fra1.digitaloceanspaces.com", // TODO: Use environment variables
-  region: "fra1", // TODO: Use environment variables
-  credentials: {
-    accessKeyId: process.env.DO_SPACES_ACCESS_KEY!,
-    secretAccessKey: process.env.DO_SPACES_SECRET_KEY!,
-  },
-});
+import {
+  s3Client,
+  getDoSpacesPublicUrl,
+  DO_SPACES_BUCKET_NAME,
+} from "@/lib/do-spaces";
 
 export async function POST(
   request: NextRequest,
@@ -50,7 +46,7 @@ export async function POST(
     // 2. Get signed URL for the new file upload
     const key = `${designId}/${fileIdentifier}/v${newVersion}-${fileName}`;
     const command = new PutObjectCommand({
-      Bucket: process.env.DO_SPACES_BUCKET,
+      Bucket: DO_SPACES_BUCKET_NAME,
       Key: key,
       ContentType: fileType,
       ACL: "public-read",
@@ -59,7 +55,7 @@ export async function POST(
       expiresIn: 3600,
       ACL: "public-read",
     });
-    const publicUrl = signedUrl.split("?")[0];
+    const publicUrl = getDoSpacesPublicUrl(key);
 
     // 3. Create a new File record for the new version
     const newFile = await prisma.file.create({

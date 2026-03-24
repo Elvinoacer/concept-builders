@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import {
+  s3Client,
+  getDoSpacesPublicUrl,
+  DO_SPACES_BUCKET_NAME,
+} from '@/lib/do-spaces';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes
-
-const s3Client = new S3Client({
-  endpoint: `https://sfo3.digitaloceanspaces.com`,
-  region: 'sfo3',
-  credentials: {
-    accessKeyId: process.env.DO_SPACES_ACCESS_KEY!,
-    secretAccessKey: process.env.DO_SPACES_SECRET_KEY!,
-  },
-});
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,7 +22,7 @@ export async function POST(req: NextRequest) {
     const upload = new Upload({
       client: s3Client,
       params: {
-        Bucket: process.env.DO_SPACES_BUCKET!,
+        Bucket: DO_SPACES_BUCKET_NAME,
         Key: fileKey,
         Body: req.body,
         ContentType: contentType,
@@ -44,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     await upload.done();
 
-    const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.sfo3.digitaloceanspaces.com/${fileKey}`;
+    const publicUrl = getDoSpacesPublicUrl(fileKey);
     return NextResponse.json({ publicUrl, originalFileName: fileName });
   } catch (error) {
     console.error('Upload error:', error);
