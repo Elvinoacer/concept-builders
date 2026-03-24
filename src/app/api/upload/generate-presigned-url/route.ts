@@ -35,9 +35,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const isPublicAsset =
-      fileTypeCategory === "IMAGE" || fileTypeCategory === "FLOOR_PLAN";
-    const objectAcl = isPublicAsset ? "public-read" : "private";
+    const objectAcl = "public-read";
 
     const fileKey = `uploads/${uuidv4()}-${fileName}`;
 
