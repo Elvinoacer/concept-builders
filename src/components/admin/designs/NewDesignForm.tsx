@@ -7,18 +7,67 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FiX, FiPlus, FiSave, FiEdit } from "react-icons/fi";
-import Link from "next/link";
+import { FiX, FiSave } from "react-icons/fi";
 import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import FileUpload from "./FileUpload";
-import { useUpload } from '@/contexts/UploadContext';
+import { useUpload } from "@/contexts/UploadContext";
 import { useFormPersistence } from "@/hooks/useFormPersistence";
+
+interface UploadedFile {
+  url: string;
+  name?: string;
+  originalFileName?: string;
+  type?: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+}
+
+type DocumentCollection = Record<string, UploadedFile[]>;
+
+interface PackageOptionState {
+  id?: string;
+  name: string;
+  price: string;
+  file: UploadedFile[];
+}
+
+interface DesignToEdit {
+  id: string;
+  name?: string;
+  description?: string;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  area?: number | null;
+  floors?: number | null;
+  categoryId?: string;
+  architecturalDesign?: DocumentCollection;
+  structuralDesign?: DocumentCollection;
+  billOfQuantities?: DocumentCollection;
+  architecturalPdfPrice?: number | null;
+  architecturalCadPrice?: number | null;
+  structuralPdfPrice?: number | null;
+  structuralCadPrice?: number | null;
+  billOfQuantitiesPrice?: number | null;
+  billOfQuantitiesPdfPrice?: number | null;
+  packageOptions?: Array<{
+    id?: string;
+    name: string;
+    price: number | string;
+    file?: UploadedFile | null;
+  }>;
+  images?: UploadedFile[];
+  floorPlans?: UploadedFile[];
+  files?: UploadedFile[];
+}
 
 interface NewDesignFormProps {
   onClose: () => void;
   folderId?: string;
-  designToEdit?: any;
+  designToEdit?: DesignToEdit;
   onSuccess?: () => void;
 }
 
@@ -28,6 +77,28 @@ const NewDesignForm = ({
   designToEdit,
   onSuccess,
 }: NewDesignFormProps) => {
+  const toFileUploadItem = (file: UploadedFile, fallbackType: string) => ({
+    url: file.url,
+    name:
+      file.name ||
+      file.originalFileName ||
+      decodeURIComponent(file.url.split("/").pop() || "file"),
+    type: file.type || fallbackType,
+  });
+
+  const toUploadFile = (
+    file: Partial<UploadedFile> & { url: string },
+    fallbackType: string,
+  ): UploadedFile => ({
+    url: file.url,
+    name:
+      file.name ||
+      file.originalFileName ||
+      decodeURIComponent(file.url.split("/").pop() || "file"),
+    originalFileName: file.originalFileName,
+    type: file.type || fallbackType,
+  });
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   // basePrice and priceRange removed from state, will be sent as defaults
@@ -36,22 +107,27 @@ const NewDesignForm = ({
   const [area, setArea] = useState("");
   const [floors, setFloors] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { uploadingFiles } = useUpload();
-  const activeUploads = uploadingFiles.filter(f => f.status === 'uploading' || f.status === 'pending');
+  const activeUploads = uploadingFiles.filter(
+    (f) => f.status === "uploading" || f.status === "pending",
+  );
 
-  const [packageOptions, setPackageOptions] = useState<any[]>([]);
-  const [architecturalDesign, setArchitecturalDesign] = useState<any>({
+  const [packageOptions, setPackageOptions] = useState<PackageOptionState[]>(
+    [],
+  );
+  const [architecturalDesign, setArchitecturalDesign] =
+    useState<DocumentCollection>({
+      pdfFiles: [],
+      cadFiles: [],
+    });
+  const [structuralDesign, setStructuralDesign] = useState<DocumentCollection>({
     pdfFiles: [],
     cadFiles: [],
   });
-  const [structuralDesign, setStructuralDesign] = useState<any>({
-    pdfFiles: [],
-    cadFiles: [],
-  });
-  const [billOfQuantities, setBillOfQuantities] = useState<any>({
+  const [billOfQuantities, setBillOfQuantities] = useState<DocumentCollection>({
     excelFiles: [],
     pdfFiles: [],
   });
@@ -61,9 +137,9 @@ const NewDesignForm = ({
   const [structuralCadPrice, setStructuralCadPrice] = useState("");
   const [billOfQuantitiesPrice, setBillOfQuantitiesPrice] = useState("");
   const [billOfQuantitiesPdfPrice, setBillOfQuantitiesPdfPrice] = useState("");
-  const [images, setImages] = useState<any[]>([]);
-  const [floorPlans, setFloorPlans] = useState<any[]>([]);
-  const [files, setFiles] = useState<any[]>([]);
+  const [images, setImages] = useState<UploadedFile[]>([]);
+  const [floorPlans, setFloorPlans] = useState<UploadedFile[]>([]);
+  const [files, setFiles] = useState<UploadedFile[]>([]);
   const [draftRestored, setDraftRestored] = useState(false);
 
   const isEditMode = Boolean(designToEdit);
@@ -93,9 +169,9 @@ const NewDesignForm = ({
   };
 
   const { loadFromStorage, clearStorage } = useFormPersistence(
-    'design-form-draft', // Same key as DesignForm
+    "design-form-draft", // Same key as DesignForm
     formData,
-    1000 // 1 second debounce
+    1000, // 1 second debounce
   );
 
   // Restore from local storage on mount (only for new designs, not edits)
@@ -104,31 +180,39 @@ const NewDesignForm = ({
       const savedData = loadFromStorage();
       if (savedData) {
         const confirmRestore = window.confirm(
-          'Found a saved draft of your design form. Would you like to restore it?'
+          "Found a saved draft of your design form. Would you like to restore it?",
         );
-        
+
         if (confirmRestore) {
-          setName(savedData.name || '');
-          setDescription(savedData.description || '');
-          setCategoryId(savedData.categoryId || '');
-          setBedrooms(savedData.bedrooms || '');
-          setBathrooms(savedData.bathrooms || '');
-          setArea(savedData.area || '');
-          setFloors(savedData.floors || '');
-          setArchitecturalPdfPrice(savedData.architecturalPdfPrice || '');
-          setArchitecturalCadPrice(savedData.architecturalCadPrice || '');
-          setStructuralPdfPrice(savedData.structuralPdfPrice || '');
-          setStructuralCadPrice(savedData.structuralCadPrice || '');
-          setBillOfQuantitiesPrice(savedData.billOfQuantitiesPrice || '');
-          setBillOfQuantitiesPdfPrice(savedData.billOfQuantitiesPdfPrice || '');
+          setName(savedData.name || "");
+          setDescription(savedData.description || "");
+          setCategoryId(savedData.categoryId || "");
+          setBedrooms(savedData.bedrooms || "");
+          setBathrooms(savedData.bathrooms || "");
+          setArea(savedData.area || "");
+          setFloors(savedData.floors || "");
+          setArchitecturalPdfPrice(savedData.architecturalPdfPrice || "");
+          setArchitecturalCadPrice(savedData.architecturalCadPrice || "");
+          setStructuralPdfPrice(savedData.structuralPdfPrice || "");
+          setStructuralCadPrice(savedData.structuralCadPrice || "");
+          setBillOfQuantitiesPrice(savedData.billOfQuantitiesPrice || "");
+          setBillOfQuantitiesPdfPrice(savedData.billOfQuantitiesPdfPrice || "");
           setImages(savedData.images || []);
           setFloorPlans(savedData.floorPlans || []);
           setFiles(savedData.files || []);
-          setArchitecturalDesign(savedData.architecturalDesign || { pdfFiles: [], cadFiles: [] });
-          setStructuralDesign(savedData.structuralDesign || { pdfFiles: [], cadFiles: [] });
-          setBillOfQuantities(savedData.billOfQuantities || { excelFiles: [], pdfFiles: [] });
-          setPackageOptions(savedData.packageOptions || [{ name: '', price: '', file: [] }]);
-          toast.success('Draft restored successfully!');
+          setArchitecturalDesign(
+            savedData.architecturalDesign || { pdfFiles: [], cadFiles: [] },
+          );
+          setStructuralDesign(
+            savedData.structuralDesign || { pdfFiles: [], cadFiles: [] },
+          );
+          setBillOfQuantities(
+            savedData.billOfQuantities || { excelFiles: [], pdfFiles: [] },
+          );
+          setPackageOptions(
+            savedData.packageOptions || [{ name: "", price: "", file: [] }],
+          );
+          toast.success("Draft restored successfully!");
         } else {
           clearStorage();
         }
@@ -146,28 +230,84 @@ const NewDesignForm = ({
 
     fetchCategories();
 
-    if (isEditMode) {
-        setName(designToEdit.name || "");
-        setDescription(designToEdit.description || "");
-        // basePrice and priceRange handled via defaults or ignored in edit if not needed for display
-        setBedrooms(designToEdit.bedrooms?.toString() || "");
-        setBathrooms(designToEdit.bathrooms?.toString() || "");
-        setArea(designToEdit.area?.toString() || "");
-        setFloors(designToEdit.floors?.toString() || "");
-        setCategoryId(designToEdit.categoryId || "");
-        setArchitecturalDesign(designToEdit.architecturalDesign || { pdfFiles: [], cadFiles: [] });
-        setStructuralDesign(designToEdit.structuralDesign || { pdfFiles: [], cadFiles: [] });
-        setBillOfQuantities(designToEdit.billOfQuantities || { excelFiles: [], pdfFiles: [] });
-        setArchitecturalPdfPrice(designToEdit.architecturalPdfPrice?.toString() || "");
-        setArchitecturalCadPrice(designToEdit.architecturalCadPrice?.toString() || "");
-        setStructuralPdfPrice(designToEdit.structuralPdfPrice?.toString() || "");
-        setStructuralCadPrice(designToEdit.structuralCadPrice?.toString() || "");
-        setBillOfQuantitiesPrice(designToEdit.billOfQuantitiesPrice?.toString() || "");
-        setBillOfQuantitiesPdfPrice(designToEdit.billOfQuantitiesPdfPrice?.toString() || "");
-        setPackageOptions(designToEdit.packageOptions.map((opt:any) => ({ ...opt, price: opt.price.toString(), file: opt.file ? [opt.file] : [] })) || []);
-        setImages(designToEdit.images || []);
-        setFloorPlans(designToEdit.floorPlans || []);
-        setFiles(designToEdit.files || []);
+    if (designToEdit) {
+      setName(designToEdit.name || "");
+      setDescription(designToEdit.description || "");
+      // basePrice and priceRange handled via defaults or ignored in edit if not needed for display
+      setBedrooms(designToEdit.bedrooms?.toString() || "");
+      setBathrooms(designToEdit.bathrooms?.toString() || "");
+      setArea(designToEdit.area?.toString() || "");
+      setFloors(designToEdit.floors?.toString() || "");
+      setCategoryId(designToEdit.categoryId || "");
+      setArchitecturalDesign(
+        designToEdit.architecturalDesign || { pdfFiles: [], cadFiles: [] },
+      );
+      setStructuralDesign(
+        designToEdit.structuralDesign || { pdfFiles: [], cadFiles: [] },
+      );
+      setBillOfQuantities(
+        designToEdit.billOfQuantities || { excelFiles: [], pdfFiles: [] },
+      );
+      setArchitecturalPdfPrice(
+        designToEdit.architecturalPdfPrice?.toString() || "",
+      );
+      setArchitecturalCadPrice(
+        designToEdit.architecturalCadPrice?.toString() || "",
+      );
+      setStructuralPdfPrice(designToEdit.structuralPdfPrice?.toString() || "");
+      setStructuralCadPrice(designToEdit.structuralCadPrice?.toString() || "");
+      setBillOfQuantitiesPrice(
+        designToEdit.billOfQuantitiesPrice?.toString() || "",
+      );
+      setBillOfQuantitiesPdfPrice(
+        designToEdit.billOfQuantitiesPdfPrice?.toString() || "",
+      );
+      setPackageOptions(
+        designToEdit.packageOptions?.map((opt) => ({
+          id: opt.id,
+          name: opt.name,
+          price: opt.price.toString(),
+          file: opt.file ? [toUploadFile(opt.file, "FILE")] : [],
+        })) || [],
+      );
+      setImages(
+        (designToEdit.images || []).map((file) => toUploadFile(file, "IMAGE")),
+      );
+      setFloorPlans(
+        (designToEdit.floorPlans || []).map((file) =>
+          toUploadFile(file, "FLOOR_PLAN"),
+        ),
+      );
+      setFiles(
+        (designToEdit.files || []).map((file) => toUploadFile(file, "FILE")),
+      );
+
+      setArchitecturalDesign({
+        pdfFiles: (designToEdit.architecturalDesign?.pdfFiles || []).map((f) =>
+          toUploadFile(f, "PDF"),
+        ),
+        cadFiles: (designToEdit.architecturalDesign?.cadFiles || []).map((f) =>
+          toUploadFile(f, "CAD"),
+        ),
+      });
+
+      setStructuralDesign({
+        pdfFiles: (designToEdit.structuralDesign?.pdfFiles || []).map((f) =>
+          toUploadFile(f, "PDF"),
+        ),
+        cadFiles: (designToEdit.structuralDesign?.cadFiles || []).map((f) =>
+          toUploadFile(f, "CAD"),
+        ),
+      });
+
+      setBillOfQuantities({
+        excelFiles: (designToEdit.billOfQuantities?.excelFiles || []).map((f) =>
+          toUploadFile(f, "EXCEL"),
+        ),
+        pdfFiles: (designToEdit.billOfQuantities?.pdfFiles || []).map((f) =>
+          toUploadFile(f, "PDF"),
+        ),
+      });
     }
   }, [designToEdit, isEditMode]);
 
@@ -176,7 +316,8 @@ const NewDesignForm = ({
     if (!description.trim()) return "Description is required.";
     if (!categoryId) return "Category is required.";
     // basePrice validation removed
-    if (images.length === 0 && !isEditMode) return "At least one image is required.";
+    if (images.length === 0 && !isEditMode)
+      return "At least one image is required.";
     return null;
   };
 
@@ -191,9 +332,18 @@ const NewDesignForm = ({
 
     setIsSubmitting(true);
 
-    const connectFiles = (files: any[]) => ({
-        connect: files.map(f => ({ id: f.fileId }))
-    });
+    const fileListPayload = (
+      files: Array<{ originalFileName?: string; name?: string; url: string }>,
+      type: string,
+    ) =>
+      files.map((file) => ({
+        name:
+          file.originalFileName ||
+          file.name ||
+          decodeURIComponent(file.url.split("/").pop() || "file"),
+        url: file.url,
+        type,
+      }));
 
     const archPdfPrice = parseFloat(architecturalPdfPrice) || 0;
     const archCadPrice = parseFloat(architecturalCadPrice) || 0;
@@ -203,7 +353,13 @@ const NewDesignForm = ({
     const boqPdfPrice = parseFloat(billOfQuantitiesPdfPrice) || 0;
 
     const calculatedBasePrice = archPdfPrice;
-    const totalPrice = archPdfPrice + archCadPrice + structPdfPrice + structCadPrice + boqExcelPrice + boqPdfPrice;
+    const totalPrice =
+      archPdfPrice +
+      archCadPrice +
+      structPdfPrice +
+      structCadPrice +
+      boqExcelPrice +
+      boqPdfPrice;
     const calculatedPriceRange = `${calculatedBasePrice.toLocaleString()} - ${totalPrice.toLocaleString()}`;
 
     const commonData = {
@@ -224,40 +380,103 @@ const NewDesignForm = ({
       billOfQuantitiesPdfPrice: boqPdfPrice || null,
     };
 
-    const packageOptionsPayload = packageOptions.map(opt => ({
-        name: opt.name,
-        price: parseFloat(opt.price) || 0,
-        file: opt.file.length > 0 ? { connect: { id: opt.file[0].fileId } } : undefined,
-    }));
+    const packageOptionsPayload = packageOptions
+      .filter((opt) => opt.name?.trim() && opt.price !== "")
+      .map((opt) => {
+        const firstFile = opt.file?.[0];
+
+        return {
+          name: opt.name,
+          price: parseFloat(opt.price) || 0,
+          ...(firstFile
+            ? {
+                file: {
+                  create: {
+                    name:
+                      firstFile.originalFileName ||
+                      firstFile.name ||
+                      decodeURIComponent(
+                        firstFile.url.split("/").pop() || "file",
+                      ),
+                    url: firstFile.url,
+                    type: "FILE",
+                  },
+                },
+              }
+            : {}),
+        };
+      });
 
     let payload;
-    const url = isEditMode ? `/api/designs/${designToEdit.id}` : "/api/designs";
+    const url =
+      isEditMode && designToEdit
+        ? `/api/designs/${designToEdit.id}`
+        : "/api/designs";
     const method = isEditMode ? "PUT" : "POST";
 
     if (isEditMode) {
       payload = {
         ...commonData,
-        images: connectFiles(images),
-        floorPlans: connectFiles(floorPlans),
-        files: connectFiles(files),
-        architecturalDesign: { update: { pdfFiles: connectFiles(architecturalDesign.pdfFiles), cadFiles: connectFiles(architecturalDesign.cadFiles) }},
-        structuralDesign: { update: { pdfFiles: connectFiles(structuralDesign.pdfFiles), cadFiles: connectFiles(structuralDesign.cadFiles) }},
-        billOfQuantities: { update: { excelFiles: connectFiles(billOfQuantities.excelFiles), pdfFiles: connectFiles(billOfQuantities.pdfFiles) }},
+        images: { create: fileListPayload(images, "IMAGE") },
+        floorPlans: { create: fileListPayload(floorPlans, "FLOOR_PLAN") },
+        files: { create: fileListPayload(files, "FILE") },
+        architecturalDesign: {
+          pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
+          cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
+        },
+        structuralDesign: {
+          pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
+          cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
+        },
+        billOfQuantities: {
+          excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
+          pdfFiles: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
+        },
         packageOptions: {
-            deleteMany: {},
-            create: packageOptionsPayload,
+          deleteMany: {},
+          create: packageOptionsPayload,
         },
       };
     } else {
       payload = {
         ...commonData,
         folderId,
-        images: connectFiles(images),
-        floorPlans: connectFiles(floorPlans),
-        files: connectFiles(files),
-        architecturalDesign: { create: { type: "ARCHITECTURAL", pdfFiles: connectFiles(architecturalDesign.pdfFiles), cadFiles: connectFiles(architecturalDesign.cadFiles) }},
-        structuralDesign: { create: { type: "STRUCTURAL", pdfFiles: connectFiles(structuralDesign.pdfFiles), cadFiles: connectFiles(structuralDesign.cadFiles) }},
-        billOfQuantities: { create: { type: "BILL_OF_QUANTITIES", excelFiles: connectFiles(billOfQuantities.excelFiles), pdfFiles: connectFiles(billOfQuantities.pdfFiles) }},
+        images: { create: fileListPayload(images, "IMAGE") },
+        floorPlans: { create: fileListPayload(floorPlans, "FLOOR_PLAN") },
+        files: { create: fileListPayload(files, "FILE") },
+        architecturalDesign: {
+          create: {
+            type: "ARCHITECTURAL",
+            pdfFiles: {
+              create: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
+            },
+            cadFiles: {
+              create: fileListPayload(architecturalDesign.cadFiles, "CAD"),
+            },
+          },
+        },
+        structuralDesign: {
+          create: {
+            type: "STRUCTURAL",
+            pdfFiles: {
+              create: fileListPayload(structuralDesign.pdfFiles, "PDF"),
+            },
+            cadFiles: {
+              create: fileListPayload(structuralDesign.cadFiles, "CAD"),
+            },
+          },
+        },
+        billOfQuantities: {
+          create: {
+            type: "BILL_OF_QUANTITIES",
+            excelFiles: {
+              create: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
+            },
+            pdfFiles: {
+              create: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
+            },
+          },
+        },
         packageOptions: { create: packageOptionsPayload },
       };
     }
@@ -274,14 +493,16 @@ const NewDesignForm = ({
         if (!isEditMode) {
           clearStorage();
         }
-        toast.success(`Design ${isEditMode ? "updated" : "created"} successfully!`);
+        toast.success(
+          `Design ${isEditMode ? "updated" : "created"} successfully!`,
+        );
         if (onSuccess) onSuccess();
         onClose();
       } else {
         const errorData = await response.json();
         toast.error(`Error: ${errorData.error || "Failed to save design"}`);
       }
-    } catch (error) {
+    } catch {
       toast.error(`An unexpected error occurred.`);
     } finally {
       setIsSubmitting(false);
@@ -289,19 +510,34 @@ const NewDesignForm = ({
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -50, opacity: 0 }} className="bg-card rounded-lg shadow-xl w-full max-w-3xl flex flex-col h-[95vh]">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+    >
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -50, opacity: 0 }}
+        className="bg-card rounded-lg shadow-xl w-full max-w-3xl flex flex-col h-[95vh]"
+      >
         <form
           onSubmit={handleSubmit}
           className="flex flex-col h-full"
           onKeyDown={(e) => {
-            if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA") {
+            if (
+              e.key === "Enter" &&
+              (e.target as HTMLElement).tagName !== "TEXTAREA"
+            ) {
               e.preventDefault();
             }
           }}
         >
           <div className="p-6 border-b">
-            <h3 className="text-xl font-semibold">{isEditMode ? "Edit Design" : "Create New Design"}</h3>
+            <h3 className="text-xl font-semibold">
+              {isEditMode ? "Edit Design" : "Create New Design"}
+            </h3>
           </div>
 
           <ScrollArea className="flex-1">
@@ -337,7 +573,7 @@ const NewDesignForm = ({
                       className="w-full p-2 border rounded-md bg-background text-sm sm:text-base h-10 sm:h-11"
                     >
                       <option value="">Select a category</option>
-                      {categories.map((category: any) => (
+                      {categories.map((category) => (
                         <option key={category.id} value={category.id}>
                           {category.name}
                         </option>
@@ -530,7 +766,9 @@ const NewDesignForm = ({
                       name="billOfQuantitiesPdfPrice"
                       type="number"
                       value={billOfQuantitiesPdfPrice}
-                      onChange={(e) => setBillOfQuantitiesPdfPrice(e.target.value)}
+                      onChange={(e) =>
+                        setBillOfQuantitiesPdfPrice(e.target.value)
+                      }
                       placeholder="e.g., 80"
                       className="text-sm sm:text-base h-10 sm:h-11"
                     />
@@ -592,10 +830,14 @@ const NewDesignForm = ({
                       }}
                       onFileRemove={(fileUrl) => {
                         const newOptions = [...packageOptions];
-                        newOptions[index].file = newOptions[index].file.filter((f: any) => f.url !== fileUrl);
+                        newOptions[index].file = newOptions[index].file.filter(
+                          (f) => f.url !== fileUrl,
+                        );
                         setPackageOptions(newOptions);
                       }}
-                      initialFiles={option.file}
+                      initialFiles={option.file.map((f) =>
+                        toFileUploadItem(f, "FILE"),
+                      )}
                       fileTypeCategory="FILE"
                       multiple={false}
                     />
@@ -690,20 +932,25 @@ const NewDesignForm = ({
                         </Label>
                         <FileUpload
                           onUploadSuccess={(file) =>
-                            section.setState((prev:any) => ({
+                            section.setState((prev) => ({
                               ...prev,
-                              [fileType.key]: [...prev[fileType.key], file],
+                              [fileType.key]: [
+                                ...(prev[fileType.key] || []),
+                                file,
+                              ],
                             }))
                           }
                           onFileRemove={(fileUrl) =>
-                            section.setState((prev:any) => ({
+                            section.setState((prev) => ({
                               ...prev,
-                              [fileType.key]: prev[fileType.key].filter(
-                                (f:any) => f.url !== fileUrl
+                              [fileType.key]: (prev[fileType.key] || []).filter(
+                                (f) => f.url !== fileUrl,
                               ),
                             }))
                           }
-                          initialFiles={section.state[fileType.key]}
+                          initialFiles={(section.state[fileType.key] || []).map(
+                            (f) => toFileUploadItem(f, fileType.category),
+                          )}
                           fileTypeCategory={fileType.category}
                           multiple
                           accept={fileType.accept}
@@ -731,10 +978,12 @@ const NewDesignForm = ({
                       }
                       onFileRemove={(fileUrl) =>
                         setImages((prev) =>
-                          prev.filter((f) => f.url !== fileUrl)
+                          prev.filter((f) => f.url !== fileUrl),
                         )
                       }
-                      initialFiles={images}
+                      initialFiles={images.map((f) =>
+                        toFileUploadItem(f, "IMAGE"),
+                      )}
                       fileTypeCategory="IMAGE"
                       multiple
                       accept="image/jpeg, image/png, image/gif, image/webp"
@@ -749,10 +998,12 @@ const NewDesignForm = ({
                       }
                       onFileRemove={(fileUrl) =>
                         setFloorPlans((prev) =>
-                          prev.filter((f) => f.url !== fileUrl)
+                          prev.filter((f) => f.url !== fileUrl),
                         )
                       }
-                      initialFiles={floorPlans}
+                      initialFiles={floorPlans.map((f) =>
+                        toFileUploadItem(f, "FLOOR_PLAN"),
+                      )}
                       fileTypeCategory="FLOOR_PLAN"
                       multiple
                       accept="image/jpeg, image/png, image/gif, image/webp, application/pdf"
@@ -767,10 +1018,12 @@ const NewDesignForm = ({
                       }
                       onFileRemove={(fileUrl) =>
                         setFiles((prev) =>
-                          prev.filter((f) => f.url !== fileUrl)
+                          prev.filter((f) => f.url !== fileUrl),
                         )
                       }
-                      initialFiles={files}
+                      initialFiles={files.map((f) =>
+                        toFileUploadItem(f, "FILE"),
+                      )}
                       fileTypeCategory="FILE"
                       multiple
                     />
@@ -803,10 +1056,10 @@ const NewDesignForm = ({
               {isSubmitting
                 ? "Saving..."
                 : activeUploads.length > 0
-                ? `Uploading (${activeUploads.length})...`
-                : isEditMode
-                ? "Update Design"
-                : "Save Design"}
+                  ? `Uploading (${activeUploads.length})...`
+                  : isEditMode
+                    ? "Update Design"
+                    : "Save Design"}
             </Button>
           </div>
         </form>

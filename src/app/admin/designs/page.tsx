@@ -21,15 +21,18 @@ const DesignsPage = () => {
   const [isFolderModalOpen, setFolderModalOpen] = useState(false);
   const [isCategoriesModalOpen, setCategoriesModalOpen] = useState(false);
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
-  const [renamingFolder, setRenamingFolder] = useState(null);
+  const [renamingFolder, setRenamingFolder] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [folders, setFolders] = useState([]);
   const [loadingFolders, setLoadingFolders] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [editingDesign, setEditingDesign] = useState<any>(null);
-  const [loadingDesign, setLoadingDesign] = useState(false);
+  const [editingDesign, setEditingDesign] = useState<unknown>(null);
+  const [designsRefreshKey, setDesignsRefreshKey] = useState(0);
 
-  const handleOpenRenameModal = (folder) => {
+  const handleOpenRenameModal = (folder: { id: string; name: string }) => {
     setRenamingFolder(folder);
     setIsRenameModalOpen(true);
   };
@@ -49,7 +52,7 @@ const DesignsPage = () => {
     } catch (error) {
       console.error("Error fetching folders:", error);
       setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
+        error instanceof Error ? error.message : "An unknown error occurred",
       );
     } finally {
       setLoadingFolders(false);
@@ -84,14 +87,14 @@ const DesignsPage = () => {
     } catch (error) {
       console.error("Error creating folder:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to create folder"
+        error instanceof Error ? error.message : "Failed to create folder",
       );
     } finally {
       setRefreshing(false);
     }
   };
 
-  const handleRenameFolder = async (folderId, newName) => {
+  const handleRenameFolder = async (folderId: string, newName: string) => {
     try {
       setRefreshing(true);
       const response = await fetch(`/api/designs/folders/${folderId}`, {
@@ -113,7 +116,7 @@ const DesignsPage = () => {
     } catch (error) {
       console.error("Error renaming folder:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to rename folder"
+        error instanceof Error ? error.message : "Failed to rename folder",
       );
     } finally {
       setRefreshing(false);
@@ -122,21 +125,18 @@ const DesignsPage = () => {
 
   const handleEditClick = async (designId: string) => {
     try {
-      setLoadingDesign(true);
       const response = await fetch(`/api/designs/${designId}`);
-      
+
       if (!response.ok) {
-        throw new Error('Failed to fetch design');
+        throw new Error("Failed to fetch design");
       }
-      
+
       const design = await response.json();
       setEditingDesign(design);
       setFormOpen(true);
     } catch (error) {
-      console.error('Error fetching design:', error);
-      toast.error('Failed to load design for editing');
-    } finally {
-      setLoadingDesign(false);
+      console.error("Error fetching design:", error);
+      toast.error("Failed to load design for editing");
     }
   };
 
@@ -191,7 +191,7 @@ const DesignsPage = () => {
         <div className="text-4xl mb-4">📁</div>
         <h3 className="text-lg font-semibold mb-2">Unable to Load Folders</h3>
         <p className="text-muted-foreground text-sm mb-4 max-w-sm mx-auto">
-          We're having trouble loading your design folders. Please check your
+          We are having trouble loading your design folders. Please check your
           connection and try again.
         </p>
         <Button
@@ -212,6 +212,7 @@ const DesignsPage = () => {
         <DesignsHeader
           activeTab={activeTab}
           newfolder={activeTab === "folders"}
+          onTabChange={setActiveTab}
           onNewDesignClick={() => setFormOpen(true)}
           onNewFolderClick={() => setFolderModalOpen(true)}
           onManageCategoriesClick={() => setCategoriesModalOpen(true)}
@@ -222,7 +223,12 @@ const DesignsPage = () => {
 
         {/* Content Section */}
         <div className="min-h-[400px]">
-          {activeTab === "all" && <DesignsTable onEditClick={handleEditClick} />}
+          {activeTab === "all" && (
+            <DesignsTable
+              onEditClick={handleEditClick}
+              refreshKey={designsRefreshKey}
+            />
+          )}
           {activeTab === "folders" && (
             <div className="space-y-4">
               {/* Folders Header with Refresh */}
@@ -313,8 +319,7 @@ const DesignsPage = () => {
           onSuccess={() => {
             setFormOpen(false);
             setEditingDesign(null);
-            // Refresh the designs table
-            window.location.reload();
+            setDesignsRefreshKey((prev) => prev + 1);
           }}
         />
       )}

@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
@@ -6,9 +5,17 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ folderId: string }> }
+  { params }: { params: Promise<{ folderId: string }> },
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
+
+    if (!canManageDesigns) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const { folderId } = await params;
 
     const folder = await prisma.folder.findUnique({
@@ -29,12 +36,14 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ folderId: string }> }
+  { params }: { params: Promise<{ folderId: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
 
-    if (!session || session.user.role !== "ADMIN") {
+    if (!canManageDesigns) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 

@@ -1,8 +1,18 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
+
+    if (!canManageDesigns) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const pageSize = parseInt(searchParams.get("pageSize") || "10");
@@ -21,27 +31,27 @@ export async function GET(request: Request) {
     const [designs, totalCount] = await prisma.$transaction([
       prisma.design.findMany({
         where: whereClause,
-        include: { 
-        category: true, 
-        files: true,
-        architecturalDesign: {
-          include: {
-            pdfFiles: true,
-            cadFiles: true,
-          }
+        include: {
+          category: true,
+          files: true,
+          architecturalDesign: {
+            include: {
+              pdfFiles: true,
+              cadFiles: true,
+            },
+          },
+          structuralDesign: {
+            include: {
+              pdfFiles: true,
+              cadFiles: true,
+            },
+          },
+          billOfQuantities: {
+            include: {
+              excelFiles: true,
+            },
+          },
         },
-        structuralDesign: {
-          include: {
-            pdfFiles: true,
-            cadFiles: true,
-          }
-        },
-        billOfQuantities: {
-          include: {
-            excelFiles: true,
-          }
-        }
-      },
         orderBy: { createdAt: "desc" },
         skip: skip,
         take: pageSize,
@@ -54,6 +64,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ designs, totalCount, page, pageSize });
   } catch (error) {
     console.error("Error fetching designs:", error);
-    return NextResponse.json({ message: "Failed to fetch designs" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to fetch designs" },
+      { status: 500 },
+    );
   }
 }

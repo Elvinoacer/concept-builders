@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import {
   s3Client,
   getDoSpacesPublicUrl,
@@ -10,18 +12,29 @@ import {
 
 if (!process.env.DO_SPACES_ACCESS_KEY || !process.env.DO_SPACES_SECRET_KEY) {
   throw new Error(
-    "Missing DigitalOcean Spaces credentials in environment variables"
+    "Missing DigitalOcean Spaces credentials in environment variables",
   );
 }
 
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
+
+    if (!canManageDesigns) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const { fileName, fileType, fileTypeCategory } = await request.json();
 
     if (!fileName || !fileType || !fileTypeCategory) {
-      return new NextResponse("Missing fileName, fileType, or fileTypeCategory", {
-        status: 400,
-      });
+      return new NextResponse(
+        "Missing fileName, fileType, or fileTypeCategory",
+        {
+          status: 400,
+        },
+      );
     }
 
     const allowedFileTypesByCategory = {
@@ -48,7 +61,13 @@ export async function POST(request: Request) {
         "application/octet-stream",
       ],
       PDF: ["application/pdf"],
-      IMAGE: ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"],
+      IMAGE: [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "image/avif",
+      ],
       FLOOR_PLAN: [
         "image/jpeg",
         "image/png",
@@ -57,8 +76,25 @@ export async function POST(request: Request) {
         "application/pdf",
         "image/avif",
       ],
-      FILE: ["application/pdf", "image/jpeg", "image/png", "image/gif", "image/webp", ".doc", ".docx", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain", "application/zip", "application/x-zip-compressed", "application/octet-stream"],
-      EXCEL: ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+      FILE: [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        ".doc",
+        ".docx",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain",
+        "application/zip",
+        "application/x-zip-compressed",
+        "application/octet-stream",
+      ],
+      EXCEL: [
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ],
     };
 
     if (!allowedFileTypesByCategory[fileTypeCategory]?.includes(fileType)) {
@@ -83,7 +119,10 @@ export async function POST(request: Request) {
 
     const url = getDoSpacesPublicUrl(key);
 
-    return NextResponse.json({ presignedUrl, url, originalFileName: fileName }, { status: 200 });
+    return NextResponse.json(
+      { presignedUrl, url, originalFileName: fileName },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Error creating signed URL:", error);
     return new NextResponse(error.message, { status: 500 });

@@ -21,9 +21,10 @@ import { toast } from "sonner";
 
 interface DesignsTableProps {
   onEditClick?: (designId: string) => void;
+  refreshKey?: number;
 }
 
-const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
+const DesignsTable = ({ onEditClick, refreshKey = 0 }: DesignsTableProps) => {
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
@@ -56,27 +57,28 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
       }
 
       const response = await fetch(
-        `/api/designs?search=${encodeURIComponent(debouncedSearch)}&page=${currentPage}&limit=8`
+        `/api/designs?search=${encodeURIComponent(debouncedSearch)}&page=${currentPage}&limit=8`,
       );
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch designs: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setDesigns(data.designs);
       setTotalPages(data.totalPages);
-      
     } catch (error) {
       console.error("Error fetching designs:", error);
-      setError(error instanceof Error ? error.message : "An unknown error occurred");
+      setError(
+        error instanceof Error ? error.message : "An unknown error occurred",
+      );
       toast.error("Failed to load designs");
     } finally {
       setLoading(false);
       setIsSearching(false);
       setRefreshing(false);
     }
-  }, [currentPage, debouncedSearch, designs.length, searchQuery]);
+  }, [currentPage, debouncedSearch, designs.length, searchQuery, refreshKey]);
 
   useEffect(() => {
     fetchDesigns();
@@ -86,7 +88,7 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
     if (page > 0 && page <= totalPages) {
       setCurrentPage(page);
       // Scroll to top when page changes
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -99,11 +101,12 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
   // Generate pagination items with ellipsis for mobile
   const getPaginationItems = () => {
     const items = [];
-    const maxVisiblePages = typeof window !== 'undefined' && window.innerWidth < 640 ? 3 : 5;
-    
+    const maxVisiblePages =
+      typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
+
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -111,16 +114,19 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
     if (startPage > 1) {
       items.push(
         <PaginationItem key={1}>
-          <PaginationLink onClick={() => handlePageChange(1)} className="cursor-pointer">
+          <PaginationLink
+            onClick={() => handlePageChange(1)}
+            className="cursor-pointer"
+          >
             1
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem>,
       );
       if (startPage > 2) {
         items.push(
           <PaginationItem key="ellipsis-start">
             <PaginationEllipsis />
-          </PaginationItem>
+          </PaginationItem>,
         );
       }
     }
@@ -135,7 +141,7 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
           >
             {i}
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem>,
       );
     }
 
@@ -144,15 +150,18 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
         items.push(
           <PaginationItem key="ellipsis-end">
             <PaginationEllipsis />
-          </PaginationItem>
+          </PaginationItem>,
         );
       }
       items.push(
         <PaginationItem key={totalPages}>
-          <PaginationLink onClick={() => handlePageChange(totalPages)} className="cursor-pointer">
+          <PaginationLink
+            onClick={() => handlePageChange(totalPages)}
+            className="cursor-pointer"
+          >
             {totalPages}
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem>,
       );
     }
 
@@ -163,7 +172,10 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
   const renderSkeleton = () => (
     <div className="space-y-4">
       {[...Array(6)].map((_, index) => (
-        <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div
+          key={index}
+          className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700"
+        >
           <div className="flex items-start gap-3">
             <Skeleton className="h-16 w-16 rounded-lg flex-shrink-0" />
             <div className="space-y-2 flex-1 min-w-0">
@@ -184,9 +196,7 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
       <Alert variant="destructive">
         <FiAlertCircle className="h-5 w-5" />
         <AlertDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <span className="flex-1">
-            {error}
-          </span>
+          <span className="flex-1">{error}</span>
           <Button
             onClick={handleRefresh}
             variant="outline"
@@ -198,14 +208,18 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
           </Button>
         </AlertDescription>
       </Alert>
-      
+
       <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
         <div className="text-4xl mb-4">🎨</div>
         <h3 className="text-lg font-semibold mb-2">Unable to Load Designs</h3>
         <p className="text-muted-foreground text-sm mb-4 max-w-sm mx-auto">
-          We're having trouble loading your designs. Please check your connection and try again.
+          We're having trouble loading your designs. Please check your
+          connection and try again.
         </p>
-        <Button onClick={handleRefresh} className="flex items-center gap-2 mx-auto">
+        <Button
+          onClick={handleRefresh}
+          className="flex items-center gap-2 mx-auto"
+        >
           <FiRefreshCw className="h-4 w-4" />
           Refresh Designs
         </Button>
@@ -260,7 +274,9 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
               disabled={refreshing}
               className="flex items-center gap-2"
             >
-              <FiRefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <FiRefreshCw
+                className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
+              />
               <span className="hidden xs:inline">Refresh</span>
             </Button>
           </div>
@@ -271,7 +287,7 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
           {(searchQuery || designs.length > 0) && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               className="flex items-center justify-between mt-4 text-sm text-muted-foreground"
             >
@@ -282,7 +298,8 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
                   </span>
                 ) : (
                   <span>
-                    Showing {designs.length} design{designs.length !== 1 ? 's' : ''}
+                    Showing {designs.length} design
+                    {designs.length !== 1 ? "s" : ""}
                   </span>
                 )}
               </div>
@@ -323,7 +340,7 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
               exit={{ opacity: 0 }}
             >
               <DesignsList designs={designs} onEditClick={onEditClick} />
-              
+
               {/* Empty State */}
               {designs.length === 0 && (
                 <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
@@ -332,16 +349,11 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
                     {searchQuery ? "No designs found" : "No designs yet"}
                   </h3>
                   <p className="text-muted-foreground text-sm mb-4 max-w-sm mx-auto">
-                    {searchQuery 
+                    {searchQuery
                       ? "Try adjusting your search terms to find what you're looking for."
-                      : "Get started by creating your first design to showcase your work."
-                    }
+                      : "Get started by creating your first design to showcase your work."}
                   </p>
-                  {!searchQuery && (
-                    <Button>
-                      Create First Design
-                    </Button>
-                  )}
+                  {!searchQuery && <Button>Create First Design</Button>}
                 </div>
               )}
             </motion.div>
@@ -364,9 +376,9 @@ const DesignsTable = ({ onEditClick }: DesignsTableProps) => {
                   }
                 />
               </PaginationItem>
-              
+
               {getPaginationItems()}
-              
+
               <PaginationItem>
                 <PaginationNext
                   onClick={() => handlePageChange(currentPage + 1)}

@@ -68,32 +68,38 @@ export async function POST(req: NextRequest) {
         if (!discount.isActive) {
           isValid = false;
           errorMessage = "Discount is not active";
-        } else if (discount.expiresAt && new Date(discount.expiresAt) < new Date()) {
+        } else if (
+          discount.expiresAt &&
+          new Date(discount.expiresAt) < new Date()
+        ) {
           isValid = false;
           errorMessage = "Discount has expired";
         } else if (discount.maxUses && discount.uses >= discount.maxUses) {
           isValid = false;
           errorMessage = "Discount has reached its maximum uses";
-        } else if (discount.minPurchaseAmount && calculatedTotal < discount.minPurchaseAmount) {
+        } else if (
+          discount.minPurchaseAmount &&
+          calculatedTotal < discount.minPurchaseAmount
+        ) {
           isValid = false;
           errorMessage = `Minimum purchase of ${discount.minPurchaseAmount.toFixed(2)} required`;
         }
 
         if (isValid) {
           // Check if user already used it
-           const existingOrderWithDiscount = await prisma.order.findFirst({
+          const existingOrderWithDiscount = await prisma.order.findFirst({
             where: {
               userId: userId,
               discountId: discount.id,
               status: {
-                in: ['PAID', 'REFUND_REQUESTED'],
+                in: ["PAID", "REFUND_REQUESTED"],
               },
             },
           });
 
           if (existingOrderWithDiscount) {
-             isValid = false;
-             errorMessage = "You have already used this discount code";
+            isValid = false;
+            errorMessage = "You have already used this discount code";
           }
         }
 
@@ -105,33 +111,40 @@ export async function POST(req: NextRequest) {
           }
 
           // Cap discount at total
-          appliedDiscountAmount = Math.min(appliedDiscountAmount, calculatedTotal);
-          
+          appliedDiscountAmount = Math.min(
+            appliedDiscountAmount,
+            calculatedTotal,
+          );
+
           calculatedTotal -= appliedDiscountAmount;
 
           // Update cart with valid discount
           await prisma.cart.update({
             where: { id: userCart.id },
             data: {
-                discountAmount: appliedDiscountAmount,
-                discountCode: discountCode,
-                discountId: discount.id
-            }
+              discountAmount: appliedDiscountAmount,
+              discountCode: discountCode,
+              discountId: discount.id,
+            },
           });
-
         } else {
-             console.warn(`Invalid discount code provided: ${discountCode} - ${errorMessage}`);
-             return NextResponse.json({ error: errorMessage }, { status: 400 });
+          console.warn(
+            `Invalid discount code provided: ${discountCode} - ${errorMessage}`,
+          );
+          return NextResponse.json({ error: errorMessage }, { status: 400 });
         }
       } else {
-          return NextResponse.json({ error: "Invalid discount code" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Invalid discount code" },
+          { status: 404 },
+        );
       }
     }
 
     if (calculatedTotal <= 0) {
       return NextResponse.json(
         { error: "A valid amount is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -141,14 +154,16 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "IntaSend keys not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
+
+    const isTestMode = process.env.INTASEND_TEST_MODE === "true";
 
     const intasend = new IntaSend(
       process.env.INTASEND_PUBLISHABLE_KEY,
       process.env.INTASEND_SECRET_KEY,
-      false
+      isTestMode,
     );
 
     const host = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -156,23 +171,25 @@ export async function POST(req: NextRequest) {
     // Fetch USD to KES exchange rate
     let usdToKesRate = 130;
     try {
-        const exchangeRateRes = await fetch(`${req.nextUrl.origin}/api/exchange-rate`);
-        if (exchangeRateRes.ok) {
-            const exchangeRateData = await exchangeRateRes.json();
-            if (exchangeRateData.usdToKesRate) {
-                usdToKesRate = exchangeRateData.usdToKesRate;
-            }
+      const exchangeRateRes = await fetch(
+        `${req.nextUrl.origin}/api/exchange-rate`,
+      );
+      if (exchangeRateRes.ok) {
+        const exchangeRateData = await exchangeRateRes.json();
+        if (exchangeRateData.usdToKesRate) {
+          usdToKesRate = exchangeRateData.usdToKesRate;
         }
+      }
     } catch (e) {
-        console.error("Failed to fetch exchange rate, using fallback");
+      console.error("Failed to fetch exchange rate, using fallback");
     }
 
     const amountKES = (calculatedTotal * usdToKesRate).toFixed(2);
-    
+
     console.log("🔧 Initializing IntaSend Checkout:", {
-        calculatedTotalUSD: calculatedTotal,
-        amountKES: amountKES,
-        discountApplied: appliedDiscountAmount
+      calculatedTotalUSD: calculatedTotal,
+      amountKES: amountKES,
+      discountApplied: appliedDiscountAmount,
     });
 
     // Prepare API Ref
@@ -203,12 +220,15 @@ export async function POST(req: NextRequest) {
         errorMessage = errorData.detail || errorMessage;
         console.error("IntaSend API Response Error:", errorData);
       } catch (e) {
-        console.error("IntaSend API Response Error (raw buffer):", error.response.data);
+        console.error(
+          "IntaSend API Response Error (raw buffer):",
+          error.response.data,
+        );
       }
     }
     return NextResponse.json(
       { error: errorMessage },
-      { status: error.response?.status || 500 }
+      { status: error.response?.status || 500 },
     );
   }
 }

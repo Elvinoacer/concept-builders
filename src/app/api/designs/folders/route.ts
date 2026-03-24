@@ -3,19 +3,18 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
+
+    if (!canManageDesigns) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    if (session?.user?.role !== "ADMIN") {
-      return new NextResponse("Forbidden: Admins only", { status: 403 });
-    }
-    const isAdmin = session.user.role === 'ADMIN';
 
     const folders = await prisma.folder.findMany({
-      where: isAdmin ? {} : { userId: session.user.id },
+      where: {},
       include: {
         _count: {
           select: {
@@ -35,15 +34,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
 
-    if (!session || !session.user?.id) {
-      return new NextResponse("Unauthorized: User ID is missing from session", {
+    if (!session || !session.user?.id || !canManageDesigns) {
+      return new NextResponse("Unauthorized", {
         status: 401,
       });
-    }
-
-    if (session?.user?.role !== "ADMIN") {
-      return new NextResponse("Forbidden: Admins only", { status: 403 });
     }
 
     const body = await request.json();

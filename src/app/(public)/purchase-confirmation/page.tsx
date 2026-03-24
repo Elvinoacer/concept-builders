@@ -13,6 +13,7 @@ import {
   RefreshCw,
   TriangleAlert,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -20,12 +21,22 @@ import { useInvoiceGenerator } from "@/hooks/useInvoiceGenerator";
 
 const PurchaseConfirmationPage = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const purchaseId = searchParams.get("purchaseId");
+  const [resolvedPurchaseId, setResolvedPurchaseId] = useState<string | null>(
+    purchaseId,
+  );
   const [purchase, setPurchase] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [awaitingPaymentConfirmation, setAwaitingPaymentConfirmation] =
+    useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { generateInvoice } = useInvoiceGenerator();
+
+  useEffect(() => {
+    setResolvedPurchaseId(purchaseId);
+  }, [purchaseId]);
 
   // Detect screen size
   useEffect(() => {
@@ -40,17 +51,68 @@ const PurchaseConfirmationPage = () => {
   }, []);
 
   useEffect(() => {
-    if (purchaseId) {
+    if (resolvedPurchaseId) {
       const fetchPurchase = async () => {
         try {
           setLoading(true);
           setError(null);
-          const response = await fetch(`/api/purchases/${purchaseId}`);
+          const response = await fetch(`/api/purchases/${resolvedPurchaseId}`);
+
+          if (response.status === 401) {
+            router.replace(
+              `/auth?callbackUrl=${encodeURIComponent(`/purchase-confirmation?purchaseId=${resolvedPurchaseId}`)}`,
+            );
+            return;
+          }
+
+          if (response.status === 404 && resolvedPurchaseId === purchaseId) {
+            setAwaitingPaymentConfirmation(true);
+
+            const timeoutAt = Date.now() + 5 * 60 * 1000;
+            const pollInterval = setInterval(async () => {
+              if (Date.now() > timeoutAt) {
+                clearInterval(pollInterval);
+                setAwaitingPaymentConfirmation(false);
+                setLoading(false);
+                setError(
+                  "Payment is still being verified. Please refresh shortly or check your dashboard purchases.",
+                );
+                return;
+              }
+
+              const statusRes = await fetch(
+                `/api/orders/status?cartId=${resolvedPurchaseId}`,
+              );
+
+              if (!statusRes.ok) {
+                return;
+              }
+
+              const statusData = await statusRes.json();
+              if (statusData.status === "PAID" && statusData.orderId) {
+                clearInterval(pollInterval);
+                setAwaitingPaymentConfirmation(false);
+                setResolvedPurchaseId(statusData.orderId);
+                router.replace(
+                  `/purchase-confirmation?purchaseId=${statusData.orderId}`,
+                );
+              } else if (statusData.status === "FAILED") {
+                clearInterval(pollInterval);
+                setAwaitingPaymentConfirmation(false);
+                setLoading(false);
+                setError("Payment failed. Please try again.");
+              }
+            }, 4000);
+
+            return;
+          }
+
           if (!response.ok) {
             throw new Error("Failed to fetch purchase details");
           }
           const data = await response.json();
           setPurchase(data);
+          setAwaitingPaymentConfirmation(false);
         } catch (error) {
           setError(error.message);
           toast.error(error.message);
@@ -63,7 +125,17 @@ const PurchaseConfirmationPage = () => {
       setLoading(false);
       setError("No purchase ID provided");
     }
-  }, [purchaseId]);
+  }, [purchaseId, resolvedPurchaseId, router]);
+
+  useEffect(() => {
+    if (!purchase?.id) return;
+
+    const redirectTimer = setTimeout(() => {
+      router.push(`/dashboard/purchases/${purchase.id}`);
+    }, 10000);
+
+    return () => clearTimeout(redirectTimer);
+  }, [purchase, router]);
 
   // Animation variants
   const containerVariants = {
@@ -118,10 +190,14 @@ const PurchaseConfirmationPage = () => {
           />
           <div className="space-y-3">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Loading Purchase Details
+              {awaitingPaymentConfirmation
+                ? "Verifying Payment"
+                : "Loading Purchase Details"}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Please wait while we retrieve your order information...
+              {awaitingPaymentConfirmation
+                ? "We are confirming your payment with the provider. This can take a moment."
+                : "Please wait while we retrieve your order information..."}
             </p>
           </div>
         </motion.div>

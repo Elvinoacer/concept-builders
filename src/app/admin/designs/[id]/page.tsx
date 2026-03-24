@@ -8,7 +8,7 @@ import NewDesignForm from "@/components/admin/designs/NewDesignForm";
 import PackageOptionsManager from "@/components/admin/designs/PackageOptionsManager";
 import VersionControl from "@/components/admin/designs/VersionControl";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +29,6 @@ import {
   FiInfo,
   FiLayers,
   FiMaximize,
-  FiStar,
   FiTrash,
 } from "react-icons/fi";
 
@@ -38,21 +37,60 @@ interface Folder {
   name: string;
 }
 
+interface CostBreakdownItem {
+  item: string;
+  cost: number | string;
+}
+
+interface BuildingCostEstimate {
+  tier: string;
+  description: string;
+  costBreakdown: CostBreakdownItem[];
+}
+
+interface PackageOption {
+  id: string;
+  name: string;
+  price: number;
+  file?: {
+    url: string;
+    name: string;
+    type: string;
+  } | null;
+}
+
+interface DesignDetail {
+  id: string;
+  name: string;
+  description: string;
+  category?: { name: string } | null;
+  folderId?: string | null;
+  folder?: Folder | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  area?: number | null;
+  floors?: number | null;
+  basePrice?: number | string | null;
+  priceRange?: string | null;
+  planDetails?: string[];
+  buildingCostEstimates?: BuildingCostEstimate[];
+  packageOptions?: PackageOption[];
+}
+
 const DesignPage = () => {
-  const [design, setDesign] = useState<any>(null);
+  const [design, setDesign] = useState<DesignDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setFormOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEstimatesModalOpen, setIsEstimatesModalOpen] = useState(false);
   const [filePreviewKey, setFilePreviewKey] = useState(0);
-  const [openAccordion, setOpenAccordion] = useState<number | null>(null);
   const [folders, setFolders] = useState<Folder[]>([]);
-  const params = useParams();
+  const params = useParams<{ id: string }>();
   const router = useRouter();
-  const { id } = params;
+  const id = params?.id;
 
-  const fetchDesign = async () => {
+  const fetchDesign = useCallback(async () => {
     if (id) {
       try {
         setLoading(true);
@@ -70,13 +108,13 @@ const DesignPage = () => {
         setLoading(false);
       }
     }
-  };
+  }, [id]);
 
-  const fetchFolders = async () => {
+  const fetchFolders = useCallback(async () => {
     try {
-      const response = await fetch("/api/admin/folders");
+      const response = await fetch("/api/designs/folders");
       if (response.ok) {
-        const data = await response.json();
+        const data = (await response.json()) as Folder[];
         setFolders(data);
       } else {
         console.error("Failed to fetch folders");
@@ -84,12 +122,12 @@ const DesignPage = () => {
     } catch (error) {
       console.error("Error fetching folders:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchDesign();
     fetchFolders();
-  }, [id]);
+  }, [fetchDesign, fetchFolders]);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -117,19 +155,28 @@ const DesignPage = () => {
   };
 
   const handleLinkToFolder = async (newFolderId: string | null) => {
+    if (!design || !id) {
+      return;
+    }
+
     const originalFolderId = design.folderId;
-    const originalFolderName = design.folder?.name;
 
     // Optimistic update
-    setDesign((prevDesign: any) => ({
-      ...prevDesign,
-      folderId: newFolderId,
-      folder: newFolderId ? folders.find((f) => f.id === newFolderId) : null,
-    }));
+    setDesign((prevDesign) =>
+      prevDesign
+        ? {
+            ...prevDesign,
+            folderId: newFolderId,
+            folder: newFolderId
+              ? folders.find((f) => f.id === newFolderId) || null
+              : null,
+          }
+        : prevDesign,
+    );
     toast.info(
       newFolderId
         ? `Linking design to folder ${folders.find((f) => f.id === newFolderId)?.name}...`
-        : "Unlinking design from folder..."
+        : "Unlinking design from folder...",
     );
 
     try {
@@ -148,20 +195,25 @@ const DesignPage = () => {
       toast.success(
         newFolderId
           ? `Design successfully linked to folder ${folders.find((f) => f.id === newFolderId)?.name}.`
-          : "Design successfully unlinked from folder."
+          : "Design successfully unlinked from folder.",
       );
       fetchDesign(); // Re-fetch to ensure data consistency
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error linking design to folder:", error);
-      toast.error(`Failed to update folder link: ${error.message}`);
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Failed to update folder link: ${message}`);
       // Revert optimistic update
-      setDesign((prevDesign: any) => ({
-        ...prevDesign,
-        folderId: originalFolderId,
-        folder: originalFolderId
-          ? folders.find((f) => f.id === originalFolderId)
-          : null,
-      }));
+      setDesign((prevDesign) =>
+        prevDesign
+          ? {
+              ...prevDesign,
+              folderId: originalFolderId,
+              folder: originalFolderId
+                ? folders.find((f) => f.id === originalFolderId) || null
+                : null,
+            }
+          : prevDesign,
+      );
     }
   };
 
@@ -174,25 +226,6 @@ const DesignPage = () => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(numericPrice);
-  };
-
-  const toggleAccordion = (accordion: number | null) => {
-    setOpenAccordion(openAccordion === accordion ? null : accordion);
-  };
-
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 0; i < 5; i++) {
-      stars.push(
-        <FiStar
-          key={i}
-          className={i < rating ? "text-yellow-400" : "text-gray-300"}
-          fill={i < rating ? "currentColor" : "none"}
-          size={16}
-        />
-      );
-    }
-    return <div className="flex gap-0.5">{stars}</div>;
   };
 
   // Loading State
@@ -240,8 +273,8 @@ const DesignPage = () => {
             Design Not Found
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            The design you're looking for doesn't exist or you don't have
-            permission to view it.
+            The design you&apos;re looking for doesn&apos;t exist or you
+            don&apos;t have permission to view it.
           </p>
           <button
             onClick={() => router.push("/admin/designs")}
@@ -380,7 +413,9 @@ const DesignPage = () => {
                       Base Price
                     </p>
                     <p className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">
-                      {formatPrice(design.basePrice)}
+                      {design.basePrice == null
+                        ? "N/A"
+                        : formatPrice(design.basePrice)}
                     </p>
                   </div>
                 </div>
@@ -426,7 +461,7 @@ const DesignPage = () => {
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     {design.buildingCostEstimates.map(
-                      (estimate: any, index: number) => (
+                      (estimate: BuildingCostEstimate, index: number) => (
                         <div
                           key={index}
                           className="p-4 sm:p-5 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600"
@@ -440,7 +475,7 @@ const DesignPage = () => {
                           <div className="space-y-3">
                             {estimate.costBreakdown
                               .slice(0, 3)
-                              .map((item: any, i: number) => (
+                              .map((item: CostBreakdownItem, i: number) => (
                                 <div
                                   key={i}
                                   className="flex justify-between items-center text-sm border-t border-gray-200 dark:border-gray-600 pt-3"
@@ -461,7 +496,7 @@ const DesignPage = () => {
                             )}
                           </div>
                         </div>
-                      )
+                      ),
                     )}
                   </div>
                   <div className="mt-4 sm:mt-6 text-center">
@@ -485,12 +520,12 @@ const DesignPage = () => {
             <DesignFileUpload design={design} onUploadComplete={fetchDesign} />
 
             {/* Version Control Component */}
-            <VersionControl designId={id} />
+            <VersionControl designId={id ?? ""} />
           </div>
 
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
-            <DesignFilePreview designId={id} key={filePreviewKey} />
+            <DesignFilePreview designId={id ?? ""} key={filePreviewKey} />
 
             {/* Additional sidebar content can go here */}
           </div>
@@ -515,7 +550,7 @@ const DesignPage = () => {
       />
       {isEstimatesModalOpen && (
         <BuildingCostEstimatesModal
-          estimates={design.buildingCostEstimates}
+          estimates={design.buildingCostEstimates || []}
           onClose={() => setIsEstimatesModalOpen(false)}
           formatPrice={formatPrice}
         />

@@ -6,12 +6,24 @@ import prisma from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const signature = req.headers.get("X-IntaSend-Signature");
-    const secret = process.env.INTASEND_WEBHOOK_SECRET;
+    const signature = req.headers.get("x-intasend-signature");
+    const secret =
+      process.env.INTASEND_WEBHOOK_SECRET || process.env.INTASEND_SECRET_KEY;
+    const expectedChallenge = process.env.INTASEND_WEBHOOK_CHALLENGE;
 
     if (!secret) {
       console.error("IntaSend webhook secret is not configured.");
-      return NextResponse.json({ error: "Webhook secret not configured." }, { status: 500 });
+      return NextResponse.json(
+        { error: "Webhook secret not configured." },
+        { status: 500 },
+      );
+    }
+
+    if (!signature) {
+      return NextResponse.json(
+        { error: "Missing signature." },
+        { status: 401 },
+      );
     }
 
     const body = await req.text();
@@ -20,32 +32,57 @@ export async function POST(req: NextRequest) {
     hmac.update(body);
     const calculatedSignature = hmac.digest("hex");
 
-    if (calculatedSignature !== signature) {
-      return NextResponse.json({ error: "Invalid signature." }, { status: 403 });
+    const provided = Buffer.from(signature);
+    const expected = Buffer.from(calculatedSignature);
+
+    if (
+      provided.length !== expected.length ||
+      !crypto.timingSafeEqual(provided, expected)
+    ) {
+      return NextResponse.json(
+        { error: "Invalid signature." },
+        { status: 403 },
+      );
     }
 
     const data = JSON.parse(body);
 
-    if (data.state === "COMPLETE") {
+    if (expectedChallenge && data.challenge !== expectedChallenge) {
+      return NextResponse.json(
+        { error: "Invalid challenge." },
+        { status: 403 },
+      );
+    }
+
+    const state = data.state || data.invoice?.state;
+    const apiRef = data.api_ref || data.invoice?.api_ref;
+    const paymentId =
+      data.invoice_id || data.invoice?.invoice_id || data.invoice?.id;
+
+    if (state === "COMPLETE") {
       // api_ref format: cart_{cartId}_{timestamp}
       // We need to extract the cartId.
       // If api_ref doesn't match the format (legacy), fallback to using it as is.
-      let cartId = data.api_ref;
-      if (data.api_ref && data.api_ref.startsWith("cart_")) {
-          const parts = data.api_ref.split('_');
-          if (parts.length >= 2) {
-              cartId = parts[1];
-          }
-      } else if (data.api_ref && data.api_ref.startsWith("cart-")) {
-          // Handle legacy format cart-{cartId}-{timestamp} just in case
-           const parts = data.api_ref.split('-');
-           if (parts.length >= 2) {
-               cartId = parts[1];
-           }
+      let cartId = apiRef;
+      if (apiRef && apiRef.startsWith("cart_")) {
+        const parts = apiRef.split("_");
+        if (parts.length >= 2) {
+          cartId = parts[1];
+        }
+      } else if (apiRef && apiRef.startsWith("cart-")) {
+        // Handle legacy format cart-{cartId}-{timestamp} just in case
+        const parts = apiRef.split("-");
+        if (parts.length >= 2) {
+          cartId = parts[1];
+        }
       }
 
-      const paymentId = data.invoice_id;
-      const amountPaidKES = data.value;
+      if (!paymentId || !cartId) {
+        return NextResponse.json(
+          { error: "Invalid webhook payload." },
+          { status: 400 },
+        );
+      }
 
       const existingOrder = await prisma.order.findUnique({
         where: { paymentId },
@@ -57,31 +94,46 @@ export async function POST(req: NextRequest) {
 
       const userCart = await prisma.cart.findUnique({
         where: { id: cartId },
-        include: { items: { include: { design: true } }, discount: true, user: true },
+        include: {
+          items: {
+            include: {
+              design: {
+                include: {
+                  packageOptions: true,
+                },
+              },
+            },
+          },
+          discount: true,
+          user: true,
+        },
       });
 
       if (!userCart) {
-        console.error(`Cart not found for api_ref: ${data.api_ref}, extracted cartId: ${cartId}`);
+        console.error(
+          `Cart not found for api_ref: ${apiRef}, extracted cartId: ${cartId}`,
+        );
         return NextResponse.json({ error: "Cart not found" }, { status: 404 });
       }
 
-      // Fetch USD to KES exchange rate to convert amount back to USD
-      // Note: In production, it might be safer to use the rate stored in the cart or a fixed rate, 
-      // but fetching current rate is acceptable if volatility is low.
-      let usdToKesRate = 130; // Default fallback
-      try {
-        const exchangeRateRes = await fetch(`${req.nextUrl.origin}/api/exchange-rate`);
-        if (exchangeRateRes.ok) {
-            const exchangeRateData = await exchangeRateRes.json();
-            if (exchangeRateData.usdToKesRate) {
-                usdToKesRate = exchangeRateData.usdToKesRate;
-            }
-        }
-      } catch (e) {
-          console.error("Failed to fetch exchange rate in webhook, using fallback", e);
-      }
+      // Recalculate USD amount deterministically from the stored cart snapshot.
+      const subtotalUSD = userCart.items.reduce((total, item) => {
+        const selectedExtras = Array.isArray(item.selectedExtras)
+          ? (item.selectedExtras as Array<{ price?: number }>).map((extra) => ({
+              price: typeof extra?.price === "number" ? extra.price : 0,
+            }))
+          : [];
 
-      const amountPaidUSD = parseFloat(amountPaidKES) / usdToKesRate;
+        const itemForCalculation = {
+          ...item,
+          selectedExtras,
+        };
+        return total + calculateItemTotal(itemForCalculation);
+      }, 0);
+      const amountPaidUSD = Math.max(
+        0,
+        subtotalUSD - (userCart.discountAmount || 0),
+      );
 
       const order = await prisma.$transaction(async (tx) => {
         const order = await tx.order.create({
@@ -104,7 +156,7 @@ export async function POST(req: NextRequest) {
             designId: item.designId,
             quantity: item.quantity,
             selectedFileTypes: item.selectedFileTypes,
-            selectedExtras: item.selectedExtras, // Pass directly as Json
+            selectedExtras: item.selectedExtras ?? undefined,
           })),
         });
 
@@ -127,6 +179,10 @@ export async function POST(req: NextRequest) {
             icon: "ShoppingCart",
           },
         });
+
+        // Clear cart after successful order creation while preserving cartId in order.
+        await tx.cartItem.deleteMany({ where: { cartId: userCart.id } });
+        await tx.cart.delete({ where: { id: userCart.id } });
 
         return order;
       });
@@ -191,15 +247,15 @@ export async function POST(req: NextRequest) {
       } catch (pushError) {
         console.error("Failed to send push notification:", pushError);
       }
-    } else {
+    } else if (state === "FAILED") {
       console.log("Payment failed:", data);
       // Try to extract cartId for notification
-      let cartId = data.api_ref;
-      if (data.api_ref && data.api_ref.startsWith("cart_")) {
-          const parts = data.api_ref.split('_');
-          if (parts.length >= 2) {
-              cartId = parts[1];
-          }
+      let cartId = apiRef;
+      if (apiRef && apiRef.startsWith("cart_")) {
+        const parts = apiRef.split("_");
+        if (parts.length >= 2) {
+          cartId = parts[1];
+        }
       }
 
       const userCart = await prisma.cart.findUnique({
@@ -215,12 +271,17 @@ export async function POST(req: NextRequest) {
           },
         });
       }
+    } else {
+      // Ignore transitional states and acknowledge delivery.
+      return NextResponse.json({ success: true });
     }
 
     return NextResponse.json({ success: true });
-
   } catch (error) {
     console.error("IntaSend webhook error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

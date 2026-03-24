@@ -2,9 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSignedUrlForUpload } from "@/lib/do-spaces";
 import { FileType } from "@/generated/prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
+
+    if (!canManageDesigns) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const { designId, fileRelation, fileName, contentType } = await req.json();
 
     if (!designId || !fileRelation || !fileName || !contentType) {
@@ -14,7 +24,7 @@ export async function POST(req: NextRequest) {
     // 1. Get signed URL
     const { signedUrl, publicUrl } = await getSignedUrlForUpload(
       fileName,
-      contentType
+      contentType,
     );
 
     // 2. Determine the FileType enum value and the foreign key
@@ -43,7 +53,7 @@ export async function POST(req: NextRequest) {
         ...whereClause,
       },
       orderBy: {
-        version: 'desc',
+        version: "desc",
       },
     });
 

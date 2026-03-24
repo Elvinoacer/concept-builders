@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FiFolder, FiFolderPlus, FiGrid, FiPlus, FiTag } from "react-icons/fi";
+import { FiFolderPlus, FiGrid, FiPlus, FiTag } from "react-icons/fi";
 
 interface DesignsHeaderProps {
   activeTab: string;
   newfolder?: boolean;
-  onTabChange: (tab: string) => void;
+  onTabChange?: (tab: string) => void;
   onNewDesignClick: () => void;
   onNewFolderClick: () => void;
   onManageCategoriesClick: () => void;
@@ -15,7 +15,6 @@ interface DesignsHeaderProps {
 const DesignsHeader = ({
   activeTab,
   newfolder,
-  onTabChange,
   onNewDesignClick,
   onNewFolderClick,
   onManageCategoriesClick,

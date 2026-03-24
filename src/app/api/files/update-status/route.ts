@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { UploadStatus } from "@/generated/prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
+
+    if (!canManageDesigns) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const { fileId, status } = await req.json();
 
     if (!fileId || !status) {
@@ -12,8 +22,8 @@ export async function POST(req: NextRequest) {
 
     const updatedFile = await prisma.file.update({
       where: { id: fileId },
-      data: { 
-        status: status as UploadStatus 
+      data: {
+        status: status as UploadStatus,
       },
     });
 

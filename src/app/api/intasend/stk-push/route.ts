@@ -9,14 +9,30 @@ import { DiscountType } from "@/generated/prisma/client";
 
 class APIException extends Error {
   public statusCode: number;
-  public metadata: any;
+  public metadata: Record<string, unknown>;
 
-  constructor(message: string, statusCode: number, metadata: any = {}) {
+  constructor(
+    message: string,
+    statusCode: number,
+    metadata: Record<string, unknown> = {},
+  ) {
     super(message);
     this.statusCode = statusCode;
     this.metadata = metadata;
     this.name = "APIException";
   }
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Unknown error";
+}
+
+function getObject(error: unknown): Record<string, unknown> {
+  if (typeof error === "object" && error !== null) {
+    return error as Record<string, unknown>;
+  }
+
+  return {};
 }
 
 export async function POST(req: NextRequest) {
@@ -31,13 +47,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const {
-      first_name,
-      last_name,
-      email,
-      phone_number,
-      discountCode,
-    } = body;
+    const { first_name, last_name, email, phone_number, discountCode } = body;
 
     // Validate required fields
     if (!first_name || !email || !phone_number) {
@@ -79,9 +89,15 @@ export async function POST(req: NextRequest) {
       // Cast item to satisfy the type expected by calculateItemTotal if necessary,
       // though the include structure should match.
       // We need to ensure selectedExtras is treated correctly (Json vs any[])
+      const selectedExtras = Array.isArray(item.selectedExtras)
+        ? (item.selectedExtras as Array<{ price?: number }>).map((extra) => ({
+            price: typeof extra?.price === "number" ? extra.price : 0,
+          }))
+        : [];
+
       const itemForCalculation = {
         ...item,
-        selectedExtras: item.selectedExtras as any[],
+        selectedExtras,
       };
       return total + calculateItemTotal(itemForCalculation);
     }, 0);
@@ -102,32 +118,38 @@ export async function POST(req: NextRequest) {
         if (!discount.isActive) {
           isValid = false;
           errorMessage = "Discount is not active";
-        } else if (discount.expiresAt && new Date(discount.expiresAt) < new Date()) {
+        } else if (
+          discount.expiresAt &&
+          new Date(discount.expiresAt) < new Date()
+        ) {
           isValid = false;
           errorMessage = "Discount has expired";
         } else if (discount.maxUses && discount.uses >= discount.maxUses) {
           isValid = false;
           errorMessage = "Discount has reached its maximum uses";
-        } else if (discount.minPurchaseAmount && calculatedTotal < discount.minPurchaseAmount) {
+        } else if (
+          discount.minPurchaseAmount &&
+          calculatedTotal < discount.minPurchaseAmount
+        ) {
           isValid = false;
           errorMessage = `Minimum purchase of ${discount.minPurchaseAmount.toFixed(2)} required`;
         }
 
         if (isValid) {
           // Check if user already used it
-           const existingOrderWithDiscount = await prisma.order.findFirst({
+          const existingOrderWithDiscount = await prisma.order.findFirst({
             where: {
               userId: userId,
               discountId: discount.id,
               status: {
-                in: ['PAID', 'REFUND_REQUESTED'],
+                in: ["PAID", "REFUND_REQUESTED"],
               },
             },
           });
 
           if (existingOrderWithDiscount) {
-             isValid = false;
-             errorMessage = "You have already used this discount code";
+            isValid = false;
+            errorMessage = "You have already used this discount code";
           }
         }
 
@@ -139,32 +161,39 @@ export async function POST(req: NextRequest) {
           }
 
           // Cap discount at total
-          appliedDiscountAmount = Math.min(appliedDiscountAmount, calculatedTotal);
-          
+          appliedDiscountAmount = Math.min(
+            appliedDiscountAmount,
+            calculatedTotal,
+          );
+
           calculatedTotal -= appliedDiscountAmount;
 
           // Update cart with valid discount
           await prisma.cart.update({
             where: { id: userCart.id },
             data: {
-                discountAmount: appliedDiscountAmount,
-                discountCode: discountCode,
-                discountId: discount.id
-            }
+              discountAmount: appliedDiscountAmount,
+              discountCode: discountCode,
+              discountId: discount.id,
+            },
           });
-
         } else {
-             console.warn(`Invalid discount code provided: ${discountCode} - ${errorMessage}`);
-             throw new APIException(errorMessage, 400);
+          console.warn(
+            `Invalid discount code provided: ${discountCode} - ${errorMessage}`,
+          );
+          throw new APIException(errorMessage, 400);
         }
       } else {
-          throw new APIException("Invalid discount code", 404);
+        throw new APIException("Invalid discount code", 404);
       }
     }
 
     // Ensure amount is positive
     if (calculatedTotal <= 0) {
-      throw new APIException("Amount must be greater than 0 for M-Pesa payment", 400);
+      throw new APIException(
+        "Amount must be greater than 0 for M-Pesa payment",
+        400,
+      );
     }
 
     // CRITICAL: Validate IntaSend configuration
@@ -192,7 +221,7 @@ export async function POST(req: NextRequest) {
             "Content-Type": "application/json",
           },
           cache: "no-cache",
-        }
+        },
       );
 
       if (!exchangeRateRes.ok) {
@@ -202,7 +231,7 @@ export async function POST(req: NextRequest) {
         const exchangeRateData = await exchangeRateRes.json();
         usdToKesRate = exchangeRateData.usdToKesRate;
       }
-    } catch (exchangeError) {
+    } catch {
       console.error("Exchange rate fetch error, using fallback");
       usdToKesRate = 130;
     }
@@ -214,22 +243,24 @@ export async function POST(req: NextRequest) {
     // Convert amount to KES
     const amountKES = calculatedTotal * usdToKesRate;
 
-    console.log("🔧 Initializing IntaSend (Live Mode):", {
+    const isTestMode = process.env.INTASEND_TEST_MODE === "true";
+
+    console.log("🔧 Initializing IntaSend:", {
+      mode: isTestMode ? "TEST" : "LIVE",
       publishableKeyStart:
         process.env.INTASEND_PUBLISHABLE_KEY?.substring(0, 15) + "...",
-      secretKeyStart:
-        process.env.INTASEND_SECRET_KEY?.substring(0, 20) + "...",
+      secretKeyStart: process.env.INTASEND_SECRET_KEY?.substring(0, 20) + "...",
       calculatedTotalUSD: calculatedTotal,
       amountKES: amountKES,
-      discountApplied: appliedDiscountAmount
+      discountApplied: appliedDiscountAmount,
     });
 
     // Initialize IntaSend SDK
-    // Note: Third parameter is 'test' - set to false for live/production mode
+    // Third parameter controls IntaSend environment.
     const intasend = new IntaSend(
       process.env.INTASEND_PUBLISHABLE_KEY!,
       process.env.INTASEND_SECRET_KEY!,
-      false // false = live/production, true = test/sandbox
+      isTestMode,
     );
     // Format phone number
     let formattedPhone = phone_number.trim().replace(/\D/g, "");
@@ -239,10 +270,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate phone number
-    if (formattedPhone.length !== 12 || (!formattedPhone.startsWith("2547") && !formattedPhone.startsWith("2541"))) {
+    if (
+      formattedPhone.length !== 12 ||
+      (!formattedPhone.startsWith("2547") && !formattedPhone.startsWith("2541"))
+    ) {
       throw new APIException(
         "Phone number must be 12 digits starting with 2547 or 2541",
-        400
+        400,
       );
     }
 
@@ -277,45 +311,52 @@ export async function POST(req: NextRequest) {
           apiRef: apiRef,
           exchangeRate: usdToKesRate,
           calculatedTotalUSD: calculatedTotal,
-          discountApplied: appliedDiscountAmount
+          discountApplied: appliedDiscountAmount,
         },
       });
-    } catch (intaSendError: any) {
+    } catch (intaSendError: unknown) {
+      const errorObj = getObject(intaSendError);
+      const responseObj = getObject(errorObj.response);
       console.error("❌ IntaSend API Call Failed:");
       console.error("Error object:", JSON.stringify(intaSendError, null, 2));
 
       // Enhanced error logging
-      if (intaSendError.response) {
-        console.error("Response status:", intaSendError.response.status);
-        console.error("Response headers:", intaSendError.response.headers);
+      if (Object.keys(responseObj).length > 0) {
+        console.error("Response status:", responseObj.status);
+        console.error("Response headers:", responseObj.headers);
 
         try {
           // Try to get the actual error response from IntaSend
           let errorData;
-          if (typeof intaSendError.response.data === "string") {
-            errorData = intaSendError.response.data;
+          if (typeof responseObj.data === "string") {
+            errorData = responseObj.data;
           } else if (
-            intaSendError.response.data &&
-            typeof intaSendError.response.data.text === "function"
+            responseObj.data &&
+            typeof (responseObj.data as { text?: unknown }).text === "function"
           ) {
-            errorData = await intaSendError.response.data.text();
+            errorData = await (
+              responseObj.data as { text: () => Promise<string> }
+            ).text();
           } else {
-            errorData = intaSendError.response.data;
+            errorData = responseObj.data;
           }
-          console.error("IntaSend Error Response:", JSON.stringify(errorData, null, 2));
+          console.error(
+            "IntaSend Error Response:",
+            JSON.stringify(errorData, null, 2),
+          );
         } catch (parseError) {
           console.error("Could not parse IntaSend error response", parseError);
         }
       }
 
       console.error("Error details:", {
-        message: intaSendError.message,
-        code: intaSendError.code,
-        stack: intaSendError.stack,
+        message: getErrorMessage(intaSendError),
+        code: errorObj.code,
+        stack: errorObj.stack,
       });
 
       // Specific error handling
-      if (intaSendError.response?.status === 401) {
+      if (responseObj.status === 401) {
         throw new APIException(
           "IntaSend authentication failed. Your credentials were rejected. Please verify: 1) API keys are correct in .env, 2) Your IntaSend account is approved for LIVE payments, 3) You have sufficient permissions. Check server logs for detailed error response.",
           401,
@@ -326,19 +367,19 @@ export async function POST(req: NextRequest) {
             keysProvided: {
               publishableKey: !!process.env.INTASEND_PUBLISHABLE_KEY,
               secretKey: !!process.env.INTASEND_SECRET_KEY,
-            }
-          }
+            },
+          },
         );
       }
 
       throw new APIException(
-        "Payment gateway error: " + (intaSendError.message || "Unknown error"),
+        "Payment gateway error: " + getErrorMessage(intaSendError),
         500,
-        { gateway: "intasend" }
+        { gateway: "intasend" },
       );
     }
-  } catch (error: any) {
-    console.error("STK Push Error:", error.message);
+  } catch (error: unknown) {
+    console.error("STK Push Error:", getErrorMessage(error));
 
     if (error instanceof APIException) {
       return NextResponse.json(
@@ -346,7 +387,7 @@ export async function POST(req: NextRequest) {
           error: error.message,
           details: error.metadata,
         },
-        { status: error.statusCode }
+        { status: error.statusCode },
       );
     }
 
@@ -354,9 +395,11 @@ export async function POST(req: NextRequest) {
       {
         error: "Failed to initiate M-Pesa STK Push",
         details:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? getErrorMessage(error)
+            : undefined,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

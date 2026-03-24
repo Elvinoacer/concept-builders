@@ -6,16 +6,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
+type UrlFile = {
+  url: string | null;
+};
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
     const isAdmin = session?.user.role === "ADMIN";
     const { id } = await params;
-    
-    console.log(`[Designs API] Fetching design with ID: ${id}, isAdmin: ${isAdmin}`);
+
+    console.log(
+      `[Designs API] Fetching design with ID: ${id}, isAdmin: ${isAdmin}`,
+    );
 
     const design = await prisma.design.findUnique({
       where: { id },
@@ -59,15 +65,15 @@ export async function GET(
       console.log(`[Designs API] Design not found with ID: ${id}`);
       return new NextResponse("Design not found", { status: 404 });
     }
-    
+
     console.log(`[Designs API] Design found: ${design.name}`);
 
     if (!isAdmin) {
-      const sanitizeFileUrls = (files: any[]) => {
+      const sanitizeFileUrls = (files: Array<UrlFile | null> | null) => {
         if (files && Array.isArray(files)) {
           files.forEach((file) => {
             if (file) {
-              (file as any).url = null;
+              file.url = null;
             }
           });
         } else if (files) {
@@ -91,7 +97,7 @@ export async function GET(
       if (design.packageOptions) {
         design.packageOptions.forEach((option) => {
           if (option.file) {
-            (option.file as any).url = null;
+            (option.file as UrlFile).url = null;
           }
         });
       }
@@ -110,9 +116,17 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
+
+    if (!canManageDesigns) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
 
@@ -142,7 +156,7 @@ export async function PUT(
       folderId,
     } = body;
 
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       name,
       description,
       basePrice,
@@ -274,9 +288,17 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    const canManageDesigns =
+      session?.user?.role === "ADMIN" || session?.user?.role === "TEAM";
+
+    if (!canManageDesigns) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const { id } = await params;
 
     console.log(`Starting deletion process for design: ${id}`);
@@ -389,19 +411,19 @@ export async function DELETE(
             error:
               "Cannot delete design because it is referenced by other records. Please remove all references first.",
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
 
       return NextResponse.json(
         { error: `Failed to delete design: ${error.message}` },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     return NextResponse.json(
       { error: "Internal server error while deleting design" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -410,7 +432,7 @@ export async function DELETE(
 async function deleteFilesFromSpacesBackground(fileUrls: string[]) {
   try {
     console.log(
-      `Starting background deletion of ${fileUrls.length} files from Spaces`
+      `Starting background deletion of ${fileUrls.length} files from Spaces`,
     );
 
     const deletePromises = fileUrls.map(async (fileUrl) => {
@@ -437,14 +459,14 @@ async function deleteFilesFromSpacesBackground(fileUrls: string[]) {
     const results = await Promise.allSettled(deletePromises);
 
     const successful = results.filter(
-      (result) => result.status === "fulfilled"
+      (result) => result.status === "fulfilled",
     ).length;
     const failed = results.filter(
-      (result) => result.status === "rejected"
+      (result) => result.status === "rejected",
     ).length;
 
     console.log(
-      `Background file deletion completed: ${successful} successful, ${failed} failed`
+      `Background file deletion completed: ${successful} successful, ${failed} failed`,
     );
   } catch (error) {
     console.error("Background file deletion process failed:", error);
@@ -476,28 +498,4 @@ function extractKeyFromUrl(url: string): string | null {
     console.error(`Invalid URL format: ${url}`, error);
     return null;
   }
-}
-
-// Alternative: If you want to wait for file deletion (slower but more reliable)
-async function deleteFilesFromSpacesWait(fileUrls: string[]) {
-  const deletePromises = fileUrls.map(async (fileUrl) => {
-    const key = extractKeyFromUrl(fileUrl);
-    if (!key) return;
-
-    try {
-      const command = new DeleteObjectCommand({
-        Bucket: process.env.DO_SPACES_BUCKET!,
-        Key: key,
-      });
-
-      await s3Client.send(command);
-      return { success: true, key };
-    } catch (error) {
-      console.error(`Failed to delete: ${key}`, error);
-      return { success: false, key, error };
-    }
-  });
-
-  const results = await Promise.allSettled(deletePromises);
-  return results;
 }
