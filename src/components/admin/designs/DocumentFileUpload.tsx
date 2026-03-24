@@ -125,6 +125,7 @@ export default function DocumentFileUpload({
         const xhr = new XMLHttpRequest();
         xhr.open("PUT", signedUrl, true);
         xhr.setRequestHeader("Content-Type", file.type);
+        xhr.setRequestHeader("x-amz-acl", "public-read");
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {

@@ -122,6 +122,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
 
       const { signedUrl, fileKey, publicUrl, originalFileName } =
         signedUrlResponse.data;
+      const objectAcl = "public-read";
       setUploadingFiles((prev) =>
         prev.map((f) =>
           f.id === id
@@ -139,6 +140,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
           await axios.put(signedUrl, file, {
             headers: {
               "Content-Type": file.type,
+              "x-amz-acl": objectAcl,
             },
             timeout: 0,
             onUploadProgress: (progressEvent) => {
