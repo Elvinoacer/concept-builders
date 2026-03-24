@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { Prisma, PrismaClient } from "../src/generated/prisma";
+import { Prisma } from "../src/generated/prisma/client";
+import { createPrismaClient } from "../prisma/client";
 
-const prisma = new PrismaClient();
+const { prisma, pool } = createPrismaClient();
 
 const userScalarSelect = Object.values(Prisma.UserScalarFieldEnum).reduce(
   (select, field) => {
@@ -35,4 +36,5 @@ exportUsers(process.argv[2])
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

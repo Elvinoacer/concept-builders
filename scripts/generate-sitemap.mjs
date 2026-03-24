@@ -1,8 +1,17 @@
-import { PrismaClient } from "../src/generated/prisma";
+import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 import fs from "fs";
 import path from "path";
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not set");
+}
+
+const pool = new pg.Pool({ connectionString });
+const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 const BASE_URL = "https://conceptbuilders.co.ke";
 
 async function generateSitemap() {
@@ -63,4 +72,5 @@ generateSitemap()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

@@ -1,6 +1,7 @@
-import { PrismaClient, FileType } from "../src/generated/prisma";
+import { FileType } from "../src/generated/prisma/client";
+import { createPrismaClient } from "./client";
 
-const prisma = new PrismaClient();
+const { prisma, pool } = createPrismaClient();
 
 const categoriesData = [
   {
@@ -264,4 +265,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

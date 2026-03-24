@@ -1,7 +1,8 @@
-import { PrismaClient, FileType, DocumentType } from "../src/generated/prisma";
+import { FileType, DocumentType } from "../src/generated/prisma/client";
+import { createPrismaClient } from "./client";
 import designData from "../design.json"; // design.json contains a single object
 
-const prisma = new PrismaClient();
+const { prisma, pool } = createPrismaClient();
 
 async function main() {
   console.log("Start seeding design...");
@@ -179,4 +180,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

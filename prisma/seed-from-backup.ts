@@ -1,8 +1,8 @@
-import { PrismaClient } from '../src/generated/prisma/index.js';
+import { createPrismaClient } from './client';
 import fs from 'fs';
 import path from 'path';
 
-const prisma = new PrismaClient();
+const { prisma, pool } = createPrismaClient();
 
 async function main() {
   const backupPath = path.join(__dirname, 'backup.json');
@@ -63,4 +63,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

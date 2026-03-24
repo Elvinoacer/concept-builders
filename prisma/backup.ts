@@ -1,7 +1,7 @@
-import { PrismaClient } from '../src/generated/prisma/index.js';
+import { createPrismaClient } from './client';
 import fs from 'fs';
 
-const prisma = new PrismaClient();
+const { prisma, pool } = createPrismaClient();
 
 async function main() {
   const users = await prisma.user.findMany({
@@ -56,4 +56,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

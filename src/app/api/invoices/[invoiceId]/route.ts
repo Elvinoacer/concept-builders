@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@/generated/prisma";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export async function GET(
   request: Request,
@@ -45,17 +43,17 @@ export async function GET(
       items: order.items.map((item) => ({
         id: item.id,
         name: item.design.name,
-        description: item.selectedFileType,
+        description: item.selectedFileTypes.join(", "),
         quantity: item.quantity,
-        rate: item.price,
+        rate: item.design.basePrice,
       })),
       subtotal: order.items.reduce(
-        (acc, item) => acc + item.price * item.quantity,
+        (acc, item) => acc + item.design.basePrice * item.quantity,
         0
       ),
       taxRate: 0, // Assuming no tax for now
       tax: 0,
-      total: order.total,
+      total: order.amount,
     };
 
     return NextResponse.json(invoiceData);
