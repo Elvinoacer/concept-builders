@@ -6,14 +6,11 @@
 > concept-builders-web@0.1.0 build
 > BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA=true prisma generate && next build
 
-Environment variables loaded from .env
-Prisma schema loaded from prisma/schema.prisma
+Loaded Prisma config from prisma.config.ts.
 
-✔ Generated Prisma Client (v6.16.2) to ./src/generated/prisma in 2.35s
+Prisma schema loaded from prisma/schema.prisma.
 
-Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
-
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+✔ Generated Prisma Client (7.5.0) to ./src/generated/prisma in 2.97s
 
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
    ▲ Next.js 16.0.7 (Turbopack)
@@ -21,108 +18,311 @@ Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
 
    Creating an optimized production build ...
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
-Turbopack build encountered 1 warnings:
-[next]/internal/font/google/d0b60be57f16ee32-s.woff2
-Error while requesting resource
-Connection timed out when requesting https://fonts.gstatic.com/s/cormorantgaramond/v21/co3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C.woff2
+ ✓ Compiled successfully in 2.8min
+   Skipping validation of types
+   Collecting page data using 3 workers ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 3 workers (0/178) ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 3 workers (44/178) 
+   Generating static pages using 3 workers (88/178) 
+(node:15606) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+   Generating static pages using 3 workers (133/178) 
+ ✓ Generating static pages using 3 workers (178/178) in 12.0s
+   Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ○ /admin
+├ ○ /admin/analytics
+├ ○ /admin/categories
+├ ƒ /admin/categories/[id]
+├ ○ /admin/content
+├ ○ /admin/content/editor
+├ ○ /admin/content/import
+├ ○ /admin/costs
+├ ƒ /admin/custom-design-requests/[id]
+├ ○ /admin/designs
+├ ƒ /admin/designs/[id]
+├ ƒ /admin/designs/[id]/edit
+├ ƒ /admin/designs/folders/[folderId]
+├ ○ /admin/designs/new
+├ ○ /admin/designs/new/demo
+├ ○ /admin/editor
+├ ○ /admin/feedback
+├ ƒ /admin/inquiries
+├ ƒ /admin/inquiries/[id]
+├ ○ /admin/marketing
+├ ○ /admin/messages
+├ ○ /admin/notifications
+├ ○ /admin/ongoing-projects
+├ ƒ /admin/ongoing-projects/[id]/edit
+├ ƒ /admin/orders/[orderId]
+├ ○ /admin/profile
+├ ○ /admin/projects
+├ ƒ /admin/projects/[id]
+├ ƒ /admin/projects/[id]/costs/[costId]/edit
+├ ƒ /admin/projects/[id]/costs/new
+├ ƒ /admin/projects/[id]/edit
+├ ƒ /admin/projects/[id]/feedback/[feedbackId]/edit
+├ ƒ /admin/projects/[id]/feedback/new
+├ ƒ /admin/projects/[id]/invoices/[invoiceId]/edit
+├ ƒ /admin/projects/[id]/invoices/new
+├ ƒ /admin/projects/[id]/milestones/[milestoneId]/edit
+├ ƒ /admin/projects/[id]/milestones/new
+├ ƒ /admin/projects/[id]/requirements/[requirementId]/edit
+├ ƒ /admin/projects/[id]/requirements/new
+├ ○ /admin/projects/new
+├ ○ /admin/purchases
+├ ○ /admin/settings
+├ ○ /admin/settings/discounts
+├ ○ /admin/users
+├ ƒ /admin/users/[id]
+├ ƒ /admin/users/[id]/analytics
+├ ƒ /admin/users/[id]/edit
+├ ƒ /admin/users/[id]/login-history
+├ ƒ /admin/users/[id]/purchases
+├ ƒ /api/admin/analytics
+├ ƒ /api/admin/banners
+├ ƒ /api/admin/banners/[id]
+├ ƒ /api/admin/categories
+├ ƒ /api/admin/categories/[id]
+├ ƒ /api/admin/client-acquisition
+├ ƒ /api/admin/content/blog-count
+├ ƒ /api/admin/content/static-content
+├ ƒ /api/admin/costs/calculate
+├ ƒ /api/admin/costs/historical
+├ ƒ /api/admin/custom-design-requests
+├ ƒ /api/admin/custom-design-requests/[id]/status
+├ ƒ /api/admin/dashboard/kpis
+├ ƒ /api/admin/designs
+├ ƒ /api/admin/designs/[id]
+├ ƒ /api/admin/digitalocean-costs
+├ ƒ /api/admin/discounts
+├ ƒ /api/admin/feedback
+├ ƒ /api/admin/feedback/[id]
+├ ƒ /api/admin/feedback/[id]/feature
+├ ƒ /api/admin/folders
+├ ƒ /api/admin/historical-costs
+├ ƒ /api/admin/marketing/referral-trends
+├ ƒ /api/admin/marquee-items
+├ ƒ /api/admin/marquee-items/[id]
+├ ƒ /api/admin/monthly-sales
+├ ƒ /api/admin/notifications
+├ ƒ /api/admin/notifications/[id]
+├ ƒ /api/admin/notifications/send
+├ ƒ /api/admin/notifications/unread-count
+├ ƒ /api/admin/ongoing-projects
+├ ƒ /api/admin/ongoing-projects/[id]
+├ ƒ /api/admin/orders
+├ ƒ /api/admin/orders/[orderId]
+├ ƒ /api/admin/orders/[orderId]/items/[itemId]/files
+├ ƒ /api/admin/orders/export/csv
+├ ƒ /api/admin/orders/export/pdf
+├ ƒ /api/admin/orders/status-counts
+├ ƒ /api/admin/profile
+├ ƒ /api/admin/projects
+├ ƒ /api/admin/projects/[projectId]
+├ ƒ /api/admin/projects/[projectId]/costs
+├ ƒ /api/admin/projects/[projectId]/costs/[costId]
+├ ƒ /api/admin/projects/[projectId]/feedback
+├ ƒ /api/admin/projects/[projectId]/feedback/[feedbackId]
+├ ƒ /api/admin/projects/[projectId]/invoices
+├ ƒ /api/admin/projects/[projectId]/invoices/[invoiceId]
+├ ƒ /api/admin/projects/[projectId]/milestones
+├ ƒ /api/admin/projects/[projectId]/milestones/[milestoneId]
+├ ƒ /api/admin/projects/[projectId]/requirements
+├ ƒ /api/admin/projects/[projectId]/requirements/[requirementId]
+├ ƒ /api/admin/projects/specf/[id]
+├ ƒ /api/admin/reset-progress
+├ ƒ /api/admin/stats
+├ ƒ /api/admin/users
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/auth/forgot-password
+├ ƒ /api/auth/reset-password
+├ ƒ /api/auth/signup
+├ ƒ /api/auth/verify-email
+├ ƒ /api/auth/verify-email/confirm
+├ ƒ /api/blog
+├ ƒ /api/blog/[slug]
+├ ƒ /api/blog/popular
+├ ƒ /api/cart/clear
+├ ƒ /api/cart/items
+├ ƒ /api/cart/items/[itemId]
+├ ƒ /api/cart/sync
+├ ƒ /api/cart/update-discount
+├ ƒ /api/categories
+├ ƒ /api/categories/[id]
+├ ƒ /api/checkout/apply-discount
+├ ƒ /api/contact
+├ ƒ /api/conversations
+├ ƒ /api/conversations/all
+├ ƒ /api/custom-design
+├ ƒ /api/custom-design/[id]
+├ ƒ /api/custom-design/[id]/file
+├ ƒ /api/dashboard/my-feedback
+├ ƒ /api/dashboard/my-feedback/[id]
+├ ƒ /api/dashboard/my-requests
+├ ƒ /api/dashboard/purchases/[orderId]
+├ ƒ /api/dashboard/recommendations
+├ ƒ /api/dashboard/stats
+├ ƒ /api/debug
+├ ƒ /api/designs
+├ ƒ /api/designs/[id]
+├ ƒ /api/designs/[id]/faq
+├ ƒ /api/designs/[id]/faq/[faqIndex]
+├ ƒ /api/designs/[id]/favorite
+├ ƒ /api/designs/[id]/files
+├ ƒ /api/designs/[id]/files/version
+├ ƒ /api/designs/[id]/package-options
+├ ƒ /api/designs/[id]/view
+├ ƒ /api/designs/delete-file
+├ ƒ /api/designs/delete-uploaded-file
+├ ƒ /api/designs/folders
+├ ƒ /api/designs/folders/[folderId]
+├ ƒ /api/designs/generate-upload-url
+├ ƒ /api/designs/inquiry
+├ ƒ /api/designs/tabs-count
+├ ƒ /api/designs/unanswered-faqs
+├ ƒ /api/designs/upload
+├ ƒ /api/designs/upload-document
+├ ƒ /api/designs/upload-file
+├ ƒ /api/designs/upload-proxy
+├ ƒ /api/downloads/[orderId]
+├ ƒ /api/exchange-rate
+├ ƒ /api/featured-feedback
+├ ƒ /api/feedback
+├ ƒ /api/files/cleanup
+├ ƒ /api/files/create
+├ ƒ /api/files/update-status
+├ ƒ /api/files/upload
+├ ƒ /api/import-gdoc
+├ ƒ /api/intasend/checkout
+├ ƒ /api/intasend/stk-push
+├ ƒ /api/intasend/webhook
+├ ƒ /api/invoices/[invoiceId]
+├ ƒ /api/landing-page
+├ ƒ /api/messages
+├ ƒ /api/messages/seen
+├ ƒ /api/notifications
+├ ƒ /api/notifications/[id]
+├ ƒ /api/notifications/[id]/read
+├ ƒ /api/notifications/clear-all
+├ ƒ /api/notifications/mark-all-read
+├ ƒ /api/notifications/save-token
+├ ƒ /api/notifications/unread-count
+├ ƒ /api/ongoing-projects
+├ ƒ /api/ongoing-projects/[slug]
+├ ƒ /api/orders
+├ ƒ /api/orders/[id]
+├ ƒ /api/orders/status
+├ ƒ /api/package-options/[optionId]
+├ ƒ /api/payment/verify
+├ ƒ /api/paypal/capture
+├ ƒ /api/paypal/create
+├ ƒ /api/poll
+├ ƒ /api/posts
+├ ƒ /api/projects
+├ ƒ /api/projects/[id]
+├ ƒ /api/projects/initialize
+├ ƒ /api/purchases
+├ ƒ /api/purchases/[purchaseId]
+├ ƒ /api/receipts/resend
+├ ƒ /api/register
+├ ƒ /api/settings/password
+├ ƒ /api/settings/profile
+├ ƒ /api/settings/referral
+├ ƒ /api/settings/referrals
+├ ƒ /api/subscribe
+├ ƒ /api/test-email
+├ ƒ /api/track
+├ ƒ /api/upload
+├ ƒ /api/upload-cloud-vercel-files
+├ ƒ /api/upload-file
+├ ƒ /api/upload/generate-presigned-url
+├ ƒ /api/user/phone
+├ ƒ /api/users
+├ ƒ /api/users/[id]
+├ ƒ /api/users/[id]/analytics
+├ ƒ /api/users/[id]/block
+├ ƒ /api/users/[id]/delete
+├ ƒ /api/users/[id]/edit
+├ ƒ /api/users/[id]/impersonate
+├ ƒ /api/users/[id]/login-history
+├ ƒ /api/users/[id]/purchases
+├ ƒ /api/users/[id]/refund
+├ ƒ /api/users/[id]/resend-receipt
+├ ƒ /api/users/[id]/reset-password
+├ ƒ /api/users/[id]/unblock
+├ ƒ /api/users/admins
+├ ƒ /api/users/clients
+├ ƒ /api/users/send-email
+├ ƒ /api/users/unimpersonate
+├ ƒ /api/wishlist
+├ ○ /auth
+├ ○ /auth/reset-password
+├ ○ /blog
+├ ƒ /blog/[slug]
+├ ○ /cart
+├ ○ /categories
+├ ƒ /categories/[id]
+├ ○ /checkout
+├ ○ /contact
+├ ○ /cost-calculator
+├ ○ /currency-converter
+├ ○ /custom-design
+├ ƒ /custom-design/[id]
+├ ○ /dashboard
+├ ○ /dashboard/feedback
+├ ○ /dashboard/help
+├ ○ /dashboard/help/articles/account-setup-guide
+├ ○ /dashboard/help/articles/creating-first-project
+├ ○ /dashboard/help/articles/payment-methods
+├ ○ /dashboard/help/articles/system-requirements
+├ ○ /dashboard/help/articles/troubleshooting
+├ ƒ /dashboard/invoice/[invoiceId]
+├ ○ /dashboard/messages
+├ ○ /dashboard/my-feedback
+├ ○ /dashboard/notifications
+├ ○ /dashboard/projects
+├ ƒ /dashboard/projects/[id]
+├ ○ /dashboard/projects/new
+├ ○ /dashboard/purchases
+├ ƒ /dashboard/purchases/[orderId]
+├ ○ /dashboard/settings
+├ ○ /dashboard/wishlist
+├ ○ /design-showcase
+├ ○ /designs
+├ ƒ /designs/[id]
+├ ○ /faq
+├ ○ /maintenance
+├ ○ /ongoing-projects
+├ ƒ /ongoing-projects/[slug]
+├ ○ /paypal-test
+├ ○ /privacy
+├ ○ /purchase-confirmation
+├ ○ /refund
+├ ○ /terms
+└ ○ /theme-test
 
 
+ƒ Proxy (Middleware)
 
-> Build error occurred
-Error: Turbopack build failed with 4 errors:
-[next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:206:9
-Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
-[0m [90m 204 |[39m   font[33m-[39mdisplay[33m:[39m swap[33m;[39m
- [90m 205 |[39m   src[33m:[39m url([33m@[39mvercel[33m/[39mturbopack[33m-[39mnext[33m/[39minternal[33m/[39mfont[33m/[39mgoogle[35m/font?{%22url%22:%22https:/[39m[33m/[39mfonts[33m.[39mgstatic[33m.[39mcom[33m/[39ms[33m/[39mcormorantgaramond[33m/[39mv21[33m/[39mco3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C[33m.[39mwoff2[33m%[39m[35m22[39m[33m,[39m[33m%[39m[35m22[39mpreload[33m%[39m[35m22[39m[33m:[39m[36mfalse[39m[33m,[39m[33m%[39m[35m22[39mhas_size_adjust[33m%[39m[35m22[39m[33m:[39m[36mtrue[39m}) format([32m'woff2'[39m)[33m;[39m
-[31m[1m>[22m[39m[90m 206 |[39m   unicode[33m-[39mrange[33m:[39m [33mU[39m[33m+[39m[35m0102[39m[33m-[39m[35m0103[39m[33m,[39m [33mU[39m[33m+[39m[35m0110[39m[33m-[39m[35m0111[39m[33m,[39m [33mU[39m[33m+[39m[35m0128[39m[33m-[39m[35m0129[39m[33m,[39m [33mU[39m[33m+[39m[35m0168[39m[33m-[39m[35m0169[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mA0[39m[33m-[39m[35m01[39m[33mA1[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mAF[39m[33m-[39m[35m01[39m[33mB0[39m[33m,[39m [33mU[39m[33m+[39m[35m0300[39m[33m-[39m[35m0301[39m[33m,[39m [33mU[39m[33m+[39m[35m0303[39m[33m-[39m[35m0304[39m[33m,[39m [33mU[39m[33m+[39m[35m0308[39m[33m-[39m[35m0309[39m[33m,[39m [33mU[39m[33m+[39m[35m0323[39m[33m,[39m [33mU[39m[33m+[39m[35m0329[39m[33m,[39m [33mU[39m[33m+[39m[35m1[39m[33mEA0[39m[33m-[39m[35m1[39m[33mEF9[39m[33m,[39m [33mU[39m[33m+[39m[35m20[39m[33mAB[39m[33m;[39m
- [90m     |[39m         [31m[1m^[22m[39m
- [90m 207 |[39m }
- [90m 208 |[39m [90m/* latin-ext */[39m
- [90m 209 |[39m [33m@[39mfont[33m-[39mface {[0m
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
 
-Import map: Resolved by import map
-
-
-Import trace:
-  Server Component:
-    [next]/internal/font/google/cormorant_garamond_1dd82d55.module.css
-    [next]/internal/font/google/cormorant_garamond_1dd82d55.js
-    ./src/app/layout.tsx
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:251:9
-Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
-[0m [90m 249 |[39m   font[33m-[39mdisplay[33m:[39m swap[33m;[39m
- [90m 250 |[39m   src[33m:[39m url([33m@[39mvercel[33m/[39mturbopack[33m-[39mnext[33m/[39minternal[33m/[39mfont[33m/[39mgoogle[35m/font?{%22url%22:%22https:/[39m[33m/[39mfonts[33m.[39mgstatic[33m.[39mcom[33m/[39ms[33m/[39mcormorantgaramond[33m/[39mv21[33m/[39mco3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C[33m.[39mwoff2[33m%[39m[35m22[39m[33m,[39m[33m%[39m[35m22[39mpreload[33m%[39m[35m22[39m[33m:[39m[36mfalse[39m[33m,[39m[33m%[39m[35m22[39mhas_size_adjust[33m%[39m[35m22[39m[33m:[39m[36mtrue[39m}) format([32m'woff2'[39m)[33m;[39m
-[31m[1m>[22m[39m[90m 251 |[39m   unicode[33m-[39mrange[33m:[39m [33mU[39m[33m+[39m[35m0102[39m[33m-[39m[35m0103[39m[33m,[39m [33mU[39m[33m+[39m[35m0110[39m[33m-[39m[35m0111[39m[33m,[39m [33mU[39m[33m+[39m[35m0128[39m[33m-[39m[35m0129[39m[33m,[39m [33mU[39m[33m+[39m[35m0168[39m[33m-[39m[35m0169[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mA0[39m[33m-[39m[35m01[39m[33mA1[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mAF[39m[33m-[39m[35m01[39m[33mB0[39m[33m,[39m [33mU[39m[33m+[39m[35m0300[39m[33m-[39m[35m0301[39m[33m,[39m [33mU[39m[33m+[39m[35m0303[39m[33m-[39m[35m0304[39m[33m,[39m [33mU[39m[33m+[39m[35m0308[39m[33m-[39m[35m0309[39m[33m,[39m [33mU[39m[33m+[39m[35m0323[39m[33m,[39m [33mU[39m[33m+[39m[35m0329[39m[33m,[39m [33mU[39m[33m+[39m[35m1[39m[33mEA0[39m[33m-[39m[35m1[39m[33mEF9[39m[33m,[39m [33mU[39m[33m+[39m[35m20[39m[33mAB[39m[33m;[39m
- [90m     |[39m         [31m[1m^[22m[39m
- [90m 252 |[39m }
- [90m 253 |[39m [90m/* latin-ext */[39m
- [90m 254 |[39m [33m@[39mfont[33m-[39mface {[0m
-
-Import map: Resolved by import map
-
-
-Import trace:
-  Server Component:
-    [next]/internal/font/google/cormorant_garamond_1dd82d55.module.css
-    [next]/internal/font/google/cormorant_garamond_1dd82d55.js
-    ./src/app/layout.tsx
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:296:9
-Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
-[0m [90m 294 |[39m   font[33m-[39mdisplay[33m:[39m swap[33m;[39m
- [90m 295 |[39m   src[33m:[39m url([33m@[39mvercel[33m/[39mturbopack[33m-[39mnext[33m/[39minternal[33m/[39mfont[33m/[39mgoogle[35m/font?{%22url%22:%22https:/[39m[33m/[39mfonts[33m.[39mgstatic[33m.[39mcom[33m/[39ms[33m/[39mcormorantgaramond[33m/[39mv21[33m/[39mco3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C[33m.[39mwoff2[33m%[39m[35m22[39m[33m,[39m[33m%[39m[35m22[39mpreload[33m%[39m[35m22[39m[33m:[39m[36mfalse[39m[33m,[39m[33m%[39m[35m22[39mhas_size_adjust[33m%[39m[35m22[39m[33m:[39m[36mtrue[39m}) format([32m'woff2'[39m)[33m;[39m
-[31m[1m>[22m[39m[90m 296 |[39m   unicode[33m-[39mrange[33m:[39m [33mU[39m[33m+[39m[35m0102[39m[33m-[39m[35m0103[39m[33m,[39m [33mU[39m[33m+[39m[35m0110[39m[33m-[39m[35m0111[39m[33m,[39m [33mU[39m[33m+[39m[35m0128[39m[33m-[39m[35m0129[39m[33m,[39m [33mU[39m[33m+[39m[35m0168[39m[33m-[39m[35m0169[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mA0[39m[33m-[39m[35m01[39m[33mA1[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mAF[39m[33m-[39m[35m01[39m[33mB0[39m[33m,[39m [33mU[39m[33m+[39m[35m0300[39m[33m-[39m[35m0301[39m[33m,[39m [33mU[39m[33m+[39m[35m0303[39m[33m-[39m[35m0304[39m[33m,[39m [33mU[39m[33m+[39m[35m0308[39m[33m-[39m[35m0309[39m[33m,[39m [33mU[39m[33m+[39m[35m0323[39m[33m,[39m [33mU[39m[33m+[39m[35m0329[39m[33m,[39m [33mU[39m[33m+[39m[35m1[39m[33mEA0[39m[33m-[39m[35m1[39m[33mEF9[39m[33m,[39m [33mU[39m[33m+[39m[35m20[39m[33mAB[39m[33m;[39m
- [90m     |[39m         [31m[1m^[22m[39m
- [90m 297 |[39m }
- [90m 298 |[39m [90m/* latin-ext */[39m
- [90m 299 |[39m [33m@[39mfont[33m-[39mface {[0m
-
-Import map: Resolved by import map
-
-
-Import trace:
-  Server Component:
-    [next]/internal/font/google/cormorant_garamond_1dd82d55.module.css
-    [next]/internal/font/google/cormorant_garamond_1dd82d55.js
-    ./src/app/layout.tsx
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:341:9
-Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
-[0m [90m 339 |[39m   font[33m-[39mdisplay[33m:[39m swap[33m;[39m
- [90m 340 |[39m   src[33m:[39m url([33m@[39mvercel[33m/[39mturbopack[33m-[39mnext[33m/[39minternal[33m/[39mfont[33m/[39mgoogle[35m/font?{%22url%22:%22https:/[39m[33m/[39mfonts[33m.[39mgstatic[33m.[39mcom[33m/[39ms[33m/[39mcormorantgaramond[33m/[39mv21[33m/[39mco3bmX5slCNuHLi8bLeY9MK7whWMhyjYpntKky2F7i6C[33m.[39mwoff2[33m%[39m[35m22[39m[33m,[39m[33m%[39m[35m22[39mpreload[33m%[39m[35m22[39m[33m:[39m[36mfalse[39m[33m,[39m[33m%[39m[35m22[39mhas_size_adjust[33m%[39m[35m22[39m[33m:[39m[36mtrue[39m}) format([32m'woff2'[39m)[33m;[39m
-[31m[1m>[22m[39m[90m 341 |[39m   unicode[33m-[39mrange[33m:[39m [33mU[39m[33m+[39m[35m0102[39m[33m-[39m[35m0103[39m[33m,[39m [33mU[39m[33m+[39m[35m0110[39m[33m-[39m[35m0111[39m[33m,[39m [33mU[39m[33m+[39m[35m0128[39m[33m-[39m[35m0129[39m[33m,[39m [33mU[39m[33m+[39m[35m0168[39m[33m-[39m[35m0169[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mA0[39m[33m-[39m[35m01[39m[33mA1[39m[33m,[39m [33mU[39m[33m+[39m[35m01[39m[33mAF[39m[33m-[39m[35m01[39m[33mB0[39m[33m,[39m [33mU[39m[33m+[39m[35m0300[39m[33m-[39m[35m0301[39m[33m,[39m [33mU[39m[33m+[39m[35m0303[39m[33m-[39m[35m0304[39m[33m,[39m [33mU[39m[33m+[39m[35m0308[39m[33m-[39m[35m0309[39m[33m,[39m [33mU[39m[33m+[39m[35m0323[39m[33m,[39m [33mU[39m[33m+[39m[35m0329[39m[33m,[39m [33mU[39m[33m+[39m[35m1[39m[33mEA0[39m[33m-[39m[35m1[39m[33mEF9[39m[33m,[39m [33mU[39m[33m+[39m[35m20[39m[33mAB[39m[33m;[39m
- [90m     |[39m         [31m[1m^[22m[39m
- [90m 342 |[39m }
- [90m 343 |[39m [90m/* latin-ext */[39m
- [90m 344 |[39m [33m@[39mfont[33m-[39mface {[0m
-
-Import map: Resolved by import map
-
-
-Import trace:
-  Server Component:
-    [next]/internal/font/google/cormorant_garamond_1dd82d55.module.css
-    [next]/internal/font/google/cormorant_garamond_1dd82d55.js
-    ./src/app/layout.tsx
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-    at <unknown> ([next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:206:9)
-    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
-    at <unknown> ([next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:251:9)
-    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
-    at <unknown> ([next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:296:9)
-    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
-    at <unknown> ([next]/internal/font/google/cormorant_garamond_1dd82d55.module.css:341:9)
-    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+EXIT_CODE:0

@@ -1,15 +1,29 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import DesignCard from "@/components/DesignCard";
 import { motion, AnimatePresence } from "framer-motion";
 import ShowMoreCard from "./ShowMoreCard";
 import { ChevronLeft, ChevronRight, RefreshCw, Sparkles } from "lucide-react";
 
-const RecommendedDesigns = () => {
+interface RecommendedDesign {
+  id: string;
+  name: string;
+  category?: string;
+  basePrice?: number;
+  images?: string[];
+}
+
+interface RecommendedDesignsProps {
+  compact?: boolean;
+}
+
+const RecommendedDesigns = ({ compact = false }: RecommendedDesignsProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-  const [recommendedDesigns, setRecommendedDesigns] = useState([]);
+  const [recommendedDesigns, setRecommendedDesigns] = useState<RecommendedDesign[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -23,9 +37,9 @@ const RecommendedDesigns = () => {
     };
 
     checkScreenSize();
-    window.addEventListener("resize", checkScrollability);
+    window.addEventListener("resize", checkScreenSize);
 
-    return () => window.removeEventListener("resize", checkScrollability);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   useEffect(() => {
@@ -92,9 +106,98 @@ const RecommendedDesigns = () => {
   // Calculate card width based on screen size
   const getCardWidth = () => {
     if (isMobile) return "min-w-[280px]";
-    if (isTablet) return "min-w-[300px]";
-    return "min-w-[320px]";
+    if (isTablet) return "min-w-[290px]";
+    return "min-w-[280px]";
   };
+
+  if (compact) {
+    return (
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-gold/15 p-1.5 text-gold">
+              <Sparkles className="h-3.5 w-3.5" />
+            </span>
+            <h3 className="text-base font-semibold text-cream">Recommended</h3>
+          </div>
+          <motion.button
+            onClick={refreshRecommendations}
+            whileHover={{ scale: 1.05, rotate: 180 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="rounded-lg border border-cb-border bg-surface p-2 text-cream-dim transition hover:text-gold"
+            title="Refresh recommendations"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+          </motion.button>
+        </div>
+
+        {loading && (
+          <div className="space-y-3">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-28 animate-pulse border border-cb-border bg-surface" />
+            ))}
+          </div>
+        )}
+
+        {!loading && recommendedDesigns.length === 0 && (
+          <div className="border border-cb-border bg-surface p-4">
+            <p className="text-sm text-cream">No recommendations yet.</p>
+            <p className="mt-1 text-xs text-cream-dim">
+              Explore designs to unlock personalized picks.
+            </p>
+            <button
+              onClick={() => (window.location.href = "/designs")}
+              className="mt-3 w-full border border-gold/40 px-3 py-2 text-xs font-medium text-cream transition hover:border-gold hover:bg-gold/10"
+            >
+              Explore Designs
+            </button>
+          </div>
+        )}
+
+        {!loading && recommendedDesigns.length > 0 && (
+          <div className="space-y-3">
+            {recommendedDesigns.slice(0, 2).map((design) => (
+              <Link
+                key={design.id}
+                href={`/designs/${design.id}`}
+                className="group block overflow-hidden border border-cb-border bg-surface transition hover:border-gold/50"
+              >
+                <div className="relative h-28 w-full border-b border-cb-border">
+                  {design.images?.[0] ? (
+                    <Image
+                      src={design.images[0]}
+                      alt={design.name}
+                      fill
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-xs text-muted">
+                      No Preview
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1 p-3">
+                  <p className="line-clamp-1 text-sm font-semibold text-cream">{design.name}</p>
+                  <p className="text-xs text-cream-dim">
+                    {design.category || "Design"}
+                    {design.basePrice ? ` • KES ${design.basePrice.toLocaleString()}` : ""}
+                  </p>
+                </div>
+              </Link>
+            ))}
+
+            <button
+              onClick={() => (window.location.href = "/designs")}
+              className="w-full border border-cb-border px-3 py-2 text-xs font-medium text-cream transition hover:border-gold/50 hover:bg-gold/10"
+            >
+              View All Designs
+            </button>
+          </div>
+        )}
+      </section>
+    );
+  }
 
   return (
     <section className="mt-6 sm:mt-8">
@@ -190,7 +293,7 @@ const RecommendedDesigns = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={() => scroll("left")}
-                className="absolute top-1/2 -translate-y-1/2 -left-4 bg-card/90 backdrop-blur-sm p-3 rounded-full shadow-xl z-10 hover:bg-card border-2 border-cb-border transition-all duration-300"
+                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full border-2 border-cb-border bg-card/90 p-3 shadow-xl backdrop-blur-sm transition-all duration-300 hover:bg-card"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -206,7 +309,7 @@ const RecommendedDesigns = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={() => scroll("right")}
-                className="absolute top-1/2 -translate-y-1/2 -right-4 bg-card/90 backdrop-blur-sm p-3 rounded-full shadow-xl z-10 hover:bg-card border-2 border-cb-border transition-all duration-300"
+                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full border-2 border-cb-border bg-card/90 p-3 shadow-xl backdrop-blur-sm transition-all duration-300 hover:bg-card"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >

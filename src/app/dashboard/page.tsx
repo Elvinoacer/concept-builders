@@ -147,32 +147,32 @@ const DashboardPage = () => {
 
   // Enhanced stats with trends
   const defaultStats = [
-    { 
-      name: "Purchased Designs", 
-      value: "0", 
-      icon: "download", 
-      trend: "up", 
+    {
+      name: "Purchased Designs",
+      value: "0",
+      icon: "download",
+      trend: "up",
       trendValue: "0%",
     },
-    { 
-      name: "Active Requests", 
-      value: "0", 
-      icon: "pending", 
-      trend: "neutral", 
+    {
+      name: "Active Requests",
+      value: "0",
+      icon: "pending",
+      trend: "neutral",
       trendValue: "0%",
     },
-    { 
-      name: "Favorites", 
-      value: "0", 
-      icon: "favorite", 
-      trend: "up", 
+    {
+      name: "Favorites",
+      value: "0",
+      icon: "favorite",
+      trend: "up",
       trendValue: "0%",
     },
-    { 
-      name: "Downloads", 
-      value: "0", 
-      icon: "file_download", 
-      trend: "up", 
+    {
+      name: "Downloads",
+      value: "0",
+      icon: "file_download",
+      trend: "up",
       trendValue: "0%",
     },
   ];
@@ -187,7 +187,7 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-ink text-cream">
+    <div className="relative min-h-screen overflow-x-hidden bg-ink text-cream">
       <NotificationPermissionModal />
 
       {/* Atmospheric background layers */}
@@ -224,7 +224,8 @@ const DashboardPage = () => {
                     'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
                 }}
               >
-                Welcome back, <span className="text-gold">
+                Welcome back,{" "}
+                <span className="text-gold">
                   {session?.user?.name?.split(" ")[0] || "User"}
                 </span>
               </motion.h1>
@@ -234,7 +235,8 @@ const DashboardPage = () => {
                 transition={{ delay: 0.1 }}
                 className="max-w-2xl text-base leading-relaxed text-cream-dim sm:text-lg lg:text-xl"
               >
-                Manage your projects, view purchased designs, and explore new architectural possibilities.
+                Manage your projects, view purchased designs, and explore new
+                architectural possibilities.
               </motion.p>
             </div>
 
@@ -301,11 +303,9 @@ const DashboardPage = () => {
               >
                 <div className="relative border border-cb-border bg-card p-5 transition-all duration-300 hover:border-border-gold sm:p-7">
                   <div className="flex items-start justify-between mb-4">
-                    <div
-                      className="relative overflow-hidden bg-gold/10 p-3.5 transition-transform duration-300 group-hover:scale-110"
-                    >
+                    <div className="relative overflow-hidden bg-gold/10 p-3.5 transition-transform duration-300 group-hover:scale-110">
                       <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-gold/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                      
+
                       {loading ? (
                         <div className="w-7 h-7 bg-gold/20 rounded animate-pulse"></div>
                       ) : (
@@ -314,22 +314,24 @@ const DashboardPage = () => {
                         </span>
                       )}
                     </div>
-                    
+
                     {/* Trend indicator */}
                     {!loading && stat.trend && (
-                      <div className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold ${
-                        stat.trend === "up" 
-                          ? "bg-emerald-900/30 text-emerald-400"
-                          : stat.trend === "down"
-                          ? "bg-red-900/30 text-red-400"
-                          : "bg-surface text-cream-dim"
-                      }`}>
+                      <div
+                        className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold ${
+                          stat.trend === "up"
+                            ? "bg-emerald-900/30 text-emerald-400"
+                            : stat.trend === "down"
+                              ? "bg-red-900/30 text-red-400"
+                              : "bg-surface text-cream-dim"
+                        }`}
+                      >
                         <TrendIcon trend={stat.trend} />
                         <span>{stat.trendValue}</span>
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="space-y-1">
                     {loading ? (
                       <>
@@ -379,12 +381,12 @@ const DashboardPage = () => {
         </motion.header>
 
         <motion.div
-          className="grid grid-cols-1 gap-5 sm:gap-6 lg:gap-8 xl:grid-cols-4"
+          className="grid grid-cols-1 gap-5 sm:gap-6 lg:gap-8 xl:grid-cols-[minmax(0,1.75fr)_minmax(300px,0.9fr)]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <div className="xl:col-span-3 space-y-6 sm:space-y-8">
+          <div className="min-w-0 space-y-6 sm:space-y-8">
             <motion.div
               variants={itemVariants}
               className="overflow-hidden border border-cb-border bg-card"
@@ -403,21 +405,21 @@ const DashboardPage = () => {
             </motion.div>
           </div>
 
-          <div className="xl:col-span-1 space-y-6 sm:space-y-8">
+          <div className="min-w-0 space-y-6 sm:space-y-8 xl:sticky xl:top-6 xl:self-start">
             <motion.div
               variants={itemVariants}
               transition={{ delay: 0.4 }}
-              className="overflow-hidden border border-cb-border bg-card"
+              className="border border-cb-border bg-card p-4 sm:p-5"
             >
-              <RecommendedDesigns />
+              <RecommendedDesigns compact />
             </motion.div>
 
             <motion.div
               variants={itemVariants}
               transition={{ delay: 0.5 }}
-              className="overflow-hidden border border-cb-border bg-card"
+              className="border border-cb-border bg-card p-4 sm:p-5"
             >
-              <Notifications compact={isMobile} />
+              <Notifications compact />
             </motion.div>
 
             {isMobile && (
@@ -430,11 +432,14 @@ const DashboardPage = () => {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full -mr-16 -mt-16" />
                 <div className="relative z-10">
                   <h3 className="text-sm font-black text-gold mb-2 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-xl">tips_and_updates</span>
+                    <span className="material-symbols-outlined text-xl">
+                      tips_and_updates
+                    </span>
                     Quick Tip
                   </h3>
                   <p className="text-cream-dim text-xs leading-relaxed font-medium">
-                    Swipe left on designs to access quick actions like download and favorite.
+                    Swipe left on designs to access quick actions like download
+                    and favorite.
                   </p>
                 </div>
               </motion.div>
