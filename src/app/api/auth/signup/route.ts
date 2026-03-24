@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { sendVerificationEmail } from "@/lib/emails";
+import { validatePassword } from "@/lib/auth/password-policy";
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
     if (!name || !email || !password) {
       return NextResponse.json(
         { success: false, message: "Missing fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -22,18 +23,15 @@ export async function POST(request: Request) {
     if (existingUser) {
       return NextResponse.json(
         { success: false, message: "User with this email already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
-    // Minimum password length check
-    if (password.length < 6) {
+    const passwordError = validatePassword(password);
+    if (passwordError) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Password must be at least 6 characters long",
-        },
-        { status: 400 }
+        { success: false, message: passwordError },
+        { status: 400 },
       );
     }
 
@@ -57,7 +55,7 @@ export async function POST(request: Request) {
     await sendVerificationEmail(
       user.email,
       user.name || "User",
-      verificationLink
+      verificationLink,
     );
 
     return NextResponse.json(
@@ -67,13 +65,13 @@ export async function POST(request: Request) {
           "User registered successfully. Please check your email to verify your account.",
         data: { userId: user.id, email: user.email },
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Error during user registration:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

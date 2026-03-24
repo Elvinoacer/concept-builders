@@ -3,16 +3,30 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { sendVerificationEmail } from "@/lib/emails"; // Assuming you have an emails utility
+import { getClientIp, isRateLimited } from "@/lib/auth/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimitKey = `verify-email:${ip}`;
+
+    if (isRateLimited(rateLimitKey, 5, 15 * 60 * 1000)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Too many requests. Please try again later.",
+        },
+        { status: 429 },
+      );
+    }
+
     const body = await request.json();
     const { email } = body;
 
     if (!email) {
       return NextResponse.json(
         { success: false, message: "Email is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -20,8 +34,21 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
-        { status: 404 }
+        {
+          success: true,
+          message: "If this account exists, a verification link has been sent.",
+        },
+        { status: 200 },
+      );
+    }
+
+    if (user.emailVerified) {
+      return NextResponse.json(
+        {
+          success: true,
+          message: "This email is already verified. Please log in.",
+        },
+        { status: 200 },
       );
     }
 
@@ -42,18 +69,18 @@ export async function POST(request: Request) {
     await sendVerificationEmail(
       user.email,
       user.name || "User",
-      verificationLink
+      verificationLink,
     );
 
     return NextResponse.json(
       { success: true, message: "Verification email sent" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error sending verification email:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

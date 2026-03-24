@@ -17,13 +17,23 @@ const SignupForm: React.FC<SignupFormProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const validatePassword = (value: string): string | null => {
+    if (value.length < 8) return "Password must be at least 8 characters long";
+    if (!/[A-Z]/.test(value))
+      return "Password must contain at least one uppercase letter";
+    if (!/[0-9]/.test(value))
+      return "Password must contain at least one number";
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
       setLoading(false);
       return;
     }
@@ -120,7 +130,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
           >
             Password
             <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
-              (min. 6 characters)
+              (min. 8, include uppercase + number)
             </span>
           </label>
           <div className="relative">
@@ -132,7 +142,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
               disabled={loading}
             />
             <button
@@ -146,9 +156,9 @@ const SignupForm: React.FC<SignupFormProps> = ({
               </span>
             </button>
           </div>
-          {password.length > 0 && password.length < 6 && (
+          {password.length > 0 && validatePassword(password) && (
             <p className="text-red-500 text-xs mt-1">
-              Password must be at least 6 characters
+              {validatePassword(password)}
             </p>
           )}
         </div>
@@ -157,7 +167,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
         <button
           className="flex w-full justify-center items-center rounded-lg xs:rounded-xl bg-gradient-to-r from-blue-600 to-cyan-400 py-2.5 xs:py-3 sm:py-3.5 px-4 text-sm xs:text-base font-semibold text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-lg"
           type="submit"
-          disabled={loading || password.length < 6}
+          disabled={loading || !!validatePassword(password)}
         >
           {loading ? (
             <span className="flex items-center gap-2">

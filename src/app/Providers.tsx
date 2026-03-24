@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider, signOut, useSession } from "next-auth/react";
 import { Toaster } from "sonner";
 import ImpersonationBanner from "@/components/admin/ImpersonationBanner";
 import { CartSync } from "@/components/cart/CartSync";
@@ -25,6 +25,12 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (session?.error === "UserNotFound") {
+      signOut({ callbackUrl: "/auth?error=account-deleted" });
+    }
+  }, [session?.error]);
 
   useEffect(() => {
     if (session?.user?.id) {

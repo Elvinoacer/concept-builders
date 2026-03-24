@@ -7,9 +7,28 @@ const SocialLogins = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-  const handleSignIn = (provider: string) => {
-    const referral = sessionStorage.getItem("referral");
-    signIn(provider, { callbackUrl, referral });
+  const handleSignIn = async (provider: string) => {
+    const referral =
+      searchParams.get("referral") ||
+      (typeof window !== "undefined"
+        ? sessionStorage.getItem("referral")
+        : null);
+
+    if (referral) {
+      try {
+        await fetch("/api/auth/set-referral", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ referral }),
+        });
+      } catch {
+        // Continue sign-in flow even if referral cookie setup fails.
+      }
+    }
+
+    signIn(provider, { callbackUrl });
   };
 
   return (

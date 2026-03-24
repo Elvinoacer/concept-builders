@@ -15,7 +15,7 @@ interface CartItem {
   cartItemId: string;
   selectedFileTypes: string[];
   selectedExtras?: any[];
-  design: Design & { files: File[]; images: File[]; name: string };
+  design: Design & { files?: File[]; images?: File[]; name: string };
 }
 
 interface OrderSummaryProps {
@@ -24,7 +24,7 @@ interface OrderSummaryProps {
   onDiscountApplied?: (
     discountAmount: number,
     discountId: string,
-    discountCode: string
+    discountCode: string,
   ) => void;
   cartTotal: number;
   appliedDiscountAmount: number;
@@ -102,7 +102,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         onDiscountApplied(
           data.discountAmount,
           data.discountId,
-          discountCodeInput
+          discountCodeInput,
         );
       }
       toast.success(`Discount "${discountCodeInput}" applied!`);

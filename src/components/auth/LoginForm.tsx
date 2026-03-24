@@ -13,13 +13,50 @@ const LoginForm = ({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(
+    null,
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
+  const handleResendVerification = async () => {
+    if (!email) {
+      setError("Enter your email to resend verification.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/auth/verify-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.message || "Failed to resend verification email.");
+        return;
+      }
+
+      setVerificationMessage(
+        data.message ||
+          "If this account exists, a verification link has been sent.",
+      );
+      setShowResendVerification(false);
+    } catch {
+      setError("Failed to resend verification email.");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setVerificationMessage(null);
+    setShowResendVerification(false);
     setLoading(true);
 
     const result = await signIn("credentials", {
@@ -32,12 +69,15 @@ const LoginForm = ({
     setLoading(false);
 
     if (result?.error) {
-      if (
+      if (result.error === "EMAIL_NOT_VERIFIED") {
+        setError("Please verify your email before logging in.");
+        setShowResendVerification(true);
+      } else if (
         result.error ===
         "Account created via social login. Please use social login or set a password."
       ) {
         setError(
-          "Your account was created using social login. Please use social login or click the 'Forgot password?' link to set a password."
+          "Your account was created using social login. Please use social login or click the 'Forgot password?' link to set a password.",
         );
       } else {
         setError(result.error);
@@ -60,6 +100,15 @@ const LoginForm = ({
         className="flex flex-col gap-3 xs:gap-4 sm:gap-5"
         onSubmit={handleSubmit}
       >
+        {verificationMessage && (
+          <div
+            className="bg-emerald-100 border border-emerald-400 text-emerald-700 px-3 xs:px-4 py-2.5 xs:py-3 rounded-lg text-xs xs:text-sm leading-relaxed"
+            role="status"
+          >
+            {verificationMessage}
+          </div>
+        )}
+
         {error && (
           <div
             className="bg-red-100 border border-red-400 text-red-700 px-3 xs:px-4 py-2.5 xs:py-3 rounded-lg text-xs xs:text-sm leading-relaxed"
@@ -81,6 +130,17 @@ const LoginForm = ({
               error
             )}
           </div>
+        )}
+
+        {showResendVerification && (
+          <button
+            type="button"
+            onClick={handleResendVerification}
+            className="self-start text-xs xs:text-sm font-medium text-blue-600 hover:text-blue-700 underline"
+            disabled={loading}
+          >
+            Resend verification email
+          </button>
         )}
 
         {/* Email Input */}

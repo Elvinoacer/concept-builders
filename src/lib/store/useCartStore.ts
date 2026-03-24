@@ -28,7 +28,7 @@ interface CartStore {
   setAppliedDiscount: (
     amount: number,
     id: string | null,
-    code: string | null
+    code: string | null,
   ) => void;
 
   // Computed values
@@ -41,13 +41,13 @@ interface CartStore {
     design: Design,
     selectedFileTypes: string[],
     selectedExtras: any[],
-    status: string
-  ) => boolean;
+    status: string,
+  ) => Promise<boolean>;
   removeItem: (cartItemId: string, status: string) => void;
   updateItem: (
     cartItemId: string,
     updates: Partial<CartItem>,
-    status: string
+    status: string,
   ) => void;
   clearCart: (status: string) => void;
   syncCart: () => Promise<void>;
@@ -77,7 +77,10 @@ const useCartStore = create<CartStore>()(
             set({ cart: newCartItems, cartId: cart.id });
           } else {
             // Handle cases where cart is cleared or local storage is empty
-            set({ cart: cart ? cart.items : [], cartId: cart ? cart.id : null });
+            set({
+              cart: cart ? cart.items : [],
+              cartId: cart ? cart.id : null,
+            });
           }
         },
         setLoading: (loading) => set({ loading }),
@@ -93,7 +96,7 @@ const useCartStore = create<CartStore>()(
         cartTotal: () =>
           get().cart.reduce(
             (total, item) => total + calculateItemTotal(item),
-            0
+            0,
           ),
 
         fetchCart: async (status) => {
@@ -124,7 +127,7 @@ const useCartStore = create<CartStore>()(
           } else {
             try {
               const cartFromStorage = JSON.parse(
-                localStorage.getItem("cart") || "[]"
+                localStorage.getItem("cart") || "[]",
               );
               if (Array.isArray(cartFromStorage)) {
                 set({ cart: cartFromStorage });
@@ -139,11 +142,11 @@ const useCartStore = create<CartStore>()(
           }
         },
 
-        addToCart: (
+        addToCart: async (
           design,
           selectedFileTypes,
           selectedExtras,
-          status
+          status,
         ) => {
           const { cart, setCart } = get();
 
@@ -164,8 +167,8 @@ const useCartStore = create<CartStore>()(
               JSON.stringify(item.selectedFileTypes.sort()) ===
                 JSON.stringify(selectedFileTypes.sort()) &&
               JSON.stringify(
-                item.selectedExtras?.map((e) => e.id).sort() || []
-              ) === JSON.stringify(selectedExtras.map((e) => e.id).sort())
+                item.selectedExtras?.map((e) => e.id).sort() || [],
+              ) === JSON.stringify(selectedExtras.map((e) => e.id).sort()),
           );
 
           if (existingItemIndex > -1) {
@@ -174,43 +177,42 @@ const useCartStore = create<CartStore>()(
           }
 
           if (status === "authenticated") {
-            // API call to add to cart
-            (async () => {
-              try {
-                const response = await fetch("/api/cart/items", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    designId: design.id,
-                    selectedFileTypes,
-                    selectedExtras,
-                  }),
-                });
+            try {
+              const response = await fetch("/api/cart/items", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  designId: design.id,
+                  selectedFileTypes,
+                  selectedExtras,
+                }),
+              });
 
-                if (response.ok) {
-                  const updatedCart = await response.json();
-                  setCart(updatedCart);
-                  toast.success("Added to cart!");
-                } else {
-                  const errorData = await response.json();
-                  toast.error(errorData.error || "Failed to add to cart.");
-                }
-              } catch (err) {
-                toast.error("An error occurred while adding to cart.");
+              if (response.ok) {
+                const updatedCart = await response.json();
+                setCart(updatedCart);
+                toast.success("Added to cart!");
+                return true;
               }
-            })();
+
+              const errorData = await response.json();
+              toast.error(errorData.error || "Failed to add to cart.");
+              return false;
+            } catch (err) {
+              toast.error("An error occurred while adding to cart.");
+              return false;
+            }
           } else {
             const newCart = [...cart, newItem];
             setCart({ items: newCart, id: null });
             localStorage.setItem("cart", JSON.stringify(newCart));
             toast.success("Added to cart!");
+            return true;
           }
-
-          return true;
         },
 
         removeItem: async (cartItemId, status) => {
-          const { cart, setCart, fetchCart } = get();
+          const { cart, setCart } = get();
 
           if (status === "authenticated") {
             try {
@@ -225,7 +227,7 @@ const useCartStore = create<CartStore>()(
               } else {
                 const errorData = await response.json();
                 toast.error(
-                  errorData.error || "Failed to remove item from cart."
+                  errorData.error || "Failed to remove item from cart.",
                 );
               }
             } catch (err) {
@@ -233,7 +235,7 @@ const useCartStore = create<CartStore>()(
             }
           } else {
             const newCart = cart.filter(
-              (item) => item.cartItemId !== cartItemId
+              (item) => item.cartItemId !== cartItemId,
             );
             setCart({ items: newCart, id: null });
             localStorage.setItem("cart", JSON.stringify(newCart));
@@ -246,14 +248,11 @@ const useCartStore = create<CartStore>()(
 
           if (status === "authenticated") {
             try {
-              const response = await fetch(
-                `/api/cart/items/${cartItemId}`,
-                {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(updates),
-                }
-              );
+              const response = await fetch(`/api/cart/items/${cartItemId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updates),
+              });
 
               if (response.ok) {
                 const updatedCart = await response.json();
@@ -268,7 +267,7 @@ const useCartStore = create<CartStore>()(
             }
           } else {
             const newCart = cart.map((item) =>
-              item.cartItemId === cartItemId ? { ...item, ...updates } : item
+              item.cartItemId === cartItemId ? { ...item, ...updates } : item,
             );
             setCart({ items: newCart, id: null });
             localStorage.setItem("cart", JSON.stringify(newCart));
@@ -295,12 +294,14 @@ const useCartStore = create<CartStore>()(
               });
 
               if (response.ok) {
+                const serverCart = await response.json();
+                setCart(serverCart);
                 localStorage.removeItem("cart");
                 window.dispatchEvent(new CustomEvent("cart-synced"));
               } else {
                 console.error(
                   "Failed to sync guest cart:",
-                  await response.text()
+                  await response.text(),
                 );
               }
             } catch (error) {
@@ -311,9 +312,9 @@ const useCartStore = create<CartStore>()(
       }),
       {
         name: "cart-storage", // name of the item in the storage (must be unique)
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export default useCartStore;

@@ -29,7 +29,14 @@ declare module "next-auth" {
     };
 
     // You can also add top-level custom properties here if needed
-    error?: "RefreshAccessTokenError"; // To include the error property you showed
+    accessToken?: string;
+    impersonator?: {
+      id: string;
+      role: "ADMIN" | "TEAM" | "CLIENT";
+      name?: string | null;
+      email?: string | null;
+    };
+    error?: "RefreshAccessTokenError" | "UserNotFound";
   }
 }
 
@@ -41,5 +48,17 @@ declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT {
     id: string;
     role: "ADMIN" | "TEAM" | "CLIENT";
+    baseUserId?: string;
+    accessToken?: string;
+    refreshToken?: string;
+    accessTokenExpires?: number;
+    lastSyncedAt?: number;
+    impersonator?: {
+      id: string;
+      role: "ADMIN" | "TEAM" | "CLIENT";
+      name?: string | null;
+      email?: string | null;
+    };
+    error?: "RefreshAccessTokenError" | "UserNotFound";
   }
 }

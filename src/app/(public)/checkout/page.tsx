@@ -5,9 +5,13 @@ import OrderSummary from "@/components/checkout/OrderSummary";
 import PaymentMethodSelector from "@/components/checkout/PaymentMethodSelector";
 import PaypalPayment from "@/components/checkout/PaypalPayment";
 import { useCart } from "@/hooks/useCart";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 const CheckoutPage = () => {
+  const { status } = useSession();
+  const router = useRouter();
   const {
     cart,
     loading: isLoading,
@@ -18,6 +22,22 @@ const CheckoutPage = () => {
     setAppliedDiscount,
   } = useCart();
   const [paymentMethod, setPaymentMethod] = useState("paypal");
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth?callbackUrl=%2Fcheckout");
+    }
+  }, [status, router]);
+
+  if (status === "loading" || status === "unauthenticated") {
+    return (
+      <div className="min-h-screen bg-ink text-cream flex items-center justify-center px-6">
+        <p className="text-sm sm:text-base text-cream-dim">
+          Preparing secure checkout...
+        </p>
+      </div>
+    );
+  }
 
   const finalTotal = cartTotal - appliedDiscountAmount;
 

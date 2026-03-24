@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
@@ -11,6 +11,17 @@ import EmailVerificationForm from "./EmailVerificationForm";
 const AuthForm = () => {
   const [authMode, setAuthMode] = useState("login");
   const [signupEmail, setSignupEmail] = useState("");
+  const [verifiedBanner, setVerifiedBanner] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const isVerified = params.get("verified") === "true";
+    if (isVerified) {
+      setAuthMode("login");
+      setVerifiedBanner(true);
+    }
+  }, []);
 
   const handleSignupSuccess = (email: string) => {
     setSignupEmail(email);
@@ -20,7 +31,11 @@ const AuthForm = () => {
   const renderForm = () => {
     switch (authMode) {
       case "login":
-        return <LoginForm setAuthMode={setAuthMode} />;
+        return (
+          <Suspense fallback={<div className="h-10" />}>
+            <LoginForm setAuthMode={setAuthMode} />
+          </Suspense>
+        );
       case "signup":
         return (
           <SignupForm
@@ -38,7 +53,11 @@ const AuthForm = () => {
           />
         );
       default:
-        return <LoginForm setAuthMode={setAuthMode} />;
+        return (
+          <Suspense fallback={<div className="h-10" />}>
+            <LoginForm setAuthMode={setAuthMode} />
+          </Suspense>
+        );
     }
   };
 
@@ -67,6 +86,15 @@ const AuthForm = () => {
       {/* Form Section */}
       <div className="w-full md:w-1/2 p-4 xs:p-5 sm:p-6 md:p-8 lg:p-10 xl:p-12">
         <div className="flex flex-col h-full justify-center">
+          {verifiedBanner && (
+            <div
+              className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs text-emerald-700 xs:text-sm"
+              role="status"
+            >
+              Email verified successfully. You can now log in.
+            </div>
+          )}
+
           <AnimatePresence mode="wait">
             <motion.div
               key={authMode}
@@ -80,7 +108,11 @@ const AuthForm = () => {
           </AnimatePresence>
 
           {/* Social Logins - Hidden during email verification */}
-          {authMode !== "emailVerification" && <SocialLogins />}
+          {authMode !== "emailVerification" && (
+            <Suspense fallback={null}>
+              <SocialLogins />
+            </Suspense>
+          )}
 
           {/* Support Link */}
           <p className="mt-4 xs:mt-5 sm:mt-6 text-center text-xs xs:text-sm text-gray-500 dark:text-gray-400">

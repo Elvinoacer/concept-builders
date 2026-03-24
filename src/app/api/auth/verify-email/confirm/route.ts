@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   if (!token) {
     return NextResponse.json(
       { success: false, message: "Verification token is missing" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     if (!user) {
       return NextResponse.json(
         { success: false, message: "Invalid or expired verification token" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -37,13 +37,14 @@ export async function GET(request: Request) {
       },
     });
 
-    // Redirect to a success page or login page
-    return NextResponse.redirect(new URL("/auth?verified=true", request.url));
+    // Redirect to app auth page with explicit app origin.
+    const appUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+    return NextResponse.redirect(new URL("/auth?verified=true", appUrl));
   } catch (error) {
     console.error("Error verifying email:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

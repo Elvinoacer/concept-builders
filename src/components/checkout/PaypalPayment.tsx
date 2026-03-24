@@ -4,7 +4,7 @@ import PayPalButton from "./PayPalButton";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface PaypalPaymentProps {
-  cart: any[];
+  cart: unknown[];
   finalTotal: number;
   appliedDiscountAmount: number;
   appliedDiscountId: string | null;
@@ -123,7 +123,8 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
         {/* Help Text */}
         <div className="text-center text-xs xs:text-sm text-gray-500 dark:text-gray-400">
           <p>
-            You'll be redirected to PayPal to complete your payment securely
+            You&apos;ll be redirected to PayPal to complete your payment
+            securely
           </p>
         </div>
       </div>

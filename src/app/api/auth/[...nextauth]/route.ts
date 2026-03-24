@@ -5,7 +5,65 @@ import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { cookies } from "next/headers";
-import { NextRequest } from "next/server"; // Import NextRequest
+import { NextRequest } from "next/server";
+
+const TOKEN_SYNC_INTERVAL_MS = 60 * 1000;
+
+function extractClientIp(req: NextRequest): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+
+  return req.headers.get("x-real-ip") || req.ip || "Unknown";
+}
+
+async function syncUserContext(token: any) {
+  const baseUserId =
+    token.baseUserId ||
+    (token.impersonator as { id?: string } | undefined)?.id ||
+    token.id;
+
+  if (!baseUserId) {
+    return token;
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: baseUserId as string },
+  });
+  if (!dbUser) {
+    return { ...token, error: "UserNotFound" };
+  }
+
+  const nextToken: any = {
+    ...token,
+    baseUserId: dbUser.id,
+    lastSyncedAt: Date.now(),
+  };
+
+  if (dbUser.impersonatingUserId) {
+    const impersonatedUser = await prisma.user.findUnique({
+      where: { id: dbUser.impersonatingUserId },
+    });
+
+    if (impersonatedUser) {
+      nextToken.id = impersonatedUser.id;
+      nextToken.role = impersonatedUser.role;
+      nextToken.impersonator = {
+        id: dbUser.id,
+        role: dbUser.role,
+        name: dbUser.name,
+        email: dbUser.email,
+      };
+      return nextToken;
+    }
+  }
+
+  nextToken.id = dbUser.id;
+  nextToken.role = dbUser.role;
+  delete nextToken.impersonator;
+  return nextToken;
+}
 
 async function refreshAccessToken(token: any) {
   try {
@@ -94,17 +152,21 @@ export const authOptions: AuthOptions = {
 
         if (!user.hashedPassword) {
           throw new Error(
-            "Account created via social login. Please use social login or set a password."
+            "Account created via social login. Please use social login or set a password.",
           );
         }
 
         const isCorrectPassword = await bcrypt.compare(
           credentials.password,
-          user.hashedPassword
+          user.hashedPassword,
         );
 
         if (!isCorrectPassword) {
           throw new Error("Incorrect password");
+        }
+
+        if (!user.emailVerified) {
+          throw new Error("EMAIL_NOT_VERIFIED");
         }
 
         return user;
@@ -117,8 +179,14 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   events: {
     async signIn({ user, isNewUser }) {
-      const ipAddress = globalThis.tempSignInIp || "Unknown";
-      delete globalThis.tempSignInIp; // Clean up
+      let ipAddress = "Unknown";
+      try {
+        const cookieStore = await cookies();
+        ipAddress = cookieStore.get("signin_ip")?.value || "Unknown";
+        cookieStore.delete("signin_ip");
+      } catch {
+        // Ignore cookie access errors and keep fallback.
+      }
 
       await prisma.loginHistory.create({
         data: {
@@ -138,69 +206,80 @@ export const authOptions: AuthOptions = {
         }
       }
     },
+    async signOut({ token }) {
+      const userId =
+        (token?.impersonator as { id?: string } | undefined)?.id ||
+        (token as any)?.baseUserId ||
+        (token as any)?.id;
+
+      if (userId) {
+        await prisma.user
+          .update({
+            where: { id: userId as string },
+            data: { impersonatingUserId: null },
+          })
+          .catch(() => {});
+      }
+    },
   },
   callbacks: {
     async signIn({ user, account, profile, isNewUser }) {
       return true;
     },
-    async signOut({ token }) {
-      const userId = (token.impersonator as { id: string })?.id || token.id;
-      if (userId) {
-        await prisma.user.update({
-          where: { id: userId as string },
-          data: { impersonatingUserId: null },
-        });
-      }
-    },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
       // Initial sign in
       if (account && user) {
-        // Fetch the user from the database to ensure we have the latest role
         const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
         if (dbUser) {
           token.id = dbUser.id;
+          token.baseUserId = dbUser.id;
           token.role = dbUser.role;
           token.accessToken = account.access_token;
           token.refreshToken = account.refresh_token;
-          token.accessTokenExpires =
-            Date.now() + (account.expires_at ?? 0) * 1000;
-        }
-        return token;
-      }
+          token.accessTokenExpires = (account.expires_at ?? 0) * 1000;
+          token.lastSyncedAt = Date.now();
 
-      // Return previous token if the access token has not expired yet
-      if (Date.now() < (token.accessTokenExpires as number)) {
-        // Fetch user from DB to get latest role and impersonation status
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-        });
-        if (!dbUser) {
-          return { ...token, error: "UserNotFound" };
-        }
+          if (dbUser.impersonatingUserId) {
+            const impersonatedUser = await prisma.user.findUnique({
+              where: { id: dbUser.impersonatingUserId },
+            });
 
-        token.role = dbUser.role;
-
-        if (dbUser.impersonatingUserId) {
-          const impersonatedUser = await prisma.user.findUnique({
-            where: { id: dbUser.impersonatingUserId },
-          });
-          if (impersonatedUser) {
-            token.id = impersonatedUser.id;
-            token.role = impersonatedUser.role;
-            token.impersonator = dbUser;
+            if (impersonatedUser) {
+              token.id = impersonatedUser.id;
+              token.role = impersonatedUser.role;
+              token.impersonator = {
+                id: dbUser.id,
+                role: dbUser.role,
+                name: dbUser.name,
+                email: dbUser.email,
+              };
+            }
           }
-        } else if (token.impersonator) {
-          // Exiting impersonation
-          token.id = (token.impersonator as { id: string }).id;
-          token.role = (token.impersonator as { role: string }).role;
-          delete token.impersonator;
         }
-
         return token;
       }
 
-      // Access token has expired, try to update it
-      return refreshAccessToken(token);
+      if (trigger === "update") {
+        return await syncUserContext(token);
+      }
+
+      const accessTokenExpires = Number(token.accessTokenExpires || 0);
+
+      // Access token has expired, try to update it first.
+      if (Date.now() >= accessTokenExpires) {
+        const refreshed = await refreshAccessToken(token);
+        return await syncUserContext(refreshed);
+      }
+
+      const shouldSyncUserContext =
+        !token.lastSyncedAt ||
+        Date.now() - Number(token.lastSyncedAt) > TOKEN_SYNC_INTERVAL_MS;
+
+      if (shouldSyncUserContext) {
+        return await syncUserContext(token);
+      }
+
+      return token;
     },
     async session({ session, token }) {
       if (session.user) {
@@ -219,14 +298,14 @@ const handler = NextAuth(authOptions);
 
 async function getHandler(req: NextRequest, context: any) {
   if (req.nextUrl.pathname.includes("callback")) {
-    const forwarded = req.headers.get("x-forwarded-for");
-    const ip = forwarded
-      ? Array.isArray(forwarded)
-        ? forwarded[0]
-        : forwarded.split(/\s*,\s*/)[0]
-      : req.headers.get("x-real-ip") || req.ip || "Unknown";
-
-    globalThis.tempSignInIp = ip;
+    const cookieStore = await cookies();
+    cookieStore.set("signin_ip", extractClientIp(req), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 120,
+    });
   }
 
   // @ts-ignore
@@ -235,14 +314,14 @@ async function getHandler(req: NextRequest, context: any) {
 
 async function postHandler(req: NextRequest, context: any) {
   if (req.nextUrl.pathname.includes("callback")) {
-    const forwarded = req.headers.get("x-forwarded-for");
-    const ip = forwarded
-      ? Array.isArray(forwarded)
-        ? forwarded[0]
-        : forwarded.split(/\s*,\s*/)[0]
-      : req.headers.get("x-real-ip") || req.ip || "Unknown";
-
-    globalThis.tempSignInIp = ip;
+    const cookieStore = await cookies();
+    cookieStore.set("signin_ip", extractClientIp(req), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 120,
+    });
   }
 
   // @ts-ignore
