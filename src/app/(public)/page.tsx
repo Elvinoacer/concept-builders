@@ -935,8 +935,14 @@ export default function Home() {
         <div className="mb-14 grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-14 max-[900px]:grid-cols-2 max-[900px]:gap-8 max-[480px]:grid-cols-1">
           <div>
             <div className="mb-5 flex items-center gap-3">
-              <span className="flex h-7 w-7 items-center justify-center border border-gold rotate-45">
-                <span className="h-2 w-2 bg-gold -rotate-45" />
+              <span className="relative h-10 w-10">
+                <Image
+                  src="/images/concept-builders-logo-free-bg.png"
+                  alt="Concept Builders logo"
+                  fill
+                  sizes="40px"
+                  className="object-contain"
+                />
               </span>
               <span
                 className="text-[28px] font-light"
