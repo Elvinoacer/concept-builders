@@ -39,8 +39,10 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
         const data = await response.json();
         setError(data.message || "Failed to resend verification link.");
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred.",
+      );
     } finally {
       setLoading(false);
     }
@@ -48,23 +50,27 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
 
   return (
     <div>
-      <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+      <h2
+        className="text-xl font-light leading-tight text-cream xs:text-2xl sm:text-3xl md:text-4xl"
+        style={{
+          fontFamily:
+            'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+        }}
+      >
         Verify your email
       </h2>
 
       {/* Email Display */}
       {email && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg xs:rounded-xl p-3 xs:p-4 mb-3 xs:mb-4">
-          <p className="text-sm xs:text-base text-blue-800 dark:text-blue-200 font-medium">
+        <div className="mb-3 rounded-lg border border-gold/30 bg-gold/10 p-3 xs:mb-4 xs:rounded-xl xs:p-4">
+          <p className="text-sm font-medium text-gold-light xs:text-base">
             Email sent to:
           </p>
-          <p className="text-sm xs:text-base text-blue-700 dark:text-blue-300 break-all">
-            {email}
-          </p>
+          <p className="break-all text-sm text-cream xs:text-base">{email}</p>
         </div>
       )}
 
-      <p className="text-gray-600 text-sm xs:text-base mt-2 mb-4 xs:mb-5 sm:mb-6 md:mb-8 dark:text-gray-400 leading-relaxed">
+      <p className="mb-4 mt-2 text-sm leading-relaxed text-cream-dim xs:mb-5 xs:text-base sm:mb-6 md:mb-8">
         We&apos;ve sent a verification link to your email address. Please check
         your inbox and click the link to activate your account.
       </p>
@@ -72,7 +78,7 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
       {/* Success Message */}
       {message && (
         <div
-          className="bg-green-100 border border-green-400 text-green-700 px-3 xs:px-4 py-2.5 xs:py-3 rounded-lg text-xs xs:text-sm leading-relaxed mb-3 xs:mb-4"
+          className="mb-3 rounded-lg border border-emerald-700/40 bg-emerald-900/20 px-3 py-2.5 text-xs leading-relaxed text-emerald-300 xs:mb-4 xs:px-4 xs:py-3 xs:text-sm"
           role="alert"
         >
           <span className="block">{message}</span>
@@ -82,7 +88,7 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
       {/* Error Message */}
       {error && (
         <div
-          className="bg-red-100 border border-red-400 text-red-700 px-3 xs:px-4 py-2.5 xs:py-3 rounded-lg text-xs xs:text-sm leading-relaxed mb-3 xs:mb-4"
+          className="mb-3 rounded-lg border border-red-700/45 bg-red-900/20 px-3 py-2.5 text-xs leading-relaxed text-red-300 xs:mb-4 xs:px-4 xs:py-3 xs:text-sm"
           role="alert"
         >
           <span className="block">{error}</span>
@@ -91,7 +97,7 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
 
       {/* Resend Button */}
       <button
-        className="flex w-full justify-center items-center rounded-lg xs:rounded-xl bg-gradient-to-r from-blue-600 to-cyan-400 py-2.5 xs:py-3 sm:py-3.5 px-4 text-sm xs:text-base font-semibold text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-lg"
+        className="flex w-full items-center justify-center rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-ink shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-gold-light hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-ink disabled:cursor-not-allowed disabled:opacity-50 disabled:transform-none disabled:hover:shadow-lg xs:rounded-xl xs:py-3 xs:text-base sm:py-3.5"
         type="button"
         onClick={handleResendVerification}
         disabled={loading}
@@ -107,11 +113,11 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
       </button>
 
       {/* Login Link */}
-      <p className="mt-4 xs:mt-5 sm:mt-6 text-center text-xs xs:text-sm text-gray-500 dark:text-gray-400">
+      <p className="mt-4 text-center text-xs text-cream-dim xs:mt-5 xs:text-sm sm:mt-6">
         Already verified?{" "}
         <button
           onClick={() => setAuthMode("login")}
-          className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 ml-1 transition-all duration-300"
+          className="ml-1 font-medium text-gold transition-colors duration-300 hover:text-gold-light"
           type="button"
           disabled={loading}
         >
@@ -120,8 +126,8 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
       </p>
 
       {/* Additional Help Text */}
-      <div className="mt-4 xs:mt-5 p-3 xs:p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg xs:rounded-xl border border-gray-200 dark:border-gray-700">
-        <p className="text-xs xs:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+      <div className="mt-4 rounded-lg border border-cb-border bg-surface p-3 xs:mt-5 xs:rounded-xl xs:p-4">
+        <p className="text-xs leading-relaxed text-cream-dim xs:text-sm">
           <strong>Didn't receive the email?</strong> Check your spam folder or
           make sure you entered the correct email address.
         </p>

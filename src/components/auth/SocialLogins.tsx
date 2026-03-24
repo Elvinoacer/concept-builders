@@ -36,10 +36,10 @@ const SocialLogins = () => {
       {/* Divider */}
       <div className="relative my-4 xs:my-5 sm:my-6 md:my-7">
         <div aria-hidden="true" className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+          <div className="w-full border-t border-cb-border"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white px-2 xs:px-3 text-xs xs:text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+          <span className="bg-card px-2 text-xs text-cream-dim xs:px-3 xs:text-sm">
             Or continue with
           </span>
         </div>
@@ -50,7 +50,7 @@ const SocialLogins = () => {
         {/* Google Button */}
         <button
           onClick={() => handleSignIn("google")}
-          className="flex items-center justify-center w-full rounded-lg xs:rounded-xl border border-gray-300 bg-white py-2 xs:py-2.5 sm:py-3 px-3 xs:px-4 text-xs xs:text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 xs:focus:ring-offset-2 focus:ring-gray-400 transition-all duration-300 hover:shadow-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-500"
+          className="flex w-full items-center justify-center rounded-lg border border-cb-border bg-surface px-3 py-2 text-xs font-medium text-cream shadow-sm transition-all duration-300 hover:border-border-gold hover:text-gold focus:outline-none focus:ring-2 focus:ring-gold/30 focus:ring-offset-1 focus:ring-offset-ink hover:shadow-md xs:rounded-xl xs:px-4 xs:py-2.5 xs:text-sm xs:focus:ring-offset-2 sm:py-3"
         >
           <svg
             aria-hidden="true"

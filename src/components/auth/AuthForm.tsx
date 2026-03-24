@@ -62,10 +62,13 @@ const AuthForm = () => {
   };
 
   return (
-    <div className="flex w-full max-w-xs xs:max-w-sm sm:max-w-md md:max-w-4xl rounded-lg xs:rounded-xl md:rounded-2xl bg-white shadow-md xs:shadow-lg md:shadow-xl overflow-hidden dark:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50">
+    <div className="flex w-full max-w-xs overflow-hidden border border-cb-border bg-card/90 shadow-2xl backdrop-blur-xl xs:max-w-sm sm:max-w-md md:max-w-4xl">
       {/* Desktop Sidebar - Hidden on mobile */}
-      <div className="hidden md:flex w-1/2 items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 p-8 lg:p-10 xl:p-12">
-        <div className="flex flex-col items-center text-center">
+      <div className="relative hidden w-1/2 border-r border-cb-border md:flex md:items-center md:justify-center md:p-8 lg:p-10 xl:p-12">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_72%_58%_at_80%_5%,rgba(200,137,42,0.2),transparent_62%),radial-gradient(ellipse_44%_34%_at_20%_35%,rgba(200,137,42,0.09),transparent_70%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.03)_1px,transparent_1px)] bg-[size:78px_78px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.52)_18%,rgba(0,0,0,0.52)_82%,transparent)]" />
+
+        <div className="relative z-10 flex flex-col items-center text-center">
           <Image
             src="/images/concept-builders-logo-free-bg.png"
             alt="Concept Builders Logo"
@@ -74,10 +77,16 @@ const AuthForm = () => {
             className="mb-4 lg:mb-6 w-24 h-24 lg:w-32 lg:h-32"
             priority
           />
-          <h1 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400">
+          <h1
+            className="text-2xl font-light tracking-[0.06em] text-cream lg:text-3xl xl:text-4xl"
+            style={{
+              fontFamily:
+                'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+            }}
+          >
             Concept Builders
           </h1>
-          <p className="mt-2 lg:mt-3 text-sm lg:text-base text-gray-600 dark:text-gray-400 max-w-xs lg:max-w-sm">
+          <p className="mt-2 max-w-xs text-sm text-cream-dim lg:mt-3 lg:max-w-sm lg:text-base">
             From blueprint to reality. Your dream home, simplified.
           </p>
         </div>
@@ -88,7 +97,7 @@ const AuthForm = () => {
         <div className="flex flex-col h-full justify-center">
           {verifiedBanner && (
             <div
-              className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs text-emerald-700 xs:text-sm"
+              className="mb-4 rounded-lg border border-emerald-700/40 bg-emerald-900/20 px-3 py-2 text-xs text-emerald-300 xs:text-sm"
               role="status"
             >
               Email verified successfully. You can now log in.
@@ -115,11 +124,11 @@ const AuthForm = () => {
           )}
 
           {/* Support Link */}
-          <p className="mt-4 xs:mt-5 sm:mt-6 text-center text-xs xs:text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-4 text-center text-xs text-cream-dim xs:mt-5 xs:text-sm sm:mt-6">
             Having trouble?{" "}
             <a
               href="/contact"
-              className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 ml-1 transition-all duration-300"
+              className="ml-1 font-medium text-gold transition-colors duration-300 hover:text-gold-light"
             >
               Contact Support
             </a>

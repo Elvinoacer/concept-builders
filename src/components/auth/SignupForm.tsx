@@ -54,8 +54,10 @@ const SignupForm: React.FC<SignupFormProps> = ({
       } else {
         onSignupSuccess(email); // Call the callback with the email
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred",
+      );
     } finally {
       setLoading(false);
     }
@@ -63,10 +65,16 @@ const SignupForm: React.FC<SignupFormProps> = ({
 
   return (
     <div>
-      <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+      <h2
+        className="text-xl font-light leading-tight text-cream xs:text-2xl sm:text-3xl md:text-4xl"
+        style={{
+          fontFamily:
+            'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+        }}
+      >
         Create an Account
       </h2>
-      <p className="text-gray-600 text-sm xs:text-base mt-2 mb-4 xs:mb-5 sm:mb-6 md:mb-8 dark:text-gray-400">
+      <p className="mb-4 mt-2 text-sm text-cream-dim xs:mb-5 xs:text-base sm:mb-6 md:mb-8">
         Get started with a free account.
       </p>
       <form
@@ -75,7 +83,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
       >
         {error && (
           <div
-            className="bg-red-100 border border-red-400 text-red-700 px-3 xs:px-4 py-2.5 xs:py-3 rounded-lg text-xs xs:text-sm leading-relaxed"
+            className="rounded-lg border border-red-700/45 bg-red-900/20 px-3 py-2.5 text-xs leading-relaxed text-red-300 xs:px-4 xs:py-3 xs:text-sm"
             role="alert"
           >
             {error}
@@ -85,13 +93,13 @@ const SignupForm: React.FC<SignupFormProps> = ({
         {/* Name Input */}
         <div>
           <label
-            className="block text-sm xs:text-base font-medium text-gray-700 dark:text-gray-300 mb-1 xs:mb-2"
+            className="mb-1 block text-sm font-medium text-cream xs:mb-2 xs:text-base"
             htmlFor="name"
           >
             Name
           </label>
           <input
-            className="w-full rounded-lg border border-gray-300 shadow-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 text-sm xs:text-base h-11 xs:h-12 px-3 xs:px-4 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors duration-200"
+            className="h-11 w-full rounded-lg border border-cb-border bg-surface px-3 text-sm text-cream shadow-sm transition-colors duration-200 placeholder:text-cb-muted focus:border-gold focus:ring-2 focus:ring-gold/20 xs:h-12 xs:px-4 xs:text-base"
             id="name"
             placeholder="Enter your name"
             type="text"
@@ -105,13 +113,13 @@ const SignupForm: React.FC<SignupFormProps> = ({
         {/* Email Input */}
         <div>
           <label
-            className="block text-sm xs:text-base font-medium text-gray-700 dark:text-gray-300 mb-1 xs:mb-2"
+            className="mb-1 block text-sm font-medium text-cream xs:mb-2 xs:text-base"
             htmlFor="email"
           >
             Email
           </label>
           <input
-            className="w-full rounded-lg border border-gray-300 shadow-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 text-sm xs:text-base h-11 xs:h-12 px-3 xs:px-4 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors duration-200"
+            className="h-11 w-full rounded-lg border border-cb-border bg-surface px-3 text-sm text-cream shadow-sm transition-colors duration-200 placeholder:text-cb-muted focus:border-gold focus:ring-2 focus:ring-gold/20 xs:h-12 xs:px-4 xs:text-base"
             id="email"
             placeholder="Enter your email"
             type="email"
@@ -125,17 +133,17 @@ const SignupForm: React.FC<SignupFormProps> = ({
         {/* Password Input */}
         <div>
           <label
-            className="block text-sm xs:text-base font-medium text-gray-700 dark:text-gray-300 mb-1 xs:mb-2"
+            className="mb-1 block text-sm font-medium text-cream xs:mb-2 xs:text-base"
             htmlFor="password"
           >
             Password
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+            <span className="ml-1 text-xs text-cb-muted">
               (min. 8, include uppercase + number)
             </span>
           </label>
           <div className="relative">
             <input
-              className="w-full rounded-lg border border-gray-300 shadow-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 text-sm xs:text-base h-11 xs:h-12 px-3 xs:px-4 pr-10 xs:pr-12 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors duration-200"
+              className="h-11 w-full rounded-lg border border-cb-border bg-surface px-3 pr-10 text-sm text-cream shadow-sm transition-colors duration-200 placeholder:text-cb-muted focus:border-gold focus:ring-2 focus:ring-gold/20 xs:h-12 xs:px-4 xs:pr-12 xs:text-base"
               id="password"
               placeholder="Enter your password"
               type={showPassword ? "text" : "password"}
@@ -148,7 +156,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 xs:px-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors top-0"
+              className="absolute inset-y-0 right-0 top-0 flex items-center px-3 text-cb-muted transition-colors hover:text-gold xs:px-4"
               disabled={loading}
             >
               <span className="material-symbols-outlined text-lg xs:text-xl">
@@ -157,7 +165,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
             </button>
           </div>
           {password.length > 0 && validatePassword(password) && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="mt-1 text-xs text-red-300">
               {validatePassword(password)}
             </p>
           )}
@@ -165,7 +173,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
 
         {/* Submit Button */}
         <button
-          className="flex w-full justify-center items-center rounded-lg xs:rounded-xl bg-gradient-to-r from-blue-600 to-cyan-400 py-2.5 xs:py-3 sm:py-3.5 px-4 text-sm xs:text-base font-semibold text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-lg"
+          className="flex w-full items-center justify-center rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-ink shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-gold-light hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-ink disabled:cursor-not-allowed disabled:opacity-50 disabled:transform-none disabled:hover:shadow-lg xs:rounded-xl xs:py-3 xs:text-base sm:py-3.5"
           type="submit"
           disabled={loading || !!validatePassword(password)}
         >
@@ -181,11 +189,11 @@ const SignupForm: React.FC<SignupFormProps> = ({
       </form>
 
       {/* Login Link */}
-      <p className="mt-6 xs:mt-7 sm:mt-8 text-center text-xs xs:text-sm text-gray-500 dark:text-gray-400">
+      <p className="mt-6 text-center text-xs text-cream-dim xs:mt-7 xs:text-sm sm:mt-8">
         Already have an account?{" "}
         <button
           onClick={() => setAuthMode("login")}
-          className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 ml-1 transition-all duration-300"
+          className="ml-1 font-medium text-gold transition-colors duration-300 hover:text-gold-light"
           type="button"
           disabled={loading}
         >

@@ -15,9 +15,13 @@ const ResetPasswordPage = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    document.body.classList.add("landing-redesign-active");
+
     if (!token) {
       setError("Password reset token is missing.");
     }
+
+    return () => document.body.classList.remove("landing-redesign-active");
   }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,7 +62,7 @@ const ResetPasswordPage = () => {
       if (response.ok) {
         setMessage(
           data.message ||
-            "Your password has been reset successfully. You can now log in."
+            "Your password has been reset successfully. You can now log in.",
         );
         setTimeout(() => {
           router.push("/auth");
@@ -66,17 +70,22 @@ const ResetPasswordPage = () => {
       } else {
         setError(data.message || "Failed to reset password.");
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950 px-3 py-8 sm:px-4 sm:py-12 lg:px-8">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-ink px-3 py-8 sm:px-4 sm:py-12 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_72%_56%_at_82%_2%,rgba(200,137,42,0.2),transparent_62%),radial-gradient(ellipse_48%_36%_at_15%_28%,rgba(200,137,42,0.1),transparent_70%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.03)_1px,transparent_1px)] bg-[size:84px_84px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.55)_18%,rgba(0,0,0,0.55)_82%,transparent)]" />
+
       {/* Fluid container with max-width constraints */}
-      <div className="w-full max-w-[90vw] sm:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl space-y-6 sm:space-y-8 rounded-xl bg-white p-6 sm:p-8 lg:p-10 shadow-lg dark:bg-gray-800">
+      <div className="relative z-10 w-full max-w-[90vw] space-y-6 border border-cb-border bg-card/90 p-6 shadow-2xl backdrop-blur-xl sm:max-w-md sm:space-y-8 sm:p-8 lg:max-w-lg lg:p-10 xl:max-w-xl 2xl:max-w-2xl">
         {/* Logo Section */}
         <div className="text-center">
           <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-3 sm:mb-4">
@@ -89,10 +98,16 @@ const ResetPasswordPage = () => {
               priority
             />
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+          <h2
+            className="text-2xl font-light leading-tight tracking-tight text-cream sm:text-3xl lg:text-4xl"
+            style={{
+              fontFamily:
+                'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+            }}
+          >
             Reset Your Password
           </h2>
-          <p className="mt-2 sm:mt-3 text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-prose mx-auto">
+          <p className="mx-auto mt-2 max-w-prose text-sm leading-relaxed text-cream-dim sm:mt-3 sm:text-base lg:text-lg">
             Enter your new password below.
           </p>
         </div>
@@ -104,9 +119,9 @@ const ResetPasswordPage = () => {
             <div
               className={`${
                 message
-                  ? "bg-green-50 border border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300"
-                  : "bg-red-50 border border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300"
-              } rounded-lg p-3 sm:p-4 text-sm sm:text-base`}
+                  ? "border border-emerald-700/40 bg-emerald-900/20 text-emerald-300"
+                  : "border border-red-700/45 bg-red-900/20 text-red-300"
+              } rounded-lg p-3 text-sm sm:p-4 sm:text-base`}
               role="alert"
             >
               <span className="block text-center sm:text-left">
@@ -127,7 +142,7 @@ const ResetPasswordPage = () => {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="w-full rounded-lg border border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-600 text-base sm:text-sm lg:text-base h-12 sm:h-14 px-4 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 placeholder:text-gray-500 transition-colors duration-200"
+                className="h-12 w-full rounded-lg border border-cb-border bg-surface px-4 text-base text-cream shadow-sm transition-colors duration-200 placeholder:text-cb-muted focus:border-gold focus:ring-gold sm:h-14 sm:text-sm lg:text-base"
                 placeholder="New Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -144,7 +159,7 @@ const ResetPasswordPage = () => {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="w-full rounded-lg border border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-600 text-base sm:text-sm lg:text-base h-12 sm:h-14 px-4 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 placeholder:text-gray-500 transition-colors duration-200"
+                className="h-12 w-full rounded-lg border border-cb-border bg-surface px-4 text-base text-cream shadow-sm transition-colors duration-200 placeholder:text-cb-muted focus:border-gold focus:ring-gold sm:h-14 sm:text-sm lg:text-base"
                 placeholder="Confirm New Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -157,7 +172,7 @@ const ResetPasswordPage = () => {
           <div>
             <button
               type="submit"
-              className="group relative flex w-full justify-center rounded-lg border border-transparent bg-gradient-to-r from-blue-600 to-cyan-400 py-3 sm:py-4 px-4 text-sm sm:text-base font-medium text-white hover:from-blue-700 hover:to-cyan-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 min-h-[3rem] sm:min-h-[3.5rem]"
+              className="group relative flex min-h-[3rem] w-full justify-center rounded-lg border border-transparent bg-gold px-4 py-3 text-sm font-medium text-ink transition-all duration-200 hover:bg-gold-light focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-ink disabled:cursor-not-allowed disabled:opacity-70 sm:min-h-[3.5rem] sm:py-4 sm:text-base"
               disabled={loading}
             >
               <span className="flex items-center justify-center">
@@ -195,11 +210,11 @@ const ResetPasswordPage = () => {
 
         {/* Additional Help Text */}
         <div className="text-center">
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-4 sm:mt-6">
+          <p className="mt-4 text-xs text-cream-dim sm:mt-6 sm:text-sm">
             Remember your password?{" "}
             <button
               onClick={() => router.push("/auth")}
-              className="text-blue-600 hover:text-blue-500 dark:text-cyan-400 dark:hover:text-cyan-300 font-medium transition-colors duration-200 focus:outline-none focus:underline"
+              className="font-medium text-gold transition-colors duration-200 hover:text-gold-light focus:outline-none focus:underline"
             >
               Back to login
             </button>
