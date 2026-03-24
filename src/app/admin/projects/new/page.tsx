@@ -1,5 +1,5 @@
 "use client";
-import { ProjectStatus } from "@/generated/prisma";
+import { ProjectStatus } from "@/generated/prisma/browser";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,

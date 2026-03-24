@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Feedback } from "@/generated/prisma";
+import { Feedback } from "@/generated/prisma/browser";
 import { useSession } from "next-auth/react";
 import { Star, Calendar, Folder, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";

@@ -26,7 +26,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { MarqueeItem } from "@/generated/prisma";
+import { MarqueeItem } from "@/generated/prisma/browser";
 import { motion } from "framer-motion";
 import {
   AlertCircle,

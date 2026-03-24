@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { Post } from "@/generated/prisma";
+import { Post } from "@/generated/prisma/browser";
 import PageSection from "@/components/ui-premium/page-section";
 import GlassCard from "@/components/ui-premium/glass-card";
 import GoldButton from "@/components/ui-premium/gold-button";

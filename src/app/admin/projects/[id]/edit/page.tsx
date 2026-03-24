@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ProjectStatus } from "@/generated/prisma";
+import { ProjectStatus } from "@/generated/prisma/browser";
 import {
   Edit,
   ArrowLeft,

@@ -1,4 +1,4 @@
-import { OrderStatus } from "@/generated/prisma";
+import { OrderStatus } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";

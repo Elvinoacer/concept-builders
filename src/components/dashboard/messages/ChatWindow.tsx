@@ -1,7 +1,7 @@
 "use client";
 
 import { useSocket } from "@/app/Providers";
-import { Attachment, Message as MessageType } from "@/generated/prisma";
+import { Attachment, Message as MessageType } from "@/generated/prisma/browser";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useRef, useState, useCallback } from "react";

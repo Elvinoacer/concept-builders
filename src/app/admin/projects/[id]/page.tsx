@@ -5,7 +5,7 @@ import {
   MilestoneStatus,
   ProjectStatus,
   RequirementStatus,
-} from "@/generated/prisma";
+} from "@/generated/prisma/browser";
 import { format, formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 import {

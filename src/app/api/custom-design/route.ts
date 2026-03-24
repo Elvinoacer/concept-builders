@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { sendCustomDesignRequestEmail } from "@/lib/emails";
-import { Role } from "@/generated/prisma";
+import { Role } from "@/generated/prisma/client";
 
 const s3Client = new S3Client({
   endpoint: "https://sfo3.digitaloceanspaces.com", // Change to your region

@@ -2,7 +2,7 @@
 
 import { useSocket } from "@/app/Providers";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Conversation, Message, User } from "@/generated/prisma";
+import { Conversation, Message, User } from "@/generated/prisma/browser";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";

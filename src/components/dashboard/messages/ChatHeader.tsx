@@ -1,6 +1,6 @@
 "use client";
 
-import { Conversation } from "@/generated/prisma";
+import { Conversation } from "@/generated/prisma/browser";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";

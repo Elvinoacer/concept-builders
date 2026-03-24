@@ -1,5 +1,5 @@
 
-import { Design, PackageOption } from '@/generated/prisma';
+import { Design, PackageOption } from '@/generated/prisma/browser';
 
 interface CartItem {
   quantity: number;

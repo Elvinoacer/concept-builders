@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Category, Design, File } from "@/generated/prisma";
+import { Category, Design, File } from "@/generated/prisma/browser";
 import { motion } from "framer-motion";
 import Image from "next/image";
 

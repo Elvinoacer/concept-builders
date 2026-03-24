@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CustomDesignRequest } from "@/generated/prisma";
+import { CustomDesignRequest } from "@/generated/prisma/browser";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 

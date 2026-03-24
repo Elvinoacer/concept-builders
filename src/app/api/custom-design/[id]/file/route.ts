@@ -4,7 +4,7 @@ import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { sendCustomDesignUpdateRequestEmail } from "@/lib/emails";
-import { Role } from "@/generated/prisma";
+import { Role } from "@/generated/prisma/client";
 
 const s3Client = new S3Client({
   endpoint: "https://sfo3.digitaloceanspaces.com", // Change to your region

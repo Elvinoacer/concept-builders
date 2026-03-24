@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Design } from "@/generated/prisma";
+import { Design } from "@/generated/prisma/browser";
 import { motion } from "framer-motion";
 import {
   ArrowUpDown,

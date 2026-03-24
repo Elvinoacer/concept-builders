@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Order, OrderItem, Design } from "@/generated/prisma";
+import { Order, OrderItem, Design } from "@/generated/prisma/browser";
 
 interface OrderWithDetails extends Order {
   items: (OrderItem & { design: Design })[];

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Design } from "@/generated/prisma";
+import { Design } from "@/generated/prisma/browser";
 import { designDetailPageData } from "@/lib/dummydata";
 import Image from "next/image";
 

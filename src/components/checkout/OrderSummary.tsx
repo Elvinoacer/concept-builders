@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Design, File } from "@/generated/prisma";
+import { Design, File } from "@/generated/prisma/browser";
 import { calculateItemTotal } from "@/lib/calculate-total";
 import Image from "next/image";
 import Link from "next/link";

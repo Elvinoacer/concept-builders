@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Feedback } from "@/generated/prisma";
+import { Feedback } from "@/generated/prisma/browser";
 
 interface TestimonialsProps {
   testimonials: Feedback[];

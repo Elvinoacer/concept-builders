@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSignedUrlForUpload } from "@/lib/do-spaces";
-import { FileType } from "@/generated/prisma";
+import { FileType } from "@/generated/prisma/client";
 
 export async function POST(req: NextRequest) {
   try {

@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Design, File, Category } from "@/generated/prisma";
+import { Design, File, Category } from "@/generated/prisma/browser";
 import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";

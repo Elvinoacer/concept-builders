@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { DiscountType } from '@/generated/prisma';
+import { DiscountType } from '@/generated/prisma/client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route'; // Adjust path as needed
 

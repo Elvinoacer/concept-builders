@@ -1,5 +1,5 @@
 import React from "react";
-import { Design } from "@/generated/prisma";
+import { Design } from "@/generated/prisma/browser";
 
 interface IncludedItemsProps {
   selectedFileTypes: string[];

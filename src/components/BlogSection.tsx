@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Post } from "@/generated/prisma";
+import { Post } from "@/generated/prisma/browser";
 
 interface BlogSectionProps {
   recentPosts: Post[];

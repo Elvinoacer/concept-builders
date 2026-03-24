@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { slides as dummySlides } from "@/lib/dummydata";
-import { Banner } from "@/generated/prisma";
+import { Banner } from "@/generated/prisma/browser";
 
 interface HeroProps {
   banners: Banner[];

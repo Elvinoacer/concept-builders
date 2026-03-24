@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { RequirementStatus } from "@/generated/prisma";
+import { RequirementStatus } from "@/generated/prisma/browser";
 import { PlusCircle, ArrowLeft, Loader2 } from "lucide-react";
 
 const CreateRequirementPage = () => {

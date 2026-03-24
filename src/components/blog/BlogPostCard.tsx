@@ -1,6 +1,6 @@
 "use client";
 
-import { Post } from "@/generated/prisma";
+import { Post } from "@/generated/prisma/browser";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";

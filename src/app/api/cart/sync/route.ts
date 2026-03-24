@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { Design } from "@/generated/prisma";
+import { Design } from "@/generated/prisma/client";
 
 interface CartItem extends Design {
   quantity: number;

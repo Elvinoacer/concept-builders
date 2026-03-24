@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { MilestoneStatus } from "@/generated/prisma";
+import { MilestoneStatus } from "@/generated/prisma/browser";
 import {
   PlusCircle,
   ArrowLeft,

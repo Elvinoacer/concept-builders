@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { CustomDesignRequestStatus, Role } from "@/generated/prisma";
+import { CustomDesignRequestStatus, Role } from "@/generated/prisma/client";
 import { sendCustomDesignRequestStatusUpdateEmail } from "@/lib/emails";
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

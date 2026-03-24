@@ -1,5 +1,5 @@
 "use client";
-import { Design } from "@/generated/prisma";
+import { Design } from "@/generated/prisma/browser";
 import DesignCard from "./design-showcase/DesignCard";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";

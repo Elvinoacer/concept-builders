@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { InvoiceStatus, InvoiceType } from "@/generated/prisma";
+import { InvoiceStatus, InvoiceType } from "@/generated/prisma/browser";
 import {
   PlusCircle,
   XCircle,

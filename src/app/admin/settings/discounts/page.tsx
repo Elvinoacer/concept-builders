@@ -39,7 +39,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { Discount, DiscountType } from "@/generated/prisma";
+import { Discount, DiscountType } from "@/generated/prisma/browser";
 import { motion } from "framer-motion";
 import {
   Calendar,

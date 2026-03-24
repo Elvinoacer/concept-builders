@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { sendCustomDesignRequestEmail, sendCustomDesignUpdateRequestEmail } from "@/lib/emails";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { Role } from "@/generated/prisma";
+import { Role } from "@/generated/prisma/client";
 
 const s3Client = new S3Client({
   endpoint: "https://sfo3.digitaloceanspaces.com", // Change to your region

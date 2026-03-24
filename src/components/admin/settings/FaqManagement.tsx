@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { Design } from "@/generated/prisma";
+import { Design } from "@/generated/prisma/browser";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,

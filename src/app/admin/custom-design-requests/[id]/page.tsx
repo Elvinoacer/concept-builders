@@ -3,7 +3,7 @@ import CustomDesignRequestDetails from "@/components/custom-design/CustomDesignR
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { Role } from "@/generated/prisma";
+import { Role } from "@/generated/prisma/browser";
 
 interface AdminCustomDesignRequestPageProps {
   params: Promise<{ id: string }>;

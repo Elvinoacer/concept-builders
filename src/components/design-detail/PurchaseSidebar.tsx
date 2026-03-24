@@ -5,7 +5,7 @@ import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // Import the icons
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { Design } from "@/generated/prisma";
+import { Design } from "@/generated/prisma/browser";
 import { useCart } from "@/hooks/useCart";
 import {
   Building2,

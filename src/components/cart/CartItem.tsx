@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 
-import { Design, PackageOption } from "@/generated/prisma";
+import { Design, PackageOption } from "@/generated/prisma/browser";
 import { calculateItemTotal } from "@/lib/calculate-total";
 
 interface CartItemProps {

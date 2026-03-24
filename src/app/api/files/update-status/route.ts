@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { UploadStatus } from "@/generated/prisma";
+import { UploadStatus } from "@/generated/prisma/client";
 
 export async function POST(req: NextRequest) {
   try {

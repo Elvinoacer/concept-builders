@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { calculateItemTotal } from "@/lib/calculate-total";
 import { toast } from "sonner";
-import { Design, PackageOption } from "@/generated/prisma";
+import { Design, PackageOption } from "@/generated/prisma/browser";
 
 interface CartItem {
   cartItemId: string;

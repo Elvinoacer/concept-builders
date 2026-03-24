@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Message as MessageType } from "@/generated/prisma";
+import { Message as MessageType } from "@/generated/prisma/browser";
 import { Paperclip, Check, CheckCheck, Clock, FileText, Image as ImageIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

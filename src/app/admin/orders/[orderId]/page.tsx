@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import Link from "next/link";
 import FileUpload from "@/components/admin/designs/FileUpload"; // Reusing FileUpload component
-import { FileType } from "@/generated/prisma";
+import { FileType } from "@/generated/prisma/browser";
 
 const AdminOrderDetailPage = () => {
   const params = useParams();

@@ -41,7 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProjectStatus } from "@/generated/prisma";
+import { ProjectStatus } from "@/generated/prisma/browser";
 import { toast } from "sonner";
 
 interface Project {

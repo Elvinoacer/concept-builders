@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { designsPageData } from "@/lib/dummydata/designsPage";
-import { Category } from "@/generated/prisma";
+import { Category } from "@/generated/prisma/browser";
 import { useState, useEffect } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 

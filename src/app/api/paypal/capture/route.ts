@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { calculateItemTotal } from "@/lib/calculate-total";
-import { DiscountType } from "@/generated/prisma";
+import { DiscountType } from "@/generated/prisma/client";
 import { sendPurchaseNotificationEmails } from "@/lib/emails";
 
 export async function POST(request: Request) {

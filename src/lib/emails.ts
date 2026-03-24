@@ -6,7 +6,7 @@ import {
   Invoice,
   InvoiceItem,
   Project,
-} from "@/generated/prisma";
+} from "@/generated/prisma/browser";
 import { Resend } from "resend";
 import prisma from "@/lib/prisma";
 

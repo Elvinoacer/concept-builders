@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { FileType } from "@/generated/prisma";
+import { FileType } from "@/generated/prisma/client";
 
 // Configure route for large file metadata handling
 export const maxDuration = 300; // 5 minutes

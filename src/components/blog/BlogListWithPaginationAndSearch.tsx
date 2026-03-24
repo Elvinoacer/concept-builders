@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Post } from "@/generated/prisma";
+import { Post } from "@/generated/prisma/browser";
 import { BlogPostCard, BlogPostCardSkeleton } from "./BlogPostCard";
 import {
   Pagination,

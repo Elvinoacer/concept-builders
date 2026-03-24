@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { Design } from "@/generated/prisma";
+import { Design } from "@/generated/prisma/browser";
 import { motion } from "framer-motion";
 
 interface NewPlansProps {

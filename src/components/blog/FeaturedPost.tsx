@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Post } from "@/generated/prisma";
+import { Post } from "@/generated/prisma/browser";
 import { motion } from "framer-motion";
 import GoldButton from "@/components/ui-premium/gold-button";
 import GlassCard from "@/components/ui-premium/glass-card";

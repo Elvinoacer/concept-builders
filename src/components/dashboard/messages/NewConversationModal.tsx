@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { User } from "@/generated/prisma";
+import { User } from "@/generated/prisma/browser";
 import { ConversationWithMessagesAndUsers } from "./ConversationList";
 import { Button } from "@/components/ui/button";
 import {

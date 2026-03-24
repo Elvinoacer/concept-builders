@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   CustomDesignRequest,
   CustomDesignRequestStatus,
-} from "@/generated/prisma";
+} from "@/generated/prisma/browser";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText,

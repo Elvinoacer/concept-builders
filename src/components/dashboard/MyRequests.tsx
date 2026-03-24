@@ -3,7 +3,7 @@
 import {
   CustomDesignRequest,
   CustomDesignRequestStatus,
-} from "@/generated/prisma";
+} from "@/generated/prisma/browser";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { marqueeItems as dummyMarqueeItems } from "@/lib/dummydata";
-import { MarqueeItem } from "@/generated/prisma";
+import { MarqueeItem } from "@/generated/prisma/browser";
 
 interface MarqueeProps {
   marqueeItems: MarqueeItem[];
