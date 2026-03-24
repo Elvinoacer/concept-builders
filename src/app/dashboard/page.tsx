@@ -6,7 +6,6 @@ import RecommendedDesigns from "@/components/dashboard/RecommendedDesigns";
 import { useSearch } from "@/lib/SearchContext";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Bell,
   Clock,
   Download,
   Filter,
@@ -28,17 +27,14 @@ const DashboardPage = () => {
   const { searchQuery } = useSearch();
   const [stats, setStats] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
   const [activeView, setActiveView] = useState<"grid" | "list">("grid");
-  const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showPhoneNumberModal, setShowPhoneNumberModal] = useState(false);
 
   useEffect(() => {
     const checkPhoneNumber = async () => {
       if (session?.user) {
-        // @ts-ignore
-        if (!session.user.phone) {
+        if (!(session.user as { phone?: string }).phone) {
           const hasDismissed = localStorage.getItem("hasDismissedPhoneModal");
           if (!hasDismissed) {
             setShowPhoneNumberModal(true);
@@ -76,7 +72,6 @@ const DashboardPage = () => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
       setIsMobile(width < 768);
-      setIsTablet(width >= 768 && width < 1024);
     };
 
     checkScreenSize();
@@ -129,7 +124,7 @@ const DashboardPage = () => {
       y: 0,
       transition: {
         duration: isMobile ? 0.4 : 0.6,
-        ease: [0.4, 0, 0.2, 1],
+        ease: [0.4, 0, 0.2, 1] as const,
       },
     },
   };
@@ -141,7 +136,7 @@ const DashboardPage = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        ease: "easeOut" as const,
       },
     },
   };
@@ -192,21 +187,26 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-ink relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-ink text-cream">
       <NotificationPermissionModal />
-      <div className="px-3 xs:px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-10 relative z-10">
-        {/* Header Section */}
+
+      {/* Atmospheric background layers */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_45%_at_85%_10%,rgba(200,137,42,0.12),transparent_60%),radial-gradient(ellipse_40%_35%_at_15%_35%,rgba(200,137,42,0.06),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.03)_1px,transparent_1px)] bg-[size:88px_88px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.45)_20%,rgba(0,0,0,0.45)_78%,transparent)]" />
+      </div>
+
+      <div className="relative z-10 px-3 py-4 xs:px-4 sm:px-6 sm:py-6 lg:px-8 lg:py-10">
         <motion.header
-          className="mb-8 sm:mb-10 lg:mb-14"
+          className="mb-8 border border-cb-border bg-[rgba(20,18,16,0.72)] p-5 backdrop-blur-2xl sm:mb-10 sm:p-7 lg:mb-12 lg:p-9"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          {/* Welcome Section */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+          <div className="mb-9 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div className="flex-1 min-w-0">
               <motion.div
-                className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gold/10 border border-border-gold text-gold text-xs font-bold tracking-wider uppercase mb-5 backdrop-blur-sm"
+                className="mb-5 inline-flex items-center gap-2.5 border border-border-gold bg-gold/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-gold"
                 variants={headerVariants}
               >
                 <span className="relative flex h-2.5 w-2.5">
@@ -218,14 +218,13 @@ const DashboardPage = () => {
 
               <motion.h1
                 variants={headerVariants}
-                className="text-4xl sm:text-5xl lg:text-6xl font-black text-cream mb-4 tracking-tight leading-tight"
+                className="mb-4 text-4xl font-black leading-tight tracking-tight text-cream sm:text-5xl lg:text-6xl"
                 style={{
                   fontFamily:
                     'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
                 }}
               >
-                Welcome back,{" "}
-                <span className="text-gold">
+                Welcome back, <span className="text-gold">
                   {session?.user?.name?.split(" ")[0] || "User"}
                 </span>
               </motion.h1>
@@ -233,13 +232,12 @@ const DashboardPage = () => {
               <motion.p
                 variants={headerVariants}
                 transition={{ delay: 0.1 }}
-                className="text-lg sm:text-xl text-cream-dim max-w-2xl leading-relaxed"
+                className="max-w-2xl text-base leading-relaxed text-cream-dim sm:text-lg lg:text-xl"
               >
                 Manage your projects, view purchased designs, and explore new architectural possibilities.
               </motion.p>
             </div>
 
-            {/* Action Buttons */}
             <motion.div
               className="flex items-center gap-3"
               initial={{ opacity: 0, x: 20 }}
@@ -251,21 +249,20 @@ const DashboardPage = () => {
                 whileHover={{ scale: 1.05, rotate: 180 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.3 }}
-                className="p-3.5 bg-card backdrop-blur-xl border border-cb-border text-cream-dim hover:text-gold rounded-2xl shadow-lg hover:shadow-xl hover:border-border-gold transition-all"
+                className="border border-cb-border bg-card p-3.5 text-cream-dim transition-all hover:border-border-gold hover:text-gold"
                 title="Refresh data"
               >
                 <RefreshCw className="w-5 h-5" />
               </motion.button>
 
-              {/* View Toggle */}
               {!isMobile && (
-                <div className="flex bg-card backdrop-blur-xl border border-cb-border rounded-2xl p-1.5 shadow-lg">
+                <div className="flex border border-cb-border bg-card p-1.5">
                   <button
                     onClick={() => setActiveView("grid")}
-                    className={`p-2.5 rounded-xl transition-all duration-200 ${
+                    className={`p-2.5 transition-all duration-200 ${
                       activeView === "grid"
-                        ? "bg-gold text-ink shadow-lg shadow-gold/30"
-                        : "text-cream-dim hover:text-cream hover:bg-surface"
+                        ? "bg-gold text-ink"
+                        : "text-cream-dim hover:bg-surface hover:text-cream"
                     }`}
                     title="Grid View"
                   >
@@ -273,10 +270,10 @@ const DashboardPage = () => {
                   </button>
                   <button
                     onClick={() => setActiveView("list")}
-                    className={`p-2.5 rounded-xl transition-all duration-200 ${
+                    className={`p-2.5 transition-all duration-200 ${
                       activeView === "list"
-                        ? "bg-gold text-ink shadow-lg shadow-gold/30"
-                        : "text-cream-dim hover:text-cream hover:bg-surface"
+                        ? "bg-gold text-ink"
+                        : "text-cream-dim hover:bg-surface hover:text-cream"
                     }`}
                     title="List View"
                   >
@@ -287,12 +284,11 @@ const DashboardPage = () => {
             </motion.div>
           </div>
 
-          {/* Enhanced Stats Grid */}
           <motion.div
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6"
+            className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5"
             variants={containerVariants}
           >
-            {displayStats.map((stat, index) => (
+            {displayStats.map((stat) => (
               <motion.div
                 key={stat.name}
                 variants={itemVariants}
@@ -301,14 +297,13 @@ const DashboardPage = () => {
                   scale: 1.02,
                   transition: { duration: 0.2 },
                 }}
-                className="relative group"
+                className="group relative"
               >
-                <div className="relative bg-card backdrop-blur-xl p-5 sm:p-7 rounded-3xl shadow-xl border border-cb-border hover:border-border-gold hover:shadow-2xl transition-all duration-300">
+                <div className="relative border border-cb-border bg-card p-5 transition-all duration-300 hover:border-border-gold sm:p-7">
                   <div className="flex items-start justify-between mb-4">
                     <div
-                      className="p-3.5 rounded-2xl bg-gold/10 shadow-lg group-hover:scale-110 transition-transform duration-300 relative overflow-hidden"
+                      className="relative overflow-hidden bg-gold/10 p-3.5 transition-transform duration-300 group-hover:scale-110"
                     >
-                      {/* Shine effect */}
                       <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-gold/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                       
                       {loading ? (
@@ -322,7 +317,7 @@ const DashboardPage = () => {
                     
                     {/* Trend indicator */}
                     {!loading && stat.trend && (
-                      <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
+                      <div className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold ${
                         stat.trend === "up" 
                           ? "bg-emerald-900/30 text-emerald-400"
                           : stat.trend === "down"
@@ -343,10 +338,10 @@ const DashboardPage = () => {
                       </>
                     ) : (
                       <>
-                        <p className="text-3xl sm:text-4xl font-black text-cream mb-1 tracking-tight">
+                        <p className="mb-1 text-3xl font-black tracking-tight text-cream sm:text-4xl">
                           {stat.value}
                         </p>
-                        <p className="text-xs sm:text-sm font-semibold text-cream-dim tracking-wide">
+                        <p className="text-xs font-semibold tracking-wide text-cream-dim sm:text-sm">
                           {stat.name}
                         </p>
                       </>
@@ -357,10 +352,9 @@ const DashboardPage = () => {
             ))}
           </motion.div>
 
-          {/* Quick Actions for Mobile */}
           {isMobile && (
             <motion.div
-              className="mt-6 flex gap-2.5 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide"
+              className="-mx-2 mt-6 flex gap-2.5 overflow-x-auto px-2 pb-2 scrollbar-hide"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -374,7 +368,7 @@ const DashboardPage = () => {
                 <motion.button
                   key={action.label}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-card backdrop-blur-xl border border-cb-border rounded-2xl text-xs font-bold text-cream-dim whitespace-nowrap flex-shrink-0 shadow-lg hover:shadow-xl hover:border-border-gold hover:text-gold transition-all"
+                  className="flex flex-shrink-0 items-center gap-2 whitespace-nowrap border border-cb-border bg-card px-4 py-2.5 text-xs font-bold text-cream-dim transition-all hover:border-border-gold hover:text-gold"
                 >
                   <action.icon className="w-4 h-4" />
                   {action.label}
@@ -384,18 +378,16 @@ const DashboardPage = () => {
           )}
         </motion.header>
 
-        {/* Main Content Grid */}
         <motion.div
-          className="grid grid-cols-1 xl:grid-cols-4 gap-5 sm:gap-6 lg:gap-8"
+          className="grid grid-cols-1 gap-5 sm:gap-6 lg:gap-8 xl:grid-cols-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          {/* Left Column - Main Content */}
           <div className="xl:col-span-3 space-y-6 sm:space-y-8">
             <motion.div
               variants={itemVariants}
-              className="bg-card backdrop-blur-xl rounded-3xl sm:rounded-[2rem] border border-cb-border overflow-hidden shadow-2xl"
+              className="overflow-hidden border border-cb-border bg-card"
             >
               <PurchasedDesigns
                 searchQuery={searchQuery}
@@ -405,39 +397,35 @@ const DashboardPage = () => {
 
             <motion.div
               variants={itemVariants}
-              className="bg-card backdrop-blur-xl rounded-3xl sm:rounded-[2rem] border border-cb-border overflow-hidden shadow-2xl"
+              className="overflow-hidden border border-cb-border bg-card"
             >
               <MyRequests />
             </motion.div>
           </div>
 
-          {/* Right Column - Sidebar */}
           <div className="xl:col-span-1 space-y-6 sm:space-y-8">
-            {/* Recommended Designs */}
             <motion.div
               variants={itemVariants}
               transition={{ delay: 0.4 }}
-              className="bg-card backdrop-blur-xl rounded-3xl sm:rounded-[2rem] border border-cb-border overflow-hidden shadow-2xl"
+              className="overflow-hidden border border-cb-border bg-card"
             >
               <RecommendedDesigns />
             </motion.div>
 
-            {/* Notifications */}
             <motion.div
               variants={itemVariants}
               transition={{ delay: 0.5 }}
-              className="bg-card backdrop-blur-xl rounded-3xl sm:rounded-[2rem] border border-cb-border overflow-hidden shadow-2xl"
+              className="overflow-hidden border border-cb-border bg-card"
             >
               <Notifications compact={isMobile} />
             </motion.div>
 
-            {/* Quick Tip for Mobile */}
             {isMobile && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="relative overflow-hidden bg-gold/10 border border-border-gold rounded-3xl p-5 shadow-xl"
+                className="relative overflow-hidden border border-border-gold bg-gold/10 p-5"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full -mr-16 -mt-16" />
                 <div className="relative z-10">
@@ -454,7 +442,6 @@ const DashboardPage = () => {
           </div>
         </motion.div>
 
-        {/* Loading Overlay */}
         <AnimatePresence>
           {loading && (
             <motion.div
@@ -466,7 +453,7 @@ const DashboardPage = () => {
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-card/95 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-cb-border"
+                className="border border-cb-border bg-card/95 p-8 backdrop-blur-xl"
               >
                 <div className="flex items-center gap-4">
                   <motion.div
