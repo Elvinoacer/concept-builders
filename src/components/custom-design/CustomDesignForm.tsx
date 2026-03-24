@@ -66,7 +66,7 @@ const CustomDesignForm = () => {
       }
 
       toast.success(
-        "Custom design request submitted successfully! We will contact you soon."
+        "Custom design request submitted successfully! We will contact you soon.",
       );
       setIsModalOpen(true);
     } catch (error: any) {
@@ -119,14 +119,13 @@ const CustomDesignForm = () => {
       transition={{ duration: 0.5, delay: 0.1 }}
       className="w-full max-w-full mx-auto"
     >
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 sm:space-y-6 md:space-y-8"
-      >
-        {/* Name & Email Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2">
+      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+        <div className="grid grid-cols-1 gap-4 border border-cb-border bg-surface p-4 sm:grid-cols-2 sm:gap-5 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm sm:text-base">
+            <Label
+              htmlFor="name"
+              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+            >
               Full Name
             </Label>
             <Input
@@ -136,11 +135,15 @@ const CustomDesignForm = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-3"
+              className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm sm:text-base">
+            <Label
+              htmlFor="email"
+              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+            >
               Email
             </Label>
             <Input
@@ -150,110 +153,130 @@ const CustomDesignForm = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-3"
+              className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label
+              htmlFor="phone"
+              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+            >
+              Phone Number (Optional)
+            </Label>
+            <Input
+              type="tel"
+              id="phone"
+              placeholder="+254 700 000 000"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label
+              htmlFor="designType"
+              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+            >
+              Type of Design
+            </Label>
+            <Select value={designType} onValueChange={setDesignType} required>
+              <SelectTrigger className="h-11 border-cb-border bg-card text-cream data-[placeholder]:text-muted focus:border-gold">
+                <SelectValue placeholder="Select design type" />
+              </SelectTrigger>
+              <SelectContent className="border-cb-border bg-card text-cream">
+                <SelectItem
+                  value="Residential"
+                  className="focus:bg-gold/15 focus:text-gold"
+                >
+                  Residential
+                </SelectItem>
+                <SelectItem
+                  value="Commercial"
+                  className="focus:bg-gold/15 focus:text-gold"
+                >
+                  Commercial
+                </SelectItem>
+                <SelectItem
+                  value="Renovation"
+                  className="focus:bg-gold/15 focus:text-gold"
+                >
+                  Renovation
+                </SelectItem>
+                <SelectItem
+                  value="Other"
+                  className="focus:bg-gold/15 focus:text-gold"
+                >
+                  Other
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label
+              htmlFor="description"
+              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+            >
+              Project Description
+            </Label>
+            <Textarea
+              id="description"
+              placeholder="Describe your project vision, room requirements, style direction, and special features."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={5}
+              className="min-h-[150px] resize-y border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
+              required
+            />
+          </div>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label
+              htmlFor="budget"
+              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+            >
+              Estimated Budget (Optional)
+            </Label>
+            <Input
+              type="text"
+              id="budget"
+              placeholder="e.g., KES 4,000,000 - 8,000,000"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+              className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
             />
           </div>
         </div>
 
-        {/* Phone */}
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="text-sm sm:text-base">
-            Phone Number (Optional)
-          </Label>
-          <Input
-            type="tel"
-            id="phone"
-            placeholder="+1 234 567 8900"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-3"
-          />
-        </div>
-
-        {/* Design Type */}
-        <div className="space-y-2">
-          <Label htmlFor="designType" className="text-sm sm:text-base">
-            Type of Design
-          </Label>
-          <Select value={designType} onValueChange={setDesignType} required>
-            <SelectTrigger className="w-full text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-3 h-auto min-h-[42px]">
-              <SelectValue placeholder="Select design type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Residential" className="text-sm sm:text-base">
-                Residential
-              </SelectItem>
-              <SelectItem value="Commercial" className="text-sm sm:text-base">
-                Commercial
-              </SelectItem>
-              <SelectItem value="Renovation" className="text-sm sm:text-base">
-                Renovation
-              </SelectItem>
-              <SelectItem value="Other" className="text-sm sm:text-base">
-                Other
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Description */}
-        <div className="space-y-2">
-          <Label htmlFor="description" className="text-sm sm:text-base">
-            Project Description
-          </Label>
-          <Textarea
-            id="description"
-            placeholder="Describe your project in detail, including your vision, requirements, and any specific features you'd like."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={4}
-            className="w-full text-sm sm:text-base resize-y min-h-[120px] sm:min-h-[140px] px-3 py-2 sm:px-4 sm:py-3"
-            required
-          />
-        </div>
-
-        {/* Budget */}
-        <div className="space-y-2">
-          <Label htmlFor="budget" className="text-sm sm:text-base">
-            Estimated Budget (Optional)
-          </Label>
-          <Input
-            type="text"
-            id="budget"
-            placeholder="e.g., $50,000 - $100,000"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            className="w-full text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-3"
-          />
-        </div>
-
-        {/* File Upload */}
-        <div className="space-y-2">
-          <Label htmlFor="file-upload" className="text-sm sm:text-base">
+        <div className="border border-dashed border-cb-border bg-surface p-4 sm:p-6">
+          <Label
+            htmlFor="file-upload"
+            className="mb-3 block text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+          >
             Attachments (Optional)
           </Label>
           <div
-            className={`mt-1 flex justify-center px-4 pt-4 pb-5 sm:px-6 sm:pt-5 sm:pb-6 border-2 border-dashed rounded-lg transition-colors ${
+            className={`flex justify-center border border-dashed p-5 sm:p-7 transition-colors ${
               isDragOver
-                ? "border-primary bg-primary/10"
-                : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                ? "border-gold bg-gold/10"
+                : "border-cb-border bg-card/40 hover:border-gold/40"
             }`}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
           >
-            <div className="space-y-2 sm:space-y-3 text-center">
+            <div className="space-y-3 text-center">
               <UploadCloud
-                className={`mx-auto h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 ${
-                  isDragOver ? "text-primary" : "text-gray-400"
-                }`}
+                className={`mx-auto h-8 w-8 ${isDragOver ? "text-gold" : "text-muted"}`}
               />
-              <div className="flex flex-col sm:flex-row items-center justify-center text-xs sm:text-sm text-gray-600 dark:text-gray-400 space-y-1 sm:space-y-0">
+              <div className="space-y-1 text-xs sm:text-sm text-cream-dim">
                 <label
                   htmlFor="file-upload"
-                  className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
+                  className="inline-flex cursor-pointer items-center justify-center border border-gold/40 px-3 py-1.5 text-[11px] uppercase tracking-[0.12em] text-gold transition-colors hover:bg-gold hover:text-ink"
                 >
-                  <span>Upload files</span>
+                  Upload Files
                   <Input
                     id="file-upload"
                     type="file"
@@ -262,23 +285,24 @@ const CustomDesignForm = () => {
                     multiple
                   />
                 </label>
-                <p className="sm:pl-1">or drag and drop</p>
+                <p className="text-xs text-muted">or drag and drop here</p>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted">
                 PNG, JPG, GIF, PDF, DOCX up to 10MB
               </p>
             </div>
           </div>
           {files.length > 0 && (
-            <FileUploadPreview files={files} onRemove={handleFileRemove} />
+            <div className="mt-4">
+              <FileUploadPreview files={files} onRemove={handleFileRemove} />
+            </div>
           )}
         </div>
 
-        {/* Submit Button */}
-        <div>
+        <div className="pt-1">
           <Button
             type="submit"
-            className="w-full min-h-[48px] text-sm sm:text-base md:text-lg bg-gradient-to-r from-blue-600 to-cyan-400 text-white hover:from-blue-700 hover:to-cyan-500 transition-all duration-200"
+            className="w-full min-h-[52px] border border-gold bg-gold text-sm uppercase tracking-[0.16em] text-ink transition-colors duration-200 hover:bg-gold-light"
             disabled={loading}
           >
             {loading ? (
@@ -286,7 +310,7 @@ const CustomDesignForm = () => {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                  className="mr-2 h-4 w-4 rounded-full border-2 border-ink border-t-transparent"
                 />
                 Submitting...
               </span>
