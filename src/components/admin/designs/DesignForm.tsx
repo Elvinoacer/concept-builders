@@ -31,6 +31,7 @@ import {
 import { toast } from "sonner";
 import FileUpload from "./FileUpload";
 import { useFormPersistence } from "@/hooks/useFormPersistence";
+import { useUpload } from "@/contexts/UploadContext";
 
 const SectionHeader = ({
   icon: Icon,
@@ -158,12 +159,16 @@ const steps = [
 
 const DesignForm = ({ design }: DesignFormProps) => {
   const router = useRouter();
+  const { uploadingFiles } = useUpload();
+  const activeUploads = uploadingFiles.filter(
+    (file) => file.status === "uploading" || file.status === "pending",
+  );
   const [name, setName] = useState(design?.name || "");
   const [description, setDescription] = useState(design?.description || "");
   // basePrice and priceRange removed from state
   const [bedrooms, setBedrooms] = useState(design?.bedrooms?.toString() || "");
   const [bathrooms, setBathrooms] = useState(
-    design?.bathrooms?.toString() || ""
+    design?.bathrooms?.toString() || "",
   );
   const [area, setArea] = useState(design?.area?.toString() || "");
   const [floors, setFloors] = useState(design?.floors?.toString() || "");
@@ -178,38 +183,38 @@ const DesignForm = ({ design }: DesignFormProps) => {
     design?.architecturalDesign || {
       pdfFiles: [],
       cadFiles: [],
-    }
+    },
   );
   const [structuralDesign, setStructuralDesign] = useState(
     design?.structuralDesign || {
       pdfFiles: [],
       cadFiles: [],
-    }
+    },
   );
   const [billOfQuantities, setBillOfQuantities] = useState(
     design?.billOfQuantities || {
       excelFiles: [],
       pdfFiles: [],
-    }
+    },
   );
 
   const [architecturalPdfPrice, setArchitecturalPdfPrice] = useState(
-    design?.architecturalPdfPrice?.toString() || ""
+    design?.architecturalPdfPrice?.toString() || "",
   );
   const [architecturalCadPrice, setArchitecturalCadPrice] = useState(
-    design?.architecturalCadPrice?.toString() || ""
+    design?.architecturalCadPrice?.toString() || "",
   );
   const [structuralPdfPrice, setStructuralPdfPrice] = useState(
-    design?.structuralPdfPrice?.toString() || ""
+    design?.structuralPdfPrice?.toString() || "",
   );
   const [structuralCadPrice, setStructuralCadPrice] = useState(
-    design?.structuralCadPrice?.toString() || ""
+    design?.structuralCadPrice?.toString() || "",
   );
   const [billOfQuantitiesPrice, setBillOfQuantitiesPrice] = useState(
-    design?.billOfQuantitiesPrice?.toString() || ""
+    design?.billOfQuantitiesPrice?.toString() || "",
   );
   const [billOfQuantitiesPdfPrice, setBillOfQuantitiesPdfPrice] = useState(
-    design?.billOfQuantitiesPdfPrice?.toString() || ""
+    design?.billOfQuantitiesPdfPrice?.toString() || "",
   );
   const [images, setImages] = useState<any[]>(design?.images || []);
   const [floorPlans, setFloorPlans] = useState<any[]>(design?.floorPlans || []);
@@ -245,9 +250,9 @@ const DesignForm = ({ design }: DesignFormProps) => {
   };
 
   const { loadFromStorage, clearStorage } = useFormPersistence(
-    'design-form-draft',
+    "design-form-draft",
     formData,
-    1000 // 1 second debounce
+    1000, // 1 second debounce
   );
 
   // Restore from local storage on mount (only for new designs, not edits)
@@ -256,31 +261,39 @@ const DesignForm = ({ design }: DesignFormProps) => {
       const savedData = loadFromStorage();
       if (savedData) {
         const confirmRestore = window.confirm(
-          'Found a saved draft of your design form. Would you like to restore it?'
+          "Found a saved draft of your design form. Would you like to restore it?",
         );
-        
+
         if (confirmRestore) {
-          setName(savedData.name || '');
-          setDescription(savedData.description || '');
-          setCategoryId(savedData.categoryId || '');
-          setBedrooms(savedData.bedrooms || '');
-          setBathrooms(savedData.bathrooms || '');
-          setArea(savedData.area || '');
-          setFloors(savedData.floors || '');
-          setArchitecturalPdfPrice(savedData.architecturalPdfPrice || '');
-          setArchitecturalCadPrice(savedData.architecturalCadPrice || '');
-          setStructuralPdfPrice(savedData.structuralPdfPrice || '');
-          setStructuralCadPrice(savedData.structuralCadPrice || '');
-          setBillOfQuantitiesPrice(savedData.billOfQuantitiesPrice || '');
-          setBillOfQuantitiesPdfPrice(savedData.billOfQuantitiesPdfPrice || '');
+          setName(savedData.name || "");
+          setDescription(savedData.description || "");
+          setCategoryId(savedData.categoryId || "");
+          setBedrooms(savedData.bedrooms || "");
+          setBathrooms(savedData.bathrooms || "");
+          setArea(savedData.area || "");
+          setFloors(savedData.floors || "");
+          setArchitecturalPdfPrice(savedData.architecturalPdfPrice || "");
+          setArchitecturalCadPrice(savedData.architecturalCadPrice || "");
+          setStructuralPdfPrice(savedData.structuralPdfPrice || "");
+          setStructuralCadPrice(savedData.structuralCadPrice || "");
+          setBillOfQuantitiesPrice(savedData.billOfQuantitiesPrice || "");
+          setBillOfQuantitiesPdfPrice(savedData.billOfQuantitiesPdfPrice || "");
           setImages(savedData.images || []);
           setFloorPlans(savedData.floorPlans || []);
           setFiles(savedData.files || []);
-          setArchitecturalDesign(savedData.architecturalDesign || { pdfFiles: [], cadFiles: [] });
-          setStructuralDesign(savedData.structuralDesign || { pdfFiles: [], cadFiles: [] });
-          setBillOfQuantities(savedData.billOfQuantities || { excelFiles: [], pdfFiles: [] });
-          setPackageOptions(savedData.packageOptions || [{ name: '', price: '', file: [] }]);
-          toast.success('Draft restored successfully!');
+          setArchitecturalDesign(
+            savedData.architecturalDesign || { pdfFiles: [], cadFiles: [] },
+          );
+          setStructuralDesign(
+            savedData.structuralDesign || { pdfFiles: [], cadFiles: [] },
+          );
+          setBillOfQuantities(
+            savedData.billOfQuantities || { excelFiles: [], pdfFiles: [] },
+          );
+          setPackageOptions(
+            savedData.packageOptions || [{ name: "", price: "", file: [] }],
+          );
+          toast.success("Draft restored successfully!");
         } else {
           clearStorage();
         }
@@ -303,19 +316,19 @@ const DesignForm = ({ design }: DesignFormProps) => {
         design.architecturalDesign || {
           pdfFiles: [],
           cadFiles: [],
-        }
+        },
       );
       setStructuralDesign(
         design.structuralDesign || {
           pdfFiles: [],
           cadFiles: [],
-        }
+        },
       );
       setBillOfQuantities(
         design.billOfQuantities || {
           excelFiles: [],
           pdfFiles: [],
-        }
+        },
       );
       setArchitecturalPdfPrice(design.architecturalPdfPrice?.toString() || "");
       setArchitecturalCadPrice(design.architecturalCadPrice?.toString() || "");
@@ -323,7 +336,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
       setStructuralCadPrice(design.structuralCadPrice?.toString() || "");
       setBillOfQuantitiesPrice(design.billOfQuantitiesPrice?.toString() || "");
       setBillOfQuantitiesPdfPrice(
-        design.billOfQuantitiesPdfPrice?.toString() || ""
+        design.billOfQuantitiesPdfPrice?.toString() || "",
       );
       setImages(design.images || []);
       setFloorPlans(design.floorPlans || []);
@@ -334,7 +347,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
             ...opt,
             price: opt.price.toString(),
             file: opt.file ? [opt.file] : [],
-          }))
+          })),
         );
       } else {
         setPackageOptions([{ name: "", price: "", file: [] }]);
@@ -350,7 +363,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
           ...opt,
           price: opt.price.toString(),
           file: opt.file ? [opt.file] : [], // FileUpload expects an array
-        }))
+        })),
       );
     } else if (!design && packageOptions.length === 0) {
       setPackageOptions([
@@ -445,7 +458,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
     // Let's check if derived basePrice > 0.
     const currentArchPdfPrice = parseFloat(architecturalPdfPrice) || 0;
     if (currentArchPdfPrice > 0) {
-       newCompleted.add(2);
+      newCompleted.add(2);
     }
 
     // Step 3: Files (Required)
@@ -498,7 +511,8 @@ const DesignForm = ({ design }: DesignFormProps) => {
         // Validation removed or changed to check derived base price if strictness is needed.
         // For now, we can relax it or check architecturalPdfPrice if that's the base.
         if (!architecturalPdfPrice || parseFloat(architecturalPdfPrice) <= 0) {
-             errors.architecturalPdfPrice = "Architectural PDF Price (Base Price) is required";
+          errors.architecturalPdfPrice =
+            "Architectural PDF Price (Base Price) is required";
         }
         break;
       case 3: // Files
@@ -529,7 +543,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
       .map((step) => step.index); // Gets [0, 2, 3]
 
     return requiredStepIndices.every((stepIndex) =>
-      completedSteps.has(stepIndex)
+      completedSteps.has(stepIndex),
     );
   };
 
@@ -548,11 +562,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
     }
   };
 
-  const handlePackageChange = (
-    index: number,
-    field: string,
-    value: string
-  ) => {
+  const handlePackageChange = (index: number, field: string, value: string) => {
     const newOptions = [...packageOptions];
     newOptions[index][field] = value;
     setPackageOptions(newOptions);
@@ -585,12 +595,20 @@ const DesignForm = ({ design }: DesignFormProps) => {
       // Find the first step with an error and navigate to it
       if (!name.trim() || !description.trim() || !categoryId) {
         setCurrentStep(0);
-      } else if (!architecturalPdfPrice || parseFloat(architecturalPdfPrice) <= 0) {
+      } else if (
+        !architecturalPdfPrice ||
+        parseFloat(architecturalPdfPrice) <= 0
+      ) {
         setCurrentStep(2);
       } else if (images.length === 0) {
         setCurrentStep(3);
       }
       toast.error(formErrors.join("\n"));
+      return;
+    }
+
+    if (activeUploads.length > 0) {
+      toast.error("Please wait for all uploads to complete before saving.");
       return;
     }
 
@@ -633,7 +651,13 @@ const DesignForm = ({ design }: DesignFormProps) => {
     const boqPdfPrice = parseFloat(billOfQuantitiesPdfPrice) || 0;
 
     const calculatedBasePrice = archPdfPrice;
-    const totalPrice = archPdfPrice + archCadPrice + structPdfPrice + structCadPrice + boqExcelPrice + boqPdfPrice;
+    const totalPrice =
+      archPdfPrice +
+      archCadPrice +
+      structPdfPrice +
+      structCadPrice +
+      boqExcelPrice +
+      boqPdfPrice;
     const calculatedPriceRange = `${calculatedBasePrice.toLocaleString()} - ${totalPrice.toLocaleString()}`;
 
     const commonData = {
@@ -681,15 +705,10 @@ const DesignForm = ({ design }: DesignFormProps) => {
           pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
           cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
         },
-        ...(structuralDesign.pdfFiles.length > 0 ||
-        structuralDesign.cadFiles.length > 0
-          ? {
-              structuralDesign: {
-                pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
-                cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
-              },
-            }
-          : {}),
+        structuralDesign: {
+          pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
+          cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
+        },
         billOfQuantities: {
           excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
           pdfFiles: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
@@ -725,27 +744,34 @@ const DesignForm = ({ design }: DesignFormProps) => {
         architecturalDesign: {
           create: {
             type: "ARCHITECTURAL",
-            pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
-            cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
+            pdfFiles: {
+              create: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
+            },
+            cadFiles: {
+              create: fileListPayload(architecturalDesign.cadFiles, "CAD"),
+            },
           },
         },
-        ...(structuralDesign.pdfFiles.length > 0 ||
-        structuralDesign.cadFiles.length > 0
-          ? {
-              structuralDesign: {
-                create: {
-                  type: "STRUCTURAL",
-                  pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
-                  cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
-                },
-              },
-            }
-          : {}),
+        structuralDesign: {
+          create: {
+            type: "STRUCTURAL",
+            pdfFiles: {
+              create: fileListPayload(structuralDesign.pdfFiles, "PDF"),
+            },
+            cadFiles: {
+              create: fileListPayload(structuralDesign.cadFiles, "CAD"),
+            },
+          },
+        },
         billOfQuantities: {
           create: {
             type: "BILL_OF_QUANTITIES",
-            excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
-            pdfFiles: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
+            excelFiles: {
+              create: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
+            },
+            pdfFiles: {
+              create: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
+            },
           },
         },
       };
@@ -774,7 +800,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
           `Error: ${
             errorData.error ||
             `Failed to ${design ? "update" : "create"} design`
-          }`
+          }`,
         );
       }
     } catch (error: any) {
@@ -812,7 +838,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
         <div className="flex items-center gap-3">
           <Button
             type="submit"
-            disabled={!canSubmit() || isSubmitting}
+            disabled={!canSubmit() || isSubmitting || activeUploads.length > 0}
             className="rounded-full font-bold shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 disabled:opacity-50"
           >
             {isSubmitting ? (
@@ -1014,7 +1040,9 @@ const DesignForm = ({ design }: DesignFormProps) => {
             ) : (
               <Button
                 type="submit"
-                disabled={!canSubmit() || isSubmitting}
+                disabled={
+                  !canSubmit() || isSubmitting || activeUploads.length > 0
+                }
                 className="rounded-full font-bold shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 disabled:opacity-50"
               >
                 {isSubmitting ? (
@@ -1416,7 +1444,11 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
           <CardContent>
             <FileUpload
               onUploadSuccess={(file) => {
-                const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
+                const mappedFile = {
+                  ...file,
+                  name: file.originalFileName || "Unknown",
+                  size: 0,
+                };
                 setImages([...images, mappedFile]);
                 setFieldErrors((prev) => ({ ...prev, images: "" }));
               }}
@@ -1446,7 +1478,10 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
               </div>
               <div>
                 <span className="font-bold text-gray-900 dark:text-white">
-                  Floor Plans <span className="text-xs font-normal text-gray-500">(Optional)</span>
+                  Floor Plans{" "}
+                  <span className="text-xs font-normal text-gray-500">
+                    (Optional)
+                  </span>
                 </span>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   Upload floor plans as images or PDF documents
@@ -1457,7 +1492,11 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
           <CardContent>
             <FileUpload
               onUploadSuccess={(file) => {
-                const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
+                const mappedFile = {
+                  ...file,
+                  name: file.originalFileName || "Unknown",
+                  size: 0,
+                };
                 setFloorPlans([...floorPlans, mappedFile]);
               }}
               onFileRemove={(fileUrl) =>
@@ -1480,7 +1519,10 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
               </div>
               <div>
                 <span className="font-bold text-gray-900 dark:text-white">
-                  Other Files <span className="text-xs font-normal text-gray-500">(Optional)</span>
+                  Other Files{" "}
+                  <span className="text-xs font-normal text-gray-500">
+                    (Optional)
+                  </span>
                 </span>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   Upload any other supporting documents
@@ -1491,7 +1533,11 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
           <CardContent>
             <FileUpload
               onUploadSuccess={(file) => {
-                const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
+                const mappedFile = {
+                  ...file,
+                  name: file.originalFileName || "Unknown",
+                  size: 0,
+                };
                 setFiles([...files, mappedFile]);
               }}
               onFileRemove={(fileUrl) =>
@@ -1579,7 +1625,10 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
                 </div>
                 <div>
                   <span className="font-bold text-gray-900 dark:text-white">
-                    {doc.title} <span className="text-xs font-normal text-gray-500">(Optional)</span>
+                    {doc.title}{" "}
+                    <span className="text-xs font-normal text-gray-500">
+                      (Optional)
+                    </span>
                   </span>
                 </div>
               </CardTitle>
@@ -1592,18 +1641,25 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
                   </Label>
                   <FileUpload
                     onUploadSuccess={(file) => {
-                      const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
+                      const mappedFile = {
+                        ...file,
+                        name: file.originalFileName || "Unknown",
+                        size: 0,
+                      };
                       doc.setState({
                         ...doc.state,
-                        [field.id]: [...doc.state[field.id as keyof DocumentState], mappedFile],
+                        [field.id]: [
+                          ...doc.state[field.id as keyof DocumentState],
+                          mappedFile,
+                        ],
                       });
                     }}
                     onFileRemove={(fileUrl) =>
                       doc.setState({
                         ...doc.state,
-                        [field.id]: doc.state[field.id as keyof DocumentState].filter(
-                          (f: FileType) => f.url !== fileUrl
-                        ),
+                        [field.id]: doc.state[
+                          field.id as keyof DocumentState
+                        ].filter((f: FileType) => f.url !== fileUrl),
                       })
                     }
                     initialFiles={doc.state[field.id as keyof DocumentState]}
@@ -1698,13 +1754,17 @@ const PackageOptionsStepComponent: React.FC<PackageOptionsStepProps> = ({
             <FormField label="File (Optional)" htmlFor={`pkg-file-${index}`}>
               <FileUpload
                 onUploadSuccess={(file) => {
-                  const mappedFile = { ...file, name: file.originalFileName || "Unknown", size: 0 };
+                  const mappedFile = {
+                    ...file,
+                    name: file.originalFileName || "Unknown",
+                    size: 0,
+                  };
                   handlePackageFile(index, [mappedFile]);
                 }}
                 onFileRemove={(fileUrl) =>
                   handlePackageFile(
                     index,
-                    option.file.filter((f) => f.url !== fileUrl)
+                    option.file.filter((f) => f.url !== fileUrl),
                   )
                 }
                 initialFiles={option.file}

@@ -27,7 +27,7 @@ export interface UploadingFile {
     url: string;
     type: string;
     originalFileName: string;
-    fileId: string;
+    fileId?: string;
   }) => void;
 }
 
@@ -40,7 +40,7 @@ interface UploadContextType {
       url: string;
       type: string;
       originalFileName: string;
-      fileId: string;
+      fileId?: string;
     }) => void,
   ) => Promise<void>;
   clearCompleted: () => void;
@@ -68,7 +68,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
       url: string;
       type: string;
       originalFileName: string;
-      fileId: string;
+      fileId?: string;
     }) => void,
   ) => {
     const id = uuidv4();
@@ -103,8 +103,6 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
     }
     processingIdsRef.current.add(id);
 
-    let fileId: string | null = null;
-
     try {
       setUploadingFiles((prev) =>
         prev.map((f) =>
@@ -136,20 +134,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
         ),
       );
 
-      // Step 2: Create file record in our database
-      const createResponse = await axios.post("/api/files/create", {
-        fileName: originalFileName,
-        fileTypeCategory: fileTypeCategory,
-        key: fileKey,
-        url: publicUrl,
-      });
-
-      fileId = createResponse.data.fileId;
-      setUploadingFiles((prev) =>
-        prev.map((f) => (f.id === id ? { ...f, fileId, progress: 25 } : f)),
-      );
-
-      // Step 3: Upload the file directly to S3/DO Spaces
+      // Step 2: Upload the file directly to S3/DO Spaces
       let uploadSucceeded = false;
       let lastUploadError: unknown = null;
 
@@ -163,7 +148,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
             timeout: 0,
             onUploadProgress: (progressEvent) => {
               const percentCompleted = Math.round(
-                25 + (progressEvent.loaded * 70) / (progressEvent.total || 1),
+                15 + (progressEvent.loaded * 80) / (progressEvent.total || 1),
               );
               setUploadingFiles((prev) =>
                 prev.map((f) =>
@@ -194,43 +179,24 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
           : new Error("Upload failed after retries");
       }
 
-      // Step 4: Update status to completed in our database
-      await axios.post("/api/files/update-status", {
-        fileId,
-        status: "COMPLETED",
-      });
-
       setUploadingFiles((prev) =>
         prev.map((f) =>
           f.id === id ? { ...f, status: "completed", progress: 100 } : f,
         ),
       );
 
-      // Step 5: Call success callback
+      // Step 3: Call success callback
       if (onSuccess) {
         onSuccess({
           url: publicUrl,
           type: fileTypeCategory,
           originalFileName: file.name,
-          fileId,
         });
       }
 
       toast.success(`Successfully uploaded ${file.name}`);
     } catch (error: any) {
       console.error("Upload error:", error);
-
-      // Update file status to failed if we have a fileId
-      if (fileId) {
-        try {
-          await axios.post("/api/files/update-status", {
-            fileId: fileId,
-            status: "FAILED",
-          });
-        } catch (updateError) {
-          console.error("Failed to update file status:", updateError);
-        }
-      }
 
       setUploadingFiles((prev) =>
         prev.map((f) =>

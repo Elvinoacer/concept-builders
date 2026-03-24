@@ -315,7 +315,9 @@ const NewDesignForm = ({
     if (!name.trim()) return "Design Name is required.";
     if (!description.trim()) return "Description is required.";
     if (!categoryId) return "Category is required.";
-    // basePrice validation removed
+    if (!architecturalPdfPrice || parseFloat(architecturalPdfPrice) <= 0) {
+      return "Architectural PDF Price (Base Price) is required.";
+    }
     if (images.length === 0 && !isEditMode)
       return "At least one image is required.";
     return null;
@@ -327,6 +329,11 @@ const NewDesignForm = ({
     const error = validateForm();
     if (error) {
       toast.error(error);
+      return;
+    }
+
+    if (activeUploads.length > 0) {
+      toast.error("Please wait for all uploads to complete before saving.");
       return;
     }
 
@@ -1045,7 +1052,7 @@ const NewDesignForm = ({
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || activeUploads.length > 0}
               className="flex-1 sm:flex-none order-1 sm:order-2 h-11 sm:h-10"
             >
               {isSubmitting ? (

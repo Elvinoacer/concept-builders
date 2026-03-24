@@ -2,24 +2,20 @@
 
 import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import {
-  FiFile,
-  FiTrash,
-  FiUpload,
-  FiImage,
-  FiFileText,
-} from "react-icons/fi";
+import { FiFile, FiTrash, FiUpload, FiImage, FiFileText } from "react-icons/fi";
 import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
-import { useUpload } from '@/contexts/UploadContext';
+import { useUpload } from "@/contexts/UploadContext";
 
-
-const MAX_UPLOAD_SIZE=2 * 1024 * 1024 * 1024;
+const MAX_UPLOAD_SIZE = 2 * 1024 * 1024 * 1024;
 
 interface FileUploadProps {
-  onUploadSuccess: (
-    file: { url: string; type: string; originalFileName: string; fileId: string }
-  ) => void;
+  onUploadSuccess: (file: {
+    url: string;
+    type: string;
+    originalFileName: string;
+    fileId?: string;
+  }) => void;
   onFileRemove: (fileUrl: string) => void;
   initialFiles: { url: string; type: string; name: string }[];
   fileTypeCategory: string;
@@ -38,7 +34,7 @@ const FileUpload = ({
   const { addUpload } = useUpload();
   const [uploadedFiles, setUploadedFiles] = useState(initialFiles);
   const [removingFiles, setRemovingFiles] = useState<Map<string, boolean>>(
-    new Map()
+    new Map(),
   );
 
   useEffect(() => {
@@ -63,11 +59,10 @@ const FileUpload = ({
       for (const file of acceptedFiles) {
         await addUpload(file, fileTypeCategory, (newFile) => {
           onUploadSuccess(newFile);
-
         });
       }
     },
-    [addUpload, fileTypeCategory, multiple, onUploadSuccess]
+    [addUpload, fileTypeCategory, multiple, onUploadSuccess],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -126,7 +121,8 @@ const FileUpload = ({
         <div className="flex flex-col items-center justify-center space-y-2">
           <FiUpload className="text-gray-500" size={24} />
           <p className="text-gray-600 text-sm">
-            Drag & drop or <span className="font-semibold text-blue-600">browse</span>
+            Drag & drop or{" "}
+            <span className="font-semibold text-blue-600">browse</span>
           </p>
           <p className="text-xs text-gray-400">Max 2GB</p>
         </div>
@@ -136,12 +132,23 @@ const FileUpload = ({
         <div className="mt-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {uploadedFiles.map((file, index) => {
-              const fileName = file.name || (file.url ? decodeURIComponent(file.url.split("/").pop() || "Unknown File") : "Unknown File");
-              const isImage = file.type === "IMAGE" || /\.(jpe?g|png|gif|bmp|webp)$/i.test(fileName);
+              const fileName =
+                file.name ||
+                (file.url
+                  ? decodeURIComponent(
+                      file.url.split("/").pop() || "Unknown File",
+                    )
+                  : "Unknown File");
+              const isImage =
+                file.type === "IMAGE" ||
+                /\.(jpe?g|png|gif|bmp|webp)$/i.test(fileName);
               const isRemoving = removingFiles.get(file.url);
 
               return (
-                <div key={index} className="relative group bg-white rounded-lg border overflow-hidden">
+                <div
+                  key={index}
+                  className="relative group bg-white rounded-lg border overflow-hidden"
+                >
                   {isImage ? (
                     <img
                       src={file.url}
@@ -163,7 +170,11 @@ const FileUpload = ({
                       disabled={isRemoving}
                       className="p-1.5 bg-white/80 hover:bg-white text-red-500 rounded-full shadow"
                     >
-                      {isRemoving ? <CgSpinner className="animate-spin" size={14} /> : <FiTrash size={14} />}
+                      {isRemoving ? (
+                        <CgSpinner className="animate-spin" size={14} />
+                      ) : (
+                        <FiTrash size={14} />
+                      )}
                     </button>
                   </div>
                 </div>
