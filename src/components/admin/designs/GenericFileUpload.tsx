@@ -111,7 +111,6 @@ export default function GenericFileUpload({
           const xhr = new XMLHttpRequest();
           xhr.open("PUT", signedUrl, true);
           xhr.setRequestHeader("Content-Type", file.type);
-          xhr.setRequestHeader("x-amz-acl", "public-read");
 
           xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
@@ -138,7 +137,7 @@ export default function GenericFileUpload({
 
       // 3. Success
       toast.success(
-        `${files.length} file${files.length > 1 ? "s" : ""} uploaded successfully`
+        `${files.length} file${files.length > 1 ? "s" : ""} uploaded successfully`,
       );
       onUploadComplete();
       setFiles([]);
