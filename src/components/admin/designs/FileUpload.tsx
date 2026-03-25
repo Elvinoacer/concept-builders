@@ -1,11 +1,19 @@
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
-import { useDropzone } from "react-dropzone";
-import { FiFile, FiTrash, FiUpload, FiImage, FiFileText } from "react-icons/fi";
+import { useCallback, useState, useEffect, useMemo } from "react";
+import { useDropzone, type FileRejection } from "react-dropzone";
+import {
+  FiFile,
+  FiTrash,
+  FiUpload,
+  FiImage,
+  FiFileText,
+  FiRefreshCw,
+} from "react-icons/fi";
 import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import { useUpload } from "@/contexts/UploadContext";
+import { ProgressBar } from "@/components/ui/progress";
 
 const MAX_UPLOAD_SIZE = 2 * 1024 * 1024 * 1024;
 
@@ -31,8 +39,9 @@ const FileUpload = ({
   accept,
   onFileRemove,
 }: FileUploadProps) => {
-  const { addUpload } = useUpload();
+  const { addUpload, uploadingFiles, retryUpload } = useUpload();
   const [uploadedFiles, setUploadedFiles] = useState(initialFiles);
+  const [localUploadIds, setLocalUploadIds] = useState<string[]>([]);
   const [removingFiles, setRemovingFiles] = useState<Map<string, boolean>>(
     new Map(),
   );
@@ -41,11 +50,46 @@ const FileUpload = ({
     setUploadedFiles(initialFiles);
   }, [initialFiles]);
 
+  const liveUploads = useMemo(
+    () =>
+      uploadingFiles.filter(
+        (file) =>
+          localUploadIds.includes(file.id) &&
+          (file.status === "pending" ||
+            file.status === "uploading" ||
+            file.status === "error"),
+      ),
+    [uploadingFiles, localUploadIds],
+  );
+
+  useEffect(() => {
+    if (localUploadIds.length === 0) return;
+
+    const activeIds = new Set(liveUploads.map((file) => file.id));
+    setLocalUploadIds((prev) => prev.filter((id) => activeIds.has(id)));
+  }, [liveUploads, localUploadIds.length]);
+
+  const buildAcceptObject = (acceptInput?: string) => {
+    if (!acceptInput) return undefined;
+
+    const values = acceptInput
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean);
+
+    if (values.length === 0) return undefined;
+
+    return values.reduce<Record<string, string[]>>((acc, value) => {
+      acc[value] = [];
+      return acc;
+    }, {});
+  };
+
   const onDrop = useCallback(
-    async (acceptedFiles: File[], fileRejections: any[]) => {
+    async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       if (fileRejections.length > 0) {
         fileRejections.forEach(({ file, errors }) => {
-          errors.forEach((error: any) => {
+          errors.forEach((error) => {
             toast.error(`${file.name}: ${error.message}`);
           });
         });
@@ -56,11 +100,12 @@ const FileUpload = ({
         return;
       }
 
-      for (const file of acceptedFiles) {
-        await addUpload(file, fileTypeCategory, (newFile) => {
+      const queuedIds = acceptedFiles.map((file) =>
+        addUpload(file, fileTypeCategory, (newFile) => {
           onUploadSuccess(newFile);
-        });
-      }
+        }),
+      );
+      setLocalUploadIds((prev) => [...prev, ...queuedIds]);
     },
     [addUpload, fileTypeCategory, multiple, onUploadSuccess],
   );
@@ -68,7 +113,7 @@ const FileUpload = ({
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple,
-    accept: accept ? { [accept]: [] } : undefined,
+    accept: buildAcceptObject(accept),
     maxSize: MAX_UPLOAD_SIZE, // 2GB max file size
   });
 
@@ -78,7 +123,7 @@ const FileUpload = ({
       await onFileRemove(fileUrl);
       setUploadedFiles((prev) => prev.filter((file) => file.url !== fileUrl));
       toast.success("File removed successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to remove file");
     } finally {
       setRemovingFiles((prev) => {
@@ -181,6 +226,37 @@ const FileUpload = ({
               );
             })}
           </div>
+        </div>
+      )}
+
+      {liveUploads.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {liveUploads.map((file) => (
+            <div key={file.id} className="rounded-lg border p-3 bg-muted/20">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-medium truncate">{file.file.name}</p>
+                <div className="flex items-center gap-2">
+                  {file.status === "error" && (
+                    <button
+                      type="button"
+                      onClick={() => retryUpload(file.id)}
+                      className="text-red-500 hover:text-red-700"
+                      title="Retry upload"
+                    >
+                      <FiRefreshCw size={14} />
+                    </button>
+                  )}
+                  <span className="text-[11px] text-muted-foreground capitalize">
+                    {file.status}
+                  </span>
+                </div>
+              </div>
+              <ProgressBar value={file.progress} className="h-1.5 mt-2" />
+              {file.error && (
+                <p className="text-[11px] text-red-500 mt-1">{file.error}</p>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -42,7 +42,7 @@ interface UploadContextType {
       originalFileName: string;
       fileId?: string;
     }) => void,
-  ) => Promise<void>;
+  ) => string;
   clearCompleted: () => void;
   retryUpload: (fileId: string) => void;
 }
@@ -61,7 +61,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
       setTimeout(resolve, ms);
     });
 
-  const addUpload = async (
+  const addUpload = (
     file: File,
     fileTypeCategory: string,
     onSuccess: (file: {
@@ -83,6 +83,7 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
     };
 
     setUploadingFiles((prev) => [...prev, uploadingFile]);
+    return id;
   };
 
   const retryUpload = (fileId: string) => {
