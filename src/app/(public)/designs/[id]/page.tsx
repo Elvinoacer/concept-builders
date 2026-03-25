@@ -125,6 +125,7 @@ export default function DesignDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [heroIndex, setHeroIndex] = useState(0);
+  const [heroAutoplayTick, setHeroAutoplayTick] = useState(0);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -359,6 +360,36 @@ export default function DesignDetailPage() {
   const safeFloorPlanIndex =
     floorPlans.length > 0 ? activeFloorPlan % floorPlans.length : 0;
 
+  const selectHeroImage = (index: number) => {
+    if (images.length === 0) return;
+    const normalized =
+      ((index % images.length) + images.length) % images.length;
+    setHeroIndex(normalized);
+    setGalleryIndex(normalized);
+    setHeroAutoplayTick((prev) => prev + 1);
+  };
+
+  const goToNextHeroImage = () => {
+    if (images.length <= 1) return;
+    selectHeroImage(safeHeroIndex + 1);
+  };
+
+  const goToPreviousHeroImage = () => {
+    if (images.length <= 1) return;
+    selectHeroImage(safeHeroIndex - 1);
+  };
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+
+    const interval = window.setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % images.length);
+      setGalleryIndex((prev) => (prev + 1) % images.length);
+    }, 5200);
+
+    return () => window.clearInterval(interval);
+  }, [images.length, heroAutoplayTick]);
+
   const toggleDocument = (key: string) => {
     const option = documentOptions.find((item) => item.key === key);
     if (!option || option.locked || !option.availability) return;
@@ -499,7 +530,7 @@ export default function DesignDetailPage() {
               <button
                 key={img.id}
                 type="button"
-                onClick={() => setHeroIndex(idx)}
+                onClick={() => selectHeroImage(idx)}
                 className={`h-[54px] w-[72px] overflow-hidden border transition-all ${
                   idx === safeHeroIndex
                     ? "border-gold opacity-100"
@@ -526,11 +557,7 @@ export default function DesignDetailPage() {
           <>
             <button
               type="button"
-              onClick={() =>
-                setHeroIndex(
-                  (prev) => (prev - 1 + images.length) % images.length,
-                )
-              }
+              onClick={goToPreviousHeroImage}
               className="absolute left-5 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center border border-[var(--design-hero-control-border)] bg-[var(--design-hero-control-bg)] text-cream transition-colors hover:border-[var(--design-hero-control-border-hover)] hover:text-gold lg:flex xl:left-[60px]"
               aria-label="Previous image"
             >
@@ -538,13 +565,34 @@ export default function DesignDetailPage() {
             </button>
             <button
               type="button"
-              onClick={() => setHeroIndex((prev) => (prev + 1) % images.length)}
+              onClick={goToNextHeroImage}
               className="absolute left-[74px] top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center border border-[var(--design-hero-control-border)] bg-[var(--design-hero-control-bg)] text-cream transition-colors hover:border-[var(--design-hero-control-border-hover)] hover:text-gold lg:flex xl:left-[114px]"
               aria-label="Next image"
             >
               <ChevronRight size={18} />
             </button>
           </>
+        )}
+
+        {images.length > 1 && (
+          <div className="absolute inset-x-0 top-[96px] z-10 flex items-center justify-between px-5 sm:px-8 lg:hidden">
+            <button
+              type="button"
+              onClick={goToPreviousHeroImage}
+              className="grid h-10 w-10 place-items-center border border-[var(--design-hero-control-border)] bg-[var(--design-hero-control-bg)] text-cream transition-colors hover:border-[var(--design-hero-control-border-hover)] hover:text-gold"
+              aria-label="Previous image"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={goToNextHeroImage}
+              className="grid h-10 w-10 place-items-center border border-[var(--design-hero-control-border)] bg-[var(--design-hero-control-bg)] text-cream transition-colors hover:border-[var(--design-hero-control-border-hover)] hover:text-gold"
+              aria-label="Next image"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
         )}
 
         <div className="absolute bottom-[68px] right-5 z-10 hidden font-mono text-[11px] tracking-[0.1em] text-cream-dim xl:right-[60px] lg:block">
@@ -556,6 +604,24 @@ export default function DesignDetailPage() {
 
         <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-10 sm:px-8 lg:px-[60px] lg:pb-16">
           <div className="mx-auto w-full max-w-screen-2xl">
+            {images.length > 1 && (
+              <div className="mb-5 flex items-center gap-2 lg:hidden">
+                {images.map((img, idx) => (
+                  <button
+                    key={`hero-dot-${img.id}`}
+                    type="button"
+                    onClick={() => selectHeroImage(idx)}
+                    className={`h-2.5 rounded-full transition-all ${
+                      idx === safeHeroIndex
+                        ? "w-7 bg-gold"
+                        : "w-2.5 bg-[rgba(240,232,216,0.38)] hover:bg-[rgba(240,232,216,0.62)]"
+                    }`}
+                    aria-label={`Go to image ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+
             <nav
               className="mb-5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em]"
               style={{ color: "var(--design-hero-breadcrumb)" }}
