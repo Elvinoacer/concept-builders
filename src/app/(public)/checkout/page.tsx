@@ -23,6 +23,7 @@ const CheckoutPage = () => {
   const {
     cart,
     loading: isLoading,
+    fetchCart,
     cartTotal,
     appliedDiscountAmount,
     appliedDiscountId,
@@ -39,6 +40,11 @@ const CheckoutPage = () => {
       router.replace("/auth?callbackUrl=%2Fcheckout");
     }
   }, [status, router]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    void fetchCart("authenticated", { silent: true });
+  }, [fetchCart, status]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -61,13 +67,6 @@ const CheckoutPage = () => {
         const data = (await response.json()) as PayPalRuntimeConfig;
         if (!mounted) return;
         setPaypalConfig(data);
-
-        if (!data.configured && paymentMethod === "paypal") {
-          setPaymentMethod("mpesa");
-          toast.info(
-            "PayPal is not configured. Switched to M-Pesa for checkout.",
-          );
-        }
       } catch {
         // Ignore and keep current UI state
       }
@@ -78,7 +77,15 @@ const CheckoutPage = () => {
     return () => {
       mounted = false;
     };
-  }, [paymentMethod]);
+  }, [status]);
+
+  useEffect(() => {
+    if (paymentMethod !== "paypal") return;
+    if (paypalConfig?.configured) return;
+
+    setPaymentMethod("mpesa");
+    toast.info("PayPal is not configured. Switched to M-Pesa for checkout.");
+  }, [paymentMethod, paypalConfig]);
 
   useEffect(() => {
     if (searchParams?.get("paypal") === "cancelled") {

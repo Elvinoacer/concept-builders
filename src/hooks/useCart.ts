@@ -1,6 +1,11 @@
 import useCartStore from "@/lib/store/useCartStore";
 import { useSession } from "next-auth/react";
 
+type FetchCartOptions = {
+  silent?: boolean;
+  force?: boolean;
+};
+
 export const useCart = () => {
   const {
     cart,
@@ -24,11 +29,11 @@ export const useCart = () => {
     return addToCartStore(design, selectedFileTypes, selectedExtras, status);
   };
 
-  const removeItem = (cartItemId) => {
+  const removeItem = (cartItemId: string) => {
     return removeItemFromStore(cartItemId, status);
   };
 
-  const updateItem = (cartItemId, updates) => {
+  const updateItem = (cartItemId: string, updates: Record<string, unknown>) => {
     return updateItemInStore(cartItemId, updates, status);
   };
 
@@ -39,6 +44,11 @@ export const useCart = () => {
   const syncCart = () => {
     return syncCartInStore();
   };
+
+  const fetchCartWithStatus = (
+    fetchStatus: "authenticated" | "unauthenticated",
+    options?: FetchCartOptions,
+  ) => fetchCart(fetchStatus, options);
 
   return {
     cart,
@@ -51,7 +61,7 @@ export const useCart = () => {
     setAppliedDiscount,
     cartCount: cart.length,
     cartTotal: useCartStore.getState().cartTotal(),
-    fetchCart,
+    fetchCart: fetchCartWithStatus,
     addToCart,
     removeItem,
     updateItem,

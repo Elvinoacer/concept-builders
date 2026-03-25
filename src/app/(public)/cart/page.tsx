@@ -13,10 +13,13 @@ const CartPage = () => {
 
   useEffect(() => {
     if (status === "loading") return;
-    fetchCart(status === "authenticated" ? "authenticated" : "unauthenticated");
+    void fetchCart(
+      status === "authenticated" ? "authenticated" : "unauthenticated",
+      { silent: true },
+    );
   }, [fetchCart, status]);
 
-  if (status === "loading" || loading) {
+  if (status === "loading" || (loading && (!cart || cart.length === 0))) {
     return (
       <div className="min-h-screen bg-ink">
         <main className="container mx-auto px-6 lg:px-8 py-12">
@@ -101,6 +104,7 @@ const CartPage = () => {
                   status === "authenticated"
                     ? "authenticated"
                     : "unauthenticated",
+                  { force: true },
                 )
               }
               className="px-8 py-3 bg-gold text-ink rounded-xl font-medium hover:bg-gold-light transition-colors w-full"
