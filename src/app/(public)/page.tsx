@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import PublicThemeToggle from "@/components/ui/public-theme-toggle";
 
 type DesignItem = {
   id: string;
@@ -273,30 +274,36 @@ export default function Home() {
               Start a Project
             </Link>
           </li>
+          <li>
+            <PublicThemeToggle className="h-9 w-9" />
+          </li>
         </ul>
 
         {/* Mobile hamburger button */}
-        <button
-          className="relative z-[110] flex h-10 w-10 flex-col items-center justify-center gap-[5px] lg:hidden"
-          onClick={() => setMobileMenuOpen((o) => !o)}
-          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-        >
-          <span
-            className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-              mobileMenuOpen ? "translate-y-[6.5px] rotate-45" : ""
-            }`}
-          />
-          <span
-            className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-              mobileMenuOpen ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-              mobileMenuOpen ? "-translate-y-[6.5px] -rotate-45" : ""
-            }`}
-          />
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <PublicThemeToggle className="h-9 w-9" />
+          <button
+            className="relative z-[110] flex h-10 w-10 flex-col items-center justify-center gap-[5px]"
+            onClick={() => setMobileMenuOpen((o) => !o)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            <span
+              className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
+                mobileMenuOpen ? "translate-y-[6.5px] rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
+                mobileMenuOpen ? "opacity-0" : ""
+              }`}
+            />
+            <span
+              className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
+                mobileMenuOpen ? "-translate-y-[6.5px] -rotate-45" : ""
+              }`}
+            />
+          </button>
+        </div>
       </nav>
 
       {/* Mobile menu overlay */}

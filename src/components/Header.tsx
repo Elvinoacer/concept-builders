@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import PublicThemeToggle from "@/components/ui/public-theme-toggle";
 
 const Header = () => {
   const pathname = usePathname();
@@ -94,27 +95,34 @@ const Header = () => {
             </Link>
           </nav>
 
-          <button
-            className="relative z-[110] flex h-10 w-10 flex-col items-center justify-center gap-[5px] lg:hidden"
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            <span
-              className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-                mobileMenuOpen ? "translate-y-[6.5px] rotate-45" : ""
-              }`}
-            />
-            <span
-              className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-                mobileMenuOpen ? "opacity-0" : ""
-              }`}
-            />
-            <span
-              className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-                mobileMenuOpen ? "-translate-y-[6.5px] -rotate-45" : ""
-              }`}
-            />
-          </button>
+          <div className="hidden lg:block">
+            <PublicThemeToggle className="h-9 w-9" />
+          </div>
+
+          <div className="flex items-center gap-2 lg:hidden">
+            <PublicThemeToggle className="h-9 w-9" />
+            <button
+              className="relative z-[110] flex h-10 w-10 flex-col items-center justify-center gap-[5px]"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              <span
+                className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
+                  mobileMenuOpen ? "translate-y-[6.5px] rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
+                  mobileMenuOpen ? "opacity-0" : ""
+                }`}
+              />
+              <span
+                className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
+                  mobileMenuOpen ? "-translate-y-[6.5px] -rotate-45" : ""
+                }`}
+              />
+            </button>
+          </div>
         </div>
       </header>
 
