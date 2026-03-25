@@ -54,15 +54,26 @@ const FeaturedDesigns = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="mb-12 sm:mb-16 md:mb-20"
+      className="mb-12 border border-cb-border bg-[rgba(10,9,7,0.45)] p-4 sm:mb-16 sm:p-6 md:mb-20 lg:p-8"
     >
       <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between mb-8 sm:mb-12 gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gold mb-3 uppercase tracking-tight">
+          <p className="mb-3 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-gold">
+            <span className="h-px w-7 bg-gold" />
+            Curated Collection
+          </p>
+          <h2
+            className="mb-3 text-[clamp(34px,5vw,58px)] font-light leading-[1.05] text-cream"
+            style={{
+              fontFamily:
+                'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+            }}
+          >
             Featured Designs
           </h2>
-          <p className="text-cream-dim text-base sm:text-lg md:text-xl font-medium max-w-2xl">
-            A curated selection of our most exceptional and innovative architectural concepts.
+          <p className="max-w-2xl text-sm leading-[1.75] text-cream-dim sm:text-base">
+            A refined selection of standout concepts with practical layouts,
+            beautiful facades, and build-ready documentation.
           </p>
         </div>
         <div className="hidden sm:flex items-center gap-3">
@@ -70,7 +81,7 @@ const FeaturedDesigns = () => {
             whileHover={{ scale: 1.1, x: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => scroll(-400)}
-            className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-card backdrop-blur-md border-2 border-cb-border text-gold hover:bg-surface transition-all duration-300 shadow-xl"
+            className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center border border-cb-border bg-surface text-gold transition-all duration-300 hover:border-gold/40 hover:text-gold-light"
           >
             <span className="material-symbols-outlined text-2xl sm:text-3xl">
               chevron_left
@@ -80,7 +91,7 @@ const FeaturedDesigns = () => {
             whileHover={{ scale: 1.1, x: 5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => scroll(400)}
-            className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-card backdrop-blur-md border-2 border-cb-border text-gold hover:bg-surface transition-all duration-300 shadow-xl"
+            className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center border border-cb-border bg-surface text-gold transition-all duration-300 hover:border-gold/40 hover:text-gold-light"
           >
             <span className="material-symbols-outlined text-2xl sm:text-3xl">
               chevron_right
@@ -131,7 +142,11 @@ const FeaturedDesigns = () => {
             animate={{
               width: loading ? "100%" : "0%",
               x: loading ? ["-100%", "100%"] : 0,
-              transition: { duration: 1.5, repeat: loading ? Infinity : 0, ease: "easeInOut" },
+              transition: {
+                duration: 1.5,
+                repeat: loading ? Infinity : 0,
+                ease: "easeInOut",
+              },
             }}
           />
         </div>

@@ -33,7 +33,7 @@ const ExploreDesigns = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(
-    searchParams.get("search") || ""
+    searchParams.get("search") || "",
   );
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -56,7 +56,7 @@ const ExploreDesigns = () => {
       }
       router.replace(`${pathname}?${params.toString()}`);
     },
-    [searchParams, router, pathname]
+    [searchParams, router, pathname],
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,14 +133,26 @@ const ExploreDesigns = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
+      className="border border-cb-border bg-[rgba(10,9,7,0.45)] p-4 sm:p-6 lg:p-8"
     >
       <div className="flex flex-col lg:flex-row items-center justify-between mb-10 gap-6">
         <div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gold mb-3 uppercase tracking-tight">
+          <p className="mb-3 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-gold">
+            <span className="h-px w-7 bg-gold" />
+            Full Library
+          </p>
+          <h2
+            className="mb-3 text-[clamp(34px,5vw,58px)] font-light leading-[1.05] text-cream"
+            style={{
+              fontFamily:
+                'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+            }}
+          >
             Explore Designs
           </h2>
-          <p className="text-cream-dim text-lg sm:text-xl font-medium">
-            Discover our complete collection of architectural excellence
+          <p className="text-sm leading-[1.75] text-cream-dim sm:text-base">
+            Discover the full catalog and filter by style, budget, and build
+            readiness.
           </p>
         </div>
         <div className="w-full lg:w-auto flex flex-col md:flex-row items-center gap-4">
@@ -153,7 +165,7 @@ const ExploreDesigns = () => {
               search
             </motion.span>
             <motion.input
-              className="w-full rounded-2xl border-2 border-cb-border bg-card/80 backdrop-blur-md py-4 pl-12 pr-6 text-base text-cream placeholder:text-muted focus:border-gold focus:ring-0 transition-all duration-300 shadow-xl font-medium"
+              className="w-full border border-cb-border bg-surface/80 py-4 pl-12 pr-6 text-base text-cream placeholder:text-muted focus:border-gold focus:ring-0 transition-all duration-300"
               placeholder="Search for designs..."
               type="search"
               value={searchTerm}
@@ -166,7 +178,7 @@ const ExploreDesigns = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center justify-center gap-3 rounded-2xl bg-card border-2 border-cb-border px-6 py-4 text-sm font-black text-gold uppercase tracking-widest hover:bg-surface transition-all duration-500 shadow-xl"
+              className="flex items-center justify-center gap-3 border border-cb-border bg-surface px-6 py-4 text-sm font-semibold uppercase tracking-[0.14em] text-gold transition-all duration-500 hover:border-gold/35"
             >
               <span className="material-symbols-outlined text-2xl">
                 filter_list
@@ -175,7 +187,7 @@ const ExploreDesigns = () => {
             </motion.button>
             <div className="relative flex-1 lg:w-64">
               <motion.select
-                className="appearance-none w-full rounded-2xl border-2 border-cb-border bg-card/80 backdrop-blur-md py-4 pl-5 pr-12 text-sm text-cream font-bold cursor-pointer focus:border-gold focus:ring-0 transition-all duration-300 shadow-xl uppercase tracking-widest"
+                className="appearance-none w-full border border-cb-border bg-surface/80 py-4 pl-5 pr-12 text-sm text-cream font-semibold cursor-pointer focus:border-gold focus:ring-0 transition-all duration-300 uppercase tracking-[0.14em]"
                 value={searchParams.get("sortBy") || "Newest"}
                 onChange={handleSortChange}
                 whileFocus={{ scale: 1.02 }}
@@ -235,11 +247,18 @@ const ExploreDesigns = () => {
                 animate={{ opacity: 1 }}
               >
                 <div className="text-7xl sm:text-9xl mb-6 opacity-20">🏛️</div>
-                <h3 className="text-2xl sm:text-3xl font-black text-gold mb-4 uppercase tracking-tight">
+                <h3
+                  className="mb-4 text-2xl font-light text-cream sm:text-3xl"
+                  style={{
+                    fontFamily:
+                      'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+                  }}
+                >
                   No designs found
                 </h3>
-                <p className="text-cream-dim text-lg font-medium max-w-md mx-auto">
-                  Try adjusting your search criteria or filters to discover other architectural gems.
+                <p className="mx-auto max-w-md text-sm leading-[1.75] text-cream-dim sm:text-base">
+                  Try adjusting your filters or search terms to reveal more
+                  options.
                 </p>
               </motion.div>
             ) : (
@@ -301,7 +320,7 @@ const ExploreDesigns = () => {
                         e.preventDefault();
                         handlePageChange(
                           Math.min(totalPages, currentPage + 1),
-                          true
+                          true,
                         );
                       }}
                       className="hover:bg-primary/10 transition-colors duration-300"
