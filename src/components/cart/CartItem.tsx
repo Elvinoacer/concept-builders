@@ -71,29 +71,40 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
 
   const handleExtraChange = (extra, isChecked) => {
     const newExtras = isChecked
-      ? [...(item.selectedExtras || []), extra]
-      : (item.selectedExtras || []).filter((e) => e.id !== extra.id);
+      ? [...safeSelectedExtras, extra]
+      : safeSelectedExtras.filter((e) => e.id !== extra.id);
     onUpdate(item.cartItemId, { selectedExtras: newExtras });
   };
 
   const handleFileTypeChange = (type, isChecked) => {
     const newFileTypes = isChecked
-      ? [...item.selectedFileTypes, type]
-      : item.selectedFileTypes.filter((t) => t !== type);
+      ? [...safeSelectedFileTypes, type]
+      : safeSelectedFileTypes.filter((t) => t !== type);
     onUpdate(item.cartItemId, { selectedFileTypes: newFileTypes });
   };
 
+  const safeSelectedFileTypes = Array.isArray(item.selectedFileTypes)
+    ? item.selectedFileTypes.filter(
+        (type): type is string => typeof type === "string",
+      )
+    : [];
+
+  const safeSelectedExtras = Array.isArray(item.selectedExtras)
+    ? item.selectedExtras.filter((extra) => extra && typeof extra === "object")
+    : [];
+
   const itemTotalPrice = calculateItemTotal(item);
-  const selectedFileTypeRows = item.selectedFileTypes.map((type) => ({
+  const selectedFileTypeRows = safeSelectedFileTypes.map((type) => ({
     type,
     label: getFileTypeLabel(type),
     price: getFileTypePrice(type),
   }));
-  const selectedExtrasRows = (item.selectedExtras || []).map((extra) => ({
+  const selectedExtrasRows = safeSelectedExtras.map((extra) => ({
     id: extra.id,
     label: extra.name,
     price: typeof extra.price === "number" ? extra.price : 0,
   }));
+  const selectedOptionRows = [...selectedFileTypeRows, ...selectedExtrasRows];
 
   return (
     <motion.div
@@ -190,7 +201,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                       type="checkbox"
                       checked={
                         fileTypeOption.isBase || // Always checked if base
-                        item.selectedFileTypes.includes(fileTypeOption.type)
+                        safeSelectedFileTypes.includes(fileTypeOption.type)
                       }
                       onChange={(e) => {
                         if (fileTypeOption.isBase) return; // Prevent change if base
@@ -233,10 +244,9 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                     >
                       <input
                         type="checkbox"
-                        checked={
-                          item.selectedExtras &&
-                          item.selectedExtras.some((e) => e.id === extra.id)
-                        }
+                        checked={safeSelectedExtras.some(
+                          (e) => e.id === extra.id,
+                        )}
                         onChange={(e) =>
                           handleExtraChange(extra, e.target.checked)
                         }
@@ -251,37 +261,43 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
               </div>
             )}
 
-          <div className="mt-6 w-full rounded-2xl border-2 border-cb-border bg-card p-4 sm:p-5">
-            <p className="text-[11px] sm:text-xs font-black uppercase tracking-[0.15em] text-cream-dim mb-4 block">
+          <div className="mt-6 w-full rounded-2xl border border-cb-border bg-[rgba(17,16,9,0.55)] p-4 sm:p-5">
+            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em] text-cream-dim mb-3">
               Selected Options Breakdown
             </p>
-            <div className="rounded-xl border border-[rgba(200,137,42,0.2)] bg-[#111009] overflow-hidden flex flex-col">
-              {[...selectedFileTypeRows, ...selectedExtrasRows].length > 0 ? (
-                [...selectedFileTypeRows, ...selectedExtrasRows].map((row, idx) => (
-                  <div
-                    key={"type" in row ? row.type : row.id || idx}
-                    className="flex justify-between items-center gap-4 px-4 py-3 border-b border-[rgba(200,185,168,0.06)] last:border-b-0"
-                  >
-                    <span className="text-sm text-cream-dim block min-w-0">
-                      {row.label || "Option"}
-                    </span>
-                    <span
-                      className={`text-sm font-bold whitespace-nowrap tabular-nums block ${
-                        row.price > 0 ? "text-[#c8892a]" : "text-emerald-400"
-                      }`}
+            <div className="rounded-xl border border-[rgba(200,137,42,0.22)] bg-[#111009] px-3 sm:px-4 py-2 sm:py-3">
+              {selectedOptionRows.length > 0 ? (
+                <ul className="divide-y divide-[rgba(200,185,168,0.08)]">
+                  {selectedOptionRows.map((row, idx) => (
+                    <li
+                      key={"type" in row ? row.type : row.id || idx}
+                      className="flex items-start justify-between gap-3 py-2.5"
                     >
-                      {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
-                    </span>
-                  </div>
-                ))
+                      <span className="min-w-0 flex-1 text-sm leading-relaxed text-cream break-words">
+                        {row.label || "Option"}
+                      </span>
+                      <span
+                        className={`text-sm font-semibold whitespace-nowrap tabular-nums ${
+                          row.price > 0 ? "text-[#c8892a]" : "text-emerald-400"
+                        }`}
+                      >
+                        {row.price > 0
+                          ? `+$${row.price.toFixed(2)}`
+                          : "Included"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <div className="px-4 py-4 text-sm text-[rgba(200,185,168,0.5)] italic text-center border-b border-[rgba(200,185,168,0.06)]">
-                  No additional options
-                </div>
+                <p className="py-2 text-sm text-[rgba(200,185,168,0.65)]">
+                  No optional items selected.
+                </p>
               )}
 
-              <div className="flex justify-between items-center gap-4 bg-[rgba(200,137,42,0.08)] px-4 py-3 border-t border-[rgba(200,137,42,0.2)]">
-                <span className="text-sm font-bold text-cream uppercase tracking-wider">Item Total</span>
+              <div className="mt-2 flex items-center justify-between gap-3 border-t border-[rgba(200,137,42,0.22)] pt-3">
+                <span className="text-sm font-semibold uppercase tracking-[0.08em] text-cream">
+                  Item Total
+                </span>
                 <span className="text-base font-bold text-[#c8892a] tabular-nums whitespace-nowrap">
                   ${itemTotalPrice.toFixed(2)}
                 </span>
