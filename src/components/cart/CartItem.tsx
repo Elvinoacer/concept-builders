@@ -255,27 +255,32 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cream-dim mb-2 sm:mb-3">
               Selected Options Breakdown
             </p>
-            <div className="w-full overflow-hidden rounded-lg border border-cb-border/70">
-              <div className="max-h-60 overflow-y-auto">
-                {[...selectedFileTypeRows, ...selectedExtrasRows].map((row) => (
+            <div className="rounded-lg border border-cb-border/70 divide-y divide-cb-border/60">
+              {[...selectedFileTypeRows, ...selectedExtrasRows].length > 0 ? (
+                [...selectedFileTypeRows, ...selectedExtrasRows].map((row) => (
                   <div
                     key={"type" in row ? row.type : row.id}
-                    className="grid grid-cols-[1fr_110px] items-start gap-3 border-b border-cb-border/60 px-3 py-2 text-xs"
+                    className="flex items-start justify-between gap-3 px-3 py-2 text-xs"
                   >
-                    <span className="min-w-0 break-words leading-snug text-cream-dim">
+                    <span className="min-w-0 text-cream-dim leading-snug break-words">
                       {row.label}
                     </span>
                     <span
-                      className={`text-right font-medium tabular-nums whitespace-nowrap ${
+                      className={`shrink-0 text-right font-medium whitespace-nowrap tabular-nums ${
                         row.price > 0 ? "text-gold" : "text-green-400"
                       }`}
                     >
                       {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
                     </span>
                   </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-[1fr_110px] items-center gap-3 bg-[rgba(200,137,42,0.08)] px-3 py-2 text-xs font-semibold">
+                ))
+              ) : (
+                <div className="px-3 py-2 text-xs text-cream-dim">
+                  No optional items selected.
+                </div>
+              )}
+
+              <div className="flex items-center justify-between gap-3 bg-[rgba(200,137,42,0.08)] px-3 py-2 text-xs font-semibold">
                 <span className="text-cream">Item Total</span>
                 <span className="text-gold text-right tabular-nums whitespace-nowrap">
                   ${itemTotalPrice.toFixed(2)}
