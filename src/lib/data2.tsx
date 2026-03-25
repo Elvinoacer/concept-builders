@@ -66,7 +66,7 @@ export const footerLinks = {
     { name: "+1 (234) 567-890", href: "tel:+1234567890", icon: "call" },
     {
       name: "support@concept.com",
-      href: "mailto:support@conceptbuilders.com",
+      href: "mailto:support@conceptbuilders.co.ke",
       icon: "email",
     },
     { name: "Live Chat", href: "#", icon: "chat_bubble" },

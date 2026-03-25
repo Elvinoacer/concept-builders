@@ -4,10 +4,10 @@ import { Mail, Phone, MessageSquare, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, any> = {
-  "chat": MessageSquare,
-  "phone_in_talk": Phone,
-  "mail": Mail,
-  "location_on": MapPin
+  chat: MessageSquare,
+  phone_in_talk: Phone,
+  mail: Mail,
+  location_on: MapPin,
 };
 
 const ContactInfo = () => {
@@ -15,10 +15,10 @@ const ContactInfo = () => {
     <div className="space-y-6">
       {contactInfo.map((item, index) => {
         const Icon = iconMap[item.icon] || MessageSquare;
-        
+
         return (
-          <GlassCard 
-            key={index} 
+          <GlassCard
+            key={index}
             className="p-6 transition-all duration-500 group"
             hover
           >
@@ -33,7 +33,7 @@ const ContactInfo = () => {
                 <h3 className="text-xs font-black text-gold uppercase tracking-[0.2em] mb-2">
                   {item.title}
                 </h3>
-                
+
                 {item.title === "Live Chat" ? (
                   <a
                     href="https://wa.me/254741360865"
@@ -52,7 +52,7 @@ const ContactInfo = () => {
                   </a>
                 ) : item.title === "Email" ? (
                   <a
-                    href="mailto:support@conceptbuilders.com"
+                    href="mailto:support@conceptbuilders.co.ke"
                     className="text-xl font-black text-white hover:text-gold transition-colors duration-300 break-words tracking-tight"
                   >
                     {item.value}

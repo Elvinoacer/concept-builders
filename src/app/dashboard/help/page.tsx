@@ -173,8 +173,8 @@ const HelpPage = () => {
       icon: Mail,
       title: "Email Support",
       description: "Get detailed help via email with 24-hour response time",
-      contact: "support@conceptbuilders.com",
-      action: "mailto:support@conceptbuilders.com",
+      contact: "support@conceptbuilders.co.ke",
+      action: "mailto:support@conceptbuilders.co.ke",
       available: true,
     },
     {
@@ -208,20 +208,20 @@ const HelpPage = () => {
   };
 
   const activeCategoryData = categories.find(
-    (cat) => cat.id === activeCategory
+    (cat) => cat.id === activeCategory,
   );
 
   const filteredArticles =
     activeCategoryData?.articles.filter(
       (article) =>
         article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.content.toLowerCase().includes(searchQuery.toLowerCase())
+        article.content.toLowerCase().includes(searchQuery.toLowerCase()),
     ) || [];
 
   const filteredFAQs = faqs.filter(
     (faq) =>
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Animation variants

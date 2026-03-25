@@ -409,7 +409,7 @@ const CheckoutPage = () => {
                 Call Support
               </a>
               <a
-                href="mailto:support@conceptbuilders.com"
+                href="mailto:support@conceptbuilders.co.ke"
                 className="flex-1 bg-transparent hover:bg-gold/10 text-gold text-xs font-medium py-2 px-3 rounded-lg border border-gold text-center transition-colors"
               >
                 Email Us

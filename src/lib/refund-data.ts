@@ -31,7 +31,7 @@ export const refund = [
     title: "3. Refund Process",
     content: `
       <p>
-        To request a refund, please contact our customer support team at <a class="text-primary hover:underline" href="mailto:support@conceptbuilders.com">support@conceptbuilders.com</a> with your project details and reason for the refund request. We will review your request and respond within 7 business days. If a refund is approved, it will be processed within 14 business days and credited back to the original payment method.
+        To request a refund, please contact our customer support team at <a class="text-primary hover:underline" href="mailto:support@conceptbuilders.co.ke">support@conceptbuilders.co.ke</a> with your project details and reason for the refund request. We will review your request and respond within 7 business days. If a refund is approved, it will be processed within 14 business days and credited back to the original payment method.
       </p>
     `,
   },
@@ -54,7 +54,7 @@ export const refund = [
         <p><strong>Concept Builders</strong></p>
         <p>123 Kenyatta Avenue</p>
         <p>P.O BOX 20100, Nakuru</p>
-        <p>Email: <a class="text-primary hover:underline" href="mailto:support@conceptbuilders.com">support@conceptbuilders.com</a></p>
+        <p>Email: <a class="text-primary hover:underline" href="mailto:support@conceptbuilders.co.ke">support@conceptbuilders.co.ke</a></p>
         <p>Phone: <a class="text-primary hover:underline" href="tel:254741360865">+254741360865</a></p>
       </address>
     `,

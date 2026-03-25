@@ -63,9 +63,7 @@ const InvoicePage = () => {
       <div className="max-w-4xl mx-auto">
         {/* Invoice Actions */}
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <h1 className="text-3xl sm:text-4xl font-bold text-cream">
-            Invoice
-          </h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-cream">Invoice</h1>
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
@@ -105,12 +103,8 @@ const InvoicePage = () => {
               </p>
             </div>
             <div className="text-right">
-              <h2 className="text-2xl font-bold text-cream">
-                INVOICE
-              </h2>
-              <p className="text-sm text-muted">
-                # {invoice.invoiceNumber}
-              </p>
+              <h2 className="text-2xl font-bold text-cream">INVOICE</h2>
+              <p className="text-sm text-muted"># {invoice.invoiceNumber}</p>
             </div>
           </div>
 
@@ -120,12 +114,8 @@ const InvoicePage = () => {
               <h3 className="text-sm font-semibold text-muted uppercase mb-3">
                 Billed To
               </h3>
-              <p className="font-medium text-cream">
-                {invoice.user.name}
-              </p>
-              <p className="text-cream-dim">
-                {invoice.user.email}
-              </p>
+              <p className="font-medium text-cream">{invoice.user.name}</p>
+              <p className="text-cream-dim">{invoice.user.email}</p>
             </div>
             <div className="text-left md:text-right">
               <h3 className="text-sm font-semibold text-muted uppercase mb-3">
@@ -141,9 +131,7 @@ const InvoicePage = () => {
               </p>
               <p
                 className={`font-semibold ${
-                  invoice.status === "Paid"
-                    ? "text-green-500"
-                    : "text-red-500"
+                  invoice.status === "Paid" ? "text-green-500" : "text-red-500"
                 }`}
               >
                 Status: {invoice.status}
@@ -172,14 +160,9 @@ const InvoicePage = () => {
               </thead>
               <tbody>
                 {invoice.items.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="border-b border-cb-border"
-                  >
+                  <tr key={item.id} className="border-b border-cb-border">
                     <td className="p-4">
-                      <p className="font-medium text-cream">
-                        {item.name}
-                      </p>
+                      <p className="font-medium text-cream">{item.name}</p>
                       <p className="text-sm text-cream-dim">
                         {item.description}
                       </p>
@@ -203,9 +186,7 @@ const InvoicePage = () => {
           <div className="flex justify-end pt-8">
             <div className="w-full max-w-xs">
               <div className="flex justify-between py-2">
-                <span className="text-cream-dim">
-                  Subtotal
-                </span>
+                <span className="text-cream-dim">Subtotal</span>
                 <span className="text-cream">
                   ${invoice.subtotal.toFixed(2)}
                 </span>
@@ -214,15 +195,11 @@ const InvoicePage = () => {
                 <span className="text-cream-dim">
                   Tax ({invoice.taxRate * 100}%)
                 </span>
-                <span className="text-cream">
-                  ${invoice.tax.toFixed(2)}
-                </span>
+                <span className="text-cream">${invoice.tax.toFixed(2)}</span>
               </div>
               <div className="border-t border-cb-border my-2"></div>
               <div className="flex justify-between py-2">
-                <span className="text-lg font-bold text-cream">
-                  Total
-                </span>
+                <span className="text-lg font-bold text-cream">Total</span>
                 <span className="text-lg font-bold text-cream">
                   ${invoice.total.toFixed(2)}
                 </span>
@@ -237,7 +214,7 @@ const InvoicePage = () => {
             </p>
             <p className="text-xs text-muted mt-1">
               Concept Builders | www.conceptbuilders.com |
-              support@conceptbuilders.com
+              support@conceptbuilders.co.ke
             </p>
           </div>
         </div>

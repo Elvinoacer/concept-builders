@@ -29,6 +29,6 @@ export const privacy = [
   },
   {
     title: "Contact Us",
-    content: `If you have any questions or concerns about this Privacy Policy, please contact us at:<address class="not-italic mt-2">Concept Builders<br/>P.O. Box 20100<br/>Nakuru, Kenya<br/>Email: <a class="text-primary hover:underline" href="mailto:support@conceptbuilders.com">support@conceptbuilders.com</a></address>`,
+    content: `If you have any questions or concerns about this Privacy Policy, please contact us at:<address class="not-italic mt-2">Concept Builders<br/>P.O. Box 20100<br/>Nakuru, Kenya<br/>Email: <a class="text-primary hover:underline" href="mailto:support@conceptbuilders.co.ke">support@conceptbuilders.co.ke</a></address>`,
   },
 ];
