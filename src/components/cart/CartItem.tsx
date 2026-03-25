@@ -255,40 +255,29 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cream-dim mb-2 sm:mb-3">
               Selected Options Breakdown
             </p>
-            <div className="space-y-2">
-              {selectedFileTypeRows.map((row) => (
-                <div
-                  key={row.type}
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-xs text-cream-dim"
-                >
-                  <span className="min-w-0 leading-snug">{row.label}</span>
-                  <span
-                    className={`whitespace-nowrap text-right ${
-                      row.price > 0 ? "text-gold" : "text-green-400"
-                    }`}
+            <div className="w-full overflow-hidden rounded-lg border border-cb-border/70">
+              <div className="max-h-60 overflow-y-auto">
+                {[...selectedFileTypeRows, ...selectedExtrasRows].map((row) => (
+                  <div
+                    key={"type" in row ? row.type : row.id}
+                    className="grid grid-cols-[1fr_110px] items-start gap-3 border-b border-cb-border/60 px-3 py-2 text-xs"
                   >
-                    {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
-                  </span>
-                </div>
-              ))}
-              {selectedExtrasRows.map((row) => (
-                <div
-                  key={row.id}
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-xs text-cream-dim"
-                >
-                  <span className="min-w-0 leading-snug">{row.label}</span>
-                  <span
-                    className={`whitespace-nowrap text-right ${
-                      row.price > 0 ? "text-gold" : "text-green-400"
-                    }`}
-                  >
-                    {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
-                  </span>
-                </div>
-              ))}
-              <div className="mt-2 border-t border-cb-border pt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-xs font-semibold">
+                    <span className="min-w-0 break-words leading-snug text-cream-dim">
+                      {row.label}
+                    </span>
+                    <span
+                      className={`text-right font-medium tabular-nums whitespace-nowrap ${
+                        row.price > 0 ? "text-gold" : "text-green-400"
+                      }`}
+                    >
+                      {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-[1fr_110px] items-center gap-3 bg-[rgba(200,137,42,0.08)] px-3 py-2 text-xs font-semibold">
                 <span className="text-cream">Item Total</span>
-                <span className="text-gold whitespace-nowrap text-right">
+                <span className="text-gold text-right tabular-nums whitespace-nowrap">
                   ${itemTotalPrice.toFixed(2)}
                 </span>
               </div>
