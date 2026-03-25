@@ -1,6 +1,9 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
 import {
   Pagination,
   PaginationContent,
@@ -12,14 +15,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import useSWR from "swr";
 import { CgSpinner } from "react-icons/cg";
-import { FiSearch, FiGrid, FiList } from "react-icons/fi";
+import { FiGrid, FiList, FiSearch } from "react-icons/fi";
 
-// Define TypeScript interfaces
 interface CategoryImage {
   url: string;
 }
@@ -55,7 +53,11 @@ export default function CategoriesPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  const serifSystem =
+    'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
+  const monoSystem =
+    'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
 
   const fetcher = async (url: string) => {
     const response = await fetch(url);
@@ -67,10 +69,12 @@ export default function CategoriesPage() {
         errorData.message || `HTTP error! status: ${response.status}`,
       );
     }
+
     const data: CategoriesResponse = await response.json();
     if (data.error) {
       throw new Error(data.message || data.error);
     }
+
     return data;
   };
 
@@ -96,6 +100,7 @@ export default function CategoriesPage() {
 
   const categories = data?.categories || [];
   const totalPages = data?.totalPages || 1;
+  const totalCategories = data?.totalCategories || 0;
   const errorMessage = error instanceof Error ? error.message : null;
 
   const handlePageChange = (page: number) => {
@@ -108,7 +113,6 @@ export default function CategoriesPage() {
   const getPaginationRange = () => {
     if (totalPages <= 1) return [1];
 
-    // Mobile: show fewer pages, desktop: show more
     const width = typeof window !== "undefined" ? window.innerWidth : 1024;
     const maxVisiblePages = width < 768 ? 3 : width < 1024 ? 5 : 7;
     const delta = Math.floor(maxVisiblePages / 2);
@@ -117,12 +121,10 @@ export default function CategoriesPage() {
     let start = Math.max(2, currentPage - delta);
     let end = Math.min(totalPages - 1, currentPage + delta);
 
-    // Adjust if we're near the start
     if (currentPage - delta <= 2) {
       end = Math.min(totalPages - 1, maxVisiblePages);
     }
 
-    // Adjust if we're near the end
     if (currentPage + delta >= totalPages - 1) {
       start = Math.max(2, totalPages - maxVisiblePages + 1);
     }
@@ -131,268 +133,247 @@ export default function CategoriesPage() {
       range.push(i);
     }
 
-    if (start > 2) {
-      range.unshift("...");
-    }
-    if (end < totalPages - 1) {
-      range.push("...");
-    }
+    if (start > 2) range.unshift("...");
+    if (end < totalPages - 1) range.push("...");
 
     range.unshift(1);
-    if (totalPages > 1) {
-      range.push(totalPages);
-    }
+    if (totalPages > 1) range.push(totalPages);
 
     return range;
   };
 
   const getCategoryImageUrl = (category: Category): string => {
-    if (category.image) {
-      return category.image;
-    }
+    if (category.image) return category.image;
     if (category.designs?.[0]?.images?.[0]?.url) {
       return category.designs[0].images[0].url;
     }
-    return "/images/placeholder.png";
+    return "/images/banners/banner1.jpg";
   };
 
   return (
-    <div className="min-h-screen bg-ink">
-      {/* Header */}
-      <header className="relative h-40 xs:h-48 sm:h-56 md:h-64 rounded-b-2xl flex items-center justify-center text-center text-white overflow-hidden">
-        <Image
-          src="/images/banners/banner1.jpg"
-          alt="Categories background"
-          fill
-          className="object-cover"
-          priority
-          placeholder="blur"
-          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-        <div className="relative z-10 px-4 max-w-4xl mx-auto">
-          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-            Categories
+    <div className="min-h-screen bg-ink text-cream">
+      <section className="relative overflow-hidden border-b border-[rgba(240,232,216,0.08)] px-6 pb-12 pt-28 sm:px-10 lg:px-[60px] lg:pt-40">
+        <div className="pointer-events-none absolute inset-0 opacity-70">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_78%_36%,rgba(200,137,42,0.08),transparent_65%),radial-gradient(ellipse_45%_42%_at_18%_82%,rgba(200,137,42,0.04),transparent_65%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.03)_1px,transparent_1px)] bg-[size:88px_88px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.5)_24%,rgba(0,0,0,0.5)_76%,transparent)]" />
+        </div>
+
+        <p
+          className="pointer-events-none absolute bottom-[-38px] right-[-14px] select-none whitespace-nowrap text-[clamp(104px,16vw,220px)] font-light leading-none text-[rgba(200,137,42,0.05)]"
+          style={{ fontFamily: serifSystem }}
+        >
+          Collections
+        </p>
+
+        <div className="relative mx-auto w-full max-w-screen-2xl">
+          <p
+            className="mb-6 flex items-center gap-4 text-[11px] uppercase tracking-[0.24em] text-gold"
+            style={{ fontFamily: monoSystem }}
+          >
+            <span className="h-px w-8 bg-gold" />
+            Concept Builders · Curated Styles
+          </p>
+
+          <h1
+            className="text-[clamp(52px,9vw,132px)] font-light leading-[0.9] tracking-[-0.03em]"
+            style={{ fontFamily: serifSystem }}
+          >
+            Architectural
+            <span className="block text-gold italic">Categories.</span>
           </h1>
-          <p className="text-sm xs:text-base sm:text-lg md:text-xl mt-2 xs:mt-3 opacity-90">
-            Discover our curated collection of categories
+
+          <p
+            className="mt-7 max-w-[560px] text-[13px] leading-[1.85] text-cream-dim"
+            style={{ fontFamily: monoSystem }}
+          >
+            Browse our architectural families and quickly narrow into the exact
+            collection that matches your build goals.
           </p>
         </div>
-      </header>
+      </section>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:py-8 px-3 xs:px-4 sm:px-6 lg:px-8">
-        {/* Controls Section */}
-        <div className="flex flex-col xs:flex-row gap-4 xs:gap-6 mb-6 sm:mb-8">
-          {/* Search Input */}
-          <div className="flex-1 relative">
-            <div
-              className={`relative transition-all duration-300 ${
-                isSearchFocused ? "scale-[1.02]" : "scale-100"
-              }`}
-            >
-              <FiSearch
-                className={`absolute left-3 xs:left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-200 z-10 ${
-                  isSearchFocused ? "text-gold" : "text-muted"
-                }`}
-                size={18}
-              />
-              <Input
-                placeholder="Search categories..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-                className="pl-10 xs:pl-12 pr-4 py-2.5 xs:py-3 text-base border-2 border-cb-border bg-surface backdrop-blur-sm rounded-xl xs:rounded-2xl shadow-sm hover:shadow-md focus:shadow-lg transition-all duration-300 focus:border-gold w-full text-cream placeholder:text-muted"
-              />
-            </div>
+      <section className="sticky top-[73px] z-20 border-b border-[rgba(240,232,216,0.08)] bg-[rgba(10,9,7,0.95)] px-6 backdrop-blur-xl sm:px-10 lg:px-[60px]">
+        <div className="mx-auto flex min-h-16 w-full max-w-screen-2xl flex-wrap items-center gap-3 py-3 lg:flex-nowrap lg:gap-0">
+          <div
+            className="pr-6 text-[11px] uppercase tracking-[0.14em] text-muted lg:border-r lg:border-[rgba(240,232,216,0.08)] lg:pr-8"
+            style={{ fontFamily: monoSystem }}
+          >
+            <span className="text-gold">{totalCategories}</span> categories
           </div>
 
-          {/* View Mode Toggle */}
-          <div className="flex items-center justify-end xs:justify-start gap-2">
-            <div className="bg-surface rounded-xl border border-cb-border p-1 flex">
+          <div className="flex flex-1 items-center gap-3 lg:pl-6">
+            <div className="group relative w-full max-w-xl">
+              <FiSearch
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted transition-colors group-focus-within:text-gold"
+                size={16}
+              />
+              <input
+                placeholder="Search categories..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-10 w-full border border-[rgba(240,232,216,0.18)] bg-[rgba(22,20,18,0.72)] py-2 pl-9 pr-3 text-[12px] tracking-[0.08em] text-cream outline-none placeholder:text-[rgba(168,152,128,0.9)] transition-all focus:border-[rgba(200,137,42,0.45)]"
+                style={{ fontFamily: monoSystem }}
+              />
+            </div>
+
+            <div className="ml-auto flex items-center gap-1 border border-[rgba(240,232,216,0.1)] bg-[rgba(15,13,11,0.75)] p-1">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-lg transition-all duration-200 ${
+                className={`grid h-8 w-8 place-items-center transition-colors ${
                   viewMode === "grid"
-                    ? "bg-gold text-ink shadow-sm"
+                    ? "bg-[rgba(200,137,42,0.14)] text-gold"
                     : "text-muted hover:text-cream"
                 }`}
+                aria-label="Grid view"
               >
-                <FiGrid size={18} />
+                <FiGrid size={15} />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded-lg transition-all duration-200 ${
+                className={`grid h-8 w-8 place-items-center transition-colors ${
                   viewMode === "list"
-                    ? "bg-gold text-ink shadow-sm"
+                    ? "bg-[rgba(200,137,42,0.14)] text-gold"
                     : "text-muted hover:text-cream"
                 }`}
+                aria-label="List view"
               >
-                <FiList size={18} />
+                <FiList size={15} />
               </button>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Error State */}
+      <main className="mx-auto w-full max-w-screen-2xl px-6 pb-20 pt-8 sm:px-10 lg:px-[60px]">
         {errorMessage && (
-          <div className="text-center py-8">
-            <div className="max-w-md mx-auto bg-destructive/10 border border-destructive/20 rounded-xl p-4 xs:p-6">
-              <div className="w-10 h-10 xs:w-12 xs:h-12 mx-auto mb-3 xs:mb-4 bg-destructive/20 rounded-full flex items-center justify-center">
-                <span className="text-destructive text-lg xs:text-xl">⚠️</span>
-              </div>
-              <h3 className="text-base xs:text-lg font-semibold text-destructive mb-2">
-                Error Loading Categories
-              </h3>
-              <p className="text-destructive/80 text-xs xs:text-sm mb-3 xs:mb-4">
-                {errorMessage}
-              </p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-gold hover:bg-gold-light text-ink rounded-lg transition-colors duration-200 text-xs xs:text-sm font-semibold"
-              >
-                Try Again
-              </button>
-            </div>
+          <div className="border border-[rgba(220,38,38,0.3)] bg-[rgba(220,38,38,0.08)] px-6 py-6 text-center">
+            <p
+              className="text-sm uppercase tracking-[0.18em] text-red-300"
+              style={{ fontFamily: monoSystem }}
+            >
+              Error Loading Categories
+            </p>
+            <p className="mt-2 text-cream-dim">{errorMessage}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 border border-[rgba(200,137,42,0.34)] bg-[rgba(200,137,42,0.1)] px-4 py-2 text-xs uppercase tracking-[0.16em] text-gold"
+              style={{ fontFamily: monoSystem }}
+            >
+              Retry
+            </button>
           </div>
         )}
 
-        {/* Loading State */}
         {isLoading && !errorMessage && (
-          <div className="flex flex-col items-center justify-center h-48 xs:h-56 sm:h-64 gap-3 xs:gap-4">
-            <div className="relative">
-              <CgSpinner className="animate-spin text-gold" size={40} />
-              <div className="absolute inset-0 bg-gradient-to-r from-gold to-gold-light blur-lg opacity-20 animate-pulse"></div>
-            </div>
-            <p className="text-cream-dim text-base xs:text-lg font-medium">
-              Discovering categories...
+          <div className="flex min-h-[300px] flex-col items-center justify-center gap-4">
+            <CgSpinner className="animate-spin text-gold" size={40} />
+            <p className="text-cream-dim" style={{ fontFamily: monoSystem }}>
+              Loading categories...
             </p>
           </div>
         )}
 
-        {/* Empty State */}
         {!isLoading && !errorMessage && categories.length === 0 && (
-          <div className="text-center py-12 xs:py-16">
-            <div className="max-w-xs xs:max-w-sm sm:max-w-md mx-auto">
-              <div className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 mx-auto mb-4 bg-surface rounded-full flex items-center justify-center">
-                <FiSearch size={24} className="text-muted" />
-              </div>
-              <h3 className="text-lg xs:text-xl font-semibold text-cream mb-2">
-                No categories found
-              </h3>
-              <p className="text-cream-dim text-sm xs:text-base mb-4 xs:mb-6">
-                {searchQuery
-                  ? `No results found for "${searchQuery}". Try adjusting your search terms.`
-                  : "No categories available at the moment."}
-              </p>
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="px-5 xs:px-6 py-2 bg-gold hover:bg-gold-light text-ink rounded-lg transition-colors duration-200 text-sm xs:text-base font-semibold"
-                >
-                  Clear search
-                </button>
-              )}
-            </div>
+          <div className="border border-[rgba(240,232,216,0.08)] bg-card/40 p-16 text-center">
+            <h3
+              className="text-4xl font-light text-cream"
+              style={{ fontFamily: serifSystem }}
+            >
+              No categories found
+            </h3>
+            <p
+              className="mt-3 text-[12px] tracking-[0.08em] text-muted"
+              style={{ fontFamily: monoSystem }}
+            >
+              {searchQuery
+                ? `No results for "${searchQuery}".`
+                : "No categories are available yet."}
+            </p>
           </div>
         )}
 
-        {/* Categories Grid/List */}
         {!isLoading && !errorMessage && categories.length > 0 && (
           <div
-            className={`${
+            className={
               viewMode === "grid"
-                ? "grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 xs:gap-6 lg:gap-8"
-                : "grid grid-cols-1 gap-4 xs:gap-6 max-w-4xl mx-auto"
-            }`}
+                ? "grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)] md:grid-cols-2 xl:grid-cols-3"
+                : "grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)]"
+            }
           >
-            {categories.map((category) => (
-              <Link href={`/categories/${category.id}`} key={category.id}>
+            {categories.map((category, index) => (
+              <Link
+                key={category.id}
+                href={`/categories/${category.id}`}
+                className={`group bg-ink transition-colors duration-300 hover:bg-card ${
+                  viewMode === "list" ? "flex flex-col sm:flex-row" : ""
+                }`}
+              >
                 <div
-                  className={`group cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl rounded-xl xs:rounded-2xl overflow-hidden ${
+                  className={`relative overflow-hidden ${
                     viewMode === "grid"
-                      ? "bg-card border border-cb-border shadow-md hover:shadow-2xl"
-                      : "bg-card border border-cb-border shadow-sm hover:shadow-lg flex flex-col sm:flex-row items-stretch"
+                      ? "aspect-[4/3]"
+                      : "aspect-[16/8] sm:aspect-auto sm:h-[220px] sm:w-[320px]"
                   }`}
                 >
-                  <div
-                    className={`relative overflow-hidden ${
+                  <Image
+                    src={getCategoryImageUrl(category)}
+                    alt={category.name}
+                    fill
+                    sizes={
                       viewMode === "grid"
-                        ? "h-48 xs:h-56 sm:h-64 w-full"
-                        : "h-40 xs:h-48 sm:h-56 w-full sm:w-48 lg:w-56 flex-shrink-0"
-                    }`}
-                  >
-                    <Image
-                      src={getCategoryImageUrl(category)}
-                      alt={category.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      sizes={
-                        viewMode === "grid"
-                          ? "(max-width: 480px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                          : "(max-width: 640px) 100vw, (max-width: 768px) 192px, 224px"
-                      }
-                      placeholder="blur"
-                      blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                        ? "(max-width: 1024px) 100vw, 33vw"
+                        : "(max-width: 640px) 100vw, 320px"
+                    }
+                    className="object-cover opacity-80 transition-all duration-700 group-hover:scale-105 group-hover:opacity-95"
+                    priority={index < 3}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                  {category.isFeatured && (
+                    <span
+                      className="absolute left-4 top-4 bg-gold px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-ink"
+                      style={{ fontFamily: monoSystem }}
+                    >
+                      Featured
+                    </span>
+                  )}
+                </div>
 
-                    {/* Featured Badge */}
-                    {category.isFeatured && (
-                      <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        Featured
-                      </div>
-                    )}
+                <div className="flex flex-1 flex-col justify-between p-6">
+                  <div>
+                    <p
+                      className="mb-2 text-[10px] uppercase tracking-[0.2em] text-gold"
+                      style={{ fontFamily: monoSystem }}
+                    >
+                      Category
+                    </p>
+                    <h2
+                      className="mb-3 text-3xl font-light text-cream transition-colors group-hover:text-gold-light"
+                      style={{ fontFamily: serifSystem }}
+                    >
+                      {category.name}
+                    </h2>
+                    <p
+                      className="line-clamp-2 text-[12px] leading-[1.8] text-cream-dim"
+                      style={{ fontFamily: monoSystem }}
+                    >
+                      {category.description ||
+                        "Explore premium plans curated for this architectural category."}
+                    </p>
                   </div>
 
-                  <div
-                    className={`flex-1 p-4 xs:p-5 sm:p-6 ${
-                      viewMode === "list"
-                        ? "flex flex-col sm:flex-row sm:justify-between sm:items-center"
-                        : ""
-                    }`}
-                  >
-                    <div className="flex-1">
-                      <h2
-                        className={`font-bold text-cream transition-colors duration-300 group-hover:text-gold ${
-                          viewMode === "grid"
-                            ? "text-xl xs:text-2xl mb-2"
-                            : "text-lg xs:text-xl mb-2 sm:mb-0"
-                        }`}
-                      >
-                        {category.name}
-                      </h2>
-
-                      {viewMode === "list" && (
-                        <p className="text-cream-dim text-sm xs:text-base line-clamp-2 hidden sm:block">
-                          {category.description ||
-                            `Explore ${category._count?.designs || 0} amazing designs`}
-                        </p>
-                      )}
-                    </div>
-
-                    <div
-                      className={`flex items-center justify-between mt-3 xs:mt-4 ${
-                        viewMode === "list"
-                          ? "sm:flex-col sm:items-end sm:gap-2"
-                          : ""
-                      }`}
+                  <div className="mt-6 flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4">
+                    <span
+                      className="text-[11px] uppercase tracking-[0.12em] text-muted"
+                      style={{ fontFamily: monoSystem }}
                     >
-                      <div className="text-sm xs:text-base text-muted">
-                        {category._count?.designs || 0} designs
-                      </div>
-                      <div className="flex items-center text-gold font-semibold transition-all duration-300 group-hover:translate-x-1 text-sm xs:text-base">
-                        <span>Explore</span>
-                        <span className="ml-1 transition-transform duration-300 group-hover:translate-x-1">
-                          →
-                        </span>
-                      </div>
-                    </div>
+                      {category._count?.designs || 0} plans
+                    </span>
+                    <span
+                      className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold"
+                      style={{ fontFamily: monoSystem }}
+                    >
+                      Explore
+                    </span>
                   </div>
                 </div>
               </Link>
@@ -400,19 +381,18 @@ export default function CategoriesPage() {
           </div>
         )}
 
-        {/* Pagination */}
         {!isLoading &&
           !errorMessage &&
           categories.length > 0 &&
           totalPages > 1 && (
-            <div className="mt-8 xs:mt-10 sm:mt-12">
+            <div className="mt-10 flex justify-center">
               <Pagination>
-                <PaginationContent className="flex-wrap gap-1 xs:gap-2 justify-center">
+                <PaginationContent className="flex-wrap gap-2 justify-center">
                   <PaginationItem>
                     <PaginationFirst
                       onClick={() => handlePageChange(1)}
                       aria-disabled={currentPage === 1}
-                      className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
+                      className={`cursor-pointer p-3 ${
                         currentPage === 1
                           ? "pointer-events-none opacity-50"
                           : "hover:bg-surface"
@@ -423,7 +403,7 @@ export default function CategoriesPage() {
                     <PaginationPrevious
                       onClick={() => handlePageChange(currentPage - 1)}
                       aria-disabled={currentPage === 1}
-                      className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
+                      className={`cursor-pointer p-3 ${
                         currentPage === 1
                           ? "pointer-events-none opacity-50"
                           : "hover:bg-surface"
@@ -435,7 +415,7 @@ export default function CategoriesPage() {
                     if (page === "...") {
                       return (
                         <PaginationItem key={`ellipsis-${index}`}>
-                          <PaginationEllipsis className="p-2 xs:p-3" />
+                          <PaginationEllipsis className="p-3" />
                         </PaginationItem>
                       );
                     }
@@ -445,7 +425,7 @@ export default function CategoriesPage() {
                         <PaginationLink
                           onClick={() => handlePageChange(page as number)}
                           isActive={currentPage === page}
-                          className={`cursor-pointer text-xs xs:text-sm min-w-[2rem] xs:min-w-[2.5rem] ${
+                          className={`cursor-pointer min-w-[2.5rem] ${
                             currentPage === page
                               ? "bg-gold text-ink"
                               : "hover:bg-surface text-cream-dim hover:text-cream"
@@ -461,7 +441,7 @@ export default function CategoriesPage() {
                     <PaginationNext
                       onClick={() => handlePageChange(currentPage + 1)}
                       aria-disabled={totalPages === currentPage}
-                      className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
+                      className={`cursor-pointer p-3 ${
                         totalPages === currentPage
                           ? "pointer-events-none opacity-50"
                           : "hover:bg-surface"
@@ -472,7 +452,7 @@ export default function CategoriesPage() {
                     <PaginationLast
                       onClick={() => handlePageChange(totalPages)}
                       aria-disabled={totalPages === currentPage}
-                      className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
+                      className={`cursor-pointer p-3 ${
                         totalPages === currentPage
                           ? "pointer-events-none opacity-50"
                           : "hover:bg-surface"

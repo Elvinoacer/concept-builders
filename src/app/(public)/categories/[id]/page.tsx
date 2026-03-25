@@ -1,6 +1,5 @@
 "use client";
 
-import DesignCard from "@/components/design-showcase/DesignCard";
 import {
   Pagination,
   PaginationContent,
@@ -12,21 +11,28 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import Image from "next/image";
 import Link from "next/link";
 import { FiAlertTriangle, FiSearch } from "react-icons/fi";
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import { useParams, useSearchParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 
 interface Design {
   id: string;
   name: string;
   description: string;
-  images: { url: string; type: string }[];
+  images: { url: string; type: string; name?: string }[];
   isFeatured: boolean;
-  reviews: any[];
-  discounts: any[];
   basePrice: number;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  area?: number | null;
+  views?: number;
 }
 
 interface Category {
@@ -41,20 +47,29 @@ interface Category {
 }
 
 export default function CategoryPage() {
+  const router = useRouter();
+  const pathname = usePathname();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
+  const safeSearchParams = searchParams ?? new URLSearchParams();
   const categoryId = params?.id;
+
+  const serifSystem =
+    'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
+  const monoSystem =
+    'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
 
   const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("search") || "",
+    safeSearchParams.get("search") || "",
   );
-  const page = searchParams.get("page")
-    ? parseInt(searchParams.get("page") || "1", 10)
+
+  const page = safeSearchParams.get("page")
+    ? parseInt(safeSearchParams.get("page") || "1", 10)
     : 1;
-  const search = searchParams.get("search") || "";
+  const search = safeSearchParams.get("search") || "";
 
   useEffect(() => {
     setSearchQuery(search);
@@ -77,7 +92,7 @@ export default function CategoryPage() {
         }
         const data = await res.json();
         setCategory(data);
-      } catch (error) {
+      } catch {
         setError("Failed to load category. Please try again later.");
       } finally {
         setLoading(false);
@@ -88,29 +103,36 @@ export default function CategoryPage() {
   }, [categoryId, page, search]);
 
   const totalPages = category ? Math.ceil(category._count.designs / 10) : 0;
+  const totalDesigns = category?._count.designs || 0;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
+  const toCategoryLink = (nextPage: number, nextSearch?: string) => {
+    const paramsObj = new URLSearchParams();
+    paramsObj.set("page", String(Math.max(1, nextPage)));
+    const query = typeof nextSearch === "string" ? nextSearch : search;
+    if (query) paramsObj.set("search", query);
+
+    if (!categoryId) return "/categories";
+    return `${pathname}?${paramsObj.toString()}`;
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Update URL with search query
-    const url = new URL(window.location.href);
-    if (searchQuery) {
-      url.searchParams.set("search", searchQuery);
-    } else {
-      url.searchParams.delete("search");
-    }
-    url.searchParams.set("page", "1");
-    window.location.href = url.toString();
+    router.push(toCategoryLink(1, searchQuery));
+  };
+
+  const getDesignImage = (design: Design) => {
+    return design.images?.[0]?.url || "/images/banners/banner1.jpg";
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-        <div className="w-12 h-12 xs:w-16 xs:h-16 border-4 border-gold border-dashed rounded-full animate-spin"></div>
-        <p className="mt-3 xs:mt-4 text-base xs:text-lg text-cream-dim">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 bg-ink text-cream">
+        <div className="h-14 w-14 animate-spin rounded-full border-4 border-dashed border-gold" />
+        <p className="text-cream-dim" style={{ fontFamily: monoSystem }}>
           Loading category...
         </p>
       </div>
@@ -119,25 +141,26 @@ export default function CategoryPage() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-ink text-center px-4 xs:px-6">
-        <div className="bg-card border border-cb-border p-6 xs:p-8 rounded-2xl shadow-lg max-w-md w-full">
-          <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 xs:mb-6 bg-destructive/10 rounded-full flex items-center justify-center">
-            <FiAlertTriangle
-              size={32}
-              className="xs:w-10 xs:h-10 text-destructive"
-            />
+      <div className="flex min-h-[60vh] items-center justify-center bg-ink px-4 text-center">
+        <div className="w-full max-w-md border border-[rgba(220,38,38,0.3)] bg-[rgba(220,38,38,0.08)] p-8">
+          <div className="mx-auto mb-4 grid h-14 w-14 place-items-center border border-[rgba(220,38,38,0.4)] text-red-300">
+            <FiAlertTriangle size={24} />
           </div>
-          <h1 className="text-2xl xs:text-3xl font-bold text-cream mb-2 xs:mb-3">
-            An Error Occurred
+          <h1
+            className="text-4xl font-light text-cream"
+            style={{ fontFamily: serifSystem }}
+          >
+            Something Went Wrong
           </h1>
-          <p className="text-cream-dim text-sm xs:text-base mb-6 xs:mb-8">
-            {error}
+          <p className="mt-3 text-cream-dim" style={{ fontFamily: monoSystem }}>
+            {error || "Unable to load category details."}
           </p>
           <Link
             href="/categories"
-            className="inline-flex items-center justify-center px-6 xs:px-8 py-2.5 xs:py-3 bg-gold hover:bg-gold-light text-ink rounded-lg transition-all duration-300 shadow-md text-sm xs:text-base w-full font-semibold"
+            className="mt-6 inline-flex w-full items-center justify-center border border-[rgba(200,137,42,0.34)] bg-[rgba(200,137,42,0.1)] px-5 py-3 text-xs uppercase tracking-[0.18em] text-gold"
+            style={{ fontFamily: monoSystem }}
           >
-            Explore Other Categories
+            Back to Categories
           </Link>
         </div>
       </div>
@@ -146,23 +169,26 @@ export default function CategoryPage() {
 
   if (!category) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-ink text-center px-4 xs:px-6">
-        <div className="bg-card border border-cb-border p-6 xs:p-8 rounded-2xl shadow-lg max-w-md w-full">
-          <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 xs:mb-6 bg-surface rounded-full flex items-center justify-center">
-            <FiAlertTriangle size={32} className="xs:w-10 xs:h-10 text-muted" />
+      <div className="flex min-h-[60vh] items-center justify-center bg-ink px-4 text-center">
+        <div className="w-full max-w-md border border-[rgba(240,232,216,0.08)] bg-card p-8">
+          <div className="mx-auto mb-4 grid h-14 w-14 place-items-center border border-[rgba(240,232,216,0.1)] text-muted">
+            <FiAlertTriangle size={24} />
           </div>
-          <h1 className="text-2xl xs:text-3xl font-bold text-cream mb-2 xs:mb-3">
+          <h1
+            className="text-4xl font-light text-cream"
+            style={{ fontFamily: serifSystem }}
+          >
             Category Not Found
           </h1>
-          <p className="text-cream-dim text-sm xs:text-base mb-6 xs:mb-8">
-            The category you are looking for does not exist or may have been
-            moved.
+          <p className="mt-3 text-cream-dim" style={{ fontFamily: monoSystem }}>
+            The category may have been moved or removed.
           </p>
           <Link
             href="/categories"
-            className="inline-flex items-center justify-center px-6 xs:px-8 py-2.5 xs:py-3 bg-gold hover:bg-gold-light text-ink rounded-lg transition-all duration-300 shadow-md text-sm xs:text-base w-full font-semibold"
+            className="mt-6 inline-flex w-full items-center justify-center border border-[rgba(200,137,42,0.34)] bg-[rgba(200,137,42,0.1)] px-5 py-3 text-xs uppercase tracking-[0.18em] text-gold"
+            style={{ fontFamily: monoSystem }}
           >
-            Explore Other Categories
+            Browse Categories
           </Link>
         </div>
       </div>
@@ -170,132 +196,239 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="bg-ink min-h-screen">
-      {/* Header Section */}
-      <header className="relative h-40 xs:h-48 sm:h-56 md:h-64 rounded-b-2xl flex items-center justify-center text-center text-white overflow-hidden">
+    <div className="min-h-screen bg-ink text-cream">
+      <section className="relative overflow-hidden border-b border-[rgba(240,232,216,0.08)] px-6 pb-12 pt-28 sm:px-10 lg:px-[60px] lg:pt-40">
+        <div className="pointer-events-none absolute inset-0 opacity-70">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_46%_at_78%_34%,rgba(200,137,42,0.08),transparent_64%),radial-gradient(ellipse_42%_42%_at_22%_82%,rgba(200,137,42,0.04),transparent_64%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.03)_1px,transparent_1px)] bg-[size:88px_88px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.5)_26%,rgba(0,0,0,0.5)_74%,transparent)]" />
+        </div>
         <Image
           src={category.image || "/images/banners/banner2.jpg"}
           alt={category.name}
           fill
-          className="object-cover"
-          placeholder="blur"
-          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+          className="object-cover opacity-35"
           sizes="100vw"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-        <div className="relative z-10 px-4 max-w-4xl mx-auto">
-          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-            {category.name} Designs
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/65 to-ink/45" />
+
+        <div className="relative mx-auto w-full max-w-screen-2xl">
+          <p
+            className="mb-6 flex items-center gap-4 text-[11px] uppercase tracking-[0.24em] text-gold"
+            style={{ fontFamily: monoSystem }}
+          >
+            <span className="h-px w-8 bg-gold" />
+            Category Spotlight
+          </p>
+
+          <h1
+            className="text-[clamp(48px,8vw,120px)] font-light leading-[0.9] tracking-[-0.03em]"
+            style={{ fontFamily: serifSystem }}
+          >
+            {category.name}
+            <span className="block text-gold italic">Plans.</span>
           </h1>
+
           {category.description && (
-            <p className="text-sm xs:text-base sm:text-lg mt-2 xs:mt-3 opacity-90 max-w-2xl mx-auto hidden xs:block">
+            <p
+              className="mt-7 max-w-[620px] text-[13px] leading-[1.85] text-cream-dim"
+              style={{ fontFamily: monoSystem }}
+            >
               {category.description}
             </p>
           )}
-        </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:py-8 lg:py-12 px-3 xs:px-4 sm:px-6 lg:px-8">
-        {/* Search and Info Section */}
-        <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-4 xs:gap-6 mb-6 sm:mb-8">
-          {/* Search Form */}
+          <div className="mt-10 grid grid-cols-2 gap-px border border-[rgba(240,232,216,0.08)] bg-[rgba(240,232,216,0.08)] md:grid-cols-4">
+            {[
+              { label: "Plans", value: String(totalDesigns) },
+              { label: "Page", value: String(page) },
+              { label: "Search", value: search ? "Filtered" : "All" },
+              { label: "Featured", value: category.image ? "Yes" : "No" },
+            ].map((item) => (
+              <div key={item.label} className="bg-ink/80 px-5 py-4">
+                <p
+                  className="text-[10px] uppercase tracking-[0.18em] text-muted"
+                  style={{ fontFamily: monoSystem }}
+                >
+                  {item.label}
+                </p>
+                <p
+                  className="mt-2 text-2xl font-light text-cream"
+                  style={{ fontFamily: serifSystem }}
+                >
+                  {item.value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="sticky top-[73px] z-20 border-b border-[rgba(240,232,216,0.08)] bg-[rgba(10,9,7,0.95)] px-6 backdrop-blur-xl sm:px-10 lg:px-[60px]">
+        <div className="mx-auto flex min-h-16 w-full max-w-screen-2xl flex-wrap items-center gap-3 py-3 lg:flex-nowrap lg:gap-0">
+          <Link
+            href="/categories"
+            className="pr-6 text-[11px] uppercase tracking-[0.14em] text-cream-dim transition-colors hover:text-gold lg:border-r lg:border-[rgba(240,232,216,0.08)]"
+            style={{ fontFamily: monoSystem }}
+          >
+            ← All Categories
+          </Link>
+
           <form
             onSubmit={handleSearchSubmit}
-            className="flex-1 max-w-md xs:max-w-lg"
+            className="flex flex-1 items-center gap-3 lg:pl-6"
           >
-            <div className="relative">
+            <div className="group relative w-full max-w-xl">
               <FiSearch
-                className="absolute left-3 xs:left-4 top-1/2 transform -translate-y-1/2 text-muted z-10"
-                size={18}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted transition-colors group-focus-within:text-gold"
+                size={16}
               />
               <input
                 type="search"
-                name="search"
-                id="search"
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full pl-10 xs:pl-12 pr-4 py-2.5 xs:py-3 text-sm xs:text-base border border-cb-border bg-surface rounded-xl xs:rounded-2xl shadow-sm focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 text-cream placeholder:text-muted"
-                placeholder={`Search in ${category.name}...`}
+                className="h-10 w-full border border-[rgba(240,232,216,0.18)] bg-[rgba(22,20,18,0.72)] py-2 pl-9 pr-3 text-[12px] tracking-[0.08em] text-cream outline-none placeholder:text-[rgba(168,152,128,0.9)] transition-all focus:border-[rgba(200,137,42,0.45)]"
+                placeholder={`Search ${category.name} plans...`}
+                style={{ fontFamily: monoSystem }}
               />
             </div>
+            <button
+              type="submit"
+              className="border border-[rgba(200,137,42,0.34)] bg-[rgba(200,137,42,0.1)] px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-gold transition-colors hover:bg-[rgba(200,137,42,0.16)]"
+              style={{ fontFamily: monoSystem }}
+            >
+              Search
+            </button>
           </form>
 
-          {/* Design Count */}
-          <div className="flex items-center justify-between xs:justify-end gap-4">
-            <p className="text-sm xs:text-base text-cream-dim font-medium whitespace-nowrap">
-              {category._count.designs} design
-              {category._count.designs !== 1 ? "s" : ""}
+          <p
+            className="ml-auto text-[11px] uppercase tracking-[0.14em] text-muted"
+            style={{ fontFamily: monoSystem }}
+          >
+            <span className="text-gold">{totalDesigns}</span> plans
+          </p>
+        </div>
+      </section>
+
+      <main className="mx-auto w-full max-w-screen-2xl px-6 pb-20 pt-8 sm:px-10 lg:px-[60px]">
+        {category.designs.length === 0 ? (
+          <div className="border border-[rgba(240,232,216,0.08)] bg-card/40 p-16 text-center">
+            <h3
+              className="text-4xl font-light text-cream"
+              style={{ fontFamily: serifSystem }}
+            >
+              No plans found
+            </h3>
+            <p
+              className="mt-3 text-[12px] tracking-[0.08em] text-muted"
+              style={{ fontFamily: monoSystem }}
+            >
+              {search
+                ? `No results for "${search}" in this category.`
+                : `No plans are available in ${category.name} yet.`}
             </p>
+            {search && (
+              <Link
+                href={toCategoryLink(1, "")}
+                className="mt-6 inline-flex border border-[rgba(200,137,42,0.34)] bg-[rgba(200,137,42,0.1)] px-5 py-3 text-xs uppercase tracking-[0.16em] text-gold"
+                style={{ fontFamily: monoSystem }}
+              >
+                Clear Search
+              </Link>
+            )}
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)] md:grid-cols-2 xl:grid-cols-3">
+            {category.designs.map((design, index) => (
+              <Link
+                key={design.id}
+                href={`/designs/${design.id}`}
+                className="group bg-ink transition-colors duration-300 hover:bg-card"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={getDesignImage(design)}
+                    alt={design.name}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                    className="object-cover opacity-80 transition-all duration-700 group-hover:scale-105 group-hover:opacity-95"
+                    priority={index < 3}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                  {design.isFeatured && (
+                    <span
+                      className="absolute left-4 top-4 bg-gold px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-ink"
+                      style={{ fontFamily: monoSystem }}
+                    >
+                      Featured
+                    </span>
+                  )}
+                </div>
 
-        {/* Designs Grid */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 xs:gap-6 lg:gap-8">
-          {category.designs.length === 0 ? (
-            <div className="text-center text-muted col-span-full py-12 xs:py-16">
-              <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 bg-surface rounded-full flex items-center justify-center">
-                <FiSearch size={24} className="text-muted" />
-              </div>
-              <h3 className="text-lg xs:text-xl font-semibold text-cream mb-2">
-                No designs found
-              </h3>
-              <p className="text-sm xs:text-base max-w-sm mx-auto text-cream-dim">
-                {search
-                  ? `No results for "${search}" in ${category.name}. Try different keywords.`
-                  : `No designs available in ${category.name} yet.`}
-              </p>
-              {search && (
-                <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    const url = new URL(window.location.href);
-                    url.searchParams.delete("search");
-                    window.location.href = url.toString();
-                  }}
-                  className="mt-4 px-4 py-2 bg-gold hover:bg-gold-light text-ink rounded-lg transition-colors text-sm font-semibold"
-                >
-                  Clear Search
-                </button>
-              )}
-            </div>
-          ) : (
-            category.designs.map((design: Design, index: number) => (
-              <DesignCard key={design.id} design={design} index={index} />
-            ))
-          )}
-        </div>
-
-        {/* Pagination */}
-        {!loading && !error && category && totalPages > 1 && (
-          <div className="mt-8 xs:mt-10 sm:mt-12">
-            <Pagination>
-              <PaginationContent className="flex-wrap gap-1 xs:gap-2 justify-center">
-                <PaginationItem>
-                  <Link
-                    href={`/categories/${categoryId}?page=1${search ? `&search=${search}` : ""}`}
+                <div className="p-6">
+                  <p
+                    className="mb-2 text-[10px] uppercase tracking-[0.2em] text-gold"
+                    style={{ fontFamily: monoSystem }}
                   >
+                    {category.name}
+                  </p>
+                  <h3
+                    className="mb-3 line-clamp-1 text-3xl font-light text-cream transition-colors group-hover:text-gold-light"
+                    style={{ fontFamily: serifSystem }}
+                  >
+                    {design.name}
+                  </h3>
+                  <p
+                    className="line-clamp-2 text-[12px] leading-[1.8] text-cream-dim"
+                    style={{ fontFamily: monoSystem }}
+                  >
+                    {design.description}
+                  </p>
+
+                  <div className="mt-5 flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4">
+                    <p
+                      className="text-2xl font-light text-cream"
+                      style={{ fontFamily: serifSystem }}
+                    >
+                      KES {design.basePrice.toLocaleString()}
+                    </p>
+                    <span
+                      className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold"
+                      style={{ fontFamily: monoSystem }}
+                    >
+                      View Plan
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {!loading && !error && category && totalPages > 1 && (
+          <div className="mt-10 flex justify-center">
+            <Pagination>
+              <PaginationContent className="flex-wrap gap-2 justify-center">
+                <PaginationItem>
+                  <Link href={toCategoryLink(1)}>
                     <PaginationFirst
                       aria-disabled={page === 1}
-                      className={`text-xs xs:text-sm p-2 xs:p-3 ${
+                      className={`p-3 ${
                         page === 1
                           ? "pointer-events-none opacity-50"
-                          : "hover:bg-surface cursor-pointer"
+                          : "hover:bg-surface"
                       }`}
                     />
                   </Link>
                 </PaginationItem>
                 <PaginationItem>
-                  <Link
-                    href={`/categories/${categoryId}?page=${page - 1}${search ? `&search=${search}` : ""}`}
-                  >
+                  <Link href={toCategoryLink(page - 1)}>
                     <PaginationPrevious
                       aria-disabled={page === 1}
-                      className={`text-xs xs:text-sm p-2 xs:p-3 ${
+                      className={`p-3 ${
                         page === 1
                           ? "pointer-events-none opacity-50"
-                          : "hover:bg-surface cursor-pointer"
+                          : "hover:bg-surface"
                       }`}
                     />
                   </Link>
@@ -305,22 +438,20 @@ export default function CategoryPage() {
                   if (p === "...") {
                     return (
                       <PaginationItem key={index}>
-                        <PaginationEllipsis className="p-2 xs:p-3 text-xs xs:text-sm" />
+                        <PaginationEllipsis className="p-3" />
                       </PaginationItem>
                     );
                   }
 
                   return (
                     <PaginationItem key={p}>
-                      <Link
-                        href={`/categories/${categoryId}?page=${p}${search ? `&search=${search}` : ""}`}
-                      >
+                      <Link href={toCategoryLink(p as number)}>
                         <PaginationLink
                           isActive={page === p}
-                          className={`text-xs xs:text-sm min-w-[2rem] xs:min-w-[2.5rem] ${
+                          className={`min-w-[2.5rem] ${
                             page === p
                               ? "bg-gold text-ink"
-                              : "hover:bg-surface text-cream-dim hover:text-cream cursor-pointer"
+                              : "text-cream-dim hover:bg-surface hover:text-cream"
                           }`}
                         >
                           {p}
@@ -331,29 +462,25 @@ export default function CategoryPage() {
                 })}
 
                 <PaginationItem>
-                  <Link
-                    href={`/categories/${categoryId}?page=${page + 1}${search ? `&search=${search}` : ""}`}
-                  >
+                  <Link href={toCategoryLink(page + 1)}>
                     <PaginationNext
                       aria-disabled={page === totalPages}
-                      className={`text-xs xs:text-sm p-2 xs:p-3 ${
+                      className={`p-3 ${
                         page === totalPages
                           ? "pointer-events-none opacity-50"
-                          : "hover:bg-surface cursor-pointer"
+                          : "hover:bg-surface"
                       }`}
                     />
                   </Link>
                 </PaginationItem>
                 <PaginationItem>
-                  <Link
-                    href={`/categories/${categoryId}?page=${totalPages}${search ? `&search=${search}` : ""}`}
-                  >
+                  <Link href={toCategoryLink(totalPages)}>
                     <PaginationLast
                       aria-disabled={page === totalPages}
-                      className={`text-xs xs:text-sm p-2 xs:p-3 ${
+                      className={`p-3 ${
                         page === totalPages
                           ? "pointer-events-none opacity-50"
-                          : "hover:bg-surface cursor-pointer"
+                          : "hover:bg-surface"
                       }`}
                     />
                   </Link>
@@ -368,7 +495,6 @@ export default function CategoryPage() {
 }
 
 function getPaginationRange(currentPage: number, totalPages: number) {
-  // Responsive pagination range based on screen size
   const maxVisiblePages =
     typeof window !== "undefined"
       ? window.innerWidth < 640
@@ -376,7 +502,7 @@ function getPaginationRange(currentPage: number, totalPages: number) {
         : window.innerWidth < 1024
           ? 5
           : 7
-      : 5; // Default for SSR
+      : 5;
 
   const delta = Math.floor(maxVisiblePages / 2);
   const range: (number | string)[] = [];
@@ -384,12 +510,10 @@ function getPaginationRange(currentPage: number, totalPages: number) {
   let start = Math.max(2, currentPage - delta);
   let end = Math.min(totalPages - 1, currentPage + delta);
 
-  // Adjust if we're near the start
   if (currentPage - delta <= 2) {
     end = Math.min(totalPages - 1, maxVisiblePages);
   }
 
-  // Adjust if we're near the end
   if (currentPage + delta >= totalPages - 1) {
     start = Math.max(2, totalPages - maxVisiblePages + 1);
   }
@@ -398,12 +522,8 @@ function getPaginationRange(currentPage: number, totalPages: number) {
     range.push(i);
   }
 
-  if (start > 2) {
-    range.unshift("...");
-  }
-  if (end < totalPages - 1) {
-    range.push("...");
-  }
+  if (start > 2) range.unshift("...");
+  if (end < totalPages - 1) range.push("...");
 
   range.unshift(1);
   if (totalPages > 1) {
