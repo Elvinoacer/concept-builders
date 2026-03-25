@@ -16,6 +16,7 @@ import Link from "next/link";
 import { FiAlertTriangle, FiSearch } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useParams, useSearchParams } from "next/navigation";
 
 interface Design {
   id: string;
@@ -39,32 +40,37 @@ interface Category {
   };
 }
 
-interface CategoryPageProps {
-  params: {
-    id: string;
-  };
-  searchParams: {
-    page?: string;
-    search?: string;
-  };
-}
+export default function CategoryPage() {
+  const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const categoryId = params?.id;
 
-export default function CategoryPage({
-  params,
-  searchParams,
-}: CategoryPageProps) {
   const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState(searchParams.search || "");
-  const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
-  const search = searchParams.search || "";
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || "",
+  );
+  const page = searchParams.get("page")
+    ? parseInt(searchParams.get("page") || "1", 10)
+    : 1;
+  const search = searchParams.get("search") || "";
+
+  useEffect(() => {
+    setSearchQuery(search);
+  }, [search]);
 
   useEffect(() => {
     const getCategory = async () => {
+      if (!categoryId) {
+        setError("Invalid category URL. Please reopen this category.");
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/categories/${params.id}?page=${page}&search=${search}`
+          `/api/categories/${categoryId}?page=${page}&search=${encodeURIComponent(search)}`,
         );
         if (!res.ok) {
           throw new Error("Failed to fetch category");
@@ -79,7 +85,7 @@ export default function CategoryPage({
     };
 
     getCategory();
-  }, [params.id, page, search]);
+  }, [categoryId, page, search]);
 
   const totalPages = category ? Math.ceil(category._count.designs / 10) : 0;
 
@@ -143,10 +149,7 @@ export default function CategoryPage({
       <div className="flex flex-col items-center justify-center min-h-[60vh] bg-ink text-center px-4 xs:px-6">
         <div className="bg-card border border-cb-border p-6 xs:p-8 rounded-2xl shadow-lg max-w-md w-full">
           <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 xs:mb-6 bg-surface rounded-full flex items-center justify-center">
-            <FiAlertTriangle
-              size={32}
-              className="xs:w-10 xs:h-10 text-muted"
-            />
+            <FiAlertTriangle size={32} className="xs:w-10 xs:h-10 text-muted" />
           </div>
           <h1 className="text-2xl xs:text-3xl font-bold text-cream mb-2 xs:mb-3">
             Category Not Found
@@ -233,10 +236,7 @@ export default function CategoryPage({
           {category.designs.length === 0 ? (
             <div className="text-center text-muted col-span-full py-12 xs:py-16">
               <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-4 bg-surface rounded-full flex items-center justify-center">
-                <FiSearch
-                  size={24}
-                  className="text-muted"
-                />
+                <FiSearch size={24} className="text-muted" />
               </div>
               <h3 className="text-lg xs:text-xl font-semibold text-cream mb-2">
                 No designs found
@@ -274,7 +274,7 @@ export default function CategoryPage({
               <PaginationContent className="flex-wrap gap-1 xs:gap-2 justify-center">
                 <PaginationItem>
                   <Link
-                    href={`/categories/${params.id}?page=1${search ? `&search=${search}` : ""}`}
+                    href={`/categories/${categoryId}?page=1${search ? `&search=${search}` : ""}`}
                   >
                     <PaginationFirst
                       aria-disabled={page === 1}
@@ -288,7 +288,7 @@ export default function CategoryPage({
                 </PaginationItem>
                 <PaginationItem>
                   <Link
-                    href={`/categories/${params.id}?page=${page - 1}${search ? `&search=${search}` : ""}`}
+                    href={`/categories/${categoryId}?page=${page - 1}${search ? `&search=${search}` : ""}`}
                   >
                     <PaginationPrevious
                       aria-disabled={page === 1}
@@ -313,7 +313,7 @@ export default function CategoryPage({
                   return (
                     <PaginationItem key={p}>
                       <Link
-                        href={`/categories/${params.id}?page=${p}${search ? `&search=${search}` : ""}`}
+                        href={`/categories/${categoryId}?page=${p}${search ? `&search=${search}` : ""}`}
                       >
                         <PaginationLink
                           isActive={page === p}
@@ -332,7 +332,7 @@ export default function CategoryPage({
 
                 <PaginationItem>
                   <Link
-                    href={`/categories/${params.id}?page=${page + 1}${search ? `&search=${search}` : ""}`}
+                    href={`/categories/${categoryId}?page=${page + 1}${search ? `&search=${search}` : ""}`}
                   >
                     <PaginationNext
                       aria-disabled={page === totalPages}
@@ -346,7 +346,7 @@ export default function CategoryPage({
                 </PaginationItem>
                 <PaginationItem>
                   <Link
-                    href={`/categories/${params.id}?page=${totalPages}${search ? `&search=${search}` : ""}`}
+                    href={`/categories/${categoryId}?page=${totalPages}${search ? `&search=${search}` : ""}`}
                   >
                     <PaginationLast
                       aria-disabled={page === totalPages}
