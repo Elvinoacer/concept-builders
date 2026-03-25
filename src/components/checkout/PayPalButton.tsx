@@ -6,12 +6,19 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface PayPalButtonProps {
-  cart: any[];
+  cart: unknown[];
   finalTotal: number;
   appliedDiscountAmount: number;
   appliedDiscountId: string | null;
   appliedDiscountCode: string | null;
+  paypalConfigured: boolean;
+  paypalClientId: string;
 }
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+};
 
 export default function PayPalButton({
   cart,
@@ -19,22 +26,51 @@ export default function PayPalButton({
   appliedDiscountAmount,
   appliedDiscountId,
   appliedDiscountCode,
+  paypalConfigured,
+  paypalClientId,
 }: PayPalButtonProps) {
   const router = useRouter();
   const [paymentStatus, setPaymentStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [isPayPalReady, setIsPayPalReady] = useState(false);
+  const [runtimeClientId, setRuntimeClientId] = useState(paypalClientId || "");
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID) {
-      console.error("PayPal Client ID is missing in environment variables");
-      setErrorMessage("PayPal configuration error: Client ID not found");
-      setPaymentStatus("error");
-      toast.error("Payment system configuration error");
-    } else {
-      setIsPayPalReady(true);
-    }
-  }, []);
+    const bootstrapPayPalConfig = async () => {
+      if (paypalClientId) {
+        setRuntimeClientId(paypalClientId);
+        setIsPayPalReady(paypalConfigured);
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/paypal/config", {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          throw new Error("Failed to load PayPal configuration.");
+        }
+
+        const data = (await response.json()) as {
+          configured: boolean;
+          clientId: string;
+        };
+
+        setRuntimeClientId(data.clientId || "");
+        setIsPayPalReady(Boolean(data.configured && data.clientId));
+
+        if (!data.configured || !data.clientId) {
+          setErrorMessage("PayPal is not configured for this environment.");
+          setPaymentStatus("error");
+        }
+      } catch (error: unknown) {
+        setErrorMessage(getErrorMessage(error, "Unable to initialize PayPal."));
+        setPaymentStatus("error");
+      }
+    };
+
+    void bootstrapPayPalConfig();
+  }, [paypalClientId, paypalConfigured]);
 
   const validatePaymentData = () => {
     if (finalTotal <= 0) {
@@ -86,11 +122,12 @@ export default function PayPalButton({
       setPaymentStatus("idle");
       toast.success("Order created successfully");
       return data.orderID;
-    } catch (error: any) {
-      console.error("Create Order Error:", error.message);
-      setErrorMessage(error.message || "Failed to create payment order");
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, "Failed to create payment order");
+      console.error("Create Order Error:", message);
+      setErrorMessage(message);
       setPaymentStatus("error");
-      toast.error(error.message || "Failed to create payment order");
+      toast.error(message);
       throw error;
     }
   };
@@ -127,11 +164,11 @@ export default function PayPalButton({
           throw new Error("Insufficient funds in your account");
         } else if (result.error?.includes("card")) {
           throw new Error(
-            "Card declined. Please check your card details or try another payment method."
+            "Card declined. Please check your card details or try another payment method.",
           );
         } else if (result.error?.includes("currency")) {
           throw new Error(
-            "Currency not supported. Please try another payment method."
+            "Currency not supported. Please try another payment method.",
           );
         } else {
           throw new Error(errorMsg);
@@ -160,37 +197,56 @@ export default function PayPalButton({
           router.push(`/purchase-confirmation?purchaseId=${result.orderId}`);
         }
       }, 1000);
-    } catch (error: any) {
-      console.error("Capture Order Error:", error.message);
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, "Payment processing failed");
+      console.error("Capture Order Error:", message);
       setPaymentStatus("error");
-      setErrorMessage(error.message || "Payment processing failed");
+      setErrorMessage(message);
 
       toast.dismiss(loadingToast);
-      toast.error(error.message || "Payment processing failed");
+      toast.error(message);
 
       // Log detailed error for debugging
       console.error("Detailed payment error:", {
         orderID: data.orderID,
-        error: error.message,
+        error: message,
         cartItems: cart?.length,
         amount: finalTotal,
       });
     }
   };
 
-  const onError = (err: any) => {
+  const onError = (err: unknown) => {
     console.error("PayPal SDK Error:", err);
 
     let userFriendlyError =
       "An error occurred with PayPal payment. Please try another payment method.";
 
     // Provide more specific error messages based on error type
-    if (err?.message?.includes("funding")) {
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      "message" in err &&
+      typeof (err as { message?: unknown }).message === "string" &&
+      (err as { message: string }).message.includes("funding")
+    ) {
       userFriendlyError =
         "Payment method not available. Please try a different card or payment method.";
-    } else if (err?.message?.includes("popup")) {
+    } else if (
+      typeof err === "object" &&
+      err !== null &&
+      "message" in err &&
+      typeof (err as { message?: unknown }).message === "string" &&
+      (err as { message: string }).message.includes("popup")
+    ) {
       userFriendlyError = "Payment window was closed. Please try again.";
-    } else if (err?.message?.includes("network")) {
+    } else if (
+      typeof err === "object" &&
+      err !== null &&
+      "message" in err &&
+      typeof (err as { message?: unknown }).message === "string" &&
+      (err as { message: string }).message.includes("network")
+    ) {
       userFriendlyError =
         "Network error occurred. Please check your connection and try again.";
     }
@@ -200,19 +256,19 @@ export default function PayPalButton({
     toast.error(userFriendlyError);
   };
 
-  const onCancel = (data: any) => {
+  const onCancel = () => {
     setPaymentStatus("cancelled");
     setErrorMessage("");
     toast.info("Payment cancelled. You can try again anytime.");
   };
 
   // Handle missing PayPal configuration
-  if (!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID) {
+  if (!runtimeClientId || !paypalConfigured) {
     return (
-      <div className="text-center p-4 xs:p-6 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-        <div className="w-12 h-12 mx-auto mb-3 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center">
+      <div className="border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.08)] p-4 text-center xs:p-6">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center border border-cb-border bg-card">
           <svg
-            className="w-6 h-6 text-red-600 dark:text-red-400"
+            className="h-6 w-6 text-gold"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -225,13 +281,13 @@ export default function PayPalButton({
             />
           </svg>
         </div>
-        <h4 className="text-red-800 dark:text-red-300 font-semibold mb-2 text-sm xs:text-base">
+        <h4 className="mb-2 text-sm font-semibold text-gold xs:text-base">
           PayPal Not Available
         </h4>
-        <p className="text-red-600 dark:text-red-400 text-xs xs:text-sm mb-3">
+        <p className="mb-3 text-xs text-cream-dim xs:text-sm">
           PayPal payment is currently unavailable due to configuration issues.
         </p>
-        <p className="text-red-500 dark:text-red-300 text-xs">
+        <p className="text-xs text-cream-dim">
           Please try another payment method or contact support.
         </p>
       </div>
@@ -270,7 +326,7 @@ export default function PayPalButton({
   return (
     <PayPalScriptProvider
       options={{
-        clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+        clientId: runtimeClientId,
         currency: "USD",
         intent: "capture",
         components: "buttons",

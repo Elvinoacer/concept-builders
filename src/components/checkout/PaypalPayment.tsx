@@ -9,6 +9,9 @@ interface PaypalPaymentProps {
   appliedDiscountAmount: number;
   appliedDiscountId: string | null;
   appliedDiscountCode: string | null;
+  paypalConfigured: boolean;
+  paypalMode: "sandbox" | "live";
+  paypalClientId: string;
 }
 
 const PaypalPayment: React.FC<PaypalPaymentProps> = ({
@@ -17,6 +20,9 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
   appliedDiscountAmount,
   appliedDiscountId,
   appliedDiscountCode,
+  paypalConfigured,
+  paypalMode,
+  paypalClientId,
 }) => {
   const [isClient, setIsClient] = useState(false);
 
@@ -28,35 +34,36 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
     <div className="w-full">
       {/* Header */}
       <div className="text-center mb-4 xs:mb-6">
-        <div className="w-12 h-12 xs:w-16 xs:h-16 mx-auto mb-3 xs:mb-4 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center border border-cb-border bg-surface xs:mb-4 xs:h-16 xs:w-16">
           <svg
-            className="w-6 h-6 xs:w-8 xs:h-8 text-blue-600 dark:text-blue-400"
+            className="h-6 w-6 text-gold xs:h-8 xs:w-8"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
             <path d="M7.5 14.25c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8.25 6c-.41 0-.75.34-.75.75v3.75c0 .41.34.75.75.75s.75-.34.75-.75V15c0-.41-.34-.75-.75-.75zm3-6c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
           </svg>
         </div>
-        <h3 className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h3 className="mb-2 text-lg font-light text-cream xs:text-xl sm:text-2xl">
           PayPal Payment
         </h3>
-        <p className="text-sm xs:text-base text-gray-600 dark:text-gray-400">
+        <p className="text-sm xs:text-base text-cream-dim">
           Securely pay with your PayPal account or credit card
+        </p>
+        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
+          Mode: {paypalMode}
         </p>
       </div>
 
       {/* Amount Display */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg xs:rounded-xl p-3 xs:p-4 mb-4 xs:mb-6">
+      <div className="mb-4 border border-cb-border bg-surface p-3 xs:mb-6 xs:p-4">
         <div className="flex items-center justify-between text-sm xs:text-base">
-          <span className="text-blue-700 dark:text-blue-300 font-medium">
-            Total Amount:
-          </span>
+          <span className="font-medium text-cream-dim">Total Amount:</span>
           <div className="text-right">
-            <span className="text-blue-800 dark:text-blue-200 font-bold">
+            <span className="font-bold text-cream">
               ${finalTotal.toFixed(2)}
             </span>
             {appliedDiscountAmount > 0 && (
-              <div className="text-xs text-green-600 dark:text-green-400 mt-1">
+              <div className="mt-1 text-xs text-gold">
                 Discount: -${appliedDiscountAmount.toFixed(2)} applied
               </div>
             )}
@@ -65,7 +72,7 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
       </div>
 
       {/* PayPal Button Container */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg xs:rounded-xl border border-gray-200 dark:border-gray-700 p-4 xs:p-6">
+      <div className="border border-cb-border bg-card p-4 xs:p-6">
         {!isClient ? (
           // Skeleton Loading State
           <div className="space-y-4">
@@ -82,6 +89,8 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
             appliedDiscountAmount={appliedDiscountAmount}
             appliedDiscountId={appliedDiscountId}
             appliedDiscountCode={appliedDiscountCode}
+            paypalConfigured={paypalConfigured}
+            paypalClientId={paypalClientId}
           />
         )}
       </div>
@@ -89,7 +98,7 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
       {/* Security & Info Section */}
       <div className="mt-4 xs:mt-6 space-y-3 xs:space-y-4">
         {/* Security Notice */}
-        <div className="flex items-center justify-center gap-2 text-xs xs:text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center justify-center gap-2 text-xs xs:text-sm text-cream-dim">
           <svg
             className="w-4 h-4 xs:w-5 xs:h-5 text-green-500 flex-shrink-0"
             fill="currentColor"
@@ -105,10 +114,8 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
         </div>
 
         {/* Accepted Methods */}
-        <div className="flex flex-wrap items-center justify-center gap-3 xs:gap-4 text-xs xs:text-sm text-gray-500 dark:text-gray-400">
-          <span className="font-medium text-gray-700 dark:text-gray-300">
-            Accepts:
-          </span>
+        <div className="flex flex-wrap items-center justify-center gap-3 xs:gap-4 text-xs xs:text-sm text-cream-dim">
+          <span className="font-medium text-cream">Accepts:</span>
           <div className="flex items-center gap-2">
             <span>PayPal Balance</span>
             <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
@@ -121,12 +128,18 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
         </div>
 
         {/* Help Text */}
-        <div className="text-center text-xs xs:text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-center text-xs xs:text-sm text-cream-dim">
           <p>
             You&apos;ll be redirected to PayPal to complete your payment
             securely
           </p>
         </div>
+
+        {!paypalConfigured && (
+          <div className="border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.08)] p-3 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-gold">
+            PayPal client id is missing in runtime configuration.
+          </div>
+        )}
       </div>
     </div>
   );

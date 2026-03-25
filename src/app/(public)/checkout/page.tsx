@@ -8,6 +8,13 @@ import { useCart } from "@/hooks/useCart";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+type PayPalRuntimeConfig = {
+  configured: boolean;
+  mode: "sandbox" | "live";
+  clientId: string;
+};
 
 const CheckoutPage = () => {
   const { status } = useSession();
@@ -22,12 +29,58 @@ const CheckoutPage = () => {
     setAppliedDiscount,
   } = useCart();
   const [paymentMethod, setPaymentMethod] = useState("paypal");
+  const [paypalConfig, setPaypalConfig] = useState<PayPalRuntimeConfig | null>(
+    null,
+  );
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/auth?callbackUrl=%2Fcheckout");
     }
   }, [status, router]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    if (isLoading) return;
+    if (cart.length > 0) return;
+
+    toast.info("Your cart is empty. Add a plan before checkout.");
+    router.replace("/cart");
+  }, [cart.length, isLoading, router, status]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchPayPalConfig = async () => {
+      try {
+        const response = await fetch("/api/paypal/config", {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+        const data = (await response.json()) as PayPalRuntimeConfig;
+        if (!mounted) return;
+        setPaypalConfig(data);
+
+        if (
+          !data.configured &&
+          (paymentMethod === "paypal" || paymentMethod === "credit-card")
+        ) {
+          setPaymentMethod("mpesa");
+          toast.info(
+            "PayPal is not configured. Switched to M-Pesa for checkout.",
+          );
+        }
+      } catch {
+        // Ignore and keep current UI state
+      }
+    };
+
+    void fetchPayPalConfig();
+
+    return () => {
+      mounted = false;
+    };
+  }, [paymentMethod]);
 
   if (status === "loading" || status === "unauthenticated") {
     return (
@@ -52,6 +105,9 @@ const CheckoutPage = () => {
             appliedDiscountAmount={appliedDiscountAmount}
             appliedDiscountId={appliedDiscountId}
             appliedDiscountCode={appliedDiscountCode}
+            paypalConfigured={Boolean(paypalConfig?.configured)}
+            paypalMode={paypalConfig?.mode || "sandbox"}
+            paypalClientId={paypalConfig?.clientId || ""}
           />
         );
       case "mpesa":
@@ -103,8 +159,8 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className="bg-ink text-cream min-h-screen">
-      <div className="container mx-auto px-6 py-8">
+    <div className="min-h-screen bg-ink text-cream">
+      <div className="mx-auto w-full max-w-screen-2xl px-5 py-8 sm:px-8 lg:px-[60px]">
         {/* Header */}
         <header className="text-center mb-8">
           <h1
@@ -173,7 +229,7 @@ const CheckoutPage = () => {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Order Summary - Comes first on mobile for better UX */}
           <div className="lg:w-1/2 xl:w-2/5 2xl:w-2/5 order-2 lg:order-1">
-            <div className="bg-card rounded-2xl shadow-lg border border-cb-border p-5 sm:p-6">
+            <div className="border border-cb-border bg-card p-5 sm:p-6">
               <OrderSummary
                 items={cart}
                 isLoading={isLoading}
@@ -187,7 +243,7 @@ const CheckoutPage = () => {
 
             {/* Trust Indicators - Mobile Only */}
             <div className="sm:hidden mt-6">
-              <div className="bg-surface/50 rounded-xl p-4 border border-cb-border">
+              <div className="border border-cb-border bg-surface p-4">
                 <h3 className="font-medium text-cream text-sm mb-3 flex items-center gap-2">
                   <svg
                     className="w-4 h-4 text-gold"
@@ -226,11 +282,13 @@ const CheckoutPage = () => {
 
           {/* Payment Section */}
           <div className="lg:w-1/2 xl:w-3/5 2xl:w-3/5 order-1 lg:order-2">
-            <div className="bg-card rounded-2xl shadow-lg border border-cb-border p-5 sm:p-6">
+            <div className="border border-cb-border bg-card p-5 sm:p-6">
               {/* Payment Method Selector */}
               <PaymentMethodSelector
                 selectedMethod={paymentMethod}
                 onSelect={setPaymentMethod}
+                paypalConfigured={Boolean(paypalConfig?.configured)}
+                paypalMode={paypalConfig?.mode || "sandbox"}
               />
 
               {/* Payment Method Render */}
@@ -239,7 +297,7 @@ const CheckoutPage = () => {
 
             {/* Additional Trust Indicators - Desktop Only */}
             <div className="hidden sm:block mt-6">
-              <div className="bg-surface/50 rounded-xl p-5 border border-cb-border">
+              <div className="border border-cb-border bg-surface p-5">
                 <h3 className="font-medium text-cream text-sm mb-3">
                   Why shop with us?
                 </h3>
@@ -324,7 +382,7 @@ const CheckoutPage = () => {
 
         {/* Mobile Footer Assistance */}
         <div className="sm:hidden mt-8">
-          <div className="bg-gold/10 rounded-xl p-4 border border-gold/30">
+          <div className="border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.08)] p-4">
             <h4 className="font-medium text-gold text-sm mb-2 flex items-center gap-2">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
