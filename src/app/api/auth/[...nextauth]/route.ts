@@ -116,9 +116,8 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      // This is a security risk, as it can lead to account takeover if a user's email account is compromised.
-      // A better approach is to link accounts only when the user is already authenticated with one of the accounts.
-      allowDangerousEmailAccountLinking: false,
+      // Allow automatic linking for users who created an account via email and later try to sign in with Google
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           prompt: "consent",
