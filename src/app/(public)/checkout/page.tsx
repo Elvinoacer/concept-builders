@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 type PayPalRuntimeConfig = {
   configured: boolean;
@@ -103,7 +104,6 @@ const CheckoutPage = () => {
             appliedDiscountCode={appliedDiscountCode}
             paypalConfigured={Boolean(paypalConfig?.configured)}
             paypalMode={paypalConfig?.mode || "sandbox"}
-            paypalClientId={paypalConfig?.clientId || ""}
           />
         );
       case "mpesa":
@@ -289,7 +289,24 @@ const CheckoutPage = () => {
                 </p>
               </div>
 
-              <div className="mt-6">{renderPaymentMethod()}</div>
+              <div className="mt-6">
+                {paypalConfig?.configured && paypalConfig.clientId ? (
+                  <PayPalScriptProvider
+                    options={{
+                      clientId: paypalConfig.clientId,
+                      currency: "USD",
+                      intent: "capture",
+                      components: "buttons",
+                      enableFunding: ["card", "paylater"],
+                      disableFunding: ["venmo"],
+                    }}
+                  >
+                    {renderPaymentMethod()}
+                  </PayPalScriptProvider>
+                ) : (
+                  renderPaymentMethod()
+                )}
+              </div>
             </div>
 
             {/* Additional Trust Indicators - Desktop Only */}

@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { calculateItemTotal } from "@/lib/calculate-total";
-import { DiscountType } from "@/generated/prisma/client";
+import { validateAndApplyDiscount } from "@/lib/validate-discount";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -46,82 +46,40 @@ export async function POST(request: Request) {
 
     // Calculate total amount from cart items
     let calculatedTotal = userCart.items.reduce((total, item) => {
+      const selectedExtras = Array.isArray(item.selectedExtras)
+        ? (item.selectedExtras as Array<{ price?: number }>).map((extra) => ({
+            price: typeof extra?.price === "number" ? extra.price : 0,
+          }))
+        : [];
+
       const itemForCalculation = {
         ...item,
-        selectedExtras: item.selectedExtras as any[],
+        selectedExtras,
       };
       return total + calculateItemTotal(itemForCalculation);
     }, 0);
 
-    let appliedDiscountAmount = 0;
-
-    // Handle Discount
     if (discountCode) {
-      const discount = await prisma.discount.findUnique({
-        where: { code: discountCode },
-      });
+      const discountResult = await validateAndApplyDiscount(
+        discountCode,
+        calculatedTotal,
+        userId,
+      );
 
-      if (discount) {
-        // Validate Discount
-        let isValid = true;
-        let errorMessage = "";
-
-        if (!discount.isActive) {
-          isValid = false;
-          errorMessage = "Discount is not active";
-        } else if (discount.expiresAt && new Date(discount.expiresAt) < new Date()) {
-          isValid = false;
-          errorMessage = "Discount has expired";
-        } else if (discount.maxUses && discount.uses >= discount.maxUses) {
-          isValid = false;
-          errorMessage = "Discount has reached its maximum uses";
-        } else if (discount.minPurchaseAmount && calculatedTotal < discount.minPurchaseAmount) {
-          isValid = false;
-          errorMessage = `Minimum purchase of ${discount.minPurchaseAmount.toFixed(2)} required`;
-        }
-
-        if (isValid) {
-           const existingOrderWithDiscount = await prisma.order.findFirst({
-            where: {
-              userId: userId,
-              discountId: discount.id,
-              status: {
-                in: ['PAID', 'REFUND_REQUESTED'],
-              },
-            },
-          });
-
-          if (existingOrderWithDiscount) {
-             isValid = false;
-             errorMessage = "You have already used this discount code";
-          }
-        }
-
-        if (isValid) {
-          if (discount.type === DiscountType.PERCENTAGE) {
-            appliedDiscountAmount = calculatedTotal * (discount.value / 100);
-          } else if (discount.type === DiscountType.FIXED_AMOUNT) {
-            appliedDiscountAmount = discount.value;
-          }
-
-          // Cap discount at total
-          appliedDiscountAmount = Math.min(appliedDiscountAmount, calculatedTotal);
-          
-          calculatedTotal -= appliedDiscountAmount;
-
-        } else {
-             console.warn(`Invalid discount code provided: ${discountCode} - ${errorMessage}`);
-             return NextResponse.json({ error: errorMessage }, { status: 400 });
-        }
-      } else {
-          return NextResponse.json({ error: "Invalid discount code" }, { status: 404 });
+      if (!discountResult.valid) {
+        return NextResponse.json(
+          { error: discountResult.error },
+          { status: 400 },
+        );
       }
+
+      calculatedTotal = discountResult.finalTotal;
     }
 
     if (calculatedTotal <= 0) {
       return NextResponse.json(
         { error: "Total amount must be greater than 0" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -136,16 +94,6 @@ export async function POST(request: Request) {
           amount: {
             currency_code: "USD",
             value: calculatedTotal.toFixed(2),
-            breakdown: {
-              item_total: {
-                currency_code: "USD",
-                value: (calculatedTotal + appliedDiscountAmount).toFixed(2),
-              },
-              discount: {
-                currency_code: "USD",
-                value: appliedDiscountAmount.toFixed(2),
-              },
-            },
           },
           // We can optionally verify items here, but total is what matters for payment
           description: `Order for Cart ${userCart.id}`,
@@ -155,8 +103,6 @@ export async function POST(request: Request) {
         brand_name: "Concept Builders",
         landing_page: "LOGIN",
         user_action: "PAY_NOW",
-        return_url: `${process.env.NEXTAUTH_URL}/purchase-confirmation`,
-        cancel_url: `${process.env.NEXTAUTH_URL}/checkout`,
       },
     });
 
@@ -175,7 +121,7 @@ export async function POST(request: Request) {
             `PayPal API error (${response.statusCode})`
           }`,
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -183,12 +129,11 @@ export async function POST(request: Request) {
       orderID: response.result.id,
       status: response.result.status,
     });
-
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("PayPal Order Creation Error:", error);
     return NextResponse.json(
       { error: "Internal server error during order creation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { PayPalButtons } from "@paypal/react-paypal-js";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface PayPalButtonProps {
@@ -12,7 +12,6 @@ interface PayPalButtonProps {
   appliedDiscountId: string | null;
   appliedDiscountCode: string | null;
   paypalConfigured: boolean;
-  paypalClientId: string;
 }
 
 const getErrorMessage = (error: unknown, fallback: string) => {
@@ -27,50 +26,12 @@ export default function PayPalButton({
   appliedDiscountId,
   appliedDiscountCode,
   paypalConfigured,
-  paypalClientId,
 }: PayPalButtonProps) {
   const router = useRouter();
   const [paymentStatus, setPaymentStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [isPayPalReady, setIsPayPalReady] = useState(false);
-  const [runtimeClientId, setRuntimeClientId] = useState(paypalClientId || "");
-
-  useEffect(() => {
-    const bootstrapPayPalConfig = async () => {
-      if (paypalClientId) {
-        setRuntimeClientId(paypalClientId);
-        setIsPayPalReady(paypalConfigured);
-        return;
-      }
-
-      try {
-        const response = await fetch("/api/paypal/config", {
-          cache: "no-store",
-        });
-        if (!response.ok) {
-          throw new Error("Failed to load PayPal configuration.");
-        }
-
-        const data = (await response.json()) as {
-          configured: boolean;
-          clientId: string;
-        };
-
-        setRuntimeClientId(data.clientId || "");
-        setIsPayPalReady(Boolean(data.configured && data.clientId));
-
-        if (!data.configured || !data.clientId) {
-          setErrorMessage("PayPal is not configured for this environment.");
-          setPaymentStatus("error");
-        }
-      } catch (error: unknown) {
-        setErrorMessage(getErrorMessage(error, "Unable to initialize PayPal."));
-        setPaymentStatus("error");
-      }
-    };
-
-    void bootstrapPayPalConfig();
-  }, [paypalClientId, paypalConfigured]);
+  const loadingToastRef = useRef<string | number | null>(null);
+  const isPayPalReady = paypalConfigured;
 
   const validatePaymentData = () => {
     if (finalTotal <= 0) {
@@ -120,20 +81,22 @@ export default function PayPalButton({
       }
 
       setPaymentStatus("idle");
-      toast.success("Order created successfully");
+      toast.success("Order created successfully", { duration: 4000 });
       return data.orderID;
     } catch (error: unknown) {
       const message = getErrorMessage(error, "Failed to create payment order");
       console.error("Create Order Error:", message);
       setErrorMessage(message);
       setPaymentStatus("error");
-      toast.error(message);
+      toast.error(message, { duration: 5000 });
       throw error;
     }
   };
 
   const onApprove = async (data: { orderID: string }) => {
-    const loadingToast = toast.loading("Processing payment...");
+    loadingToastRef.current = toast.loading("Processing payment...", {
+      duration: 10000,
+    });
     setPaymentStatus("processing");
     setErrorMessage("");
 
@@ -186,8 +149,11 @@ export default function PayPalButton({
       }
 
       setPaymentStatus("success");
-      toast.dismiss(loadingToast);
-      toast.success("Payment successful! Order confirmed.");
+      if (loadingToastRef.current) {
+        toast.dismiss(loadingToastRef.current);
+      }
+      loadingToastRef.current = null;
+      toast.success("Payment successful! Order confirmed.", { duration: 4000 });
 
       // Only redirect after successful payment verification
       setTimeout(() => {
@@ -203,8 +169,11 @@ export default function PayPalButton({
       setPaymentStatus("error");
       setErrorMessage(message);
 
-      toast.dismiss(loadingToast);
-      toast.error(message);
+      if (loadingToastRef.current) {
+        toast.dismiss(loadingToastRef.current);
+      }
+      loadingToastRef.current = null;
+      toast.error(message, { duration: 5000 });
 
       // Log detailed error for debugging
       console.error("Detailed payment error:", {
@@ -218,6 +187,11 @@ export default function PayPalButton({
 
   const onError = (err: unknown) => {
     console.error("PayPal SDK Error:", err);
+
+    if (loadingToastRef.current) {
+      toast.dismiss(loadingToastRef.current);
+    }
+    loadingToastRef.current = null;
 
     let userFriendlyError =
       "An error occurred with PayPal payment. Please try another payment method.";
@@ -253,17 +227,23 @@ export default function PayPalButton({
 
     setPaymentStatus("error");
     setErrorMessage(userFriendlyError);
-    toast.error(userFriendlyError);
+    toast.error(userFriendlyError, { duration: 5000 });
   };
 
   const onCancel = () => {
+    if (loadingToastRef.current) {
+      toast.dismiss(loadingToastRef.current);
+    }
+    loadingToastRef.current = null;
     setPaymentStatus("cancelled");
     setErrorMessage("");
-    toast.info("Payment cancelled. You can try again anytime.");
+    toast.info("Payment cancelled. You can try again anytime.", {
+      duration: 4000,
+    });
   };
 
   // Handle missing PayPal configuration
-  if (!runtimeClientId || !paypalConfigured) {
+  if (!paypalConfigured) {
     return (
       <div className="border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.08)] p-4 text-center xs:p-6">
         <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center border border-cb-border bg-card">
@@ -324,134 +304,123 @@ export default function PayPalButton({
   }
 
   return (
-    <PayPalScriptProvider
-      options={{
-        clientId: runtimeClientId,
-        currency: "USD",
-        intent: "capture",
-        components: "buttons",
-        enableFunding: ["card", "paylater"],
-        disableFunding: ["venmo"],
-      }}
-    >
-      <div className="space-y-3 xs:space-y-4">
-        {/* Status Messages */}
-        {paymentStatus === "error" && errorMessage && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 xs:p-4">
-            <div className="flex items-center gap-2 text-red-700 dark:text-red-300 text-xs xs:text-sm">
-              <svg
-                className="w-4 h-4 flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>{errorMessage}</span>
-            </div>
+    <div className="space-y-3 xs:space-y-4">
+      {/* Status Messages */}
+      {paymentStatus === "error" && errorMessage && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 xs:p-4">
+          <div className="flex items-center gap-2 text-red-700 dark:text-red-300 text-xs xs:text-sm">
+            <svg
+              className="w-4 h-4 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>{errorMessage}</span>
           </div>
-        )}
-
-        {paymentStatus === "creating" && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 xs:p-4">
-            <div className="flex items-center justify-center gap-2 text-blue-700 dark:text-blue-300 text-xs xs:text-sm">
-              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              Creating order...
-            </div>
-          </div>
-        )}
-
-        {paymentStatus === "processing" && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 xs:p-4">
-            <div className="flex items-center justify-center gap-2 text-blue-700 dark:text-blue-300 text-xs xs:text-sm">
-              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              Processing payment... Please wait.
-            </div>
-          </div>
-        )}
-
-        {paymentStatus === "cancelled" && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 xs:p-4">
-            <div className="flex items-center justify-center gap-2 text-yellow-700 dark:text-yellow-300 text-xs xs:text-sm">
-              <svg
-                className="w-4 h-4 flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Payment cancelled. You can try again.
-            </div>
-          </div>
-        )}
-
-        {/* PayPal Buttons */}
-        <div
-          className={`transition-opacity duration-300 ${
-            !isPayPalReady || paymentStatus === "processing"
-              ? "opacity-50 pointer-events-none"
-              : "opacity-100"
-          }`}
-        >
-          <PayPalButtons
-            style={{
-              layout: "vertical",
-              color: "blue",
-              shape: "rect",
-              height: 48,
-              label: "paypal",
-            }}
-            createOrder={createOrder}
-            onApprove={onApprove}
-            onError={onError}
-            onCancel={onCancel}
-            disabled={
-              finalTotal <= 0 ||
-              !isPayPalReady ||
-              paymentStatus === "processing" ||
-              paymentStatus === "creating"
-            }
-            forceReRender={[finalTotal]}
-          />
         </div>
+      )}
 
-        {/* Loading State */}
-        {!isPayPalReady && (
-          <div className="text-center py-4">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-            <p className="text-gray-600 dark:text-gray-400 text-xs xs:text-sm">
-              Loading PayPal...
-            </p>
+      {paymentStatus === "creating" && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 xs:p-4">
+          <div className="flex items-center justify-center gap-2 text-blue-700 dark:text-blue-300 text-xs xs:text-sm">
+            <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            Creating order...
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Terms Notice */}
-        <div className="text-center text-xs xs:text-sm text-gray-500 dark:text-gray-400 pt-2">
-          <p>
-            By continuing, you agree to our{" "}
-            <a
-              href="/terms"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
+      {paymentStatus === "processing" && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 xs:p-4">
+          <div className="flex items-center justify-center gap-2 text-blue-700 dark:text-blue-300 text-xs xs:text-sm">
+            <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            Processing payment... Please wait.
+          </div>
+        </div>
+      )}
+
+      {paymentStatus === "cancelled" && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 xs:p-4">
+          <div className="flex items-center justify-center gap-2 text-yellow-700 dark:text-yellow-300 text-xs xs:text-sm">
+            <svg
+              className="w-4 h-4 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
             >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="/privacy"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Privacy Policy
-            </a>
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Payment cancelled. You can try again.
+          </div>
+        </div>
+      )}
+
+      {/* PayPal Buttons */}
+      <div
+        className={`transition-opacity duration-300 ${
+          !isPayPalReady || paymentStatus === "processing"
+            ? "opacity-50 pointer-events-none"
+            : "opacity-100"
+        }`}
+      >
+        <PayPalButtons
+          style={{
+            layout: "vertical",
+            color: "blue",
+            shape: "rect",
+            height: 48,
+            label: "paypal",
+          }}
+          createOrder={createOrder}
+          onApprove={onApprove}
+          onError={onError}
+          onCancel={onCancel}
+          disabled={
+            finalTotal <= 0 ||
+            !isPayPalReady ||
+            paymentStatus === "processing" ||
+            paymentStatus === "creating"
+          }
+          forceReRender={[finalTotal]}
+        />
+      </div>
+
+      {/* Loading State */}
+      {!isPayPalReady && (
+        <div className="text-center py-4">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+          <p className="text-gray-600 dark:text-gray-400 text-xs xs:text-sm">
+            Loading PayPal...
           </p>
         </div>
+      )}
+
+      {/* Terms Notice */}
+      <div className="text-center text-xs xs:text-sm text-gray-500 dark:text-gray-400 pt-2">
+        <p>
+          By continuing, you agree to our{" "}
+          <a
+            href="/terms"
+            className="text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a
+            href="/privacy"
+            className="text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Privacy Policy
+          </a>
+        </p>
       </div>
-    </PayPalScriptProvider>
+    </div>
   );
 }

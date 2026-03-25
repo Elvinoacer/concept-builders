@@ -68,8 +68,16 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   }, []);
 
   const subtotal = cartTotal;
+  const baseSubtotal = items.reduce(
+    (sum, item) =>
+      sum +
+      (typeof item.design.basePrice === "number" ? item.design.basePrice : 0) *
+        item.quantity,
+    0,
+  );
+  const addOnsTotal = Math.max(subtotal - baseSubtotal, 0);
   const taxes = 0;
-  const totalBeforeDiscount = subtotal + taxes;
+  const totalBeforeDiscount = baseSubtotal + addOnsTotal + taxes;
   const total = totalBeforeDiscount - appliedDiscountAmount;
 
   const totalKES = usdToKesRate ? (total * usdToKesRate).toFixed(2) : "N/A";
@@ -273,8 +281,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         {/* Pricing Breakdown */}
         <div className="space-y-2 xs:space-y-3">
           <div className="flex justify-between text-gray-700 dark:text-gray-300 text-sm xs:text-base">
-            <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>Subtotal (Base Plans)</span>
+            <span>${baseSubtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-gray-700 dark:text-gray-300 text-sm xs:text-base">
+            <span>Add-ons Total</span>
+            <span>${addOnsTotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-gray-700 dark:text-gray-300 text-sm xs:text-base">
             <span>Taxes</span>

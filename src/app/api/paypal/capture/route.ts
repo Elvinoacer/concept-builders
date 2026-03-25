@@ -5,8 +5,9 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { calculateItemTotal } from "@/lib/calculate-total";
-import { DiscountType } from "@/generated/prisma/client";
 import { sendPurchaseNotificationEmails } from "@/lib/emails";
+import { validateAndApplyDiscount } from "@/lib/validate-discount";
+import { logPaymentEvent } from "@/lib/payment-logger";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -22,7 +23,10 @@ export async function POST(request: Request) {
     const { orderID, discountCode } = body;
 
     if (!orderID) {
-      return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Order ID is required" },
+        { status: 400 },
+      );
     }
 
     // Fetch user cart
@@ -43,115 +47,88 @@ export async function POST(request: Request) {
     });
 
     if (!userCart || userCart.items.length === 0) {
-      return NextResponse.json({ error: "Cart is empty or no longer exists" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Cart is empty or no longer exists" },
+        { status: 400 },
+      );
     }
 
     // Calculate total amount from cart items
     let calculatedTotal = userCart.items.reduce((total, item) => {
+      const selectedExtras = Array.isArray(item.selectedExtras)
+        ? (item.selectedExtras as Array<{ price?: number }>).map((extra) => ({
+            price: typeof extra?.price === "number" ? extra.price : 0,
+          }))
+        : [];
+
       const itemForCalculation = {
         ...item,
-        selectedExtras: item.selectedExtras as any[],
+        selectedExtras,
       };
       return total + calculateItemTotal(itemForCalculation);
     }, 0);
 
     let appliedDiscountAmount = 0;
-    let appliedDiscountId = null;
+    let appliedDiscountId: string | null = null;
 
-    // Handle Discount
     if (discountCode) {
-      const discount = await prisma.discount.findUnique({
-        where: { code: discountCode },
-      });
+      const discountResult = await validateAndApplyDiscount(
+        discountCode,
+        calculatedTotal,
+        userId,
+      );
 
-      if (discount) {
-        // Validate Discount
-        let isValid = true;
-        let errorMessage = "";
-
-        if (!discount.isActive) {
-          isValid = false;
-          errorMessage = "Discount is not active";
-        } else if (discount.expiresAt && new Date(discount.expiresAt) < new Date()) {
-          isValid = false;
-          errorMessage = "Discount has expired";
-        } else if (discount.maxUses && discount.uses >= discount.maxUses) {
-          isValid = false;
-          errorMessage = "Discount has reached its maximum uses";
-        } else if (discount.minPurchaseAmount && calculatedTotal < discount.minPurchaseAmount) {
-          isValid = false;
-          errorMessage = `Minimum purchase of ${discount.minPurchaseAmount.toFixed(2)} required`;
-        }
-
-        if (isValid) {
-           const existingOrderWithDiscount = await prisma.order.findFirst({
-            where: {
-              userId: userId,
-              discountId: discount.id,
-              status: {
-                in: ['PAID', 'REFUND_REQUESTED'],
-              },
-            },
-          });
-
-          if (existingOrderWithDiscount) {
-             isValid = false;
-             errorMessage = "You have already used this discount code";
-          }
-        }
-
-        if (isValid) {
-          if (discount.type === DiscountType.PERCENTAGE) {
-            appliedDiscountAmount = calculatedTotal * (discount.value / 100);
-          } else if (discount.type === DiscountType.FIXED_AMOUNT) {
-            appliedDiscountAmount = discount.value;
-          }
-
-          // Cap discount at total
-          appliedDiscountAmount = Math.min(appliedDiscountAmount, calculatedTotal);
-          
-          calculatedTotal -= appliedDiscountAmount;
-          appliedDiscountId = discount.id;
-
-        } else {
-             console.warn(`Invalid discount code provided: ${discountCode} - ${errorMessage}`);
-             return NextResponse.json({ error: errorMessage }, { status: 400 });
-        }
-      } else {
-          return NextResponse.json({ error: "Invalid discount code" }, { status: 404 });
+      if (!discountResult.valid) {
+        return NextResponse.json(
+          { error: discountResult.error },
+          { status: 400 },
+        );
       }
+
+      appliedDiscountAmount = discountResult.appliedAmount;
+      appliedDiscountId = discountResult.discount.id;
+      calculatedTotal = discountResult.finalTotal;
     }
 
     // Capture Payment
     const PaypalClient = client();
     const req = new paypal.orders.OrdersCaptureRequest(orderID);
-    req.requestBody({});
 
     console.log("Attempting to capture PayPal order:", orderID);
 
     const response = await PaypalClient.execute(req);
 
     if (response.statusCode !== 201) {
-      console.error("PayPal Capture Failed Response:", JSON.stringify(response.result, null, 2));
-      
+      console.error(
+        "PayPal Capture Failed Response:",
+        JSON.stringify(response.result, null, 2),
+      );
+
       let errorMsg = `PayPal capture failed with status: ${response.statusCode}`;
-      
+
       // Extract specific error details
-      if (response.result && response.result.details && response.result.details.length > 0) {
+      if (
+        response.result &&
+        response.result.details &&
+        response.result.details.length > 0
+      ) {
         const issue = response.result.details[0].issue;
         const description = response.result.details[0].description;
-        
+
         switch (issue) {
-          case 'INSTRUMENT_DECLINED':
-            errorMsg = "Your payment method was declined. Please try a different card or bank account.";
+          case "INSTRUMENT_DECLINED":
+            errorMsg =
+              "Your payment method was declined. Please try a different card or bank account.";
             break;
-          case 'TRANSACTION_REFUSED':
-            errorMsg = "The transaction was refused by PayPal. Please contact PayPal support or try again.";
+          case "TRANSACTION_REFUSED":
+            errorMsg =
+              "The transaction was refused by PayPal. Please contact PayPal support or try again.";
             break;
-          case 'PAYER_ACTION_REQUIRED':
-            errorMsg = "Additional action is required to complete the payment. Please try again.";
+          case "PAYER_ACTION_REQUIRED":
+            errorMsg =
+              "Additional action is required to complete the payment. Please try again.";
             break;
-          case 'DUPLICATE_INVOICE_ID':
+          case "DUPLICATE_INVOICE_ID":
             errorMsg = "This order has already been paid.";
             break;
           default:
@@ -172,24 +149,27 @@ export async function POST(request: Request) {
     }
 
     const capture = response.result.purchase_units[0].payments.captures[0];
-    
+
     if (capture.status !== "COMPLETED") {
       return NextResponse.json(
         { error: `Payment not completed. Status: ${capture.status}` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Verify Amount
-    const capturedAmount = parseFloat(capture.amount.value);
-    if (Math.abs(capturedAmount - calculatedTotal) > 0.01) {
+    const capturedAmount = parseFloat(
+      parseFloat(capture.amount.value).toFixed(2),
+    );
+    const expectedAmount = parseFloat(calculatedTotal.toFixed(2));
+    if (Math.abs(capturedAmount - expectedAmount) > 0.01) {
       console.error("Amount mismatch:", {
         captured: capturedAmount,
-        expected: calculatedTotal,
+        expected: expectedAmount,
       });
       return NextResponse.json(
         { error: "Payment amount mismatch detected" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -203,7 +183,8 @@ export async function POST(request: Request) {
           paymentGateway: "PAYPAL",
           paymentId: capture.id,
           discountCode: discountCode || null,
-          discountAmount: appliedDiscountAmount > 0 ? appliedDiscountAmount : null,
+          discountAmount:
+            appliedDiscountAmount > 0 ? appliedDiscountAmount : null,
           discountId: appliedDiscountId,
           cartId: userCart.id, // Store cartId for reference
         },
@@ -215,7 +196,7 @@ export async function POST(request: Request) {
           designId: item.designId,
           quantity: item.quantity,
           selectedFileTypes: item.selectedFileTypes,
-          selectedExtras: item.selectedExtras as any,
+          selectedExtras: item.selectedExtras ?? undefined,
         })),
       });
 
@@ -307,28 +288,37 @@ export async function POST(request: Request) {
       console.error("Failed to send push notification:", pushError);
     }
 
+    logPaymentEvent("PAYPAL_CAPTURE_SUCCESS", {
+      userId,
+      orderId: newOrder.id,
+      capturedAmount,
+      expectedAmount,
+      paypalOrderId: orderID,
+    });
+
     return NextResponse.json({
       success: true,
       orderId: newOrder.id,
       redirect_url: `/purchase-confirmation?purchaseId=${newOrder.id}`,
     });
-
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("PayPal Capture Error:", error);
-    
+    logPaymentEvent("PAYPAL_CAPTURE_FAILED", {
+      userId,
+      error: error instanceof Error ? error.message : "unknown",
+    });
+
     // Handle SDK errors that might throw exceptions
     let errorMessage = "Internal server error during payment processing";
-    if (error.message) {
-        if (error.message.includes("INSTRUMENT_DECLINED")) {
-            errorMessage = "Your payment method was declined. Please try a different card.";
-        } else if (error.message.includes("insufficient funds")) {
-            errorMessage = "Insufficient funds in your account.";
-        }
+    if (error instanceof Error && error.message) {
+      if (error.message.includes("INSTRUMENT_DECLINED")) {
+        errorMessage =
+          "Your payment method was declined. Please try a different card.";
+      } else if (error.message.includes("insufficient funds")) {
+        errorMessage = "Insufficient funds in your account.";
+      }
     }
 
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

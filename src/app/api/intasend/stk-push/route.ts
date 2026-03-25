@@ -5,7 +5,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { calculateItemTotal } from "@/lib/calculate-total";
-import { DiscountType } from "@/generated/prisma/client";
+import { validateAndApplyDiscount } from "@/lib/validate-discount";
+import { logPaymentEvent } from "@/lib/payment-logger";
 
 class APIException extends Error {
   public statusCode: number;
@@ -110,89 +111,31 @@ export async function POST(req: NextRequest) {
     }, 0);
 
     let appliedDiscountAmount = 0;
+    let appliedDiscountId: string | null = null;
 
-    // Handle Discount
     if (discountCode) {
-      const discount = await prisma.discount.findUnique({
-        where: { code: discountCode },
-      });
+      const discountResult = await validateAndApplyDiscount(
+        discountCode,
+        calculatedTotal,
+        userId,
+      );
 
-      if (discount) {
-        // Validate Discount
-        let isValid = true;
-        let errorMessage = "";
-
-        if (!discount.isActive) {
-          isValid = false;
-          errorMessage = "Discount is not active";
-        } else if (
-          discount.expiresAt &&
-          new Date(discount.expiresAt) < new Date()
-        ) {
-          isValid = false;
-          errorMessage = "Discount has expired";
-        } else if (discount.maxUses && discount.uses >= discount.maxUses) {
-          isValid = false;
-          errorMessage = "Discount has reached its maximum uses";
-        } else if (
-          discount.minPurchaseAmount &&
-          calculatedTotal < discount.minPurchaseAmount
-        ) {
-          isValid = false;
-          errorMessage = `Minimum purchase of ${discount.minPurchaseAmount.toFixed(2)} required`;
-        }
-
-        if (isValid) {
-          // Check if user already used it
-          const existingOrderWithDiscount = await prisma.order.findFirst({
-            where: {
-              userId: userId,
-              discountId: discount.id,
-              status: {
-                in: ["PAID", "REFUND_REQUESTED"],
-              },
-            },
-          });
-
-          if (existingOrderWithDiscount) {
-            isValid = false;
-            errorMessage = "You have already used this discount code";
-          }
-        }
-
-        if (isValid) {
-          if (discount.type === DiscountType.PERCENTAGE) {
-            appliedDiscountAmount = calculatedTotal * (discount.value / 100);
-          } else if (discount.type === DiscountType.FIXED_AMOUNT) {
-            appliedDiscountAmount = discount.value;
-          }
-
-          // Cap discount at total
-          appliedDiscountAmount = Math.min(
-            appliedDiscountAmount,
-            calculatedTotal,
-          );
-
-          calculatedTotal -= appliedDiscountAmount;
-
-          // Update cart with valid discount
-          await prisma.cart.update({
-            where: { id: userCart.id },
-            data: {
-              discountAmount: appliedDiscountAmount,
-              discountCode: discountCode,
-              discountId: discount.id,
-            },
-          });
-        } else {
-          console.warn(
-            `Invalid discount code provided: ${discountCode} - ${errorMessage}`,
-          );
-          throw new APIException(errorMessage, 400);
-        }
-      } else {
-        throw new APIException("Invalid discount code", 404);
+      if (!discountResult.valid) {
+        throw new APIException(discountResult.error, 400);
       }
+
+      appliedDiscountAmount = discountResult.appliedAmount;
+      calculatedTotal = discountResult.finalTotal;
+      appliedDiscountId = discountResult.discount.id;
+
+      await prisma.cart.update({
+        where: { id: userCart.id },
+        data: {
+          discountAmount: appliedDiscountAmount,
+          discountCode,
+          discountId: appliedDiscountId,
+        },
+      });
     }
 
     // Ensure amount is positive
@@ -219,6 +162,7 @@ export async function POST(req: NextRequest) {
 
     // Fetch USD to KES exchange rate
     let usdToKesRate: number;
+    let exchangeRateIsStale = false;
     try {
       const exchangeRateRes = await fetch(
         `${req.nextUrl.origin}/api/exchange-rate`,
@@ -237,6 +181,7 @@ export async function POST(req: NextRequest) {
       } else {
         const exchangeRateData = await exchangeRateRes.json();
         usdToKesRate = exchangeRateData.usdToKesRate;
+        exchangeRateIsStale = Boolean(exchangeRateData.stale);
       }
     } catch {
       console.error("Exchange rate fetch error, using fallback");
@@ -245,6 +190,14 @@ export async function POST(req: NextRequest) {
 
     if (!usdToKesRate || usdToKesRate <= 0) {
       usdToKesRate = 130;
+    }
+
+    if (exchangeRateIsStale) {
+      logPaymentEvent("EXCHANGE_RATE_STALE", {
+        userId,
+        cartId: userCart.id,
+        usdToKesRate,
+      });
     }
 
     // Convert amount to KES
@@ -290,6 +243,14 @@ export async function POST(req: NextRequest) {
     // Prepare STK payload - Following IntaSend NodeJS SDK documentation
     const apiRef = `cart_${userCart.id}_${Date.now()}`;
 
+    logPaymentEvent("STK_PUSH_INITIATED", {
+      userId,
+      cartId: userCart.id,
+      apiRef,
+      amountKES,
+      amountUSD: calculatedTotal,
+    });
+
     const stkPayload = {
       first_name: first_name.trim(),
       last_name: (last_name || "").trim(),
@@ -321,6 +282,28 @@ export async function POST(req: NextRequest) {
       ]);
 
       console.log("✅ IntaSend STK Push Success Response:", resp);
+
+      await prisma.paymentAttempt.create({
+        data: {
+          userId,
+          cartId: userCart.id,
+          amount: calculatedTotal,
+          amountKES,
+          amountInCents: Math.round(calculatedTotal * 100),
+          phoneNumber: formattedPhone,
+          apiRef,
+          status: "PENDING",
+          gateway: "INTASEND",
+          response: JSON.stringify(resp),
+          exchangeRate: usdToKesRate,
+        },
+      });
+
+      logPaymentEvent("STK_PUSH_SUCCESS", {
+        userId,
+        cartId: userCart.id,
+        apiRef,
+      });
 
       return NextResponse.json({
         success: true,
@@ -407,6 +390,10 @@ export async function POST(req: NextRequest) {
     }
   } catch (error: unknown) {
     console.error("STK Push Error:", getErrorMessage(error));
+    logPaymentEvent("STK_PUSH_FAILED", {
+      userId,
+      error: getErrorMessage(error),
+    });
 
     if (error instanceof APIException) {
       return NextResponse.json(

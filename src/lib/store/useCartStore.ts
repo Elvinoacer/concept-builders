@@ -284,7 +284,7 @@ const useCartStore = create<CartStore>()(
         },
 
         syncCart: async () => {
-          const { cart } = get();
+          const { cart, setCart } = get();
           if (cart.length > 0) {
             try {
               const response = await fetch("/api/cart/sync", {
@@ -312,6 +312,13 @@ const useCartStore = create<CartStore>()(
       }),
       {
         name: "cart-storage", // name of the item in the storage (must be unique)
+        partialize: (state) => ({
+          cart: state.cart,
+          cartId: state.cartId,
+          appliedDiscountAmount: state.appliedDiscountAmount,
+          appliedDiscountId: state.appliedDiscountId,
+          appliedDiscountCode: state.appliedDiscountCode,
+        }),
       },
     ),
   ),

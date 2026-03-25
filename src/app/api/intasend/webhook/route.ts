@@ -3,10 +3,27 @@ import crypto from "crypto";
 import { sendPurchaseNotificationEmails } from "@/lib/emails";
 import { calculateItemTotal } from "@/lib/calculate-total";
 import prisma from "@/lib/prisma";
+import { logPaymentEvent } from "@/lib/payment-logger";
+
+const extractCartIdFromApiRef = (apiRef?: string | null) => {
+  if (!apiRef) return null;
+  const match = apiRef.match(/^cart_(.+)_\d+$/);
+  if (match?.[1]) return match[1];
+
+  if (apiRef.startsWith("cart-")) {
+    const parts = apiRef.split("-");
+    if (parts.length >= 2) return parts[1];
+  }
+
+  return apiRef;
+};
 
 export async function POST(req: NextRequest) {
   try {
-    const signature = req.headers.get("x-intasend-signature");
+    const signature =
+      req.headers.get("x-intasend-signature") ||
+      req.headers.get("x-intasend-hmac-signature") ||
+      req.headers.get("intasend-signature");
     const secret =
       process.env.INTASEND_WEBHOOK_SECRET || process.env.INTASEND_SECRET_KEY;
     const expectedChallenge = process.env.INTASEND_WEBHOOK_CHALLENGE;
@@ -63,37 +80,20 @@ export async function POST(req: NextRequest) {
     const paymentId =
       data.invoice_id || data.invoice?.invoice_id || data.invoice?.id;
 
+    logPaymentEvent("WEBHOOK_RECEIVED", {
+      state,
+      apiRef,
+      paymentId,
+    });
+
     if (state === "COMPLETE") {
-      // api_ref format: cart_{cartId}_{timestamp}
-      // We need to extract the cartId.
-      // If api_ref doesn't match the format (legacy), fallback to using it as is.
-      let cartId = apiRef;
-      if (apiRef && apiRef.startsWith("cart_")) {
-        const parts = apiRef.split("_");
-        if (parts.length >= 2) {
-          cartId = parts[1];
-        }
-      } else if (apiRef && apiRef.startsWith("cart-")) {
-        // Handle legacy format cart-{cartId}-{timestamp} just in case
-        const parts = apiRef.split("-");
-        if (parts.length >= 2) {
-          cartId = parts[1];
-        }
-      }
+      const cartId = extractCartIdFromApiRef(apiRef);
 
       if (!paymentId || !cartId) {
         return NextResponse.json(
           { error: "Invalid webhook payload." },
           { status: 400 },
         );
-      }
-
-      const existingOrder = await prisma.order.findUnique({
-        where: { paymentId },
-      });
-
-      if (existingOrder) {
-        return NextResponse.json({ success: true });
       }
 
       const userCart = await prisma.cart.findUnique({
@@ -140,7 +140,15 @@ export async function POST(req: NextRequest) {
       );
 
       const order = await prisma.$transaction(async (tx) => {
-        const order = await tx.order.create({
+        const existingOrder = await tx.order.findUnique({
+          where: { paymentId },
+        });
+
+        if (existingOrder) {
+          return existingOrder;
+        }
+
+        const createdOrder = await tx.order.create({
           data: {
             userId: userCart.userId,
             amount: amountPaidUSD, // Use 'amount' as per existing schema
@@ -179,7 +187,7 @@ export async function POST(req: NextRequest) {
           data: {
             userId: userCart.userId,
             title: "Order Created",
-            description: `Your order #${order.id} has been created successfully.`,
+            description: `Your order #${createdOrder.id} has been created successfully.`,
             icon: "ShoppingCart",
           },
         });
@@ -188,7 +196,18 @@ export async function POST(req: NextRequest) {
         await tx.cartItem.deleteMany({ where: { cartId: userCart.id } });
         await tx.cart.delete({ where: { id: userCart.id } });
 
-        return order;
+        await tx.paymentAttempt.updateMany({
+          where: { apiRef },
+          data: { status: "COMPLETE" },
+        });
+
+        return createdOrder;
+      });
+
+      logPaymentEvent("WEBHOOK_ORDER_CREATED", {
+        orderId: order.id,
+        cartId: userCart.id,
+        amountUSD: amountPaidUSD,
       });
 
       // Send email notifications
@@ -253,13 +272,15 @@ export async function POST(req: NextRequest) {
       }
     } else if (state === "FAILED") {
       console.log("Payment failed:", data);
-      // Try to extract cartId for notification
-      let cartId = apiRef;
-      if (apiRef && apiRef.startsWith("cart_")) {
-        const parts = apiRef.split("_");
-        if (parts.length >= 2) {
-          cartId = parts[1];
-        }
+      const cartId = extractCartIdFromApiRef(apiRef);
+
+      await prisma.paymentAttempt.updateMany({
+        where: { apiRef },
+        data: { status: "FAILED" },
+      });
+
+      if (!cartId) {
+        return NextResponse.json({ success: true });
       }
 
       const userCart = await prisma.cart.findUnique({
@@ -275,6 +296,11 @@ export async function POST(req: NextRequest) {
           },
         });
       }
+
+      logPaymentEvent("STK_PUSH_FAILED", {
+        apiRef,
+        paymentId,
+      });
     } else {
       // Ignore transitional states and acknowledge delivery.
       return NextResponse.json({ success: true });

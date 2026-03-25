@@ -98,13 +98,55 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
     type,
     label: getFileTypeLabel(type),
     price: getFileTypePrice(type),
+    badge: type.includes("cad")
+      ? "CAD"
+      : type.includes("Pdf") || type.includes("pdf")
+        ? "PDF"
+        : type.includes("Quantities")
+          ? "BOQ"
+          : "FILE",
   }));
   const selectedExtrasRows = safeSelectedExtras.map((extra) => ({
     id: extra.id,
     label: extra.name,
     price: typeof extra.price === "number" ? extra.price : 0,
+    badge: "ADD-ON",
   }));
-  const selectedOptionRows = [...selectedFileTypeRows, ...selectedExtrasRows];
+  const hasSelectedRows =
+    selectedFileTypeRows.length > 0 || selectedExtrasRows.length > 0;
+  const fileTypeOptions = [
+    {
+      type: "architecturalPdf",
+      label: "Architectural PDF",
+      isBase: true,
+      isAvailable: (item.design.architecturalDesign?.pdfFiles?.length || 0) > 0,
+    },
+    {
+      type: "architecturalCad",
+      label: "Architectural CAD",
+      isAvailable: (item.design.architecturalDesign?.cadFiles?.length || 0) > 0,
+    },
+    {
+      type: "structuralPdf",
+      label: "Structural PDF",
+      isAvailable: (item.design.structuralDesign?.pdfFiles?.length || 0) > 0,
+    },
+    {
+      type: "structuralCad",
+      label: "Structural CAD",
+      isAvailable: (item.design.structuralDesign?.cadFiles?.length || 0) > 0,
+    },
+    {
+      type: "billOfQuantitiesExcel",
+      label: "Bill of Quantities (Excel)",
+      isAvailable: (item.design.billOfQuantities?.excelFiles?.length || 0) > 0,
+    },
+    {
+      type: "billOfQuantitiesPdf",
+      label: "Bill of Quantities (PDF)",
+      isAvailable: (item.design.billOfQuantities?.pdfFiles?.length || 0) > 0,
+    },
+  ];
 
   return (
     <motion.div
@@ -144,54 +186,14 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
             <p className="text-xs xs:text-sm font-medium text-cream-dim mb-2 xs:mb-3">
               File Types:
             </p>
-            <div className="flex flex-wrap gap-x-4 gap-y-2">
-              {[
-                {
-                  type: "architecturalPdf",
-                  label: "Architectural PDF",
-                  isBase: true,
-                  isAvailable:
-                    (item.design.architecturalDesign?.pdfFiles?.length || 0) >
-                    0,
-                },
-                {
-                  type: "architecturalCad",
-                  label: "Architectural CAD",
-                  isAvailable:
-                    (item.design.architecturalDesign?.cadFiles?.length || 0) >
-                    0,
-                },
-                {
-                  type: "structuralPdf",
-                  label: "Structural PDF",
-                  isAvailable:
-                    (item.design.structuralDesign?.pdfFiles?.length || 0) > 0,
-                },
-                {
-                  type: "structuralCad",
-                  label: "Structural CAD",
-                  isAvailable:
-                    (item.design.structuralDesign?.cadFiles?.length || 0) > 0,
-                },
-                {
-                  type: "billOfQuantitiesExcel", // Fixed key from billOfQuantities to match PurchaseSidebar
-                  label: "Bill of Quantities (Excel)",
-                  isAvailable:
-                    (item.design.billOfQuantities?.excelFiles?.length || 0) > 0,
-                },
-                {
-                  type: "billOfQuantitiesPdf",
-                  label: "Bill of Quantities (PDF)",
-                  isAvailable:
-                    (item.design.billOfQuantities?.pdfFiles?.length || 0) > 0,
-                },
-              ].map((fileTypeOption) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
+              {fileTypeOptions.map((fileTypeOption) => (
                 <div
                   key={fileTypeOption.type}
-                  className="flex flex-col w-full sm:w-auto"
+                  className="flex flex-col min-w-0"
                 >
                   <label
-                    className={`flex items-center gap-2 text-xs xs:text-sm ${
+                    className={`flex items-start gap-2.5 text-xs xs:text-sm ${
                       fileTypeOption.isBase
                         ? "cursor-not-allowed opacity-80"
                         : "cursor-pointer"
@@ -213,11 +215,17 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                       disabled={fileTypeOption.isBase}
                       className="rounded border-cb-border text-gold shadow-sm focus:border-gold focus:ring focus:ring-[rgba(200,137,42,0.35)] focus:ring-opacity-50 bg-surface w-3 h-3 xs:w-4 xs:h-4 disabled:opacity-50"
                     />
-                    <span className="sm:whitespace-nowrap">
+                    <span className="leading-snug text-cream-dim">
                       {fileTypeOption.label}
-                      {fileTypeOption.isBase
-                        ? " (Included)"
-                        : ` (+$${getFileTypePrice(fileTypeOption.type).toFixed(2)})`}
+                      <span
+                        className={
+                          fileTypeOption.isBase ? "text-emerald-400" : "text-gold"
+                        }
+                      >
+                        {fileTypeOption.isBase
+                          ? " - Included"
+                          : ` - +$${getFileTypePrice(fileTypeOption.type).toFixed(2)}`}
+                      </span>
                     </span>
                   </label>
                   {!fileTypeOption.isAvailable && (
@@ -266,15 +274,65 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
               Selected Options Breakdown
             </p>
             <div className="rounded-xl border border-[rgba(200,137,42,0.22)] bg-[#111009] px-3 sm:px-4 py-2 sm:py-3">
-              {selectedOptionRows.length > 0 ? (
-                <ul className="divide-y divide-[rgba(200,185,168,0.08)]">
-                  {selectedOptionRows.map((row, idx) => (
+              <ul className="divide-y divide-[rgba(200,185,168,0.08)]">
+                <li className="flex items-center justify-between gap-3 py-2.5 opacity-85">
+                  <span className="text-sm text-cream-dim">
+                    Base Design (Architectural PDF)
+                  </span>
+                  <span className="text-sm font-semibold text-emerald-400">Included</span>
+                </li>
+
+                {selectedFileTypeRows.length > 0 && (
+                  <li className="py-2">
+                    <p className="text-[11px] uppercase tracking-[0.12em] text-cream-dim">
+                      File Types
+                    </p>
+                  </li>
+                )}
+
+                {selectedFileTypeRows.map((row, idx) => (
+                  <li
+                    key={row.type || idx}
+                    className="flex items-start justify-between gap-3 py-2.5"
+                  >
+                    <span className="min-w-0 flex-1 flex items-start gap-2">
+                      <span className="mt-0.5 rounded-full border border-cb-border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-cream-dim">
+                        {row.badge}
+                      </span>
+                      <span className="min-w-0 text-sm leading-relaxed text-cream break-words">
+                        {row.label || "Option"}
+                      </span>
+                    </span>
+                    <span
+                      className={`text-sm font-semibold whitespace-nowrap tabular-nums ${
+                        row.price > 0 ? "text-[#c8892a]" : "text-emerald-400"
+                      }`}
+                    >
+                      {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
+                    </span>
+                  </li>
+                ))}
+
+                {selectedExtrasRows.length > 0 && (
+                  <li className="py-2">
+                    <p className="text-[11px] uppercase tracking-[0.12em] text-cream-dim">
+                      Add-ons
+                    </p>
+                  </li>
+                )}
+
+                {selectedExtrasRows.map((row, idx) => (
                     <li
-                      key={"type" in row ? row.type : row.id || idx}
+                      key={row.id || idx}
                       className="flex items-start justify-between gap-3 py-2.5"
                     >
-                      <span className="min-w-0 flex-1 text-sm leading-relaxed text-cream break-words">
-                        {row.label || "Option"}
+                      <span className="min-w-0 flex-1 flex items-start gap-2">
+                        <span className="mt-0.5 rounded-full border border-cb-border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-cream-dim">
+                          {row.badge}
+                        </span>
+                        <span className="min-w-0 text-sm leading-relaxed text-cream break-words">
+                          {row.label || "Option"}
+                        </span>
                       </span>
                       <span
                         className={`text-sm font-semibold whitespace-nowrap tabular-nums ${
@@ -286,9 +344,11 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                           : "Included"}
                       </span>
                     </li>
+                    </li>
                   ))}
-                </ul>
-              ) : (
+              </ul>
+
+              {!hasSelectedRows && (
                 <p className="py-2 text-sm text-[rgba(200,185,168,0.65)]">
                   No optional items selected.
                 </p>

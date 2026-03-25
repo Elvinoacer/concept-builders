@@ -168,6 +168,8 @@ export default function StkPushForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    stopPolling();
+
     if (!isPhoneValid) {
       setStatus("failed");
       setStatusMessage("Use format 2547XXXXXXXX or 2541XXXXXXXX.");
@@ -298,7 +300,21 @@ export default function StkPushForm({
                 : "border-[var(--border-gold)] bg-[rgba(200,137,42,0.12)] text-gold"
           }`}
         >
-          {statusMessage}
+          {status === "awaiting" ? (
+            <div className="flex items-center gap-3">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gold border-t-transparent" />
+              <div>
+                <p className="text-sm font-semibold text-gold">
+                  Waiting for M-Pesa confirmation
+                </p>
+                <p className="text-xs text-cream-dim mt-0.5">
+                  Check your phone and enter your PIN
+                </p>
+              </div>
+            </div>
+          ) : (
+            statusMessage
+          )}
         </div>
       )}
 

@@ -11,7 +11,6 @@ interface PaypalPaymentProps {
   appliedDiscountCode: string | null;
   paypalConfigured: boolean;
   paypalMode: "sandbox" | "live";
-  paypalClientId: string;
 }
 
 const PaypalPayment: React.FC<PaypalPaymentProps> = ({
@@ -22,7 +21,6 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
   appliedDiscountCode,
   paypalConfigured,
   paypalMode,
-  paypalClientId,
 }) => {
   const [isClient, setIsClient] = useState(false);
 
@@ -90,7 +88,6 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
             appliedDiscountId={appliedDiscountId}
             appliedDiscountCode={appliedDiscountCode}
             paypalConfigured={paypalConfigured}
-            paypalClientId={paypalClientId}
           />
         )}
       </div>
