@@ -29,7 +29,7 @@ const CheckoutPage = () => {
     appliedDiscountCode,
     setAppliedDiscount,
   } = useCart();
-  const [paymentMethod, setPaymentMethod] = useState("paypal");
+  const [paymentMethod, setPaymentMethod] = useState("mpesa");
   const [paypalConfig, setPaypalConfig] = useState<PayPalRuntimeConfig | null>(
     null,
   );
@@ -151,7 +151,7 @@ const CheckoutPage = () => {
 
   const selectedMethodLabel =
     paymentMethod === "mpesa"
-      ? "M-Pesa (STK Push + Checkout Link)"
+      ? "M-Pesa Checkout Link"
       : "PayPal Redirect Checkout";
 
   return (
