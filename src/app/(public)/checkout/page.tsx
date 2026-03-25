@@ -151,7 +151,7 @@ const CheckoutPage = () => {
 
   const selectedMethodLabel =
     paymentMethod === "mpesa"
-      ? "M-Pesa / Checkout Link"
+      ? "M-Pesa (STK Push + Checkout Link)"
       : "PayPal Redirect Checkout";
 
   return (

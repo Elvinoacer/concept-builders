@@ -21,9 +21,9 @@ const paymentMethods = [
   },
   {
     id: "mpesa",
-    name: "M-Pesa / Checkout Link",
+    name: "M-Pesa (STK + Link)",
     image: "/payments/mpesa.png",
-    description: "Generate a secure redirect link and pay via M-Pesa",
+    description: "Try STK Push first, with checkout link fallback",
     supportedCurrencies: ["KES"],
     processingTime: "Instant",
   },
