@@ -47,7 +47,7 @@ export default function FloatingCartButton() {
     previousCount.current = cartCount;
   }, [cartCount]);
 
-  if (pathname === "/cart" || pathname === "/checkout") {
+  if (pathname === "/cart") {
     return null;
   }
 

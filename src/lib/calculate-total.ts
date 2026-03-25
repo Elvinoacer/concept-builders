@@ -9,13 +9,12 @@ interface CartItem {
 
 export const calculateItemTotal = (item: CartItem): number => {
   const { design, quantity, selectedFileTypes, selectedExtras } = item;
+  const normalizedQuantity = Math.min(Math.max(quantity || 1, 1), 1);
 
-  let total = design.basePrice * quantity;
+  let total = design.basePrice * normalizedQuantity;
 
   if (selectedFileTypes) {
-    if (selectedFileTypes.includes("architecturalPdf")) {
-      total += design.architecturalPdfPrice || 0;
-    }
+    // Architectural PDF is part of the base package and should not be charged twice.
     if (selectedFileTypes.includes("architecturalCad")) {
       total += design.architecturalCadPrice || 0;
     }

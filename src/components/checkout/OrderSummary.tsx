@@ -85,7 +85,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
     (sum, item) =>
       sum +
       (typeof item.design.basePrice === "number" ? item.design.basePrice : 0) *
-        item.quantity,
+        1,
     0,
   );
   const addOnsTotal = Math.max(subtotal - baseSubtotal, 0);
@@ -251,7 +251,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                   {item.design.name}
                 </p>
                 <p className="text-xs xs:text-sm text-gray-500 dark:text-gray-400 mb-2 xs:mb-3">
-                  Quantity: {item.quantity}
+                  Quantity: 1
                 </p>
                 <div className="text-xs xs:text-sm">
                   <IncludedItems

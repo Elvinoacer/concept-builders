@@ -21,9 +21,9 @@ const paymentMethods = [
   },
   {
     id: "mpesa",
-    name: "M-Pesa",
+    name: "M-Pesa / Checkout Link",
     image: "/payments/mpesa.png",
-    description: "Pay with your M-Pesa account",
+    description: "Generate a secure redirect link and pay via M-Pesa",
     supportedCurrencies: ["KES"],
     processingTime: "Instant",
   },

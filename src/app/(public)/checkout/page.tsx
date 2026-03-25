@@ -144,7 +144,7 @@ const CheckoutPage = () => {
   };
 
   const selectedMethodLabel =
-    paymentMethod === "mpesa" ? "M-Pesa" : "PayPal / Card";
+    paymentMethod === "mpesa" ? "M-Pesa / Checkout Link" : "PayPal / Card";
 
   return (
     <div className="min-h-screen bg-ink text-cream">

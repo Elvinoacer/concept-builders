@@ -39,7 +39,7 @@ const getFileTypeName = (type: string) => {
 const getFileTypePrice = (type: string, design: Design) => {
   switch (type) {
     case "architecturalPdf":
-      return design.architecturalPdfPrice;
+      return 0;
     case "architecturalCad":
       return design.architecturalCadPrice;
     case "structuralPdf":
