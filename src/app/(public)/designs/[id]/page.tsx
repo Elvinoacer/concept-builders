@@ -470,14 +470,28 @@ export default function DesignDetailPage() {
             alt={design.name}
             fill
             priority
-            className="object-cover brightness-[0.55] saturate-[0.8] scale-[1.04] transition-transform duration-[8000ms] ease-out"
+            className="object-cover scale-[1.04] transition-transform duration-[8000ms] ease-out"
+            style={{ filter: "var(--design-hero-image-filter)" }}
             sizes="100vw"
           />
         ) : (
-          <div className="absolute inset-0 bg-[linear-gradient(130deg,rgba(200,137,42,0.08),transparent_55%)]" />
+          <div
+            className="absolute inset-0"
+            style={{ background: "var(--design-hero-fallback-bg)" }}
+          />
         )}
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,9,7,0.3)_0%,transparent_30%,rgba(10,9,7,0.5)_65%,#0a0907_100%),linear-gradient(130deg,rgba(200,137,42,0.07),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.03)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.4)_40%,rgba(0,0,0,0.4)_70%,transparent)]" />
+        <div
+          className="absolute inset-0"
+          style={{ background: "var(--design-hero-overlay)" }}
+        />
+        <div
+          className="absolute inset-0 bg-[size:80px_80px]"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--design-hero-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--design-hero-grid-line) 1px, transparent 1px)",
+            maskImage: "var(--design-hero-grid-mask)",
+          }}
+        />
 
         {images.length > 0 && (
           <div className="absolute right-5 top-1/2 z-10 hidden -translate-y-1/2 flex-col gap-2 lg:flex xl:right-[60px]">
@@ -517,7 +531,7 @@ export default function DesignDetailPage() {
                   (prev) => (prev - 1 + images.length) % images.length,
                 )
               }
-              className="absolute left-5 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center border border-[rgba(240,232,216,0.07)] bg-[rgba(10,9,7,0.5)] text-cream transition-colors hover:border-[rgba(200,137,42,0.22)] hover:text-gold lg:flex xl:left-[60px]"
+              className="absolute left-5 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center border border-[var(--design-hero-control-border)] bg-[var(--design-hero-control-bg)] text-cream transition-colors hover:border-[var(--design-hero-control-border-hover)] hover:text-gold lg:flex xl:left-[60px]"
               aria-label="Previous image"
             >
               <ChevronLeft size={18} />
@@ -525,7 +539,7 @@ export default function DesignDetailPage() {
             <button
               type="button"
               onClick={() => setHeroIndex((prev) => (prev + 1) % images.length)}
-              className="absolute left-[74px] top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center border border-[rgba(240,232,216,0.07)] bg-[rgba(10,9,7,0.5)] text-cream transition-colors hover:border-[rgba(200,137,42,0.22)] hover:text-gold lg:flex xl:left-[114px]"
+              className="absolute left-[74px] top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center border border-[var(--design-hero-control-border)] bg-[var(--design-hero-control-bg)] text-cream transition-colors hover:border-[var(--design-hero-control-border-hover)] hover:text-gold lg:flex xl:left-[114px]"
               aria-label="Next image"
             >
               <ChevronRight size={18} />
@@ -542,7 +556,10 @@ export default function DesignDetailPage() {
 
         <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-10 sm:px-8 lg:px-[60px] lg:pb-16">
           <div className="mx-auto w-full max-w-screen-2xl">
-            <nav className="mb-5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[rgba(240,232,216,0.55)]">
+            <nav
+              className="mb-5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em]"
+              style={{ color: "var(--design-hero-breadcrumb)" }}
+            >
               <Link href="/" className="transition-colors hover:text-gold">
                 Home
               </Link>
@@ -753,7 +770,7 @@ export default function DesignDetailPage() {
                 Gallery <span className="h-px w-7 bg-[rgba(200,137,42,0.22)]" />
               </p>
 
-              <div className="relative mb-3 aspect-[16/10] cursor-zoom-in overflow-hidden border border-[rgba(240,232,216,0.07)] bg-card">
+              <div className="relative mb-3 aspect-[16/10] cursor-zoom-in overflow-hidden border border-[var(--design-border-soft)] bg-card">
                 {images[safeGalleryIndex]?.url ? (
                   <Image
                     src={images[safeGalleryIndex].url}
@@ -783,7 +800,7 @@ export default function DesignDetailPage() {
                           (prev) => (prev - 1 + images.length) % images.length,
                         )
                       }
-                      className="absolute left-4 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[rgba(240,232,216,0.07)] bg-[rgba(10,9,7,0.65)] text-cream transition-colors hover:border-[rgba(200,137,42,0.22)] hover:text-gold"
+                      className="absolute left-4 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[var(--design-border-soft)] bg-[var(--design-control-bg)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
                     >
                       <ChevronLeft size={18} />
                     </button>
@@ -792,14 +809,14 @@ export default function DesignDetailPage() {
                       onClick={() =>
                         setGalleryIndex((prev) => (prev + 1) % images.length)
                       }
-                      className="absolute right-4 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[rgba(240,232,216,0.07)] bg-[rgba(10,9,7,0.65)] text-cream transition-colors hover:border-[rgba(200,137,42,0.22)] hover:text-gold"
+                      className="absolute right-4 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[var(--design-border-soft)] bg-[var(--design-control-bg)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
                     >
                       <ChevronRight size={18} />
                     </button>
                   </>
                 )}
 
-                <div className="absolute bottom-4 right-4 bg-[rgba(10,9,7,0.55)] px-3 py-1 font-mono text-[10px] tracking-[0.1em] text-[rgba(240,232,216,0.75)]">
+                <div className="absolute bottom-4 right-4 bg-[var(--design-control-bg-soft)] px-3 py-1 font-mono text-[10px] tracking-[0.1em] text-[var(--design-text-subtle)]">
                   {String(safeGalleryIndex + 1).padStart(2, "0")} /{" "}
                   {String(Math.max(images.length, 1)).padStart(2, "0")}
                 </div>
@@ -809,7 +826,7 @@ export default function DesignDetailPage() {
                     setLightboxIndex(safeGalleryIndex);
                     setLightboxOpen(true);
                   }}
-                  className="absolute bottom-4 left-4 flex items-center gap-2 border border-[rgba(240,232,216,0.07)] bg-[rgba(10,9,7,0.55)] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-cream-dim transition-colors hover:border-[rgba(200,137,42,0.22)] hover:text-gold"
+                  className="absolute bottom-4 left-4 flex items-center gap-2 border border-[var(--design-border-soft)] bg-[var(--design-control-bg-soft)] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-cream-dim transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
                 >
                   <Expand size={13} />
                   Expand
@@ -847,7 +864,7 @@ export default function DesignDetailPage() {
             </div>
 
             <div id="design-floorplans" className="scroll-mt-28">
-              <div className="mb-8 flex border-b border-[rgba(240,232,216,0.07)]">
+              <div className="mb-8 flex border-b border-[var(--design-border-soft)]">
                 {[
                   { key: "details" as const, label: "Details" },
                   { key: "floorplans" as const, label: "Floor Plans" },
@@ -897,7 +914,7 @@ export default function DesignDetailPage() {
                     ].map((item) => (
                       <div
                         key={item.label}
-                        className="border border-[rgba(240,232,216,0.07)] bg-surface px-5 py-4"
+                        className="border border-[var(--design-border-soft)] bg-surface px-5 py-4"
                       >
                         <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
                           {item.label}
@@ -936,20 +953,20 @@ export default function DesignDetailPage() {
               {activeTab === "floorplans" && (
                 <div>
                   {floorPlans.length === 0 ? (
-                    <div className="border border-[rgba(240,232,216,0.07)] bg-surface px-6 py-12 text-center">
+                    <div className="border border-[var(--design-border-soft)] bg-surface px-6 py-12 text-center">
                       <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
                         No floor plans uploaded
                       </p>
                     </div>
                   ) : (
                     <>
-                      <div className="mb-4 grid grid-cols-2 border border-[rgba(240,232,216,0.07)] sm:grid-cols-4">
+                      <div className="mb-4 grid grid-cols-2 border border-[var(--design-border-soft)] sm:grid-cols-4">
                         {floorPlans.map((fp, idx) => (
                           <button
                             key={fp.id}
                             type="button"
                             onClick={() => setActiveFloorPlan(idx)}
-                            className={`border-r border-[rgba(240,232,216,0.07)] px-3 py-3 font-mono text-[10px] uppercase tracking-[0.14em] ${
+                            className={`border-r border-[var(--design-border-soft)] px-3 py-3 font-mono text-[10px] uppercase tracking-[0.14em] ${
                               idx === safeFloorPlanIndex
                                 ? "bg-[rgba(200,137,42,0.08)] text-gold"
                                 : "text-muted hover:bg-card hover:text-cream"
@@ -959,7 +976,7 @@ export default function DesignDetailPage() {
                           </button>
                         ))}
                       </div>
-                      <div className="overflow-hidden border border-[rgba(240,232,216,0.07)] bg-card">
+                      <div className="overflow-hidden border border-[var(--design-border-soft)] bg-card">
                         {floorPlans[safeFloorPlanIndex]?.url ? (
                           <Image
                             src={floorPlans[safeFloorPlanIndex].url || ""}
@@ -982,7 +999,7 @@ export default function DesignDetailPage() {
               )}
 
               {activeTab === "specs" && (
-                <div className="space-y-4 border border-[rgba(240,232,216,0.07)] bg-surface p-6">
+                <div className="space-y-4 border border-[var(--design-border-soft)] bg-surface p-6">
                   {[
                     ["Bedrooms", String(design.bedrooms ?? "N/A")],
                     ["Bathrooms", String(design.bathrooms ?? "N/A")],
@@ -996,7 +1013,7 @@ export default function DesignDetailPage() {
                   ].map(([label, value]) => (
                     <div
                       key={label}
-                      className="flex items-center justify-between border-b border-[rgba(240,232,216,0.07)] pb-3 font-mono text-[12px]"
+                      className="flex items-center justify-between border-b border-[var(--design-border-soft)] pb-3 font-mono text-[12px]"
                     >
                       <span className="uppercase tracking-[0.12em] text-muted">
                         {label}
@@ -1010,7 +1027,7 @@ export default function DesignDetailPage() {
               {activeTab === "faq" && (
                 <div id="design-faq" className="scroll-mt-28">
                   {faqItems.length === 0 ? (
-                    <div className="border border-[rgba(240,232,216,0.07)] bg-surface px-6 py-12 text-center">
+                    <div className="border border-[var(--design-border-soft)] bg-surface px-6 py-12 text-center">
                       <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
                         No FAQ entries yet
                       </p>
@@ -1022,7 +1039,7 @@ export default function DesignDetailPage() {
                         return (
                           <div
                             key={`${faq.question}-${idx}`}
-                            className="border-b border-[rgba(240,232,216,0.07)]"
+                            className="border-b border-[var(--design-border-soft)]"
                           >
                             <button
                               type="button"
@@ -1071,7 +1088,7 @@ export default function DesignDetailPage() {
             id="purchase-options"
             className="scroll-mt-28 lg:sticky lg:top-[100px]"
           >
-            <div className="border border-[rgba(240,232,216,0.07)] bg-card p-8">
+            <div className="border border-[var(--design-border-soft)] bg-card p-8">
               <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
                 Starting From
               </p>
@@ -1105,9 +1122,9 @@ export default function DesignDetailPage() {
               return (
                 <div
                   key={category}
-                  className="mt-px border border-[rgba(240,232,216,0.07)] bg-card"
+                  className="mt-px border border-[var(--design-border-soft)] bg-card"
                 >
-                  <div className="border-b border-[rgba(240,232,216,0.07)] px-5 py-4 font-mono text-[10px] uppercase tracking-[0.16em] text-gold">
+                  <div className="border-b border-[var(--design-border-soft)] px-5 py-4 font-mono text-[10px] uppercase tracking-[0.16em] text-gold">
                     {title} Documents
                   </div>
                   {options.map((option) => {
@@ -1119,17 +1136,17 @@ export default function DesignDetailPage() {
                         type="button"
                         onClick={() => toggleDocument(option.key)}
                         disabled={option.locked || !option.availability}
-                        className={`flex w-full items-center gap-3 border-b border-[rgba(240,232,216,0.07)] px-5 py-4 text-left transition-colors last:border-b-0 ${
+                        className={`flex w-full items-center gap-3 border-b border-[var(--design-border-soft)] px-5 py-4 text-left transition-colors last:border-b-0 ${
                           selected
                             ? "bg-[rgba(200,137,42,0.08)]"
-                            : "hover:bg-[#1c1a17]"
+                            : "hover:bg-[var(--design-row-hover)]"
                         } ${!option.availability ? "opacity-60" : ""}`}
                       >
                         <span
                           className={`grid h-5 w-5 shrink-0 place-items-center border ${
                             selected
                               ? "border-gold bg-gold text-ink"
-                              : "border-[rgba(240,232,216,0.07)] text-transparent"
+                              : "border-[var(--design-border-soft)] text-transparent"
                           }`}
                         >
                           <Check size={11} />
@@ -1168,8 +1185,8 @@ export default function DesignDetailPage() {
             })}
 
             {design.packageOptions.length > 0 && (
-              <div className="mt-px border border-[rgba(240,232,216,0.07)] bg-card">
-                <div className="border-b border-[rgba(240,232,216,0.07)] px-5 py-4 font-mono text-[10px] uppercase tracking-[0.16em] text-gold">
+              <div className="mt-px border border-[var(--design-border-soft)] bg-card">
+                <div className="border-b border-[var(--design-border-soft)] px-5 py-4 font-mono text-[10px] uppercase tracking-[0.16em] text-gold">
                   Customizations
                 </div>
                 {design.packageOptions.map((option) => {
@@ -1179,17 +1196,17 @@ export default function DesignDetailPage() {
                       key={option.id}
                       type="button"
                       onClick={() => toggleExtra(option.id)}
-                      className={`flex w-full items-center gap-3 border-b border-[rgba(240,232,216,0.07)] px-5 py-4 text-left transition-colors last:border-b-0 ${
+                      className={`flex w-full items-center gap-3 border-b border-[var(--design-border-soft)] px-5 py-4 text-left transition-colors last:border-b-0 ${
                         selected
                           ? "bg-[rgba(200,137,42,0.08)]"
-                          : "hover:bg-[#1c1a17]"
+                          : "hover:bg-[var(--design-row-hover)]"
                       }`}
                     >
                       <span
                         className={`grid h-5 w-5 shrink-0 place-items-center border ${
                           selected
                             ? "border-gold bg-gold text-ink"
-                            : "border-[rgba(240,232,216,0.07)] text-transparent"
+                            : "border-[var(--design-border-soft)] text-transparent"
                         }`}
                       >
                         <Check size={11} />
@@ -1213,7 +1230,7 @@ export default function DesignDetailPage() {
               </div>
             )}
 
-            <div className="mt-px border border-[rgba(240,232,216,0.07)] bg-card px-6 py-6">
+            <div className="mt-px border border-[var(--design-border-soft)] bg-card px-6 py-6">
               <div className="mb-2 flex items-center justify-between font-mono text-[11px] text-muted">
                 <span>Base Plan</span>
                 <span>{priceLabel(design.basePrice)}</span>
@@ -1236,7 +1253,7 @@ export default function DesignDetailPage() {
                   <span>+ {priceLabel(item.price)}</span>
                 </div>
               ))}
-              <div className="my-4 h-px bg-[rgba(240,232,216,0.07)]" />
+              <div className="my-4 h-px bg-[var(--design-border-soft)]" />
               <div className="flex items-end justify-between">
                 <span
                   className="text-[16px]"
@@ -1280,14 +1297,14 @@ export default function DesignDetailPage() {
                 type="button"
                 onClick={handleAddToCart}
                 disabled={isBuyingNow || isAddingToCart}
-                className="flex w-full items-center justify-center gap-2 border border-[rgba(240,232,216,0.07)] bg-surface px-5 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-cream transition-colors hover:border-[rgba(200,137,42,0.22)] hover:text-gold disabled:cursor-not-allowed disabled:opacity-70"
+                className="flex w-full items-center justify-center gap-2 border border-[var(--design-border-soft)] bg-surface px-5 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold disabled:cursor-not-allowed disabled:opacity-70"
               >
                 <ShoppingCart size={15} />
                 {isAddingToCart ? "Adding..." : "Add to Cart"}
               </button>
               <Link
                 href={`/contact?designId=${design.id}`}
-                className="flex w-full items-center justify-center gap-2 border border-[rgba(240,232,216,0.07)] px-5 py-4 font-mono text-[10px] uppercase tracking-[0.14em] text-cream-dim transition-colors hover:bg-card hover:text-cream"
+                className="flex w-full items-center justify-center gap-2 border border-[var(--design-border-soft)] px-5 py-4 font-mono text-[10px] uppercase tracking-[0.14em] text-cream-dim transition-colors hover:bg-card hover:text-cream"
               >
                 Request Consultation
               </Link>
@@ -1296,7 +1313,7 @@ export default function DesignDetailPage() {
               Secure checkout with instant digital delivery after payment.
             </p>
 
-            <div className="mt-px grid grid-cols-2 gap-px bg-[rgba(240,232,216,0.07)]">
+            <div className="mt-px grid grid-cols-2 gap-px bg-[var(--design-border-soft)]">
               <div className="flex items-center gap-2 bg-card px-4 py-3">
                 <ShieldCheck size={16} className="text-[#3fa86a]" />
                 <div>
@@ -1345,7 +1362,7 @@ export default function DesignDetailPage() {
       </div>
 
       {related.length > 0 && (
-        <section className="mx-auto mb-20 w-full max-w-[1440px] border-t border-[rgba(240,232,216,0.07)] px-5 pt-16 sm:px-8 lg:px-[60px]">
+        <section className="mx-auto mb-20 w-full max-w-[1440px] border-t border-[var(--design-border-soft)] px-5 pt-16 sm:px-8 lg:px-[60px]">
           <div className="mb-10 flex items-end justify-between gap-3">
             <h2
               className="text-[clamp(32px,4vw,52px)] font-light leading-[1.1]"
@@ -1365,7 +1382,7 @@ export default function DesignDetailPage() {
             </Link>
           </div>
 
-          <div className="grid gap-px bg-[rgba(240,232,216,0.07)] md:grid-cols-3">
+          <div className="grid gap-px bg-[var(--design-border-soft)] md:grid-cols-3">
             {related.map((item) => (
               <Link
                 key={item.id}
@@ -1400,7 +1417,7 @@ export default function DesignDetailPage() {
                   >
                     {item.name}
                   </p>
-                  <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.07)] pt-3">
+                  <div className="flex items-center justify-between border-t border-[var(--design-border-soft)] pt-3">
                     <span className="font-mono text-[12px] text-cream-dim">
                       {priceLabel(item.basePrice)}
                     </span>
@@ -1413,7 +1430,7 @@ export default function DesignDetailPage() {
         </section>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[rgba(240,232,216,0.07)] bg-[rgba(20,18,16,0.96)] p-3 backdrop-blur-xl lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--design-border-soft)] bg-[var(--design-mobile-bar-bg)] p-3 backdrop-blur-xl lg:hidden">
         <div className="mx-auto flex max-w-screen-md items-center gap-3">
           <div className="flex-1">
             <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
@@ -1445,7 +1462,7 @@ export default function DesignDetailPage() {
 
       {lightboxOpen && images.length > 0 && (
         <div
-          className="fixed inset-0 z-[500] flex items-center justify-center bg-[rgba(10,9,7,0.96)] p-4 backdrop-blur-xl"
+          className="fixed inset-0 z-[500] flex items-center justify-center bg-[var(--design-lightbox-bg)] p-4 backdrop-blur-xl"
           onClick={(event) => {
             if (event.target === event.currentTarget) setLightboxOpen(false);
           }}
@@ -1454,7 +1471,7 @@ export default function DesignDetailPage() {
             <button
               type="button"
               onClick={() => setLightboxOpen(false)}
-              className="absolute -top-12 right-0 grid h-10 w-10 place-items-center border border-[rgba(240,232,216,0.07)] text-cream transition-colors hover:border-[rgba(200,137,42,0.22)] hover:text-gold"
+              className="absolute -top-12 right-0 grid h-10 w-10 place-items-center border border-[var(--design-border-soft)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
             >
               <Plus className="rotate-45" size={18} />
             </button>
@@ -1476,7 +1493,7 @@ export default function DesignDetailPage() {
                       (prev) => (prev - 1 + images.length) % images.length,
                     )
                   }
-                  className="absolute -left-12 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[rgba(240,232,216,0.07)] bg-[rgba(10,9,7,0.6)] text-cream transition-colors hover:border-[rgba(200,137,42,0.22)] hover:text-gold"
+                  className="absolute -left-12 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[var(--design-border-soft)] bg-[var(--design-control-bg)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
                 >
                   <ChevronLeft size={18} />
                 </button>
@@ -1485,7 +1502,7 @@ export default function DesignDetailPage() {
                   onClick={() =>
                     setLightboxIndex((prev) => (prev + 1) % images.length)
                   }
-                  className="absolute -right-12 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[rgba(240,232,216,0.07)] bg-[rgba(10,9,7,0.6)] text-cream transition-colors hover:border-[rgba(200,137,42,0.22)] hover:text-gold"
+                  className="absolute -right-12 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[var(--design-border-soft)] bg-[var(--design-control-bg)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
                 >
                   <ChevronRight size={18} />
                 </button>

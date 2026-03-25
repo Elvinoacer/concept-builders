@@ -101,6 +101,44 @@
       rgba(0, 0, 0, 0.4) 70%,
       transparent 100%
     );
+
+    --design-hero-image-filter: brightness(0.55) saturate(0.8);
+    --design-hero-fallback-bg: linear-gradient(
+      130deg,
+      rgba(200, 137, 42, 0.08),
+      transparent 55%
+    );
+    --design-hero-overlay:
+      linear-gradient(
+        to bottom,
+        rgba(10, 9, 7, 0.3) 0%,
+        transparent 30%,
+        rgba(10, 9, 7, 0.5) 65%,
+        #0a0907 100%
+      ),
+      linear-gradient(130deg, rgba(200, 137, 42, 0.07), transparent 55%);
+    --design-hero-grid-line: rgba(200, 137, 42, 0.03);
+    --design-hero-grid-mask: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(0, 0, 0, 0.4) 40%,
+      rgba(0, 0, 0, 0.4) 70%,
+      transparent
+    );
+    --design-hero-control-bg: rgba(10, 9, 7, 0.5);
+    --design-hero-control-border: rgba(240, 232, 216, 0.07);
+    --design-hero-control-border-hover: rgba(200, 137, 42, 0.22);
+    --design-hero-breadcrumb: rgba(240, 232, 216, 0.55);
+
+    --design-border-soft: rgba(240, 232, 216, 0.07);
+    --design-border-accent: rgba(200, 137, 42, 0.22);
+    --design-text-subtle: rgba(240, 232, 216, 0.75);
+    --design-text-muted: rgba(240, 232, 216, 0.58);
+    --design-control-bg: rgba(10, 9, 7, 0.65);
+    --design-control-bg-soft: rgba(10, 9, 7, 0.55);
+    --design-row-hover: #1c1a17;
+    --design-mobile-bar-bg: rgba(20, 18, 16, 0.96);
+    --design-lightbox-bg: rgba(10, 9, 7, 0.96);
   }
 
   /* === LIGHT MODE === */
@@ -173,6 +211,44 @@
       rgba(0, 0, 0, 0.16) 70%,
       transparent 100%
     );
+
+    --design-hero-image-filter: brightness(0.82) saturate(0.9);
+    --design-hero-fallback-bg: linear-gradient(
+      130deg,
+      rgba(176, 120, 32, 0.14),
+      transparent 55%
+    );
+    --design-hero-overlay:
+      linear-gradient(
+        to bottom,
+        rgba(250, 247, 242, 0.2) 0%,
+        rgba(250, 247, 242, 0.08) 35%,
+        rgba(242, 236, 224, 0.7) 72%,
+        var(--ink) 100%
+      ),
+      linear-gradient(130deg, rgba(176, 120, 32, 0.09), transparent 58%);
+    --design-hero-grid-line: rgba(80, 65, 50, 0.06);
+    --design-hero-grid-mask: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(0, 0, 0, 0.2) 40%,
+      rgba(0, 0, 0, 0.2) 70%,
+      transparent
+    );
+    --design-hero-control-bg: rgba(250, 247, 242, 0.55);
+    --design-hero-control-border: rgba(80, 65, 50, 0.18);
+    --design-hero-control-border-hover: rgba(176, 120, 32, 0.35);
+    --design-hero-breadcrumb: rgba(44, 37, 32, 0.68);
+
+    --design-border-soft: rgba(80, 65, 50, 0.16);
+    --design-border-accent: rgba(176, 120, 32, 0.34);
+    --design-text-subtle: rgba(44, 37, 32, 0.8);
+    --design-text-muted: rgba(44, 37, 32, 0.62);
+    --design-control-bg: rgba(250, 247, 242, 0.74);
+    --design-control-bg-soft: rgba(250, 247, 242, 0.66);
+    --design-row-hover: #ede4d6;
+    --design-mobile-bar-bg: rgba(250, 247, 242, 0.96);
+    --design-lightbox-bg: rgba(250, 247, 242, 0.92);
   }
 }
 
