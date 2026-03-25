@@ -184,6 +184,8 @@ const FileUpload = ({
                       file.url.split("/").pop() || "Unknown File",
                     )
                   : "Unknown File");
+              const previewKey =
+                file.url || `${fileName}-${file.type || "file"}-${index}`;
               const isImage =
                 file.type === "IMAGE" ||
                 /\.(jpe?g|png|gif|bmp|webp)$/i.test(fileName);
@@ -191,7 +193,7 @@ const FileUpload = ({
 
               return (
                 <div
-                  key={index}
+                  key={previewKey}
                   className="relative group bg-white rounded-lg border overflow-hidden"
                 >
                   {isImage ? (

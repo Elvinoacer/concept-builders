@@ -1376,17 +1376,17 @@ interface DocumentState {
 
 interface FilesStepProps {
   images: FileType[];
-  setImages: (files: FileType[]) => void;
+  setImages: React.Dispatch<React.SetStateAction<FileType[]>>;
   floorPlans: FileType[];
-  setFloorPlans: (files: FileType[]) => void;
+  setFloorPlans: React.Dispatch<React.SetStateAction<FileType[]>>;
   files: FileType[];
-  setFiles: (files: FileType[]) => void;
+  setFiles: React.Dispatch<React.SetStateAction<FileType[]>>;
   architecturalDesign: DocumentState;
-  setArchitecturalDesign: (doc: DocumentState) => void;
+  setArchitecturalDesign: React.Dispatch<React.SetStateAction<DocumentState>>;
   structuralDesign: DocumentState;
-  setStructuralDesign: (doc: DocumentState) => void;
+  setStructuralDesign: React.Dispatch<React.SetStateAction<DocumentState>>;
   billOfQuantities: DocumentState;
-  setBillOfQuantities: (doc: DocumentState) => void;
+  setBillOfQuantities: React.Dispatch<React.SetStateAction<DocumentState>>;
   fieldErrors: Record<string, string>;
   setFieldErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
@@ -1449,11 +1449,11 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
                   name: file.originalFileName || "Unknown",
                   size: 0,
                 };
-                setImages([...images, mappedFile]);
+                setImages((prev) => [...prev, mappedFile]);
                 setFieldErrors((prev) => ({ ...prev, images: "" }));
               }}
               onFileRemove={(fileUrl) =>
-                setImages(images.filter((f) => f.url !== fileUrl))
+                setImages((prev) => prev.filter((f) => f.url !== fileUrl))
               }
               initialFiles={images}
               fileTypeCategory="IMAGE"
@@ -1497,10 +1497,10 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
                   name: file.originalFileName || "Unknown",
                   size: 0,
                 };
-                setFloorPlans([...floorPlans, mappedFile]);
+                setFloorPlans((prev) => [...prev, mappedFile]);
               }}
               onFileRemove={(fileUrl) =>
-                setFloorPlans(floorPlans.filter((f) => f.url !== fileUrl))
+                setFloorPlans((prev) => prev.filter((f) => f.url !== fileUrl))
               }
               initialFiles={floorPlans}
               fileTypeCategory="FLOOR_PLAN"
@@ -1538,10 +1538,10 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
                   name: file.originalFileName || "Unknown",
                   size: 0,
                 };
-                setFiles([...files, mappedFile]);
+                setFiles((prev) => [...prev, mappedFile]);
               }}
               onFileRemove={(fileUrl) =>
-                setFiles(files.filter((f) => f.url !== fileUrl))
+                setFiles((prev) => prev.filter((f) => f.url !== fileUrl))
               }
               initialFiles={files}
               fileTypeCategory="FILE"
@@ -1646,21 +1646,21 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
                         name: file.originalFileName || "Unknown",
                         size: 0,
                       };
-                      doc.setState({
-                        ...doc.state,
+                      doc.setState((prev) => ({
+                        ...prev,
                         [field.id]: [
-                          ...doc.state[field.id as keyof DocumentState],
+                          ...prev[field.id as keyof DocumentState],
                           mappedFile,
                         ],
-                      });
+                      }));
                     }}
                     onFileRemove={(fileUrl) =>
-                      doc.setState({
-                        ...doc.state,
-                        [field.id]: doc.state[
+                      doc.setState((prev) => ({
+                        ...prev,
+                        [field.id]: prev[
                           field.id as keyof DocumentState
                         ].filter((f: FileType) => f.url !== fileUrl),
-                      })
+                      }))
                     }
                     initialFiles={doc.state[field.id as keyof DocumentState]}
                     fileTypeCategory={categoryMap[field.id] || "OTHER"}
