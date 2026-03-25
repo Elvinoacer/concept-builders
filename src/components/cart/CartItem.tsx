@@ -251,23 +251,23 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
               </div>
             )}
 
-          <div className="mt-5 w-full rounded-2xl border border-cb-border bg-card/80 p-4 sm:p-5 shadow-sm block relative">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-cream-dim mb-3 whitespace-nowrap">
+          <div className="mt-6 w-full rounded-2xl border-2 border-cb-border bg-card p-4 sm:p-5">
+            <p className="text-[11px] sm:text-xs font-black uppercase tracking-[0.15em] text-cream-dim mb-4 block">
               Selected Options Breakdown
-            </h4>
-            <div className="rounded-xl border border-cb-border/70 divide-y divide-cb-border/60 bg-surface overflow-hidden">
+            </p>
+            <div className="rounded-xl border border-[rgba(200,137,42,0.2)] bg-[#111009] overflow-hidden flex flex-col">
               {[...selectedFileTypeRows, ...selectedExtrasRows].length > 0 ? (
                 [...selectedFileTypeRows, ...selectedExtrasRows].map((row, idx) => (
                   <div
                     key={"type" in row ? row.type : row.id || idx}
-                    className="flex flex-row items-center justify-between gap-4 px-4 py-3 text-sm"
+                    className="flex justify-between items-center gap-4 px-4 py-3 border-b border-[rgba(200,185,168,0.06)] last:border-b-0"
                   >
-                    <span className="flex-1 text-cream-dim font-medium truncate">
-                      {row.label || "Unknown Option"}
+                    <span className="text-sm text-cream-dim block min-w-0">
+                      {row.label || "Option"}
                     </span>
                     <span
-                      className={`flex-shrink-0 text-right font-bold whitespace-nowrap tabular-nums ${
-                        row.price > 0 ? "text-gold" : "text-green-400"
+                      className={`text-sm font-bold whitespace-nowrap tabular-nums block ${
+                        row.price > 0 ? "text-[#c8892a]" : "text-emerald-400"
                       }`}
                     >
                       {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
@@ -275,14 +275,14 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                   </div>
                 ))
               ) : (
-                <div className="px-4 py-3 text-sm text-cream-dim italic font-medium">
-                  No additional options selected.
+                <div className="px-4 py-4 text-sm text-[rgba(200,185,168,0.5)] italic text-center border-b border-[rgba(200,185,168,0.06)]">
+                  No additional options
                 </div>
               )}
 
-              <div className="flex items-center justify-between gap-4 bg-gold/10 px-4 py-3 text-sm font-bold border-t border-gold/20">
-                <span className="text-cream uppercase tracking-wide">Item Total</span>
-                <span className="text-gold text-right tabular-nums whitespace-nowrap text-base">
+              <div className="flex justify-between items-center gap-4 bg-[rgba(200,137,42,0.08)] px-4 py-3 border-t border-[rgba(200,137,42,0.2)]">
+                <span className="text-sm font-bold text-cream uppercase tracking-wider">Item Total</span>
+                <span className="text-base font-bold text-[#c8892a] tabular-nums whitespace-nowrap">
                   ${itemTotalPrice.toFixed(2)}
                 </span>
               </div>
