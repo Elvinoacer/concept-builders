@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useEffect } from "react";
-import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { useCart } from "@/hooks/useCart";
 import { useSession } from "next-auth/react";
 
 export default function CheckoutClientPage() {
-  const { cart, isLoading, fetchCart } = useCart();
+  const { cart, loading, fetchCart, cartTotal, appliedDiscountAmount } =
+    useCart();
   const { status } = useSession();
 
   useEffect(() => {
@@ -33,10 +33,18 @@ export default function CheckoutClientPage() {
             </div>
             <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
               <div className="flex flex-col gap-8">
-                <CheckoutForm />
+                <div className="rounded-xl bg-card p-8 shadow-lg border border-cb-border text-cream-dim">
+                  Use the main checkout flow at /checkout for payment method
+                  selection.
+                </div>
               </div>
               <div className="rounded-xl bg-card p-8 shadow-lg border border-cb-border">
-                <OrderSummary items={cart} isLoading={isLoading} />
+                <OrderSummary
+                  items={cart}
+                  isLoading={loading}
+                  cartTotal={cartTotal}
+                  appliedDiscountAmount={appliedDiscountAmount}
+                />
               </div>
             </div>
           </div>

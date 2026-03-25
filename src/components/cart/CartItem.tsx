@@ -12,12 +12,32 @@ interface CartItemProps {
     cartItemId: string;
     quantity: number;
     selectedFileTypes: string[];
-    selectedExtras?: any[];
-    design: Design & { packageOptions: PackageOption[] };
-    images: { url: string }[];
+    selectedExtras?: Array<{ id: string; name: string; price: number }>;
+    design: Design & {
+      packageOptions: PackageOption[];
+      images?: Array<{ url: string }>;
+      architecturalDesign?: {
+        pdfFiles?: unknown[];
+        cadFiles?: unknown[];
+      };
+      structuralDesign?: {
+        pdfFiles?: unknown[];
+        cadFiles?: unknown[];
+      };
+      billOfQuantities?: {
+        pdfFiles?: unknown[];
+        excelFiles?: unknown[];
+      };
+    };
   };
   onRemove: (cartItemId: string) => void;
-  onUpdate: (cartItemId: string, updates: Partial<any>) => void;
+  onUpdate: (
+    cartItemId: string,
+    updates: Partial<{
+      selectedFileTypes: string[];
+      selectedExtras: Array<{ id: string; name: string; price: number }>;
+    }>,
+  ) => void;
 }
 
 const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
@@ -69,14 +89,17 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
     setIsRemoving(false);
   };
 
-  const handleExtraChange = (extra, isChecked) => {
+  const handleExtraChange = (
+    extra: { id: string; name: string; price: number },
+    isChecked: boolean,
+  ) => {
     const newExtras = isChecked
       ? [...safeSelectedExtras, extra]
       : safeSelectedExtras.filter((e) => e.id !== extra.id);
     onUpdate(item.cartItemId, { selectedExtras: newExtras });
   };
 
-  const handleFileTypeChange = (type, isChecked) => {
+  const handleFileTypeChange = (type: string, isChecked: boolean) => {
     const newFileTypes = isChecked
       ? [...safeSelectedFileTypes, type]
       : safeSelectedFileTypes.filter((t) => t !== type);
@@ -90,7 +113,19 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
     : [];
 
   const safeSelectedExtras = Array.isArray(item.selectedExtras)
-    ? item.selectedExtras.filter((extra) => extra && typeof extra === "object")
+    ? item.selectedExtras.filter(
+        (
+          extra,
+        ): extra is {
+          id: string;
+          name: string;
+          price: number;
+        } =>
+          Boolean(extra) &&
+          typeof extra === "object" &&
+          typeof extra.id === "string" &&
+          typeof extra.name === "string",
+      )
     : [];
 
   const itemTotalPrice = calculateItemTotal(item);
@@ -219,7 +254,9 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                       {fileTypeOption.label}
                       <span
                         className={
-                          fileTypeOption.isBase ? "text-emerald-400" : "text-gold"
+                          fileTypeOption.isBase
+                            ? "text-emerald-400"
+                            : "text-gold"
                         }
                       >
                         {fileTypeOption.isBase
@@ -279,7 +316,9 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                   <span className="text-sm text-cream-dim">
                     Base Design (Architectural PDF)
                   </span>
-                  <span className="text-sm font-semibold text-emerald-400">Included</span>
+                  <span className="text-sm font-semibold text-emerald-400">
+                    Included
+                  </span>
                 </li>
 
                 {selectedFileTypeRows.length > 0 && (
@@ -322,30 +361,27 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                 )}
 
                 {selectedExtrasRows.map((row, idx) => (
-                    <li
-                      key={row.id || idx}
-                      className="flex items-start justify-between gap-3 py-2.5"
+                  <li
+                    key={row.id || idx}
+                    className="flex items-start justify-between gap-3 py-2.5"
+                  >
+                    <span className="min-w-0 flex-1 flex items-start gap-2">
+                      <span className="mt-0.5 rounded-full border border-cb-border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-cream-dim">
+                        {row.badge}
+                      </span>
+                      <span className="min-w-0 text-sm leading-relaxed text-cream break-words">
+                        {row.label || "Option"}
+                      </span>
+                    </span>
+                    <span
+                      className={`text-sm font-semibold whitespace-nowrap tabular-nums ${
+                        row.price > 0 ? "text-[#c8892a]" : "text-emerald-400"
+                      }`}
                     >
-                      <span className="min-w-0 flex-1 flex items-start gap-2">
-                        <span className="mt-0.5 rounded-full border border-cb-border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-cream-dim">
-                          {row.badge}
-                        </span>
-                        <span className="min-w-0 text-sm leading-relaxed text-cream break-words">
-                          {row.label || "Option"}
-                        </span>
-                      </span>
-                      <span
-                        className={`text-sm font-semibold whitespace-nowrap tabular-nums ${
-                          row.price > 0 ? "text-[#c8892a]" : "text-emerald-400"
-                        }`}
-                      >
-                        {row.price > 0
-                          ? `+$${row.price.toFixed(2)}`
-                          : "Included"}
-                      </span>
-                    </li>
-                    </li>
-                  ))}
+                      {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
+                    </span>
+                  </li>
+                ))}
               </ul>
 
               {!hasSelectedRows && (

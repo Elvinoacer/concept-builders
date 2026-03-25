@@ -15,7 +15,18 @@ interface CartItem {
   cartItemId: string;
   selectedFileTypes: string[];
   selectedExtras?: any[];
-  design: Design & { files?: File[]; images?: File[]; name: string };
+  design: Design & {
+    files?: File[];
+    images?: File[];
+    name: string;
+    packageOptions: {
+      id: string;
+      name: string;
+      price: number;
+      fileId: string | null;
+      designId: string;
+    }[];
+  };
 }
 
 interface OrderSummaryProps {
@@ -23,8 +34,8 @@ interface OrderSummaryProps {
   isLoading?: boolean;
   onDiscountApplied?: (
     discountAmount: number,
-    discountId: string,
-    discountCode: string,
+    discountId: string | null,
+    discountCode: string | null,
   ) => void;
   cartTotal: number;
   appliedDiscountAmount: number;
@@ -57,9 +68,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         }
         const data = await res.json();
         setUsdToKesRate(data.usdToKesRate);
-      } catch (err: any) {
-        setRateError(err.message);
-        toast.error(`Exchange rate error: ${err.message}`);
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : "Failed to fetch exchange rate";
+        setRateError(message);
+        toast.error(`Exchange rate error: ${message}`);
       } finally {
         setIsFetchingRate(false);
       }
@@ -114,12 +127,14 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         );
       }
       toast.success(`Discount "${discountCodeInput}" applied!`);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Failed to apply discount";
       if (onDiscountApplied) {
         onDiscountApplied(0, null, null);
       }
-      setDiscountError(err.message);
-      toast.error(err.message);
+      setDiscountError(message);
+      toast.error(message);
     } finally {
       setIsApplyingDiscount(false);
     }
@@ -241,7 +256,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 <div className="text-xs xs:text-sm">
                   <IncludedItems
                     selectedFileTypes={item.selectedFileTypes}
-                    selectedExtras={item.selectedExtras}
+                    selectedExtras={item.selectedExtras || []}
                     design={item.design}
                   />
                 </div>
