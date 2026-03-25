@@ -1,7 +1,7 @@
 import { s3Client } from "@/lib/do-spaces";
 import prisma from "@/lib/prisma";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
@@ -18,10 +18,6 @@ export async function GET(
     const session = await getServerSession(authOptions);
     const isAdmin = session?.user.role === "ADMIN";
     const { id } = await params;
-
-    console.log(
-      `[Designs API] Fetching design with ID: ${id}, isAdmin: ${isAdmin}`,
-    );
 
     const design = await prisma.design.findUnique({
       where: { id },
@@ -62,11 +58,8 @@ export async function GET(
     });
 
     if (!design) {
-      console.log(`[Designs API] Design not found with ID: ${id}`);
       return new NextResponse("Design not found", { status: 404 });
     }
-
-    console.log(`[Designs API] Design found: ${design.name}`);
 
     if (!isAdmin) {
       const sanitizeFileUrls = (files: Array<UrlFile | null> | null) => {
@@ -76,8 +69,6 @@ export async function GET(
               file.url = null;
             }
           });
-        } else if (files) {
-          console.warn(`[Designs API] Expected array but got:`, typeof files);
         }
       };
 
@@ -103,13 +94,16 @@ export async function GET(
       }
     }
 
-    console.log(`[Designs API] Successfully returning design: ${design.name}`);
-    return NextResponse.json(design, { status: 200 });
+    return NextResponse.json(design, {
+      status: 200,
+      headers: {
+        "Cache-Control": isAdmin
+          ? "private, no-store"
+          : "public, s-maxage=120, stale-while-revalidate=600",
+      },
+    });
   } catch (error) {
-    console.error("[Designs API] Error fetching design:", error);
-    if (error instanceof Error) {
-      console.error(`[Designs API] Error stack:`, error.stack);
-    }
+    console.error("Error fetching design:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
@@ -274,10 +268,9 @@ export async function PUT(
       data: updateData,
     });
 
-    revalidatePath("/");
-    revalidatePath(`/admin/designs`);
-    revalidatePath(`/admin/designs/${id}`);
-    revalidatePath(`/designs/${id}`);
+    revalidateTag("designs", "max");
+    revalidateTag("featured-designs", "max");
+    revalidateTag(`design-${id}`, "max");
 
     return NextResponse.json(updatedDesign, { status: 200 });
   } catch (error) {
@@ -300,8 +293,6 @@ export async function DELETE(
     }
 
     const { id } = await params;
-
-    console.log(`Starting deletion process for design: ${id}`);
 
     // 1. Fetch the design to get file details before deletion
     const design = await prisma.design.findUnique({
@@ -367,8 +358,6 @@ export async function DELETE(
       addFileUrls(design.billOfQuantities.excelFiles);
     }
 
-    console.log(`Found ${fileUrls.length} files to delete from Spaces`);
-
     // 3. Delete files from DigitalOcean Spaces (non-blocking)
     if (fileUrls.length > 0) {
       deleteFilesFromSpacesBackground(fileUrls).catch((error) => {
@@ -381,13 +370,10 @@ export async function DELETE(
       where: { id },
     });
 
-    console.log(`Successfully deleted design: ${id}`);
-
     // 5. Revalidate paths
-    revalidatePath("/");
-    revalidatePath("/admin/designs");
-    revalidatePath("/designs");
-    revalidatePath("/api/designs");
+    revalidateTag("designs", "max");
+    revalidateTag("featured-designs", "max");
+    revalidateTag(`design-${id}`, "max");
 
     return NextResponse.json({
       success: true,

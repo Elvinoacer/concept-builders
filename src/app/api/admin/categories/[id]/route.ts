@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
     const { searchParams } = request.nextUrl;
-    const designPage = parseInt(searchParams.get("designPage") || "1");
-    const designLimit = parseInt(searchParams.get("designLimit") || "10");
+    const designPage = Math.max(
+      1,
+      parseInt(searchParams.get("designPage") || "1", 10),
+    );
+    const designLimit = Math.min(
+      50,
+      Math.max(1, parseInt(searchParams.get("designLimit") || "10", 10)),
+    );
     const designSearch = searchParams.get("designSearch") || "";
 
     const designSkip = (designPage - 1) * designLimit;
@@ -62,7 +68,7 @@ export async function GET(
     if (!category) {
       return NextResponse.json(
         { error: "Category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -81,14 +87,14 @@ export async function GET(
     console.error("Error fetching category:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -99,21 +105,21 @@ export async function PUT(
       data: body,
     });
 
-    revalidatePath("/"); // Revalidate the homepage to show updated featured categories
+    revalidateTag("categories", "max");
 
     return NextResponse.json(updatedCategory);
   } catch (error) {
     console.error("Error updating category:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -121,14 +127,14 @@ export async function DELETE(
       where: { id },
     });
 
-    revalidatePath("/"); // Revalidate the homepage after deleting a category
+    revalidateTag("categories", "max");
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error("Error deleting category:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 
@@ -9,10 +9,6 @@ type DesignWhere = NonNullable<FindManyArgs["where"]>;
 type DesignOrderBy = NonNullable<FindManyArgs["orderBy"]>;
 type CreateArgs = NonNullable<Parameters<typeof prisma.design.create>[0]>;
 type DesignCreateData = CreateArgs["data"];
-
-type UrlFile = {
-  url: string | null;
-};
 
 type FilePayload = {
   name: string;
@@ -44,10 +40,17 @@ type DesignDocumentPayload = {
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    const isAdmin = session?.user.role === "ADMIN";
+
     const searchParams = request.nextUrl.searchParams;
-    const search = searchParams.get("search") || "";
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    const search = (searchParams.get("search") || "").trim();
+    const cursor = searchParams.get("cursor");
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.min(
+      50,
+      Math.max(1, parseInt(searchParams.get("limit") || "10", 10)),
+    );
     const skip = (page - 1) * limit;
 
     const priceType = searchParams.get("priceType");
@@ -62,22 +65,43 @@ export async function GET(request: NextRequest) {
     const exclude = searchParams.get("exclude");
     const isFeatured = searchParams.get("isFeatured");
 
-    const where: DesignWhere = {
-      OR: [
-        {
-          name: {
-            contains: search,
-            mode: "insensitive",
+    const where: DesignWhere = {};
+
+    if (search) {
+      const ftsMatches = await prisma.$queryRaw<Array<{ id: string }>>`
+        SELECT "id"
+        FROM "public"."Design"
+        WHERE "search_vector" @@ plainto_tsquery('english', ${search})
+        ORDER BY ts_rank("search_vector", plainto_tsquery('english', ${search})) DESC
+        LIMIT 2000
+      `;
+
+      const matchedIds = ftsMatches.map((row) => row.id);
+      if (matchedIds.length === 0) {
+        return NextResponse.json(
+          cursor
+            ? {
+                designs: [],
+                nextCursor: null,
+                hasMore: false,
+              }
+            : {
+                designs: [],
+                totalPages: 0,
+                totalDesigns: 0,
+              },
+          {
+            headers: {
+              "Cache-Control": isAdmin
+                ? "private, no-store"
+                : "public, s-maxage=60, stale-while-revalidate=300",
+            },
           },
-        },
-        {
-          description: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
-      ],
-    };
+        );
+      }
+
+      where.id = { in: matchedIds };
+    }
 
     if (priceType === "design" && (minPrice || maxPrice)) {
       const basePriceFilter: Record<string, number> = {};
@@ -105,15 +129,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (styles && styles.length > 0) {
-      const categories = await prisma.category.findMany({
-        where: {
-          name: {
-            in: styles,
-          },
+      where.category = {
+        name: {
+          in: styles,
         },
-      });
-      const categoryIds = categories.map((c) => c.id);
-      where.categoryId = { in: categoryIds };
+      };
     }
 
     if (minSize || maxSize) {
@@ -128,7 +148,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (exclude) {
-      where.id = { not: exclude };
+      if (where.id && typeof where.id === "object" && "in" in where.id) {
+        const existing = where.id.in as string[];
+        where.id = { in: existing.filter((id) => id !== exclude) };
+      } else {
+        where.id = { not: exclude };
+      }
     }
 
     if (isFeatured) {
@@ -154,78 +179,150 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const designs = await prisma.design.findMany({
-      where,
-      skip,
-      take: limit,
-      include: {
-        images: true,
-        files: true,
-        reviews: true,
-        category: true,
-        discounts: {
-          include: {
-            discount: true,
+    if (!isAdmin && cursor) {
+      const designs = await prisma.design.findMany({
+        where,
+        take: limit + 1,
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          basePrice: true,
+          bedrooms: true,
+          bathrooms: true,
+          area: true,
+          floors: true,
+          isFeatured: true,
+          createdAt: true,
+          updatedAt: true,
+          views: true,
+          category: { select: { id: true, name: true } },
+          images: {
+            where: { type: "IMAGE" },
+            take: 1,
+            select: { url: true, name: true, type: true },
+          },
+          discounts: {
+            select: {
+              discount: {
+                select: { value: true, code: true, isActive: true },
+              },
+            },
           },
         },
-        orderItems: true,
-        architecturalDesign: {
-          include: {
-            pdfFiles: true,
-            cadFiles: true,
-          },
-        },
-        structuralDesign: {
-          include: {
-            pdfFiles: true,
-            cadFiles: true,
-          },
-        },
-        billOfQuantities: {
-          include: {
-            excelFiles: true,
-          },
-        },
-      },
-      orderBy,
-    });
-
-    const totalDesigns = await prisma.design.count({ where });
-
-    const session = await getServerSession(authOptions);
-    const isAdmin = session?.user.role === "ADMIN";
-
-    if (!isAdmin) {
-      const sanitizeFileUrls = (files: Array<UrlFile | null> | null) => {
-        if (files) {
-          files.forEach((file) => {
-            if (file) {
-              file.url = null;
-            }
-          });
-        }
-      };
-
-      designs.forEach((design) => {
-        sanitizeFileUrls(design.files);
-        if (design.architecturalDesign) {
-          sanitizeFileUrls(design.architecturalDesign.pdfFiles);
-          sanitizeFileUrls(design.architecturalDesign.cadFiles);
-        }
-        if (design.structuralDesign) {
-          sanitizeFileUrls(design.structuralDesign.pdfFiles);
-          sanitizeFileUrls(design.structuralDesign.cadFiles);
-        }
-        if (design.billOfQuantities) {
-          sanitizeFileUrls(design.billOfQuantities.excelFiles);
-        }
+        orderBy,
       });
+
+      const hasMore = designs.length > limit;
+      const items = hasMore ? designs.slice(0, -1) : designs;
+      const nextCursor = hasMore ? items[items.length - 1].id : null;
+
+      return NextResponse.json(
+        {
+          designs: items,
+          nextCursor,
+          hasMore,
+        },
+        {
+          headers: {
+            "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+          },
+        },
+      );
     }
 
-    return NextResponse.json({
-      designs,
-      totalPages: Math.ceil(totalDesigns / limit),
-    });
+    const [designs, totalDesigns] = isAdmin
+      ? await prisma.$transaction([
+          prisma.design.findMany({
+            where,
+            skip,
+            take: limit,
+            include: {
+              images: true,
+              files: true,
+              reviews: true,
+              category: true,
+              floorPlans: true,
+              discounts: {
+                include: {
+                  discount: true,
+                },
+              },
+              orderItems: true,
+              architecturalDesign: {
+                include: {
+                  pdfFiles: true,
+                  cadFiles: true,
+                },
+              },
+              structuralDesign: {
+                include: {
+                  pdfFiles: true,
+                  cadFiles: true,
+                },
+              },
+              billOfQuantities: {
+                include: {
+                  excelFiles: true,
+                },
+              },
+            },
+            orderBy,
+          }),
+          prisma.design.count({ where }),
+        ])
+      : await prisma.$transaction([
+          prisma.design.findMany({
+            where,
+            skip,
+            take: limit,
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              basePrice: true,
+              bedrooms: true,
+              bathrooms: true,
+              area: true,
+              floors: true,
+              isFeatured: true,
+              createdAt: true,
+              updatedAt: true,
+              views: true,
+              category: { select: { id: true, name: true } },
+              images: {
+                where: { type: "IMAGE" },
+                take: 1,
+                select: { url: true, name: true, type: true },
+              },
+              discounts: {
+                select: {
+                  discount: {
+                    select: { value: true, code: true, isActive: true },
+                  },
+                },
+              },
+            },
+            orderBy,
+          }),
+          prisma.design.count({ where }),
+        ]);
+
+    return NextResponse.json(
+      {
+        designs,
+        totalPages: Math.ceil(totalDesigns / limit),
+        totalDesigns,
+      },
+      {
+        headers: {
+          "Cache-Control": isAdmin
+            ? "private, no-store"
+            : "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      },
+    );
   } catch (error) {
     console.error("Error fetching designs:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
@@ -393,9 +490,8 @@ export async function POST(request: Request) {
       },
     });
 
-    revalidatePath("/");
-    revalidatePath("/admin/designs");
-    revalidatePath("/designs");
+    revalidateTag("designs", "max");
+    revalidateTag("featured-designs", "max");
 
     return NextResponse.json(newDesign, { status: 201 });
   } catch (error) {

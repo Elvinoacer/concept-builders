@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const search = request.nextUrl.searchParams.get("search") || "";
     const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
     const limit = parseInt(request.nextUrl.searchParams.get("limit") || "10");
@@ -32,7 +33,7 @@ export async function GET(
       : {};
 
     const category = await prisma.category.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         designs: {
           where: designsWhere,
@@ -72,41 +73,59 @@ export async function GET(
     });
 
     if (!category) {
-      return NextResponse.json({ error: "Category not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Category not found" },
+        { status: 404 },
+      );
     }
 
-    return NextResponse.json(category);
+    return NextResponse.json(category, {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=900",
+      },
+    });
   } catch (error) {
     console.error("Error fetching category:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
     const body = await request.json();
-    console.log("Received PUT request body for category:", body); // Added logging
-    const { name, image, isFeatured } = body; // Added image and isFeatured
+    const { name, image, isFeatured } = body;
 
     if (!name) {
-      return NextResponse.json({ message: "Name is required" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Name is required" },
+        { status: 400 },
+      );
     }
 
     // Construct data object for update, only include fields if they are provided
-    const updateData: { name: string; image?: string | null; isFeatured?: boolean } = { name };
-    if (image !== undefined) { // Allow image to be null
+    const updateData: {
+      name: string;
+      image?: string | null;
+      isFeatured?: boolean;
+    } = { name };
+    if (image !== undefined) {
+      // Allow image to be null
       updateData.image = image;
     }
-    if (isFeatured !== undefined) { // Allow isFeatured to be false
-      if (typeof isFeatured !== 'boolean') {
-        return NextResponse.json({ message: "isFeatured must be a boolean value" }, { status: 400 });
+    if (isFeatured !== undefined) {
+      // Allow isFeatured to be false
+      if (typeof isFeatured !== "boolean") {
+        return NextResponse.json(
+          { message: "isFeatured must be a boolean value" },
+          { status: 400 },
+        );
       }
       updateData.isFeatured = isFeatured;
     }
@@ -116,35 +135,36 @@ export async function PUT(
       data: updateData,
     });
 
-    revalidatePath('/');
+    revalidateTag("categories", "max");
 
     return NextResponse.json(updatedCategory);
   } catch (error) {
     console.error("Error updating category:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     await prisma.category.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
-    revalidatePath('/');
+    revalidateTag("categories", "max");
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error("Error deleting category:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

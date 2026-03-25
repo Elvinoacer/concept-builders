@@ -2,16 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { Prisma } from "@/generated/prisma/browser";
 import prisma from "@/lib/prisma";
+import PublicDesignsInfiniteGrid from "@/components/design-showcase/PublicDesignsInfiniteGrid";
 
 interface AllDesignsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     category?: string;
     sort?: string;
     search?: string;
     page?: string;
     pageSize?: string;
     isFeatured?: string;
-  };
+  }>;
 }
 
 function normalizeSearchParam(value?: string) {
@@ -20,32 +21,18 @@ function normalizeSearchParam(value?: string) {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
-function getPageNumbers(currentPage: number, totalPages: number) {
-  if (totalPages <= 1) return [] as Array<number | string>;
-
-  const delta = 2;
-  const pages: Array<number | string> = [];
-  const left = Math.max(2, currentPage - delta);
-  const right = Math.min(totalPages - 1, currentPage + delta);
-
-  pages.push(1);
-  if (left > 2) pages.push("...");
-  for (let i = left; i <= right; i += 1) pages.push(i);
-  if (right < totalPages - 1) pages.push("...");
-  if (totalPages > 1) pages.push(totalPages);
-
-  return pages;
-}
-
 const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
-  const category = normalizeSearchParam(searchParams.category);
-  const sort = normalizeSearchParam(searchParams.sort) || "name";
-  const search = normalizeSearchParam(searchParams.search);
-  const isFeatured = searchParams.isFeatured === "true";
+  const resolvedSearchParams = await searchParams;
 
-  const currentPage = Number(searchParams.page) > 0 ? Number(searchParams.page) : 1;
-  const pageSize = Number(searchParams.pageSize) > 0 ? Number(searchParams.pageSize) : 9;
-  const skip = (currentPage - 1) * pageSize;
+  const category = normalizeSearchParam(resolvedSearchParams.category);
+  const sort = normalizeSearchParam(resolvedSearchParams.sort) || "name";
+  const search = normalizeSearchParam(resolvedSearchParams.search);
+  const isFeatured = resolvedSearchParams.isFeatured === "true";
+
+  const pageSize =
+    Number(resolvedSearchParams.pageSize) > 0
+      ? Number(resolvedSearchParams.pageSize)
+      : 9;
 
   const where: Prisma.DesignWhereInput = {};
 
@@ -74,25 +61,15 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
     where.isFeatured = true;
   }
 
-  const orderBy: Prisma.DesignOrderByWithRelationInput =
-    sort === "price-asc"
-      ? { basePrice: "asc" }
-      : sort === "price-desc"
-        ? { basePrice: "desc" }
-        : { name: "asc" };
-
-  const [categories, designs, totalDesigns, totalUsers, featuredDesign] = await Promise.all([
+  const [
+    categories,
+    totalDesigns,
+    totalUsers,
+    featuredDesign,
+    priceRange,
+    bedroomSummary,
+  ] = await Promise.all([
     prisma.category.findMany({ orderBy: { name: "asc" } }),
-    prisma.design.findMany({
-      where,
-      orderBy,
-      skip,
-      take: pageSize,
-      include: {
-        images: true,
-        category: true,
-      },
-    }),
     prisma.design.count({ where }),
     prisma.user.count(),
     prisma.design.findFirst({
@@ -103,21 +80,30 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
       },
       orderBy: { updatedAt: "desc" },
     }),
+    prisma.design.aggregate({
+      where,
+      _min: { basePrice: true },
+      _max: { basePrice: true },
+    }),
+    prisma.design.groupBy({
+      by: ["bedrooms"],
+      where,
+      _count: { _all: true },
+    }),
   ]);
 
-  const totalPages = Math.ceil(totalDesigns / pageSize);
   const allCategories = ["All", ...categories.map((item) => item.name)];
-  const pageNumbers = getPageNumbers(currentPage, totalPages);
   const fallbackImage = "/images/banners/banner1.jpg";
-  const serifSystem = 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
+  const serifSystem =
+    'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
   const monoSystem =
     'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
-  const minPrice = designs.length ? Math.min(...designs.map((item) => item.basePrice)) : 0;
-  const maxPrice = designs.length ? Math.max(...designs.map((item) => item.basePrice)) : 0;
-  const bedroomCounts = designs.reduce(
-    (acc, design) => {
-      const key = String(design.bedrooms ?? "Unknown");
-      acc[key] = (acc[key] || 0) + 1;
+  const minPrice = priceRange._min.basePrice ?? 0;
+  const maxPrice = priceRange._max.basePrice ?? 0;
+  const bedroomCounts: Record<string, number> = bedroomSummary.reduce(
+    (acc, item) => {
+      const key = item.bedrooms === null ? "Unknown" : String(item.bedrooms);
+      acc[key] = item._count._all;
       return acc;
     },
     {} as Record<string, number>,
@@ -183,7 +169,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
             style={{ fontFamily: serifSystem }}
           >
             <span className="block">House</span>
-            <span className="block italic text-gold not-italic">
+            <span className="block text-gold not-italic">
               <em className="italic">Plans.</em>
             </span>
           </h1>
@@ -193,12 +179,14 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
               className="max-w-[340px] text-[13px] font-light leading-[1.8] text-cream-dim"
               style={{ fontFamily: monoSystem }}
             >
-              Curated architectural designs for every Kenyan homeowner. Filter by style, size,
-              and budget to find your blueprint.
+              Curated architectural designs for every Kenyan homeowner. Filter
+              by style, size, and budget to find your blueprint.
             </p>
             <div className="flex gap-6 sm:gap-12">
               <div>
-                <p className="text-[42px] font-light leading-none text-cream">{totalDesigns}+</p>
+                <p className="text-[42px] font-light leading-none text-cream">
+                  {totalDesigns}+
+                </p>
                 <p
                   className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted"
                   style={{ fontFamily: monoSystem }}
@@ -207,7 +195,9 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                 </p>
               </div>
               <div>
-                <p className="text-[42px] font-light leading-none text-cream">{categories.length}</p>
+                <p className="text-[42px] font-light leading-none text-cream">
+                  {categories.length}
+                </p>
                 <p
                   className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted"
                   style={{ fontFamily: monoSystem }}
@@ -216,7 +206,9 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                 </p>
               </div>
               <div>
-                <p className="text-[42px] font-light leading-none text-cream">{totalUsers}+</p>
+                <p className="text-[42px] font-light leading-none text-cream">
+                  {totalUsers}+
+                </p>
                 <p
                   className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted"
                   style={{ fontFamily: monoSystem }}
@@ -245,7 +237,10 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
             "Kenyan Dream Homes",
             "Bespoke Blueprints",
           ].map((item, idx) => (
-            <span key={`${item}-${idx}`} className="px-8 text-[14px] italic text-cream-dim">
+            <span
+              key={`${item}-${idx}`}
+              className="px-8 text-[14px] italic text-cream-dim"
+            >
               <span className="mr-7 inline-block h-[5px] w-[5px] rounded-full bg-gold align-middle" />
               {item}
             </span>
@@ -296,9 +291,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                   key={option.value}
                   href={queryWith({ sort: option.value, page: "1" })}
                   className={`px-2 py-1 text-[11px] uppercase tracking-[0.12em] ${
-                    active
-                      ? "text-cream"
-                      : "text-muted hover:text-cream"
+                    active ? "text-cream" : "text-muted hover:text-cream"
                   }`}
                   style={{ fontFamily: monoSystem }}
                 >
@@ -309,7 +302,10 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
           </div>
 
           <Link
-            href={queryWith({ isFeatured: isFeatured ? undefined : "true", page: "1" })}
+            href={queryWith({
+              isFeatured: isFeatured ? undefined : "true",
+              page: "1",
+            })}
             className={`ml-1 border px-3 py-2 text-[10px] uppercase tracking-[0.2em] ${
               isFeatured
                 ? "border border-[rgba(200,137,42,0.34)] bg-[rgba(200,137,42,0.1)] text-gold"
@@ -320,10 +316,18 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
             Featured Only
           </Link>
 
-          <form action="/designs" method="get" className="ml-auto w-full sm:w-[220px] lg:w-[290px]">
+          <form
+            action="/designs"
+            method="get"
+            className="ml-auto w-full sm:w-[220px] lg:w-[290px]"
+          >
             <input type="hidden" name="category" value={category || ""} />
             <input type="hidden" name="sort" value={sort || "name"} />
-            <input type="hidden" name="isFeatured" value={isFeatured ? "true" : ""} />
+            <input
+              type="hidden"
+              name="isFeatured"
+              value={isFeatured ? "true" : ""}
+            />
             <input type="hidden" name="pageSize" value={String(pageSize)} />
             <input type="hidden" name="page" value="1" />
             <div className="group relative">
@@ -376,8 +380,14 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                     className="flex w-full items-center justify-between border border-transparent px-3 py-2 text-left text-[12px] tracking-[0.06em] text-cream-dim transition-colors hover:border-[rgba(240,232,216,0.08)] hover:bg-card hover:text-cream"
                     style={{ fontFamily: monoSystem }}
                   >
-                    <span>{bedroom === "Unknown" ? "Unknown" : `${bedroom} Bed${bedroom === "1" ? "" : "s"}`}</span>
-                    <span className="text-[10px] tracking-[0.1em] text-muted">{count}</span>
+                    <span>
+                      {bedroom === "Unknown"
+                        ? "Unknown"
+                        : `${bedroom} Bed${bedroom === "1" ? "" : "s"}`}
+                    </span>
+                    <span className="text-[10px] tracking-[0.1em] text-muted">
+                      {count}
+                    </span>
                   </button>
                 ))}
             </div>
@@ -393,9 +403,16 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
             <div className="relative my-4 h-[2px] bg-[rgba(240,232,216,0.08)]">
               <div className="absolute inset-y-0 left-[10%] right-[30%] bg-gold" />
             </div>
-            <div className="flex items-center justify-between text-[11px] text-muted" style={{ fontFamily: monoSystem }}>
-              <span>{minPrice ? `KES ${Math.floor(minPrice / 1000)}K` : "KES 0"}</span>
-              <span>{maxPrice ? `KES ${Math.ceil(maxPrice / 1000)}K` : "KES 0"}</span>
+            <div
+              className="flex items-center justify-between text-[11px] text-muted"
+              style={{ fontFamily: monoSystem }}
+            >
+              <span>
+                {minPrice ? `KES ${Math.floor(minPrice / 1000)}K` : "KES 0"}
+              </span>
+              <span>
+                {maxPrice ? `KES ${Math.ceil(maxPrice / 1000)}K` : "KES 0"}
+              </span>
             </div>
           </div>
 
@@ -433,11 +450,17 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
 
         <div className="flex-1 px-6 pb-20 pt-10 sm:px-10 lg:px-12">
           <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-[rgba(240,232,216,0.08)] pb-6 sm:flex-row sm:items-center">
-            <h2 className="text-[28px] font-light text-cream" style={{ fontFamily: serifSystem }}>
+            <h2
+              className="text-[28px] font-light text-cream"
+              style={{ fontFamily: serifSystem }}
+            >
               All <em className="italic text-gold">Designs</em>
             </h2>
             <Link
-              href={queryWith({ isFeatured: isFeatured ? undefined : "true", page: "1" })}
+              href={queryWith({
+                isFeatured: isFeatured ? undefined : "true",
+                page: "1",
+              })}
               className="inline-flex items-center gap-2 border border-[rgba(200,137,42,0.22)] bg-[rgba(200,137,42,0.08)] px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-gold transition-colors hover:bg-[rgba(200,137,42,0.15)]"
               style={{ fontFamily: monoSystem }}
             >
@@ -446,205 +469,81 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
           </div>
 
           <div className="flex flex-col gap-10">
-          {featuredDesign && (
-            <article className="grid overflow-hidden border border-[rgba(240,232,216,0.08)] bg-card lg:grid-cols-[1.4fr_1fr]">
-              <div className="relative min-h-[280px] overflow-hidden sm:min-h-[380px]">
-                <Image
-                  src={featuredDesign.images?.[0]?.url || fallbackImage}
-                  alt={featuredDesign.name}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  className="object-cover opacity-80"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-                <p
-                  className="absolute left-4 top-4 border border-[rgba(200,137,42,0.34)] bg-gold px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-ink"
-                  style={{ fontFamily: monoSystem }}
-                >
-                  Editor&apos;s Pick
-                </p>
-              </div>
-
-              <div className="flex flex-col justify-end p-6 sm:p-8">
-                <p
-                  className="mb-4 text-[10px] uppercase tracking-[0.25em] text-gold"
-                  style={{ fontFamily: monoSystem }}
-                >
-                  - Featured Design
-                </p>
-                <h2
-                  className="mb-3 text-4xl font-light leading-[1.05] text-cream"
-                  style={{ fontFamily: serifSystem }}
-                >
-                  {featuredDesign.name}
-                </h2>
-                <p className="mb-6 line-clamp-3 text-[13px] leading-[1.7] text-cream-dim" style={{ fontFamily: monoSystem }}>
-                  {featuredDesign.description}
-                </p>
-                <div className="mb-6 flex flex-wrap gap-4 text-[11px] uppercase tracking-[0.12em] text-muted" style={{ fontFamily: monoSystem }}>
-                  <span>{featuredDesign.bedrooms ?? "-"} Beds</span>
-                  <span>{featuredDesign.bathrooms ?? "-"} Baths</span>
-                  <span>{featuredDesign.area ?? "-"} m2</span>
-                </div>
-                <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-5">
-                  <p className="text-2xl font-light text-cream">
-                    <span className="mr-1 text-[10px] uppercase tracking-[0.15em] text-muted" style={{ fontFamily: monoSystem }}>
-                      from
-                    </span>
-                    KES {featuredDesign.basePrice.toLocaleString()}
-                  </p>
-                  <Link
-                    href={`/designs/${featuredDesign.id}`}
-                    className="border border-gold px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-gold transition-colors hover:bg-gold hover:text-ink"
+            {featuredDesign && (
+              <article className="grid overflow-hidden border border-[rgba(240,232,216,0.08)] bg-card lg:grid-cols-[1.4fr_1fr]">
+                <div className="relative min-h-[280px] overflow-hidden sm:min-h-[380px]">
+                  <Image
+                    src={featuredDesign.images?.[0]?.url || fallbackImage}
+                    alt={featuredDesign.name}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    className="object-cover opacity-80"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                  <p
+                    className="absolute left-4 top-4 border border-[rgba(200,137,42,0.34)] bg-gold px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-ink"
                     style={{ fontFamily: monoSystem }}
                   >
-                    View Plan
-                  </Link>
+                    Editor&apos;s Pick
+                  </p>
                 </div>
-              </div>
-            </article>
-          )}
 
-          {designs.length > 0 ? (
-            <div className="grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)] md:grid-cols-2 xl:grid-cols-3">
-              {designs.map((design, index) => {
-                const imageUrl = design.images?.[0]?.url || fallbackImage;
-
-                return (
-                  <article
-                    key={design.id}
-                    className="group bg-ink transition-colors duration-300 hover:bg-card"
+                <div className="flex flex-col justify-end p-6 sm:p-8">
+                  <p
+                    className="mb-4 text-[10px] uppercase tracking-[0.25em] text-gold"
+                    style={{ fontFamily: monoSystem }}
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      <Image
-                        src={imageUrl}
-                        alt={design.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                        className="object-cover opacity-80 transition-all duration-700 group-hover:scale-105 group-hover:opacity-95"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-                      {design.isFeatured && (
-                        <span
-                          className="absolute left-4 top-4 bg-gold px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-ink"
-                          style={{ fontFamily: monoSystem }}
-                        >
-                          Featured
-                        </span>
-                      )}
-                      <span className="absolute bottom-4 right-4 text-[10px] tracking-[0.12em] text-[rgba(240,232,216,0.45)]" style={{ fontFamily: monoSystem }}>
-                        {String(skip + index + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-
-                    <div className="p-6">
-                      <div className="mb-3 flex items-center justify-between">
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-gold" style={{ fontFamily: monoSystem }}>
-                          {design.category?.name || "Uncategorized"}
-                        </p>
-                        <p className="text-[10px] tracking-[0.1em] text-muted" style={{ fontFamily: monoSystem }}>
-                          {(design.views || 0).toLocaleString()} views
-                        </p>
-                      </div>
-
-                      <h3
-                        className="mb-3 line-clamp-1 text-3xl font-light text-cream transition-colors group-hover:text-gold-light"
-                        style={{ fontFamily: serifSystem }}
+                    - Featured Design
+                  </p>
+                  <h2
+                    className="mb-3 text-4xl font-light leading-[1.05] text-cream"
+                    style={{ fontFamily: serifSystem }}
+                  >
+                    {featuredDesign.name}
+                  </h2>
+                  <p
+                    className="mb-6 line-clamp-3 text-[13px] leading-[1.7] text-cream-dim"
+                    style={{ fontFamily: monoSystem }}
+                  >
+                    {featuredDesign.description}
+                  </p>
+                  <div
+                    className="mb-6 flex flex-wrap gap-4 text-[11px] uppercase tracking-[0.12em] text-muted"
+                    style={{ fontFamily: monoSystem }}
+                  >
+                    <span>{featuredDesign.bedrooms ?? "-"} Beds</span>
+                    <span>{featuredDesign.bathrooms ?? "-"} Baths</span>
+                    <span>{featuredDesign.area ?? "-"} m2</span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-5">
+                    <p className="text-2xl font-light text-cream">
+                      <span
+                        className="mr-1 text-[10px] uppercase tracking-[0.15em] text-muted"
+                        style={{ fontFamily: monoSystem }}
                       >
-                        {design.name}
-                      </h3>
-
-                      <div className="mb-5 flex flex-wrap gap-4 text-[11px] uppercase tracking-[0.12em] text-muted" style={{ fontFamily: monoSystem }}>
-                        <span>{design.bedrooms ?? "-"} Beds</span>
-                        <span>{design.bathrooms ?? "-"} Baths</span>
-                        <span>{design.area ?? "-"} m2</span>
-                      </div>
-
-                      <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4">
-                        <p className="text-2xl font-light text-cream">
-                          <span className="mr-1 text-[10px] uppercase tracking-[0.15em] text-muted" style={{ fontFamily: monoSystem }}>
-                            from
-                          </span>
-                          KES {design.basePrice.toLocaleString()}
-                        </p>
-                        <Link
-                          href={`/designs/${design.id}`}
-                          className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold"
-                          style={{ fontFamily: monoSystem }}
-                        >
-                          View Plan
-                        </Link>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="border border-[rgba(240,232,216,0.08)] bg-card/40 p-16 text-center">
-              <h3 className="mb-2 text-4xl font-light text-cream" style={{ fontFamily: serifSystem }}>
-                No designs found
-              </h3>
-              <p className="text-[12px] tracking-[0.08em] text-muted" style={{ fontFamily: monoSystem }}>
-                Adjust the category, featured toggle, or search phrase.
-              </p>
-            </div>
-          )}
-
-          {totalPages > 1 && (
-            <div className="mt-2 flex flex-col items-center justify-between gap-5 border-t border-[rgba(240,232,216,0.08)] pt-8 sm:flex-row">
-              <p className="text-[11px] tracking-[0.08em] text-muted" style={{ fontFamily: monoSystem }}>
-                Showing {Math.min(skip + 1, totalDesigns)} - {Math.min(skip + pageSize, totalDesigns)} of {totalDesigns}
-              </p>
-
-              <div className="flex items-center gap-1">
-                <Link
-                  href={queryWith({ page: String(Math.max(currentPage - 1, 1)) })}
-                  className={`px-3 py-2 text-[11px] uppercase tracking-[0.14em] ${
-                    currentPage === 1
-                      ? "pointer-events-none border border-[rgba(240,232,216,0.08)] text-[rgba(240,232,216,0.3)]"
-                      : "border border-[rgba(240,232,216,0.12)] text-cream-dim hover:text-cream"
-                  }`}
-                  style={{ fontFamily: monoSystem }}
-                >
-                  Prev
-                </Link>
-
-                {pageNumbers.map((item, idx) =>
-                  typeof item === "number" ? (
+                        from
+                      </span>
+                      KES {featuredDesign.basePrice.toLocaleString()}
+                    </p>
                     <Link
-                      key={`${item}-${idx}`}
-                      href={queryWith({ page: String(item) })}
-                      className={`h-9 min-w-9 px-2 text-center text-[11px] leading-9 tracking-[0.08em] ${
-                        item === currentPage
-                          ? "border border-[rgba(200,137,42,0.34)] bg-[rgba(200,137,42,0.1)] text-gold"
-                          : "border border-[rgba(240,232,216,0.1)] text-cream-dim hover:text-cream"
-                      }`}
+                      href={`/designs/${featuredDesign.id}`}
+                      className="border border-gold px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-gold transition-colors hover:bg-gold hover:text-ink"
                       style={{ fontFamily: monoSystem }}
                     >
-                      {item}
+                      View Plan
                     </Link>
-                  ) : (
-                    <span key={`${item}-${idx}`} className="px-2 text-[11px] text-muted" style={{ fontFamily: monoSystem }}>
-                      ...
-                    </span>
-                  ),
-                )}
+                  </div>
+                </div>
+              </article>
+            )}
 
-                <Link
-                  href={queryWith({ page: String(Math.min(currentPage + 1, totalPages)) })}
-                  className={`px-3 py-2 text-[11px] uppercase tracking-[0.14em] ${
-                    currentPage === totalPages
-                      ? "pointer-events-none border border-[rgba(240,232,216,0.08)] text-[rgba(240,232,216,0.3)]"
-                      : "border border-[rgba(240,232,216,0.12)] text-cream-dim hover:text-cream"
-                  }`}
-                  style={{ fontFamily: monoSystem }}
-                >
-                  Next
-                </Link>
-              </div>
-            </div>
-          )}
+            <PublicDesignsInfiniteGrid
+              fallbackImage={fallbackImage}
+              search={search}
+              category={category}
+              sort={sort}
+              isFeatured={isFeatured}
+            />
           </div>
         </div>
       </main>

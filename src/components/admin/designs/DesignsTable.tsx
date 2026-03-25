@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import useSWR from "swr";
 import DesignsList from "./DesignsList";
 import {
   Pagination,
@@ -25,15 +26,18 @@ interface DesignsTableProps {
 }
 
 const DesignsTable = ({ onEditClick, refreshKey = 0 }: DesignsTableProps) => {
-  const [designs, setDesigns] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  const fetcher = async (url: string) => {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch designs: ${response.status}`);
+    }
+    return response.json();
+  };
 
   // Debounce search input
   useEffect(() => {
@@ -45,44 +49,35 @@ const DesignsTable = ({ onEditClick, refreshKey = 0 }: DesignsTableProps) => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const fetchDesigns = useCallback(async () => {
-    try {
-      setError(null);
-      if (searchQuery) {
-        setIsSearching(true);
-      } else if (!searchQuery && designs.length > 0) {
-        // Don't show loading indicator if search is cleared and we have data
-      } else {
-        setLoading(true);
-      }
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    `/api/designs?search=${encodeURIComponent(debouncedSearch)}&page=${currentPage}&limit=8&refresh=${refreshKey}`,
+    fetcher,
+    {
+      keepPreviousData: true,
+      revalidateOnFocus: false,
+      revalidateIfStale: true,
+      dedupingInterval: 10_000,
+    },
+  );
 
-      const response = await fetch(
-        `/api/designs?search=${encodeURIComponent(debouncedSearch)}&page=${currentPage}&limit=8`,
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch designs: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setDesigns(data.designs);
-      setTotalPages(data.totalPages);
-    } catch (error) {
-      console.error("Error fetching designs:", error);
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred",
-      );
-      toast.error("Failed to load designs");
-    } finally {
-      setLoading(false);
-      setIsSearching(false);
-      setRefreshing(false);
-    }
-  }, [currentPage, debouncedSearch, designs.length, searchQuery, refreshKey]);
+  const designs = data?.designs || [];
+  const totalPages = data?.totalPages || 1;
+  const loading = isLoading && !data;
+  const isSearching = !!searchQuery && isValidating;
+  const errorMessage =
+    error instanceof Error ? error.message : "An unknown error occurred";
 
   useEffect(() => {
-    fetchDesigns();
-  }, [fetchDesigns]);
+    if (error) {
+      toast.error("Failed to load designs");
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (!isValidating) {
+      setRefreshing(false);
+    }
+  }, [isValidating]);
 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
@@ -94,7 +89,7 @@ const DesignsTable = ({ onEditClick, refreshKey = 0 }: DesignsTableProps) => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchDesigns();
+    await mutate();
     toast.success("Designs refreshed");
   };
 
@@ -196,7 +191,7 @@ const DesignsTable = ({ onEditClick, refreshKey = 0 }: DesignsTableProps) => {
       <Alert variant="destructive">
         <FiAlertCircle className="h-5 w-5" />
         <AlertDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <span className="flex-1">{error}</span>
+          <span className="flex-1">{errorMessage}</span>
           <Button
             onClick={handleRefresh}
             variant="outline"

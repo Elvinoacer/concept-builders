@@ -4,8 +4,17 @@ import prisma from "@/lib/prisma";
 export async function GET(request: NextRequest) {
   try {
     const search = request.nextUrl.searchParams.get("search") || "";
-    const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
-    const limit = parseInt(request.nextUrl.searchParams.get("limit") || "10");
+    const page = Math.max(
+      1,
+      parseInt(request.nextUrl.searchParams.get("page") || "1", 10),
+    );
+    const limit = Math.min(
+      50,
+      Math.max(
+        1,
+        parseInt(request.nextUrl.searchParams.get("limit") || "10", 10),
+      ),
+    );
     const skip = (page - 1) * limit;
 
     const where = search
@@ -17,43 +26,51 @@ export async function GET(request: NextRequest) {
         }
       : {};
 
-    const categories = await prisma.category.findMany({
-      where,
-      include: {
-        _count: {
-          select: { designs: true },
-        },
-        designs: {
-          take: 1, // Take only the latest design
-          orderBy: {
-            createdAt: "desc", // Order by creation date to get the latest
+    const [categories, totalCategories] = await prisma.$transaction([
+      prisma.category.findMany({
+        where,
+        include: {
+          _count: {
+            select: { designs: true },
           },
-          select: {
-            images: {
-              take: 1, // Take only one image file
-              orderBy: {
-                createdAt: "desc", // Get the latest image if multiple
-              },
-              select: {
-                url: true, // Select only the URL of the image
+          designs: {
+            take: 1,
+            orderBy: {
+              createdAt: "desc",
+            },
+            select: {
+              images: {
+                take: 1,
+                orderBy: {
+                  createdAt: "desc",
+                },
+                select: {
+                  url: true,
+                },
               },
             },
           },
         },
-      },
-      skip,
-      take: limit,
-      orderBy: {
-        name: "asc",
-      },
-    });
+        skip,
+        take: limit,
+        orderBy: {
+          name: "asc",
+        },
+      }),
+      prisma.category.count({ where }),
+    ]);
 
-    const totalCategories = await prisma.category.count({ where });
-
-    return NextResponse.json({
-      categories,
-      totalPages: Math.ceil(totalCategories / limit),
-    });
+    return NextResponse.json(
+      {
+        categories,
+        totalPages: Math.ceil(totalCategories / limit),
+      },
+      {
+        headers: {
+          "Cache-Control": "private, no-store",
+        },
+      },
+    );
   } catch (error) {
     console.error("Error fetching categories:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

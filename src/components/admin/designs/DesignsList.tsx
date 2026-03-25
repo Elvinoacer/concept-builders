@@ -1,7 +1,9 @@
 "use client";
 
+import { useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import Link from "next/link";
 import {
   FiEye,
@@ -28,6 +30,15 @@ interface DesignsListProps {
 }
 
 const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
+  const desktopParentRef = useRef<HTMLDivElement>(null);
+  const shouldVirtualizeDesktop = designs.length > 50;
+  const rowVirtualizer = useVirtualizer({
+    count: shouldVirtualizeDesktop ? designs.length : 0,
+    getScrollElement: () => desktopParentRef.current,
+    estimateSize: () => 74,
+    overscan: 6,
+  });
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -56,8 +67,7 @@ const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
     const structuralFiles =
       (design.structuralDesign?.pdfFiles?.length || 0) +
       (design.structuralDesign?.cadFiles?.length || 0);
-    const boqFiles =
-      design.billOfQuantities?.excelFiles?.length || 0;
+    const boqFiles = design.billOfQuantities?.excelFiles?.length || 0;
     return architecturalFiles + structuralFiles + boqFiles;
   };
 
@@ -331,7 +341,10 @@ const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden sm:block overflow-x-auto rounded-lg border border-border bg-card">
+      <div
+        ref={desktopParentRef}
+        className="hidden sm:block overflow-x-auto rounded-lg border border-border bg-card"
+      >
         <table className="w-full text-sm text-left">
           <thead className="text-xs text-muted-foreground uppercase bg-muted">
             <tr>
@@ -371,15 +384,64 @@ const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
             </tr>
           </thead>
           <tbody>
-            <AnimatePresence>
-              {designs.map((design, index) => (
-                <DesktopTableRow
-                  key={design.id}
-                  design={design}
-                  index={index}
-                />
-              ))}
-            </AnimatePresence>
+            {shouldVirtualizeDesktop ? (
+              <>
+                {rowVirtualizer.getVirtualItems().length > 0 && (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      style={{
+                        height: `${rowVirtualizer.getVirtualItems()[0].start}px`,
+                        padding: 0,
+                        border: 0,
+                      }}
+                    />
+                  </tr>
+                )}
+
+                <AnimatePresence>
+                  {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                    const design = designs[virtualRow.index];
+                    if (!design) return null;
+                    return (
+                      <DesktopTableRow
+                        key={design.id}
+                        design={design}
+                        index={virtualRow.index}
+                      />
+                    );
+                  })}
+                </AnimatePresence>
+
+                {rowVirtualizer.getVirtualItems().length > 0 && (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      style={{
+                        height: `${
+                          rowVirtualizer.getTotalSize() -
+                          rowVirtualizer.getVirtualItems()[
+                            rowVirtualizer.getVirtualItems().length - 1
+                          ].end
+                        }px`,
+                        padding: 0,
+                        border: 0,
+                      }}
+                    />
+                  </tr>
+                )}
+              </>
+            ) : (
+              <AnimatePresence>
+                {designs.map((design, index) => (
+                  <DesktopTableRow
+                    key={design.id}
+                    design={design}
+                    index={index}
+                  />
+                ))}
+              </AnimatePresence>
+            )}
           </tbody>
         </table>
       </div>

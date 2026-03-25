@@ -15,6 +15,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { CgSpinner } from "react-icons/cg";
 import { FiSearch, FiGrid, FiList } from "react-icons/fi";
 
@@ -50,60 +51,52 @@ interface CategoriesResponse {
 }
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchCategories = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `/api/categories?search=${encodeURIComponent(searchQuery)}&page=${currentPage}&limit=9`
+  const fetcher = async (url: string) => {
+    const response = await fetch(url);
+    if (!response.ok) {
+      const errorData = await response
+        .json()
+        .catch(() => ({ error: "Failed to fetch categories" }));
+      throw new Error(
+        errorData.message || `HTTP error! status: ${response.status}`,
       );
-
-      if (!response.ok) {
-        const errorData = await response
-          .json()
-          .catch(() => ({ error: "Failed to fetch categories" }));
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      const data: CategoriesResponse = await response.json();
-
-      if (data.error) {
-        throw new Error(data.message || data.error);
-      }
-
-      setCategories(data.categories || []);
-      setTotalPages(data.totalPages || 1);
-    } catch (err) {
-      console.error("Error fetching categories:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to load categories"
-      );
-      setCategories([]);
-      setTotalPages(1);
-    } finally {
-      setIsLoading(false);
     }
+    const data: CategoriesResponse = await response.json();
+    if (data.error) {
+      throw new Error(data.message || data.error);
+    }
+    return data;
   };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      fetchCategories();
-    }, 300);
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 400);
 
     return () => clearTimeout(timeoutId);
-  }, [currentPage, searchQuery]);
+  }, [searchQuery]);
+
+  const { data, error, isLoading } = useSWR<CategoriesResponse>(
+    `/api/categories?search=${encodeURIComponent(debouncedSearch)}&page=${currentPage}&limit=9`,
+    fetcher,
+    {
+      keepPreviousData: true,
+      revalidateOnFocus: false,
+      revalidateIfStale: true,
+      dedupingInterval: 10_000,
+    },
+  );
+
+  const categories = data?.categories || [];
+  const totalPages = data?.totalPages || 1;
+  const errorMessage = error instanceof Error ? error.message : null;
 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
@@ -116,8 +109,8 @@ export default function CategoriesPage() {
     if (totalPages <= 1) return [1];
 
     // Mobile: show fewer pages, desktop: show more
-    const maxVisiblePages =
-      window.innerWidth < 768 ? 3 : window.innerWidth < 1024 ? 5 : 7;
+    const width = typeof window !== "undefined" ? window.innerWidth : 1024;
+    const maxVisiblePages = width < 768 ? 3 : width < 1024 ? 5 : 7;
     const delta = Math.floor(maxVisiblePages / 2);
 
     const range: (number | string)[] = [];
@@ -201,9 +194,7 @@ export default function CategoriesPage() {
             >
               <FiSearch
                 className={`absolute left-3 xs:left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-200 z-10 ${
-                  isSearchFocused
-                    ? "text-gold"
-                    : "text-muted"
+                  isSearchFocused ? "text-gold" : "text-muted"
                 }`}
                 size={18}
               />
@@ -249,22 +240,20 @@ export default function CategoriesPage() {
         </div>
 
         {/* Error State */}
-        {error && (
+        {errorMessage && (
           <div className="text-center py-8">
             <div className="max-w-md mx-auto bg-destructive/10 border border-destructive/20 rounded-xl p-4 xs:p-6">
               <div className="w-10 h-10 xs:w-12 xs:h-12 mx-auto mb-3 xs:mb-4 bg-destructive/20 rounded-full flex items-center justify-center">
-                <span className="text-destructive text-lg xs:text-xl">
-                  ⚠️
-                </span>
+                <span className="text-destructive text-lg xs:text-xl">⚠️</span>
               </div>
               <h3 className="text-base xs:text-lg font-semibold text-destructive mb-2">
                 Error Loading Categories
               </h3>
               <p className="text-destructive/80 text-xs xs:text-sm mb-3 xs:mb-4">
-                {error}
+                {errorMessage}
               </p>
               <button
-                onClick={fetchCategories}
+                onClick={() => window.location.reload()}
                 className="px-4 py-2 bg-gold hover:bg-gold-light text-ink rounded-lg transition-colors duration-200 text-xs xs:text-sm font-semibold"
               >
                 Try Again
@@ -274,13 +263,10 @@ export default function CategoriesPage() {
         )}
 
         {/* Loading State */}
-        {isLoading && !error && (
+        {isLoading && !errorMessage && (
           <div className="flex flex-col items-center justify-center h-48 xs:h-56 sm:h-64 gap-3 xs:gap-4">
             <div className="relative">
-              <CgSpinner
-                className="animate-spin text-gold"
-                size={40}
-              />
+              <CgSpinner className="animate-spin text-gold" size={40} />
               <div className="absolute inset-0 bg-gradient-to-r from-gold to-gold-light blur-lg opacity-20 animate-pulse"></div>
             </div>
             <p className="text-cream-dim text-base xs:text-lg font-medium">
@@ -290,14 +276,11 @@ export default function CategoriesPage() {
         )}
 
         {/* Empty State */}
-        {!isLoading && !error && categories.length === 0 && (
+        {!isLoading && !errorMessage && categories.length === 0 && (
           <div className="text-center py-12 xs:py-16">
             <div className="max-w-xs xs:max-w-sm sm:max-w-md mx-auto">
               <div className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 mx-auto mb-4 bg-surface rounded-full flex items-center justify-center">
-                <FiSearch
-                  size={24}
-                  className="text-muted"
-                />
+                <FiSearch size={24} className="text-muted" />
               </div>
               <h3 className="text-lg xs:text-xl font-semibold text-cream mb-2">
                 No categories found
@@ -320,7 +303,7 @@ export default function CategoriesPage() {
         )}
 
         {/* Categories Grid/List */}
-        {!isLoading && !error && categories.length > 0 && (
+        {!isLoading && !errorMessage && categories.length > 0 && (
           <div
             className={`${
               viewMode === "grid"
@@ -400,7 +383,7 @@ export default function CategoriesPage() {
                           : ""
                       }`}
                     >
-                       <div className="text-sm xs:text-base text-muted">
+                      <div className="text-sm xs:text-base text-muted">
                         {category._count?.designs || 0} designs
                       </div>
                       <div className="flex items-center text-gold font-semibold transition-all duration-300 group-hover:translate-x-1 text-sm xs:text-base">
@@ -418,85 +401,88 @@ export default function CategoriesPage() {
         )}
 
         {/* Pagination */}
-        {!isLoading && !error && categories.length > 0 && totalPages > 1 && (
-          <div className="mt-8 xs:mt-10 sm:mt-12">
-            <Pagination>
-              <PaginationContent className="flex-wrap gap-1 xs:gap-2 justify-center">
-                <PaginationItem>
-                  <PaginationFirst
-                    onClick={() => handlePageChange(1)}
-                    aria-disabled={currentPage === 1}
-                    className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
-                      currentPage === 1
-                        ? "pointer-events-none opacity-50"
-                        : "hover:bg-surface"
-                    }`}
-                  />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    aria-disabled={currentPage === 1}
-                    className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
-                      currentPage === 1
-                        ? "pointer-events-none opacity-50"
-                        : "hover:bg-surface"
-                    }`}
-                  />
-                </PaginationItem>
+        {!isLoading &&
+          !errorMessage &&
+          categories.length > 0 &&
+          totalPages > 1 && (
+            <div className="mt-8 xs:mt-10 sm:mt-12">
+              <Pagination>
+                <PaginationContent className="flex-wrap gap-1 xs:gap-2 justify-center">
+                  <PaginationItem>
+                    <PaginationFirst
+                      onClick={() => handlePageChange(1)}
+                      aria-disabled={currentPage === 1}
+                      className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : "hover:bg-surface"
+                      }`}
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      aria-disabled={currentPage === 1}
+                      className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : "hover:bg-surface"
+                      }`}
+                    />
+                  </PaginationItem>
 
-                {getPaginationRange().map((page, index) => {
-                  if (page === "...") {
+                  {getPaginationRange().map((page, index) => {
+                    if (page === "...") {
+                      return (
+                        <PaginationItem key={`ellipsis-${index}`}>
+                          <PaginationEllipsis className="p-2 xs:p-3" />
+                        </PaginationItem>
+                      );
+                    }
+
                     return (
-                      <PaginationItem key={`ellipsis-${index}`}>
-                        <PaginationEllipsis className="p-2 xs:p-3" />
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(page as number)}
+                          isActive={currentPage === page}
+                          className={`cursor-pointer text-xs xs:text-sm min-w-[2rem] xs:min-w-[2.5rem] ${
+                            currentPage === page
+                              ? "bg-gold text-ink"
+                              : "hover:bg-surface text-cream-dim hover:text-cream"
+                          }`}
+                        >
+                          {page}
+                        </PaginationLink>
                       </PaginationItem>
                     );
-                  }
+                  })}
 
-                  return (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        onClick={() => handlePageChange(page as number)}
-                        isActive={currentPage === page}
-                        className={`cursor-pointer text-xs xs:text-sm min-w-[2rem] xs:min-w-[2.5rem] ${
-                          currentPage === page
-                            ? "bg-gold text-ink"
-                            : "hover:bg-surface text-cream-dim hover:text-cream"
-                        }`}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                })}
-
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    aria-disabled={totalPages === currentPage}
-                    className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
-                      totalPages === currentPage
-                        ? "pointer-events-none opacity-50"
-                        : "hover:bg-surface"
-                    }`}
-                  />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLast
-                    onClick={() => handlePageChange(totalPages)}
-                    aria-disabled={totalPages === currentPage}
-                    className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
-                      totalPages === currentPage
-                        ? "pointer-events-none opacity-50"
-                        : "hover:bg-surface"
-                    }`}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      aria-disabled={totalPages === currentPage}
+                      className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
+                        totalPages === currentPage
+                          ? "pointer-events-none opacity-50"
+                          : "hover:bg-surface"
+                      }`}
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLast
+                      onClick={() => handlePageChange(totalPages)}
+                      aria-disabled={totalPages === currentPage}
+                      className={`cursor-pointer text-xs xs:text-sm p-2 xs:p-3 ${
+                        totalPages === currentPage
+                          ? "pointer-events-none opacity-50"
+                          : "hover:bg-surface"
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
       </main>
     </div>
   );

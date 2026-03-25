@@ -1,41 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
-
-// Type for category response
-interface CategoryResponse {
-  id: string;
-  name: string;
-  description: string | null;
-  isFeatured: boolean;
-  image: string | null;
-  _count: {
-    designs: number;
-  };
-  designs: Array<{
-    id: string;
-    images: Array<{
-      url: string;
-    }>;
-  }>;
-}
+import { revalidateTag, unstable_cache } from "next/cache";
 
 export async function GET(request: NextRequest) {
   try {
     const forFilters = request.nextUrl.searchParams.get("forFilters");
 
     if (forFilters) {
-      const categories = await prisma.category.findMany({
-        orderBy: {
-          isFeatured: "desc",
+      const getCachedCategoriesForFilters = unstable_cache(
+        async () =>
+          prisma.category.findMany({
+            orderBy: {
+              isFeatured: "desc",
+            },
+          }),
+        ["categories-filters"],
+        { revalidate: 300, tags: ["categories"] },
+      );
+
+      const categories = await getCachedCategoriesForFilters();
+      return NextResponse.json(categories, {
+        headers: {
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=900",
         },
       });
-      return NextResponse.json(categories);
     }
 
     const search = request.nextUrl.searchParams.get("search") || "";
-    const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
-    const limit = parseInt(request.nextUrl.searchParams.get("limit") || "10");
+    const page = Math.max(
+      1,
+      parseInt(request.nextUrl.searchParams.get("page") || "1", 10),
+    );
+    const limit = Math.min(
+      50,
+      Math.max(
+        1,
+        parseInt(request.nextUrl.searchParams.get("limit") || "10", 10),
+      ),
+    );
 
     // Validate pagination parameters
     if (page < 1 || limit < 1 || limit > 100) {
@@ -44,7 +46,7 @@ export async function GET(request: NextRequest) {
           error: "Invalid pagination parameters",
           message: "Page must be at least 1 and limit between 1-100",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -56,62 +58,65 @@ export async function GET(request: NextRequest) {
             {
               name: {
                 contains: search,
-                mode: "insensitive",
+                mode: "insensitive" as const,
               },
             },
           ],
         }
       : {};
 
-    const categories = await prisma.category.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        isFeatured: true,
-        image: true,
-        _count: {
-          select: { designs: true },
-        },
-        designs: {
-          orderBy: {
-            createdAt: "asc",
+    const [categories, totalCategories] = await prisma.$transaction([
+      prisma.category.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+          isFeatured: true,
+          image: true,
+          _count: {
+            select: { designs: true },
           },
-          take: 1,
-          select: {
-            id: true,
-            images: {
-              where: {
-                type: "IMAGE",
+          designs: {
+            orderBy: {
+              createdAt: "asc",
+            },
+            take: 1,
+            select: {
+              id: true,
+              images: {
+                where: {
+                  type: "IMAGE",
+                },
+                take: 1,
+                select: {
+                  url: true,
+                },
               },
-              take: 1,
             },
           },
         },
+        skip,
+        take: limit,
+        orderBy: {
+          name: "asc",
+        },
+      }),
+      prisma.category.count({ where }),
+    ]);
+
+    return NextResponse.json(
+      {
+        categories,
+        totalPages: Math.ceil(totalCategories / limit),
+        currentPage: page,
+        totalCategories,
       },
-      skip,
-      take: limit,
-      orderBy: {
-        name: "asc",
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=900",
+        },
       },
-    });
-
-    const totalCategories = await prisma.category.count({ where });
-
-    // Transform the data to ensure consistent structure
-    const transformedCategories = categories.map((category) => ({
-      ...category,
-      description: category.description || "",
-      image: category.image || null,
-      designs: category.designs || [],
-    }));
-
-    return NextResponse.json({
-      categories: transformedCategories,
-      totalPages: Math.ceil(totalCategories / limit),
-      currentPage: page,
-      totalCategories,
-    });
+    );
   } catch (error) {
     console.error("Error fetching categories:", error);
     return NextResponse.json(
@@ -119,7 +124,7 @@ export async function GET(request: NextRequest) {
         error: "Internal Server Error",
         message: "Failed to fetch categories. Please try again later.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -135,7 +140,7 @@ export async function POST(request: Request) {
           error: "Invalid category name",
           message: "Category name is required and must be a non-empty string",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -145,19 +150,20 @@ export async function POST(request: Request) {
       },
     });
 
-    revalidatePath("/");
+    revalidateTag("categories", "max");
 
     return NextResponse.json(newCategory, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating category:", error);
 
-    if (error.code === "P2002") {
+    const prismaError = error as { code?: string };
+    if (prismaError.code === "P2002") {
       return NextResponse.json(
         {
           error: "Category already exists",
           message: "A category with this name already exists",
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -166,7 +172,7 @@ export async function POST(request: Request) {
         error: "Internal Server Error",
         message: "Failed to create category. Please try again later.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

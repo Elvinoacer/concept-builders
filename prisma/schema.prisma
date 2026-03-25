@@ -199,6 +199,14 @@ model Design {
   reviews                  Review[]
   wishlistedBy             User[]           @relation("DesignToUser")
   inquiries                DesignInquiry[]
+
+  @@index([categoryId])
+  @@index([isFeatured])
+  @@index([createdAt(sort: Desc)])
+  @@index([views(sort: Desc)])
+  @@index([basePrice])
+  @@index([bedrooms])
+  @@index([categoryId, isFeatured, createdAt(sort: Desc)])
 }
 
 model DesignInquiry {
