@@ -15,7 +15,7 @@ export default function PublicLayout({
         <Header />
         <main className="flex-1 w-full">{children}</main>
         <FloatingCartButton />
-        <Toaster />
+        <Toaster position="top-right" richColors closeButton duration={4000} />
         <Footer />
       </div>
     </SearchProvider>

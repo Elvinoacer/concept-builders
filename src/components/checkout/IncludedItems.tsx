@@ -27,6 +27,10 @@ const getFileTypeName = (type: string) => {
       return "Structural CAD";
     case "billOfQuantities":
       return "Bill of Quantities";
+    case "billOfQuantitiesPdf":
+      return "Bill of Quantities (PDF)";
+    case "billOfQuantitiesExcel":
+      return "Bill of Quantities (Excel)";
     default:
       return type;
   }
@@ -43,6 +47,8 @@ const getFileTypePrice = (type: string, design: Design) => {
     case "structuralCad":
       return design.structuralCadPrice;
     case "billOfQuantities":
+    case "billOfQuantitiesPdf":
+    case "billOfQuantitiesExcel":
       return design.billOfQuantitiesPrice;
     default:
       return 0;
@@ -86,6 +92,8 @@ const getFileTypeIcon = (type: string) => {
         </svg>
       );
     case "billOfQuantities":
+    case "billOfQuantitiesPdf":
+    case "billOfQuantitiesExcel":
       return (
         <svg
           className="w-3 h-3 xs:w-3.5 xs:h-3.5 flex-shrink-0"

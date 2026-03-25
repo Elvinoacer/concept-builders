@@ -86,30 +86,46 @@ export default function CheckoutLink({
 
   const handleGenerateLink = async () => {
     setLoading(true);
-    toast.loading("Generating payment link...");
-
-    const response = await fetch("/api/intasend/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: finalTotal,
-        currency: "KES",
-        discountCode: appliedDiscountCode,
-        discountAmount: appliedDiscountAmount,
-        discountId: appliedDiscountId,
-        cart: cart,
-      }),
+    const loadingToastId = toast.loading("Generating payment link...", {
+      duration: 10000,
     });
 
-    const result = await response.json();
+    try {
+      const response = await fetch("/api/intasend/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: finalTotal,
+          currency: "KES",
+          discountCode: appliedDiscountCode,
+          discountAmount: appliedDiscountAmount,
+          discountId: appliedDiscountId,
+          cart: cart,
+        }),
+      });
 
-    if (response.ok) {
-      setCheckoutUrl(result.url);
-      toast.success("Payment link generated successfully!");
-    } else {
-      toast.error(result.error || "Failed to generate checkout link");
+      const result = await response.json();
+
+      if (response.ok) {
+        setCheckoutUrl(result.url);
+        toast.success("Payment link generated successfully!", {
+          id: loadingToastId,
+          duration: 4000,
+        });
+      } else {
+        toast.error(result.error || "Failed to generate checkout link", {
+          id: loadingToastId,
+          duration: 5000,
+        });
+      }
+    } catch {
+      toast.error("Failed to generate checkout link", {
+        id: loadingToastId,
+        duration: 5000,
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -192,7 +208,7 @@ export default function CheckoutLink({
               href={checkoutUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 xs:py-4 px-6 rounded-lg xs:rounded-xl transition-all duration-200 transform hover:scale-[1.02] text-sm xs:text-base min-h-[3rem] xs:min-h-[3.5rem] flex items-center justify-center"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 xs:py-4 px-6 rounded-lg xs:rounded-xl transition-all duration-200 transform hover:scale-[1.02] text-sm xs:text-base min-h-[3rem] xs:min-h-[3.5rem] flex items-center justify-center"
             >
               <span>Proceed to Secure Checkout</span>
               <svg

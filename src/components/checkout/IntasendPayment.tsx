@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import StkPushForm from "./StkPushForm";
-import CheckoutLink from "./CheckoutLink";
 
 interface IntasendPaymentProps {
   cart: any[];
@@ -20,31 +19,17 @@ const IntasendPayment: React.FC<IntasendPaymentProps> = ({
   appliedDiscountCode,
   paymentMethod,
 }) => {
-  if (paymentMethod === "mpesa") {
-    return (
-      <StkPushForm
-        cart={cart}
-        finalTotal={finalTotal}
-        appliedDiscountAmount={appliedDiscountAmount}
-        appliedDiscountId={appliedDiscountId}
-        appliedDiscountCode={appliedDiscountCode}
-      />
-    );
-  }
+  if (paymentMethod !== "mpesa") return null;
 
-  if (paymentMethod === "secure-url") {
-    return (
-      <CheckoutLink
-        cart={cart}
-        finalTotal={finalTotal}
-        appliedDiscountAmount={appliedDiscountAmount}
-        appliedDiscountId={appliedDiscountId}
-        appliedDiscountCode={appliedDiscountCode}
-      />
-    );
-  }
-
-  return null;
+  return (
+    <StkPushForm
+      cart={cart}
+      finalTotal={finalTotal}
+      appliedDiscountAmount={appliedDiscountAmount}
+      appliedDiscountId={appliedDiscountId}
+      appliedDiscountCode={appliedDiscountCode}
+    />
+  );
 };
 
 export default IntasendPayment;

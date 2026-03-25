@@ -23,6 +23,46 @@ interface CartItemProps {
 const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
   const [isRemoving, setIsRemoving] = useState(false);
 
+  const getFileTypePrice = (type: string): number => {
+    switch (type) {
+      case "architecturalPdf":
+        return 0;
+      case "architecturalCad":
+        return item.design.architecturalCadPrice || 0;
+      case "structuralPdf":
+        return item.design.structuralPdfPrice || 0;
+      case "structuralCad":
+        return item.design.structuralCadPrice || 0;
+      case "billOfQuantitiesPdf":
+      case "billOfQuantitiesExcel":
+      case "billOfQuantities":
+        return item.design.billOfQuantitiesPrice || 0;
+      default:
+        return 0;
+    }
+  };
+
+  const getFileTypeLabel = (type: string): string => {
+    switch (type) {
+      case "architecturalPdf":
+        return "Architectural PDF";
+      case "architecturalCad":
+        return "Architectural CAD";
+      case "structuralPdf":
+        return "Structural PDF";
+      case "structuralCad":
+        return "Structural CAD";
+      case "billOfQuantitiesPdf":
+        return "Bill of Quantities (PDF)";
+      case "billOfQuantitiesExcel":
+        return "Bill of Quantities (Excel)";
+      case "billOfQuantities":
+        return "Bill of Quantities";
+      default:
+        return type;
+    }
+  };
+
   const handleRemove = async () => {
     setIsRemoving(true);
     await onRemove(item.cartItemId);
@@ -44,6 +84,16 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
   };
 
   const itemTotalPrice = calculateItemTotal(item);
+  const selectedFileTypeRows = item.selectedFileTypes.map((type) => ({
+    type,
+    label: getFileTypeLabel(type),
+    price: getFileTypePrice(type),
+  }));
+  const selectedExtrasRows = (item.selectedExtras || []).map((extra) => ({
+    id: extra.id,
+    label: extra.name,
+    price: typeof extra.price === "number" ? extra.price : 0,
+  }));
 
   return (
     <motion.div
@@ -154,7 +204,9 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                     />
                     <span className="sm:whitespace-nowrap">
                       {fileTypeOption.label}
-                      {fileTypeOption.isBase && " (Base Price)"}
+                      {fileTypeOption.isBase
+                        ? " (Included)"
+                        : ` (+$${getFileTypePrice(fileTypeOption.type).toFixed(2)})`}
                     </span>
                   </label>
                   {!fileTypeOption.isAvailable && (
@@ -198,6 +250,44 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                 </div>
               </div>
             )}
+
+          <div className="mt-4 rounded-xl border border-cb-border bg-surface p-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cream-dim mb-2">
+              Selected Options Breakdown
+            </p>
+            <div className="space-y-1.5">
+              {selectedFileTypeRows.map((row) => (
+                <div
+                  key={row.type}
+                  className="flex items-center justify-between text-xs text-cream-dim"
+                >
+                  <span>{row.label}</span>
+                  <span
+                    className={row.price > 0 ? "text-gold" : "text-green-400"}
+                  >
+                    {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
+                  </span>
+                </div>
+              ))}
+              {selectedExtrasRows.map((row) => (
+                <div
+                  key={row.id}
+                  className="flex items-center justify-between text-xs text-cream-dim"
+                >
+                  <span>{row.label}</span>
+                  <span
+                    className={row.price > 0 ? "text-gold" : "text-green-400"}
+                  >
+                    {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
+                  </span>
+                </div>
+              ))}
+              <div className="mt-2 border-t border-cb-border pt-2 flex items-center justify-between text-xs font-semibold">
+                <span className="text-cream">Item Total</span>
+                <span className="text-gold">${itemTotalPrice.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-row xs:flex-col sm:flex-row items-center justify-between xs:items-end sm:items-center gap-3 xs:gap-2 sm:gap-4 w-full xs:w-auto">

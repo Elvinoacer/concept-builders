@@ -1,5 +1,4 @@
-
-import { Design, PackageOption } from '@/generated/prisma/browser';
+import { Design, PackageOption } from "@/generated/prisma/browser";
 
 interface CartItem {
   quantity: number;
@@ -14,19 +13,23 @@ export const calculateItemTotal = (item: CartItem): number => {
   let total = design.basePrice * quantity;
 
   if (selectedFileTypes) {
-    if (selectedFileTypes.includes('architecturalPdf')) {
+    if (selectedFileTypes.includes("architecturalPdf")) {
       total += design.architecturalPdfPrice || 0;
     }
-    if (selectedFileTypes.includes('architecturalCad')) {
+    if (selectedFileTypes.includes("architecturalCad")) {
       total += design.architecturalCadPrice || 0;
     }
-    if (selectedFileTypes.includes('structuralPdf')) {
+    if (selectedFileTypes.includes("structuralPdf")) {
       total += design.structuralPdfPrice || 0;
     }
-    if (selectedFileTypes.includes('structuralCad')) {
+    if (selectedFileTypes.includes("structuralCad")) {
       total += design.structuralCadPrice || 0;
     }
-    if (selectedFileTypes.includes('billOfQuantities')) {
+    if (
+      selectedFileTypes.includes("billOfQuantities") ||
+      selectedFileTypes.includes("billOfQuantitiesPdf") ||
+      selectedFileTypes.includes("billOfQuantitiesExcel")
+    ) {
       total += design.billOfQuantitiesPrice || 0;
     }
   }

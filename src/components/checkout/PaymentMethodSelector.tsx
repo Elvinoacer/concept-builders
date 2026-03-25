@@ -13,18 +13,10 @@ type PaymentMethodSelectorProps = {
 const paymentMethods = [
   {
     id: "paypal",
-    name: "PayPal",
+    name: "PayPal / Card",
     image: "/payments/paypal.png",
-    description: "Pay with your PayPal account",
+    description: "Pay with PayPal, Visa, Mastercard, or Amex",
     supportedCurrencies: ["USD", "EUR", "GBP"],
-    processingTime: "Instant",
-  },
-  {
-    id: "credit-card",
-    name: "Credit Card",
-    image: "/payments/visa-master.webp",
-    description: "Pay with Visa, Mastercard, or Amex",
-    supportedCurrencies: ["USD", "EUR", "KES"],
     processingTime: "Instant",
   },
   {
@@ -33,14 +25,6 @@ const paymentMethods = [
     image: "/payments/mpesa.png",
     description: "Pay with your M-Pesa account",
     supportedCurrencies: ["KES"],
-    processingTime: "Instant",
-  },
-  {
-    id: "secure-url",
-    name: "Secure Checkout URL",
-    image: "/payments/apple-pay.webp",
-    description: "Get a secure payment link",
-    supportedCurrencies: ["USD", "KES"],
     processingTime: "Instant",
   },
 ];
@@ -56,16 +40,16 @@ const PaymentMethodSelector = ({
       {/* Header */}
       <div className="text-center xs:text-left mb-4 xs:mb-6">
         <h2 className="text-xl xs:text-2xl sm:text-3xl font-light text-cream mb-2 leading-tight">
-          Choose Payment Method
+          Select Payment Method
         </h2>
         <p className="font-mono text-xs xs:text-sm uppercase tracking-[0.12em] text-cream-dim">
-          Select your preferred payment method to complete your purchase
+          Pick one method, then complete payment below
         </p>
       </div>
 
       {!paypalConfigured && (
         <div className="mb-4 border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.08)] px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em] text-gold">
-          PayPal is currently unavailable. Use M-Pesa or secure checkout link.
+          PayPal is currently unavailable. Use M-Pesa.
         </div>
       )}
 
@@ -79,9 +63,7 @@ const PaymentMethodSelector = ({
       <div className="grid grid-cols-1 gap-3 xs:gap-4">
         {paymentMethods.map((method) =>
           (() => {
-            const isUnavailable =
-              !paypalConfigured &&
-              (method.id === "paypal" || method.id === "credit-card");
+            const isUnavailable = !paypalConfigured && method.id === "paypal";
 
             return (
               <motion.div
@@ -134,6 +116,25 @@ const PaymentMethodSelector = ({
                         Selected
                       </div>
                     )}
+                  </div>
+
+                  <div className="mt-2 flex items-center gap-2 text-xs text-cream-dim">
+                    <span
+                      className={`inline-flex h-4 w-4 items-center justify-center rounded-full border ${
+                        selectedMethod === method.id
+                          ? "border-gold"
+                          : "border-cb-border"
+                      }`}
+                    >
+                      {selectedMethod === method.id && (
+                        <span className="h-2 w-2 rounded-full bg-gold" />
+                      )}
+                    </span>
+                    <span>
+                      {selectedMethod === method.id
+                        ? "Currently selected"
+                        : "Tap to select"}
+                    </span>
                   </div>
 
                   <p className="mb-2 text-xs leading-relaxed text-cream-dim xs:mb-3 xs:text-sm">

@@ -61,10 +61,7 @@ const CheckoutPage = () => {
         if (!mounted) return;
         setPaypalConfig(data);
 
-        if (
-          !data.configured &&
-          (paymentMethod === "paypal" || paymentMethod === "credit-card")
-        ) {
+        if (!data.configured && paymentMethod === "paypal") {
           setPaymentMethod("mpesa");
           toast.info(
             "PayPal is not configured. Switched to M-Pesa for checkout.",
@@ -97,7 +94,6 @@ const CheckoutPage = () => {
   const renderPaymentMethod = () => {
     switch (paymentMethod) {
       case "paypal":
-      case "credit-card":
         return (
           <PaypalPayment
             cart={cart}
@@ -111,17 +107,6 @@ const CheckoutPage = () => {
           />
         );
       case "mpesa":
-        return (
-          <IntasendPayment
-            cart={cart}
-            finalTotal={finalTotal}
-            appliedDiscountAmount={appliedDiscountAmount}
-            appliedDiscountId={appliedDiscountId}
-            appliedDiscountCode={appliedDiscountCode}
-            paymentMethod={paymentMethod}
-          />
-        );
-      case "secure-url":
         return (
           <IntasendPayment
             cart={cart}
@@ -157,6 +142,9 @@ const CheckoutPage = () => {
         );
     }
   };
+
+  const selectedMethodLabel =
+    paymentMethod === "mpesa" ? "M-Pesa" : "PayPal / Card";
 
   return (
     <div className="min-h-screen bg-ink text-cream">
@@ -291,7 +279,16 @@ const CheckoutPage = () => {
                 paypalMode={paypalConfig?.mode || "sandbox"}
               />
 
-              {/* Payment Method Render */}
+              <div className="mt-6 border border-cb-border bg-surface p-3">
+                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream-dim">
+                  Quick Checkout
+                </p>
+                <p className="mt-1 text-sm text-cream">
+                  Selected method:{" "}
+                  <span className="text-gold">{selectedMethodLabel}</span>
+                </p>
+              </div>
+
               <div className="mt-6">{renderPaymentMethod()}</div>
             </div>
 

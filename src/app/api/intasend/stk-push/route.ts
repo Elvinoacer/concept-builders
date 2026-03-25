@@ -35,6 +35,13 @@ function getObject(error: unknown): Record<string, unknown> {
   return {};
 }
 
+class TimeoutException extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "TimeoutException";
+  }
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -299,13 +306,26 @@ export async function POST(req: NextRequest) {
     // Execute STK Push
     try {
       const collection = intasend.collection();
-      const resp = await collection.mpesaStkPush(stkPayload);
+      const timeoutMs = 30000;
+      const resp = await Promise.race([
+        collection.mpesaStkPush(stkPayload),
+        new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(
+              new TimeoutException(
+                "M-Pesa gateway did not respond in time. Please retry.",
+              ),
+            );
+          }, timeoutMs);
+        }),
+      ]);
 
       console.log("✅ IntaSend STK Push Success Response:", resp);
 
       return NextResponse.json({
         success: true,
         data: resp,
+        message: "STK request sent to phone. Awaiting callback confirmation.",
         metadata: {
           amountKES: amountKES.toFixed(2),
           apiRef: apiRef,
@@ -315,6 +335,13 @@ export async function POST(req: NextRequest) {
         },
       });
     } catch (intaSendError: unknown) {
+      if (intaSendError instanceof TimeoutException) {
+        throw new APIException(intaSendError.message, 504, {
+          gateway: "intasend",
+          code: "GATEWAY_TIMEOUT",
+        });
+      }
+
       const errorObj = getObject(intaSendError);
       const responseObj = getObject(errorObj.response);
       console.error("❌ IntaSend API Call Failed:");

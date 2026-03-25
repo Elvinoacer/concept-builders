@@ -47,7 +47,11 @@ export async function POST(req: NextRequest) {
 
     const data = JSON.parse(body);
 
-    if (expectedChallenge && data.challenge !== expectedChallenge) {
+    if (
+      expectedChallenge &&
+      data.challenge &&
+      data.challenge !== expectedChallenge
+    ) {
       return NextResponse.json(
         { error: "Invalid challenge." },
         { status: 403 },
