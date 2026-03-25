@@ -5,28 +5,27 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/hooks/useCart";
 import { useEffect } from "react";
+import { ShoppingBag } from "lucide-react";
 
 const CartPage = () => {
   const { cart, fetchCart, removeItem, updateItem, loading, error } = useCart();
-  const { data: session, status } = useSession();
-  useEffect(() => {
-    fetchCart("authenticated");
-  }, [fetchCart]);
+  const { status } = useSession();
 
-  // Enhanced loading state
+  useEffect(() => {
+    if (status === "loading") return;
+    fetchCart(status === "authenticated" ? "authenticated" : "unauthenticated");
+  }, [fetchCart, status]);
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-ink">
         <main className="container mx-auto px-6 lg:px-8 py-12">
-          {/* Skeleton Header */}
           <div className="mb-8 lg:mb-10 text-center">
             <div className="h-10 sm:h-12 bg-surface rounded-2xl animate-pulse max-w-xs mx-auto mb-2"></div>
             <div className="h-5 bg-surface rounded-lg animate-pulse max-w-sm mx-auto"></div>
           </div>
 
-          {/* Skeleton Content */}
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-            {/* Cart Items Skeleton */}
             <div className="lg:w-2/3">
               <div className="bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-cb-border">
                 {[...Array(2)].map((_, i) => (
@@ -34,17 +33,14 @@ const CartPage = () => {
                     key={i}
                     className="flex gap-4 pb-4 sm:pb-6 mb-4 sm:mb-6 border-b border-cb-border last:border-b-0 last:mb-0 last:pb-0"
                   >
-                    {/* Image Skeleton */}
                     <div className="w-24 sm:w-28 h-24 sm:h-28 bg-surface rounded-xl sm:rounded-2xl animate-pulse flex-shrink-0"></div>
 
-                    {/* Content Skeleton */}
                     <div className="flex-1 space-y-3">
                       <div className="h-5 sm:h-6 bg-surface rounded animate-pulse w-3/4"></div>
                       <div className="h-4 bg-surface rounded animate-pulse w-1/2"></div>
                       <div className="h-10 bg-surface rounded-lg animate-pulse w-32"></div>
                     </div>
 
-                    {/* Price Skeleton */}
                     <div className="text-right space-y-2">
                       <div className="h-6 bg-surface rounded animate-pulse w-20"></div>
                       <div className="h-9 bg-surface rounded-lg animate-pulse w-24"></div>
@@ -54,7 +50,6 @@ const CartPage = () => {
               </div>
             </div>
 
-            {/* Order Summary Skeleton */}
             <div className="lg:w-1/3">
               <div className="bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-cb-border sticky top-6">
                 <div className="h-7 sm:h-8 bg-surface rounded animate-pulse mb-4 sm:mb-6"></div>
@@ -82,35 +77,6 @@ const CartPage = () => {
     );
   }
 
-  if (status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-ink flex items-center justify-center px-6">
-        <div className="text-center w-full max-w-md">
-          <div className="bg-card rounded-2xl sm:rounded-3xl p-8 sm:p-10 shadow-xl border border-cb-border">
-            <h1
-              className="text-3xl sm:text-4xl font-light text-cream mb-4"
-              style={{
-                fontFamily:
-                  'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-              }}
-            >
-              Sign In Required
-            </h1>
-            <p className="text-cream-dim text-base sm:text-lg mb-8 leading-relaxed">
-              Please log in to view and manage your cart items.
-            </p>
-            <Link
-              href="/auth"
-              className="inline-flex items-center justify-center px-8 py-3 bg-gold text-ink rounded-xl font-medium hover:bg-gold-light transition-all duration-200 shadow-lg w-full"
-            >
-              Log In / Sign Up
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="min-h-screen bg-ink flex items-center justify-center px-6">
@@ -130,7 +96,13 @@ const CartPage = () => {
               {error}
             </p>
             <button
-              onClick={() => fetchCart("authenticated")}
+              onClick={() =>
+                fetchCart(
+                  status === "authenticated"
+                    ? "authenticated"
+                    : "unauthenticated",
+                )
+              }
               className="px-8 py-3 bg-gold text-ink rounded-xl font-medium hover:bg-gold-light transition-colors w-full"
             >
               Try Again
@@ -142,10 +114,18 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-ink">
-      <main className="container mx-auto px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-8 lg:mb-10 text-center">
+    <div className="relative min-h-screen overflow-hidden bg-ink">
+      <div className="pointer-events-none absolute inset-0 -z-0">
+        <div className="absolute -top-16 right-0 h-64 w-64 rounded-full bg-[rgba(200,137,42,0.14)] blur-3xl" />
+        <div className="absolute left-0 top-[30%] h-72 w-72 rounded-full bg-[rgba(200,137,42,0.1)] blur-3xl" />
+      </div>
+
+      <main className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+        <div className="mb-6 sm:mb-8 lg:mb-10 text-center reveal visible">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--border-gold)] bg-[rgba(200,137,42,0.12)] px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-gold">
+            <ShoppingBag className="h-3.5 w-3.5" />
+            Your Selections
+          </div>
           <h1
             className="text-3xl sm:text-4xl lg:text-5xl font-light text-cream leading-tight"
             style={{
@@ -156,13 +136,26 @@ const CartPage = () => {
             Your Cart
           </h1>
           <p className="text-cream-dim mt-3 text-base sm:text-lg">
-            Review your selected designs
+            Review, refine, and proceed when your plan set feels right.
           </p>
         </div>
 
+        {status !== "authenticated" && (
+          <div className="mb-5 sm:mb-6 rounded-2xl border border-[var(--border-gold)] bg-[rgba(200,137,42,0.1)] px-4 sm:px-5 py-3.5 sm:py-4 text-sm text-cream-dim">
+            You are viewing a local guest cart. To keep your cart across
+            devices,
+            <Link
+              href="/auth"
+              className="ml-1 text-gold hover:text-gold-light transition-colors"
+            >
+              sign in here
+            </Link>
+            .
+          </div>
+        )}
+
         {cart && cart.length > 0 ? (
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-            {/* Cart Items - Main Content */}
+          <div className="flex flex-col lg:flex-row gap-5 sm:gap-6 lg:gap-8 reveal visible">
             <div className="lg:w-2/3 xl:w-7/12 2xl:w-2/3">
               <CartItemList
                 loading={loading}
@@ -172,7 +165,6 @@ const CartPage = () => {
               />
             </div>
 
-            {/* Order Summary - Sidebar */}
             <div className="lg:w-1/3 xl:w-5/12 2xl:w-1/3">
               <div className="sticky top-4 sm:top-6 lg:top-8">
                 <OrderSummary items={cart} loading={loading} />
@@ -180,9 +172,9 @@ const CartPage = () => {
             </div>
           </div>
         ) : (
-          // Empty Cart State
-          <div className="flex flex-col items-center justify-center px-4">
-            <div className="bg-card rounded-2xl sm:rounded-3xl p-8 sm:p-10 lg:p-12 text-center shadow-xl border border-cb-border w-full max-w-md sm:max-w-lg">
+          <div className="flex flex-col items-center justify-center px-4 reveal visible">
+            <div className="relative overflow-hidden bg-card rounded-2xl sm:rounded-3xl p-8 sm:p-10 lg:p-12 text-center shadow-xl border border-cb-border w-full max-w-md sm:max-w-lg">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-gold to-transparent" />
               <div className="w-20 sm:w-24 mx-auto mb-6 text-cream-dim">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -203,13 +195,13 @@ const CartPage = () => {
                 Your Cart is Empty
               </h2>
               <p className="text-cream-dim text-base sm:text-lg mb-8 leading-relaxed">
-                Discover amazing designs and start building your collection
+                Discover curated house plans and add your favorites here.
               </p>
               <Link
                 href="/design-showcase"
                 className="inline-flex items-center justify-center px-8 py-3 bg-gold text-ink rounded-xl font-medium hover:bg-gold-light transition-all duration-200 shadow-lg w-full"
               >
-                Start Shopping
+                Explore Designs
               </Link>
             </div>
           </div>

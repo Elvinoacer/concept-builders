@@ -363,6 +363,22 @@
   }
 }
 
+@keyframes cartBump {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-cart-bump {
+  animation: cartBump 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 body.landing-redesign-active .min-h-screen.flex.flex-col > header,
 body.landing-redesign-active .min-h-screen.flex.flex-col > footer {
   display: none !important;
@@ -409,6 +425,10 @@ body.landing-redesign-active .min-h-screen.flex.flex-col > footer {
   .animate-marquee,
   .animate-marquee2 {
     animation-duration: 60s;
+  }
+
+  .animate-cart-bump {
+    animation: none;
   }
 }
 
