@@ -86,6 +86,10 @@ export async function POST(request: Request) {
     const PaypalClient = client();
     const req = new paypal.orders.OrdersCreateRequest();
     req.headers["Prefer"] = "return=representation";
+    const host = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
+    const encodedDiscount = discountCode
+      ? `?discountCode=${encodeURIComponent(discountCode)}`
+      : "";
 
     req.requestBody({
       intent: "CAPTURE",
@@ -101,8 +105,10 @@ export async function POST(request: Request) {
       ],
       application_context: {
         brand_name: "Concept Builders",
-        landing_page: "LOGIN",
+        landing_page: "BILLING",
         user_action: "PAY_NOW",
+        return_url: `${host}/checkout/paypal-return${encodedDiscount}`,
+        cancel_url: `${host}/checkout?paypal=cancelled`,
       },
     });
 
@@ -125,9 +131,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const approveUrl = response.result.links?.find(
+      (link: { rel?: string; href?: string }) => link.rel === "approve",
+    )?.href;
+
     return NextResponse.json({
       orderID: response.result.id,
       status: response.result.status,
+      approveUrl,
     });
   } catch (error: unknown) {
     console.error("PayPal Order Creation Error:", error);

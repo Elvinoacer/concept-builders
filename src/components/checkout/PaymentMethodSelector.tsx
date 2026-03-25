@@ -13,9 +13,9 @@ type PaymentMethodSelectorProps = {
 const paymentMethods = [
   {
     id: "paypal",
-    name: "PayPal / Card",
+    name: "PayPal Redirect",
     image: "/payments/paypal.png",
-    description: "Pay with PayPal, Visa, Mastercard, or Amex",
+    description: "Continue to PayPal and return after secure payment",
     supportedCurrencies: ["USD", "EUR", "GBP"],
     processingTime: "Instant",
   },

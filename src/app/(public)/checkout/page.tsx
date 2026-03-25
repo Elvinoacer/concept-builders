@@ -5,11 +5,10 @@ import OrderSummary from "@/components/checkout/OrderSummary";
 import PaymentMethodSelector from "@/components/checkout/PaymentMethodSelector";
 import PaypalPayment from "@/components/checkout/PaypalPayment";
 import { useCart } from "@/hooks/useCart";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 type PayPalRuntimeConfig = {
   configured: boolean;
@@ -20,6 +19,7 @@ type PayPalRuntimeConfig = {
 const CheckoutPage = () => {
   const { status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     cart,
     loading: isLoading,
@@ -79,6 +79,12 @@ const CheckoutPage = () => {
       mounted = false;
     };
   }, [paymentMethod]);
+
+  useEffect(() => {
+    if (searchParams?.get("paypal") === "cancelled") {
+      toast.info("PayPal checkout was cancelled.");
+    }
+  }, [searchParams]);
 
   if (status === "loading" || status === "unauthenticated") {
     return (
@@ -144,7 +150,9 @@ const CheckoutPage = () => {
   };
 
   const selectedMethodLabel =
-    paymentMethod === "mpesa" ? "M-Pesa / Checkout Link" : "PayPal / Card";
+    paymentMethod === "mpesa"
+      ? "M-Pesa / Checkout Link"
+      : "PayPal Redirect Checkout";
 
   return (
     <div className="min-h-screen bg-ink text-cream">
@@ -289,24 +297,7 @@ const CheckoutPage = () => {
                 </p>
               </div>
 
-              <div className="mt-6">
-                {paypalConfig?.configured && paypalConfig.clientId ? (
-                  <PayPalScriptProvider
-                    options={{
-                      clientId: paypalConfig.clientId,
-                      currency: "USD",
-                      intent: "capture",
-                      components: "buttons",
-                      enableFunding: ["card", "paylater"],
-                      disableFunding: ["venmo"],
-                    }}
-                  >
-                    {renderPaymentMethod()}
-                  </PayPalScriptProvider>
-                ) : (
-                  renderPaymentMethod()
-                )}
-              </div>
+              <div className="mt-6">{renderPaymentMethod()}</div>
             </div>
 
             {/* Additional Trust Indicators - Desktop Only */}

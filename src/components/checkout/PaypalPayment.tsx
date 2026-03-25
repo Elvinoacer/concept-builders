@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import PayPalButton from "./PayPalButton";
+import PayPalButton from "@/components/checkout/PayPalButton";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface PaypalPaymentProps {
@@ -42,10 +42,10 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
           </svg>
         </div>
         <h3 className="mb-2 text-lg font-light text-cream xs:text-xl sm:text-2xl">
-          PayPal Payment
+          PayPal Redirect Checkout
         </h3>
         <p className="text-sm xs:text-base text-cream-dim">
-          Securely pay with your PayPal account or credit card
+          Continue to PayPal and return automatically after payment
         </p>
         <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
           Mode: {paypalMode}
@@ -126,10 +126,7 @@ const PaypalPayment: React.FC<PaypalPaymentProps> = ({
 
         {/* Help Text */}
         <div className="text-center text-xs xs:text-sm text-cream-dim">
-          <p>
-            You&apos;ll be redirected to PayPal to complete your payment
-            securely
-          </p>
+          <p>You&apos;ll complete payment on PayPal and return here securely</p>
         </div>
 
         {!paypalConfigured && (
