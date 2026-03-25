@@ -251,19 +251,21 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
               </div>
             )}
 
-          <div className="mt-4 rounded-xl border border-cb-border bg-surface p-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cream-dim mb-2">
+          <div className="mt-4 w-full rounded-xl border border-cb-border bg-surface p-3 sm:p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cream-dim mb-2 sm:mb-3">
               Selected Options Breakdown
             </p>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {selectedFileTypeRows.map((row) => (
                 <div
                   key={row.type}
-                  className="flex items-center justify-between text-xs text-cream-dim"
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-xs text-cream-dim"
                 >
-                  <span>{row.label}</span>
+                  <span className="min-w-0 leading-snug">{row.label}</span>
                   <span
-                    className={row.price > 0 ? "text-gold" : "text-green-400"}
+                    className={`whitespace-nowrap text-right ${
+                      row.price > 0 ? "text-gold" : "text-green-400"
+                    }`}
                   >
                     {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
                   </span>
@@ -272,19 +274,23 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
               {selectedExtrasRows.map((row) => (
                 <div
                   key={row.id}
-                  className="flex items-center justify-between text-xs text-cream-dim"
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-xs text-cream-dim"
                 >
-                  <span>{row.label}</span>
+                  <span className="min-w-0 leading-snug">{row.label}</span>
                   <span
-                    className={row.price > 0 ? "text-gold" : "text-green-400"}
+                    className={`whitespace-nowrap text-right ${
+                      row.price > 0 ? "text-gold" : "text-green-400"
+                    }`}
                   >
                     {row.price > 0 ? `+$${row.price.toFixed(2)}` : "Included"}
                   </span>
                 </div>
               ))}
-              <div className="mt-2 border-t border-cb-border pt-2 flex items-center justify-between text-xs font-semibold">
+              <div className="mt-2 border-t border-cb-border pt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-xs font-semibold">
                 <span className="text-cream">Item Total</span>
-                <span className="text-gold">${itemTotalPrice.toFixed(2)}</span>
+                <span className="text-gold whitespace-nowrap text-right">
+                  ${itemTotalPrice.toFixed(2)}
+                </span>
               </div>
             </div>
           </div>
