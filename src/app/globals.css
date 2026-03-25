@@ -71,6 +71,36 @@
     --chart-3: 30 18% 25%;
     --chart-4: 35 20% 35%;
     --chart-5: 200 20% 45%;
+
+    --landing-nav-bg: rgba(10, 9, 7, 0.92);
+    --landing-hero-image-opacity: 0.4;
+    --landing-hero-overlay:
+      linear-gradient(
+        to bottom,
+        rgba(10, 9, 7, 0.44) 0%,
+        rgba(10, 9, 7, 0.24) 35%,
+        rgba(10, 9, 7, 0.86) 78%,
+        var(--ink) 100%
+      ),
+      linear-gradient(
+        130deg,
+        rgba(200, 137, 42, 0.1) 0%,
+        rgba(200, 137, 42, 0.02) 38%,
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 72% 34%,
+        rgba(232, 168, 74, 0.14) 0%,
+        transparent 44%
+      );
+    --landing-hero-grid-line: rgba(200, 137, 42, 0.04);
+    --landing-hero-grid-mask: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.4) 30%,
+      rgba(0, 0, 0, 0.4) 70%,
+      transparent 100%
+    );
   }
 
   /* === LIGHT MODE === */
@@ -113,6 +143,36 @@
     --chart-3: 42 20% 65%;
     --chart-4: 30 18% 45%;
     --chart-5: 200 30% 45%;
+
+    --landing-nav-bg: rgba(250, 247, 242, 0.9);
+    --landing-hero-image-opacity: 0.5;
+    --landing-hero-overlay:
+      linear-gradient(
+        to bottom,
+        rgba(250, 247, 242, 0.52) 0%,
+        rgba(250, 247, 242, 0.42) 35%,
+        rgba(242, 236, 224, 0.82) 78%,
+        var(--ink) 100%
+      ),
+      linear-gradient(
+        130deg,
+        rgba(176, 120, 32, 0.1) 0%,
+        rgba(176, 120, 32, 0.02) 38%,
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 72% 34%,
+        rgba(200, 144, 48, 0.18) 0%,
+        transparent 44%
+      );
+    --landing-hero-grid-line: rgba(80, 65, 50, 0.06);
+    --landing-hero-grid-mask: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.16) 30%,
+      rgba(0, 0, 0, 0.16) 70%,
+      transparent 100%
+    );
   }
 }
 

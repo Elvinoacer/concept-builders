@@ -205,7 +205,7 @@ export default function Home() {
       <nav
         className={`fixed inset-x-0 top-0 z-[100] mx-auto flex w-full items-center justify-between border-b px-6 py-6 transition-all duration-300 lg:px-[60px] ${
           navScrolled
-            ? "border-cb-border bg-[rgba(10,9,7,0.92)] py-4 backdrop-blur-[20px]"
+            ? "border-cb-border bg-[var(--landing-nav-bg)] py-4 backdrop-blur-[20px]"
             : "border-transparent bg-transparent"
         }`}
       >
@@ -369,11 +369,22 @@ export default function Home() {
               className={`object-cover object-center opacity-40 ${
                 index === activeBannerIndex ? "scale-100" : "scale-105"
               } transition-transform duration-[5200ms] ease-out`}
+              style={{ opacity: "var(--landing-hero-image-opacity)" }}
             />
           </div>
         ))}
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,9,7,0.44)_0%,rgba(10,9,7,0.24)_35%,rgba(10,9,7,0.86)_78%,var(--ink)_100%),linear-gradient(130deg,rgba(200,137,42,0.1)_0%,rgba(200,137,42,0.02)_38%,transparent_60%),radial-gradient(circle_at_72%_34%,rgba(232,168,74,0.14)_0%,transparent_44%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.04)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:linear-gradient(to_bottom,transparent_0%,rgba(0,0,0,0.4)_30%,rgba(0,0,0,0.4)_70%,transparent_100%)]" />
+        <div
+          className="absolute inset-0"
+          style={{ background: "var(--landing-hero-overlay)" }}
+        />
+        <div
+          className="absolute inset-0 bg-[size:80px_80px]"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--landing-hero-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--landing-hero-grid-line) 1px, transparent 1px)",
+            maskImage: "var(--landing-hero-grid-mask)",
+          }}
+        />
 
         <div className="relative z-10">
           <p className="mb-6 flex items-center gap-4 text-[11px] uppercase tracking-[0.25em] text-gold animate-[fadeUp_0.8s_ease_0.3s_forwards] opacity-0">
