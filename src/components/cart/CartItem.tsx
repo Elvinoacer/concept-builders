@@ -306,24 +306,30 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
               </div>
             )}
 
-          <div className="mt-6 w-full rounded-2xl border border-cb-border bg-[rgba(17,16,9,0.55)] p-4 sm:p-5">
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em] text-cream-dim mb-3">
-              Selected Options Breakdown
+          <div className="mt-6 w-full rounded-2xl border border-cb-border bg-[rgba(17,16,9,0.55)] p-3 sm:p-5">
+            <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.08em] text-cream-dim leading-tight mb-3">
+              Options Breakdown
             </p>
             <div className="rounded-xl border border-[rgba(200,137,42,0.22)] bg-[#111009] px-3 sm:px-4 py-2 sm:py-3">
               <ul className="divide-y divide-[rgba(200,185,168,0.08)]">
-                <li className="flex items-center justify-between gap-3 py-2.5 opacity-85">
-                  <span className="text-sm text-cream-dim">
+                <li className="flex items-center justify-between gap-2 py-2 opacity-85">
+                  <span
+                    className="flex-1 min-w-0 text-sm text-cream-dim"
+                    style={{
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
+                    }}
+                  >
                     Base Design (Architectural PDF)
                   </span>
-                  <span className="text-sm font-semibold text-emerald-400">
+                  <span className="text-sm font-semibold shrink-0 ml-2 text-emerald-400">
                     Included
                   </span>
                 </li>
 
                 {selectedFileTypeRows.length > 0 && (
-                  <li className="py-2">
-                    <p className="text-[11px] uppercase tracking-[0.12em] text-cream-dim">
+                  <li className="pt-2 pb-1">
+                    <p className="text-[10px] uppercase tracking-[0.08em] text-cream-dim font-semibold">
                       File Types
                     </p>
                   </li>
@@ -332,18 +338,24 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                 {selectedFileTypeRows.map((row, idx) => (
                   <li
                     key={row.type || idx}
-                    className="flex items-start justify-between gap-3 py-2.5"
+                    className="flex items-center justify-between gap-2 py-2"
                   >
                     <span className="min-w-0 flex-1 flex items-start gap-2">
                       <span className="mt-0.5 rounded-full border border-cb-border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-cream-dim">
                         {row.badge}
                       </span>
-                      <span className="min-w-0 text-sm leading-relaxed text-cream break-words">
+                      <span
+                        className="min-w-0 text-sm text-cream"
+                        style={{
+                          wordBreak: "break-word",
+                          overflowWrap: "anywhere",
+                        }}
+                      >
                         {row.label || "Option"}
                       </span>
                     </span>
                     <span
-                      className={`text-sm font-semibold whitespace-nowrap tabular-nums ${
+                      className={`text-sm font-semibold shrink-0 ml-2 tabular-nums ${
                         row.price > 0 ? "text-[#c8892a]" : "text-emerald-400"
                       }`}
                     >
@@ -353,8 +365,8 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                 ))}
 
                 {selectedExtrasRows.length > 0 && (
-                  <li className="py-2">
-                    <p className="text-[11px] uppercase tracking-[0.12em] text-cream-dim">
+                  <li className="pt-3 pb-1 border-t border-[rgba(200,185,168,0.08)] mt-1">
+                    <p className="text-[10px] uppercase tracking-[0.08em] text-cream-dim font-semibold">
                       Add-ons
                     </p>
                   </li>
@@ -363,18 +375,24 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
                 {selectedExtrasRows.map((row, idx) => (
                   <li
                     key={row.id || idx}
-                    className="flex items-start justify-between gap-3 py-2.5"
+                    className="flex items-center justify-between gap-2 py-2"
                   >
                     <span className="min-w-0 flex-1 flex items-start gap-2">
                       <span className="mt-0.5 rounded-full border border-cb-border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-cream-dim">
                         {row.badge}
                       </span>
-                      <span className="min-w-0 text-sm leading-relaxed text-cream break-words">
+                      <span
+                        className="min-w-0 text-sm text-cream"
+                        style={{
+                          wordBreak: "break-word",
+                          overflowWrap: "anywhere",
+                        }}
+                      >
                         {row.label || "Option"}
                       </span>
                     </span>
                     <span
-                      className={`text-sm font-semibold whitespace-nowrap tabular-nums ${
+                      className={`text-sm font-semibold shrink-0 ml-2 tabular-nums ${
                         row.price > 0 ? "text-[#c8892a]" : "text-emerald-400"
                       }`}
                     >

@@ -8,6 +8,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: "475px",
+      },
       animation: {
         marquee: "marquee 50s linear infinite",
         marquee2: "marquee2 50s linear infinite",
