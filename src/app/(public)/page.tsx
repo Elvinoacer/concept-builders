@@ -43,17 +43,24 @@ export default async function Home() {
       <section className="relative flex min-h-screen flex-col justify-end overflow-hidden px-5 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-40 lg:px-[60px]">
         <div className="absolute inset-0 bg-[var(--surface)]" />
         <div className="absolute inset-0 transition-opacity duration-[1800ms] ease-in-out opacity-100">
-          <Image
-            key={heroBanners[activeBannerIndex]}
-            src={heroBanners[activeBannerIndex]}
-            alt="Concept Builders hero banner"
-            fill
-            priority={activeBannerIndex === 0}
-            fetchPriority="high"
-            sizes="100vw"
-            className="object-cover object-center opacity-40 scale-100 transition-transform duration-[5200ms] ease-out"
-            style={{ opacity: "var(--landing-hero-image-opacity)" }}
-          />
+          <picture className="absolute inset-0">
+            <source
+              media="(max-width: 828px)"
+              srcSet={heroBanners[activeBannerIndex].replace(
+                ".webp",
+                "-mobile.webp",
+              )}
+            />
+            <img
+              src={heroBanners[activeBannerIndex]}
+              alt=""
+              aria-hidden="true"
+              decoding="async"
+              fetchPriority="high"
+              className="h-full w-full object-cover object-center opacity-40 scale-100 transition-transform duration-[5200ms] ease-out"
+              style={{ opacity: "var(--landing-hero-image-opacity)" }}
+            />
+          </picture>
         </div>
         <div
           className="absolute inset-0"

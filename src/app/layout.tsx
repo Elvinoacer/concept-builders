@@ -1,13 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { Cormorant_Garamond } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-
-import { ThemeProvider } from "@/components/theme-provider";
 
 import { TrackingScript } from "@/components/TrackingScript";
 import { VercelAnalytics } from "@/components/VercelAnalytics";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Providers from "./Providers";
+
+const cormorantGaramond = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant-garamond",
+  display: "swap",
+  preload: true,
+});
 
 // Viewport configuration for mobile responsiveness
 export const viewport: Viewport = {
@@ -122,8 +130,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={cormorantGaramond.variable}
+      suppressHydrationWarning
+    >
       <head>
+        {/* Apply persisted theme class before first paint without next-themes runtime. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var t = localStorage.getItem('concept-builders-theme') || 'dark';
+                var root = document.documentElement;
+                root.classList.remove('light', 'dark');
+                root.classList.add(t === 'light' ? 'light' : 'dark');
+                root.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+              } catch(e) {
+                var rootFallback = document.documentElement;
+                rootFallback.classList.remove('light');
+                rootFallback.classList.add('dark');
+                rootFallback.setAttribute('data-theme', 'dark');
+              }
+            `,
+          }}
+        />
+
         {/* Preload critical resources */}
         <link
           rel="preload"
@@ -132,16 +164,13 @@ export default function RootLayout({
           type="image/webp"
         />
 
-        {/* DNS Prefetch for external domains */}
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
-
-        {/* Preconnect to critical third-party origins */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
+          rel="preload"
+          as="image"
+          type="image/webp"
+          href="/images/banners/banner1.webp"
+          imageSrcSet="/images/banners/banner1-mobile.webp 828w, /images/banners/banner1.webp 1920w"
+          imageSizes="100vw"
         />
 
         {/* Structured Data for SEO */}
@@ -210,20 +239,12 @@ export default function RootLayout({
         <meta name="google" content="notranslate" />
       </head>
       <body className="antialiased min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-          storageKey="concept-builders-theme"
-        >
-          <Providers>
-            {/* Main content container with mobile-safe areas */}
-            <div className="min-h-screen flex flex-col safe-top safe-bottom">
-              {children}
-            </div>
-          </Providers>
-        </ThemeProvider>
+        <Providers>
+          {/* Main content container with mobile-safe areas */}
+          <div className="min-h-screen flex flex-col safe-top safe-bottom">
+            {children}
+          </div>
+        </Providers>
 
         {/* Performance and Analytics */}
         <VercelAnalytics />

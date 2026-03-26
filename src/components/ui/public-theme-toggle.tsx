@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
 import { toast } from "sonner";
 
 type PublicThemeToggleProps = {
@@ -16,11 +15,32 @@ export default function PublicThemeToggle({
   className,
   autoDark = true,
 }: PublicThemeToggleProps) {
-  const { resolvedTheme, setTheme } = useTheme();
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
   const [mounted, setMounted] = useState(false);
+
+  const applyTheme = (theme: "light" | "dark") => {
+    if (typeof document === "undefined") return;
+    const html = document.documentElement;
+    html.classList.remove("light", "dark");
+    html.classList.add(theme);
+    html.setAttribute("data-theme", theme);
+    setResolvedTheme(theme);
+    try {
+      localStorage.setItem("concept-builders-theme", theme);
+    } catch {
+      // Ignore storage failures in private mode.
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
+    if (typeof document === "undefined") return;
+    const html = document.documentElement;
+    if (html.classList.contains("light")) {
+      setResolvedTheme("light");
+    } else {
+      setResolvedTheme("dark");
+    }
   }, []);
 
   useEffect(() => {
@@ -34,12 +54,12 @@ export default function PublicThemeToggle({
     sessionStorage.setItem(AUTO_DARK_SESSION_KEY, "1");
 
     if (resolvedTheme === "light") {
-      setTheme("dark");
+      applyTheme("dark");
       toast("Switched to dark mode for better readability.", {
         description: "You can still switch back anytime from the theme button.",
       });
     }
-  }, [autoDark, mounted, resolvedTheme, setTheme]);
+  }, [autoDark, mounted, resolvedTheme]);
 
   if (!mounted) {
     return (
@@ -58,7 +78,7 @@ export default function PublicThemeToggle({
   return (
     <button
       type="button"
-      onClick={() => setTheme(isLight ? "dark" : "light")}
+      onClick={() => applyTheme(isLight ? "dark" : "light")}
       aria-label="Toggle theme"
       title={isLight ? "Switch to dark mode" : "Switch to light mode"}
       className={`group grid h-10 w-10 place-items-center border border-cb-border bg-card/70 text-cream-dim transition-colors hover:border-gold hover:text-gold ${className || ""}`}

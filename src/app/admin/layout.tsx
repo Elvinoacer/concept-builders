@@ -4,6 +4,7 @@ import AdminHeader from "@/components/admin/dashboard/AdminHeader";
 import React, { useState, useEffect } from "react";
 import { UploadProvider } from "@/contexts/UploadContext";
 import GlobalUploadStatus from "@/components/admin/designs/GlobalUploadStatus";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function AdminLayout({
   children,
@@ -56,24 +57,21 @@ export default function AdminLayout({
   };
 
   return (
-    <UploadProvider>
-      <div
-        className={`flex h-screen w-full bg-gray-50 dark:bg-gray-900 group/design-root overflow-hidden transition-all duration-300 ease-linear ${
-          isDesktopSidebarOpen && !isMobile ? "pl-0" : "pl-0"
-        }`}
-        onClick={handleMainContentClick}
-      >
-        <AdminSidebar
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          isDesktopSidebarOpen={isDesktopSidebarOpen}
-          setIsDesktopSidebarOpen={setIsDesktopSidebarOpen}
-          isMobile={isMobile}
-        />
-
-        {/* Main Content Area */}
-        <div className="flex flex-1 flex-col min-w-0 transition-all duration-300">
-          <AdminHeader
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem={false}
+      disableTransitionOnChange
+      storageKey="concept-builders-theme"
+    >
+      <UploadProvider>
+        <div
+          className={`flex h-screen w-full bg-gray-50 dark:bg-gray-900 group/design-root overflow-hidden transition-all duration-300 ease-linear ${
+            isDesktopSidebarOpen && !isMobile ? "pl-0" : "pl-0"
+          }`}
+          onClick={handleMainContentClick}
+        >
+          <AdminSidebar
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
             isDesktopSidebarOpen={isDesktopSidebarOpen}
@@ -81,12 +79,23 @@ export default function AdminLayout({
             isMobile={isMobile}
           />
 
-          <main className="flex-1 overflow-y-auto p-3 min-[375px]:p-4 sm:p-5 md:p-6 lg:p-8 w-full">
-            <div className="w-full max-w-full mx-auto">{children}</div>
-          </main>
+          {/* Main Content Area */}
+          <div className="flex flex-1 flex-col min-w-0 transition-all duration-300">
+            <AdminHeader
+              sidebarOpen={sidebarOpen}
+              setSidebarOpen={setSidebarOpen}
+              isDesktopSidebarOpen={isDesktopSidebarOpen}
+              setIsDesktopSidebarOpen={setIsDesktopSidebarOpen}
+              isMobile={isMobile}
+            />
+
+            <main className="flex-1 overflow-y-auto p-3 min-[375px]:p-4 sm:p-5 md:p-6 lg:p-8 w-full">
+              <div className="w-full max-w-full mx-auto">{children}</div>
+            </main>
+          </div>
+          <GlobalUploadStatus />
         </div>
-        <GlobalUploadStatus />
-      </div>
-    </UploadProvider>
+      </UploadProvider>
+    </ThemeProvider>
   );
 }

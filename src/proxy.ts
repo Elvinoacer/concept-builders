@@ -58,11 +58,14 @@ export async function proxy(req: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set("x-pathname", pathname);
+  return response;
 }
 
 export const config = {
   matcher: [
+    "/",
     "/auth/:path*",
     "/admin/:path*",
     "/dashboard/:path*",

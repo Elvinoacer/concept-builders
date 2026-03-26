@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SearchProvider } from "@/lib/SearchContext";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function DashboardLayout({
   children,
@@ -46,48 +47,56 @@ export default function DashboardLayout({
   }, []);
 
   return (
-    <SearchProvider>
-      {/* Using flex instead of grid for better alignment control */}
-      <div className="flex h-screen w-full bg-ink overflow-hidden">
-        {/* Sidebar */}
-        <div
-          className="h-full flex-shrink-0 transition-all duration-300 ease-in-out"
-          style={{
-            width: isSidebarOpen && !isMobile ? sidebarWidth : 0,
-            minWidth: isSidebarOpen && !isMobile ? sidebarWidth : 0,
-          }}
-        >
-          <Sidebar
-            isSidebarOpen={isSidebarOpen}
-            setIsSidebarOpen={setIsSidebarOpen}
-            isMobile={isMobile}
-            sidebarWidth={sidebarWidth}
-            setSidebarWidth={setSidebarWidth}
-          />
-        </div>
-
-        {/* Main Content Area - This will now sit flush against the sidebar */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <DashboardHeader
-            setIsSidebarOpen={setIsSidebarOpen}
-            isSidebarOpen={isSidebarOpen}
-          />
-
-          <main className="flex-1 overflow-hidden bg-ink">
-            <div className="h-full w-full p-4 md:p-6 overflow-y-auto">
-              {children}
-            </div>
-          </main>
-        </div>
-
-        {/* Mobile Overlay */}
-        {isSidebarOpen && isMobile && (
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem={false}
+      disableTransitionOnChange
+      storageKey="concept-builders-theme"
+    >
+      <SearchProvider>
+        {/* Using flex instead of grid for better alignment control */}
+        <div className="flex h-screen w-full bg-ink overflow-hidden">
+          {/* Sidebar */}
           <div
-            className="fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity duration-300"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-      </div>
-    </SearchProvider>
+            className="h-full flex-shrink-0 transition-all duration-300 ease-in-out"
+            style={{
+              width: isSidebarOpen && !isMobile ? sidebarWidth : 0,
+              minWidth: isSidebarOpen && !isMobile ? sidebarWidth : 0,
+            }}
+          >
+            <Sidebar
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+              isMobile={isMobile}
+              sidebarWidth={sidebarWidth}
+              setSidebarWidth={setSidebarWidth}
+            />
+          </div>
+
+          {/* Main Content Area - This will now sit flush against the sidebar */}
+          <div className="flex-1 flex flex-col min-w-0">
+            <DashboardHeader
+              setIsSidebarOpen={setIsSidebarOpen}
+              isSidebarOpen={isSidebarOpen}
+            />
+
+            <main className="flex-1 overflow-hidden bg-ink">
+              <div className="h-full w-full p-4 md:p-6 overflow-y-auto">
+                {children}
+              </div>
+            </main>
+          </div>
+
+          {/* Mobile Overlay */}
+          {isSidebarOpen && isMobile && (
+            <div
+              className="fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity duration-300"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          )}
+        </div>
+      </SearchProvider>
+    </ThemeProvider>
   );
 }
