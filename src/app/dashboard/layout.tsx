@@ -31,6 +31,20 @@ export default function DashboardLayout({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  useEffect(() => {
+    const id = "material-symbols-outlined-font";
+    if (document.getElementById(id)) {
+      return;
+    }
+
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap";
+    document.head.appendChild(link);
+  }, []);
+
   return (
     <SearchProvider>
       {/* Using flex instead of grid for better alignment control */}

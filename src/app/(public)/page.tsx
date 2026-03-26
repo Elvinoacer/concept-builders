@@ -22,75 +22,24 @@ type FeaturedFeedback = {
 
 function useReveal<T extends HTMLElement>(delay = 0) {
   const ref = useRef<T | null>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisible(true);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" },
-    );
-
-    observer.observe(node);
-
-    return () => observer.disconnect();
-  }, []);
 
   return {
     ref,
-    className: `reveal ${visible ? "visible" : ""}`,
+    className: "reveal visible",
     style: { transitionDelay: `${delay}ms` },
   };
 }
 
-function useCountUp(target: number, isActive: boolean, duration = 1800) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!isActive) return;
-
-    let start = 0;
-    let frame = 0;
-
-    const animate = (timestamp: number) => {
-      if (!start) start = timestamp;
-      const progress = Math.min((timestamp - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * target));
-
-      if (progress < 1) {
-        frame = window.requestAnimationFrame(animate);
-      } else {
-        setCount(target);
-      }
-    };
-
-    frame = window.requestAnimationFrame(animate);
-
-    return () => window.cancelAnimationFrame(frame);
-  }, [duration, isActive, target]);
-
-  return count;
+function useCountUp(target: number) {
+  return target;
 }
 
 export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
-  const [activeBannerIndex, setActiveBannerIndex] = useState(0);
+  const activeBannerIndex = 0;
   const [designs, setDesigns] = useState<DesignItem[]>([]);
   const [feedback, setFeedback] = useState<FeaturedFeedback | null>(null);
-  const [statsVisible, setStatsVisible] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const statsRef = useRef<HTMLDivElement | null>(null);
 
   const heroBanners = useMemo(
     () => [
@@ -109,14 +58,6 @@ export default function Home() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setActiveBannerIndex((prev) => (prev + 1) % heroBanners.length);
-    }, 5200);
-
-    return () => window.clearInterval(interval);
-  }, [heroBanners.length]);
 
   useEffect(() => {
     document.body.classList.add("landing-redesign-active");
@@ -152,37 +93,16 @@ export default function Home() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const node = statsRef.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setStatsVisible(true);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.5 },
-    );
-
-    observer.observe(node);
-
-    return () => observer.disconnect();
-  }, []);
-
   const bestSellingPlans = useMemo(() => {
     return [...designs]
       .sort((a, b) => (b.views || 0) - (a.views || 0))
       .slice(0, 3);
   }, [designs]);
 
-  const countPlans = useCountUp(500, statsVisible);
-  const countHomeowners = useCountUp(1200, statsVisible);
-  const countCounties = useCountUp(47, statsVisible);
-  const countYears = useCountUp(12, statsVisible);
+  const countPlans = useCountUp(500);
+  const countHomeowners = useCountUp(1200);
+  const countCounties = useCountUp(47);
+  const countYears = useCountUp(12);
 
   const headerReveal = useReveal<HTMLDivElement>(0);
   const stepRevealOne = useReveal<HTMLDivElement>(0);
@@ -449,10 +369,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div
-        ref={statsRef}
-        className="flex items-stretch overflow-hidden border-y border-cb-border bg-card px-6 lg:px-[60px] max-[900px]:flex-wrap"
-      >
+      <div className="flex items-stretch overflow-hidden border-y border-cb-border bg-card px-6 lg:px-[60px] max-[900px]:flex-wrap">
         <div className="flex flex-1 flex-col items-center justify-center gap-1.5 border-r border-cb-border py-9 text-center max-[900px]:basis-1/2 max-[900px]:border-b">
           <p
             className="text-[32px] font-light leading-none sm:text-[42px]"
