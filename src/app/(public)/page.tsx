@@ -8,11 +8,11 @@ import PublicThemeToggle from "@/components/ui/public-theme-toggle";
 type DesignItem = {
   id: string;
   name: string;
+  views?: number;
   category?: {
     name: string;
   } | null;
   images?: Array<{ url: string }>;
-  orderItems?: Array<{ id: string }>;
 };
 
 type FeaturedFeedback = {
@@ -173,7 +173,7 @@ export default function Home() {
 
   const bestSellingPlans = useMemo(() => {
     return [...designs]
-      .sort((a, b) => (b.orderItems?.length || 0) - (a.orderItems?.length || 0))
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
       .slice(0, 3);
   }, [designs]);
 

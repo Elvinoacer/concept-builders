@@ -25,24 +25,39 @@ interface OngoingProject {
   status: string;
   category: string;
   startDate: string | null;
-  estimatedCompletionDate: string | null;
-  completedAt: string | null;
   featuredImage: string | null;
-  gallery: any;
   size: string | null;
-  value: string | null;
-  highlights: string[];
-  published: boolean;
-  createdAt: string;
+}
+
+interface OngoingProjectsResponse {
+  projects: OngoingProject[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalProjects: number;
+    limit: number;
+    hasMore: boolean;
+  };
+  filters: {
+    categories: string[];
+    statuses: string[];
+  };
 }
 
 const OngoingProjectsPage = () => {
   const [projects, setProjects] = useState<OngoingProject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableStatuses, setAvailableStatuses] = useState<string[]>([]);
+  const [totalProjects, setTotalProjects] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -58,45 +73,72 @@ const OngoingProjectsPage = () => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  const fetchOngoingProjects = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/ongoing-projects");
-      if (!response.ok) {
-        throw new Error(`Failed to load projects: ${response.status}`);
+  const fetchOngoingProjects = useCallback(
+    async (pageToLoad: number, append: boolean) => {
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
       }
-      const data: OngoingProject[] = await response.json();
-      setProjects(data.filter((p) => p.published));
-    } catch (err: any) {
-      setError(err.message || "Failed to load projects");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      setError(null);
+
+      const params = new URLSearchParams();
+      params.set("page", String(pageToLoad));
+      params.set("limit", "9");
+      if (debouncedSearchTerm.trim()) {
+        params.set("search", debouncedSearchTerm.trim());
+      }
+      if (selectedCategory !== "all") {
+        params.set("category", selectedCategory);
+      }
+      if (selectedStatus !== "all") {
+        params.set("status", selectedStatus);
+      }
+
+      try {
+        const response = await fetch(
+          `/api/ongoing-projects?${params.toString()}`,
+        );
+        if (!response.ok) {
+          throw new Error(`Failed to load projects: ${response.status}`);
+        }
+
+        const data: OngoingProjectsResponse = await response.json();
+        setProjects((prev) =>
+          append ? [...prev, ...data.projects] : data.projects,
+        );
+        setCurrentPage(data.pagination.currentPage);
+        setHasMore(data.pagination.hasMore);
+        setTotalProjects(data.pagination.totalProjects);
+        setAvailableCategories(data.filters.categories || []);
+        setAvailableStatuses(data.filters.statuses || []);
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : "Failed to load projects";
+        setError(message);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    },
+    [debouncedSearchTerm, selectedCategory, selectedStatus],
+  );
 
   useEffect(() => {
-    fetchOngoingProjects();
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchOngoingProjects(1, false);
   }, [fetchOngoingProjects]);
 
   // Get unique categories and statuses for filters
-  const categories = ["all", ...new Set(projects.map((p) => p.category))];
-  const statuses = ["all", ...new Set(projects.map((p) => p.status))];
-
-  // Filter projects based on search and filters
-  const filteredProjects = projects.filter((project) => {
-    const matchesSearch =
-      project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.location?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesCategory =
-      selectedCategory === "all" || project.category === selectedCategory;
-    const matchesStatus =
-      selectedStatus === "all" || project.status === selectedStatus;
-
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  const categories = ["all", ...availableCategories];
+  const statuses = ["all", ...availableStatuses];
 
   // Animation variants
   const containerVariants = {
@@ -176,7 +218,7 @@ const OngoingProjectsPage = () => {
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
           <button
-            onClick={fetchOngoingProjects}
+            onClick={() => fetchOngoingProjects(1, false)}
             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition-colors duration-200"
           >
             <RefreshCw className="w-4 h-4" />
@@ -342,13 +384,13 @@ const OngoingProjectsPage = () => {
             animate={{ opacity: 1 }}
           >
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Showing {filteredProjects.length} of {projects.length} projects
+              Showing {projects.length} of {totalProjects} projects
             </p>
           </motion.div>
         ) : null}
 
         {/* Projects Grid */}
-        {filteredProjects.length === 0 ? (
+        {projects.length === 0 ? (
           <motion.div
             className="flex flex-col items-center justify-center text-center py-12 sm:py-16 lg:py-24"
             initial={{ opacity: 0 }}
@@ -358,12 +400,12 @@ const OngoingProjectsPage = () => {
               <Building2 className="w-12 h-12 text-gray-400 dark:text-gray-600" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-3">
-              {projects.length === 0
+              {totalProjects === 0
                 ? "No ongoing projects"
                 : "No projects found"}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
-              {projects.length === 0
+              {totalProjects === 0
                 ? "Check back soon to see our latest work in progress!"
                 : "Try adjusting your search criteria or filters to see more results."}
             </p>
@@ -384,130 +426,154 @@ const OngoingProjectsPage = () => {
             )}
           </motion.div>
         ) : (
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {filteredProjects.map((project) => (
-              <motion.div
-                key={project.id}
-                variants={cardVariants}
-                whileHover={!isMobile ? "hover" : undefined}
-                className="flex"
-              >
-                <Link
-                  href={`/ongoing-projects/${project.slug}`}
-                  className="flex-1"
+          <>
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {projects.map((project) => (
+                <motion.div
+                  key={project.id}
+                  variants={cardVariants}
+                  whileHover={!isMobile ? "hover" : undefined}
+                  className="flex"
                 >
-                  <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden cursor-pointer h-full flex flex-col group border-2 border-gray-200/50 dark:border-gray-700/50 hover:border-blue-300/50 dark:hover:border-blue-600/30 transition-all duration-300 active:scale-95">
-                    {/* Image Section */}
-                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-900">
-                      {project.featuredImage ? (
-                        <Image
-                          src={project.featuredImage}
-                          alt={project.title}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                          placeholder="blur"
-                          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
-                          <Building2 className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+                  <Link
+                    href={`/ongoing-projects/${project.slug}`}
+                    className="flex-1"
+                  >
+                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden cursor-pointer h-full flex flex-col group border-2 border-gray-200/50 dark:border-gray-700/50 hover:border-blue-300/50 dark:hover:border-blue-600/30 transition-all duration-300 active:scale-95">
+                      {/* Image Section */}
+                      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-900">
+                        {project.featuredImage ? (
+                          <Image
+                            src={project.featuredImage}
+                            alt={project.title}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            placeholder="blur"
+                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
+                            <Building2 className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+                          </div>
+                        )}
+
+                        {/* Status Badge */}
+                        <div className="absolute top-3 right-3">
+                          <span
+                            className={`px-3 py-1 text-xs font-bold rounded-full shadow-md ${
+                              project.status === "in_progress"
+                                ? "bg-blue-600 text-white"
+                                : project.status === "planning"
+                                  ? "bg-amber-500 text-white"
+                                  : "bg-green-600 text-white"
+                            }`}
+                          >
+                            {project.status.replace("_", " ")}
+                          </span>
                         </div>
-                      )}
 
-                      {/* Status Badge */}
-                      <div className="absolute top-3 right-3">
-                        <span
-                          className={`px-3 py-1 text-xs font-bold rounded-full shadow-md ${
-                            project.status === "in_progress"
-                              ? "bg-blue-600 text-white"
-                              : project.status === "planning"
-                                ? "bg-amber-500 text-white"
-                                : "bg-green-600 text-white"
-                          }`}
-                        >
-                          {project.status.replace("_", " ")}
-                        </span>
+                        {/* Category Badge */}
+                        <div className="absolute top-3 left-3">
+                          <span className="px-3 py-1 bg-black/70 text-white text-xs font-medium rounded-full backdrop-blur-sm">
+                            {project.category.replace("_", " ")}
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Category Badge */}
-                      <div className="absolute top-3 left-3">
-                        <span className="px-3 py-1 bg-black/70 text-white text-xs font-medium rounded-full backdrop-blur-sm">
-                          {project.category.replace("_", " ")}
-                        </span>
+                      {/* Content Section */}
+                      <div className="p-4 sm:p-6 flex flex-col flex-grow">
+                        {/* Project Meta */}
+                        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-3">
+                          {project.location && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {project.location}
+                            </span>
+                          )}
+                          {project.startDate && (
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              Started
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-tight">
+                          {project.title}
+                        </h3>
+
+                        {/* Description */}
+                        {project.description && (
+                          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base mb-4 flex-grow line-clamp-3 leading-relaxed">
+                            {project.description}
+                          </p>
+                        )}
+
+                        {/* Project Details */}
+                        <div className="space-y-2 mb-4">
+                          {project.clientName && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-500 dark:text-gray-400">
+                                Client:
+                              </span>
+                              <span className="text-gray-900 dark:text-white font-medium">
+                                {project.clientName}
+                              </span>
+                            </div>
+                          )}
+                          {project.size && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-500 dark:text-gray-400">
+                                Size:
+                              </span>
+                              <span className="text-gray-900 dark:text-white font-medium">
+                                {project.size}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* CTA */}
+                        <div className="mt-auto flex items-center justify-between text-blue-600 dark:text-blue-400 font-semibold text-sm sm:text-base group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-200">
+                          <span>View Progress</span>
+                          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transform transition-transform group-hover:translate-x-1" />
+                        </div>
                       </div>
                     </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
 
-                    {/* Content Section */}
-                    <div className="p-4 sm:p-6 flex flex-col flex-grow">
-                      {/* Project Meta */}
-                      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-3">
-                        {project.location && (
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            {project.location}
-                          </span>
-                        )}
-                        {project.startDate && (
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            Started
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-tight">
-                        {project.title}
-                      </h3>
-
-                      {/* Description */}
-                      {project.description && (
-                        <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base mb-4 flex-grow line-clamp-3 leading-relaxed">
-                          {project.description}
-                        </p>
-                      )}
-
-                      {/* Project Details */}
-                      <div className="space-y-2 mb-4">
-                        {project.clientName && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">
-                              Client:
-                            </span>
-                            <span className="text-gray-900 dark:text-white font-medium">
-                              {project.clientName}
-                            </span>
-                          </div>
-                        )}
-                        {project.size && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">
-                              Size:
-                            </span>
-                            <span className="text-gray-900 dark:text-white font-medium">
-                              {project.size}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* CTA */}
-                      <div className="mt-auto flex items-center justify-between text-blue-600 dark:text-blue-400 font-semibold text-sm sm:text-base group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-200">
-                        <span>View Progress</span>
-                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transform transition-transform group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
+            {hasMore && (
+              <div className="mt-8 flex justify-center">
+                <button
+                  onClick={() => fetchOngoingProjects(currentPage + 1, true)}
+                  disabled={loadingMore}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-2xl transition-colors duration-200"
+                >
+                  {loadingMore ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      Load More
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
