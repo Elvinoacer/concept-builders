@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle, Shield, Smartphone, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
@@ -27,6 +27,11 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
     return isPossiblePhoneNumber(number);
   };
 
+  const handleClose = useCallback(() => {
+    localStorage.setItem("hasDismissedPhoneModal", "true");
+    onClose();
+  }, [onClose]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -48,25 +53,32 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save phone number.");
+        let message = "Failed to save phone number. Please try again.";
+        try {
+          const data = await response.json();
+          if (data?.message) {
+            message = data.message;
+          }
+        } catch {
+          // Keep fallback message when response is not JSON.
+        }
+        throw new Error(message);
       }
 
       setIsSuccess(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       onSubmit(phoneNumber as string);
     } catch (err) {
-      setError("Failed to save phone number. Please try again.");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to save phone number. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleClose = () => {
-    localStorage.setItem("hasDismissedPhoneModal", "true");
-    onClose();
-  };
-
-  // Reset states when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       setPhoneNumber("");
@@ -76,7 +88,6 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
     }
   }, [isOpen]);
 
-  // Handle escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
@@ -86,7 +97,7 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen]);
+  }, [isOpen, handleClose]);
 
   return (
     <AnimatePresence>
@@ -117,9 +128,7 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
             className="bg-ink rounded-3xl shadow-2xl w-full max-w-md sm:max-w-lg lg:max-w-xl border border-cb-border overflow-hidden flex flex-col max-h-[90vh] lg:max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header Section */}
             <div className="flex-shrink-0 relative bg-surface p-4 sm:p-6 border-b border-cb-border">
-              {/* Close Button */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -130,7 +139,6 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                 <X className="w-4 h-4" />
               </motion.button>
 
-              {/* Icon and Title */}
               <div className="flex flex-col items-center text-center space-y-2">
                 <div className="relative">
                   <motion.div
@@ -142,13 +150,12 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                     <Smartphone className="w-6 h-6 text-ink" />
                   </motion.div>
 
-                  {/* Success Checkmark */}
                   <AnimatePresence>
                     {isSuccess && (
                       <motion.div
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900 shadow-lg"
+                        className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg"
                       >
                         <CheckCircle className="w-3 h-3 text-white fill-current" />
                       </motion.div>
@@ -169,11 +176,9 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
               </div>
             </div>
 
-            {/* Content Section - Scrollable if needed */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8">
               {!isSuccess ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Phone Input */}
                   <div className="space-y-3">
                     <label
                       htmlFor="phone-input"
@@ -194,7 +199,6 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                       />
                     </div>
 
-                    {/* Error Message */}
                     <AnimatePresence>
                       {error && (
                         <motion.p
@@ -209,7 +213,6 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                     </AnimatePresence>
                   </div>
 
-                  {/* Security Info */}
                   <div className="flex items-start gap-4 p-4 bg-gold/10 rounded-2xl border border-gold/30">
                     <Shield className="w-6 h-6 text-gold mt-0.5 flex-shrink-0" />
                     <div className="space-y-2">
@@ -217,13 +220,13 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                         Your privacy matters
                       </p>
                       <p className="text-sm text-cream-dim leading-relaxed">
-                        We'll only use this for important updates and secure
-                        communication. Your number is encrypted and protected.
+                        We&apos;ll only use this for important updates and
+                        secure communication. Your number is encrypted and
+                        protected.
                       </p>
                     </div>
                   </div>
 
-                  {/* Submit Button */}
                   <motion.button
                     type="submit"
                     disabled={isLoading || !phoneNumber}
@@ -250,7 +253,6 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                   </motion.button>
                 </form>
               ) : (
-                /* Success State */
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -266,12 +268,11 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
                   </motion.div>
 
                   <div className="space-y-4">
-                    <h3 className="text-2xl font-bold text-cream">
-                      All Set!
-                    </h3>
+                    <h3 className="text-2xl font-bold text-cream">All Set!</h3>
                     <p className="text-cream-dim text-base leading-relaxed max-w-md">
                       Your phone number has been verified and saved securely.
-                      You'll now receive important updates and notifications.
+                      You&apos;ll now receive important updates and
+                      notifications.
                     </p>
                   </div>
 
@@ -287,7 +288,6 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
               )}
             </div>
 
-            {/* Footer Note */}
             {!isSuccess && (
               <div className="flex-shrink-0 px-6 sm:px-8 pb-6 sm:pb-8 border-t border-cb-border pt-5">
                 <p className="text-sm text-cream-dim text-center leading-relaxed">
