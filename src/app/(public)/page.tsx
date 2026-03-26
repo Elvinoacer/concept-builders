@@ -362,26 +362,18 @@ export default function Home() {
 
       <section className="relative flex min-h-screen flex-col justify-end overflow-hidden px-5 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-40 lg:px-[60px]">
         <div className="absolute inset-0 bg-[var(--surface)]" />
-        {heroBanners.map((banner, index) => (
-          <div
-            key={banner}
-            className={`absolute inset-0 transition-opacity duration-[1800ms] ease-in-out ${
-              index === activeBannerIndex ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <Image
-              src={banner}
-              alt="Concept Builders hero banner"
-              fill
-              priority={index === 0}
-              sizes="100vw"
-              className={`object-cover object-center opacity-40 ${
-                index === activeBannerIndex ? "scale-100" : "scale-105"
-              } transition-transform duration-[5200ms] ease-out`}
-              style={{ opacity: "var(--landing-hero-image-opacity)" }}
-            />
-          </div>
-        ))}
+        <div className="absolute inset-0 transition-opacity duration-[1800ms] ease-in-out opacity-100">
+          <Image
+            key={heroBanners[activeBannerIndex]}
+            src={heroBanners[activeBannerIndex]}
+            alt="Concept Builders hero banner"
+            fill
+            priority={activeBannerIndex === 0}
+            sizes="100vw"
+            className="object-cover object-center opacity-40 scale-100 transition-transform duration-[5200ms] ease-out"
+            style={{ opacity: "var(--landing-hero-image-opacity)" }}
+          />
+        </div>
         <div
           className="absolute inset-0"
           style={{ background: "var(--landing-hero-overlay)" }}

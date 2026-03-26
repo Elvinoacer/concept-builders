@@ -270,49 +270,10 @@ export default function RootLayout({
         {/* External Scripts with optimized loading */}
         <TrackingScript />
 
-        {/* Performance monitoring script */}
-        <Script
-          id="performance-monitoring"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('connection' in navigator) {
-                const connection = navigator.connection;
-                if (connection) {
-                  console.log('Connection type:', connection.effectiveType);
-                  console.log('Data saver:', connection.saveData);
-                  
-                  // Adjust loading behavior based on connection
-                  if (connection.saveData || connection.effectiveType === 'slow-2g') {
-                    // Implement data-saving measures
-                    window.__DATA_SAVER_MODE = true;
-                  }
-                }
-              }
-              
-              // Monitor largest contentful paint
-              new PerformanceObserver((entryList) => {
-                const entries = entryList.getEntries();
-                const lastEntry = entries[entries.length - 1];
-                console.log('LCP:', lastEntry.renderTime || lastEntry.loadTime);
-              }).observe({type: 'largest-contentful-paint', buffered: true});
-              
-              // Monitor cumulative layout shift
-              new PerformanceObserver((entryList) => {
-                for (const entry of entryList.getEntries()) {
-                  if (!entry.hadRecentInput) {
-                    console.log('CLS:', entry.value);
-                  }
-                }
-              }).observe({type: 'layout-shift', buffered: true});
-            `,
-          }}
-        />
-
         {/* Service Worker Registration for PWA */}
         <Script
           id="service-worker-registration"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
@@ -332,11 +293,9 @@ export default function RootLayout({
                           }
                         });
                       });
-
-                      console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     },
                     function(err) {
-                      console.log('ServiceWorker registration failed: ', err);
+                      console.error('ServiceWorker registration failed:', err);
                     }
                   );
                 });
@@ -348,7 +307,7 @@ export default function RootLayout({
         {/* Touch detection for mobile interactions */}
         <Script
           id="touch-detection"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               // Detect touch device
@@ -364,23 +323,13 @@ export default function RootLayout({
               } else {
                 document.body.classList.add('no-touch-device');
               }
-              
-              // Prevent zoom on double-tap (for iOS)
-              let lastTouchEnd = 0;
-              document.addEventListener('touchend', function (event) {
-                const now = (new Date()).getTime();
-                if (now - lastTouchEnd <= 300) {
-                  event.preventDefault();
-                }
-                lastTouchEnd = now;
-              }, false);
             `,
           }}
         />
 
         <Script
           id="custom-cursor"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
