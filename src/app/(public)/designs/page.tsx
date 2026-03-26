@@ -398,7 +398,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
               className="mb-5 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-gold after:h-px after:flex-1 after:bg-[rgba(200,137,42,0.22)] after:content-['']"
               style={{ fontFamily: monoSystem }}
             >
-              Budget (KES)
+              Budget (USD)
             </p>
             <div className="relative my-4 h-[2px] bg-[rgba(240,232,216,0.08)]">
               <div className="absolute inset-y-0 left-[10%] right-[30%] bg-gold" />
@@ -408,11 +408,9 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
               style={{ fontFamily: monoSystem }}
             >
               <span>
-                {minPrice ? `KES ${Math.floor(minPrice / 1000)}K` : "KES 0"}
+                {minPrice ? `$${Math.floor(minPrice / 1000)}K` : "$0"}
               </span>
-              <span>
-                {maxPrice ? `KES ${Math.ceil(maxPrice / 1000)}K` : "KES 0"}
-              </span>
+              <span>{maxPrice ? `$${Math.ceil(maxPrice / 1000)}K` : "$0"}</span>
             </div>
           </div>
 
@@ -523,7 +521,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                       >
                         from
                       </span>
-                      KES {featuredDesign.basePrice.toLocaleString()}
+                      ${featuredDesign.basePrice.toLocaleString()}
                     </p>
                     <Link
                       href={`/designs/${featuredDesign.id}`}

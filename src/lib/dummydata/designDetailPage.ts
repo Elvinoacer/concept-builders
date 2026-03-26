@@ -16,7 +16,7 @@ export const designDetailPageData = {
   purchaseSidebar: {
     selectFileTypeLegend: "Select File Type",
     totalPriceText: "Total Price:",
-    currencyPrefix: "KES",
+    currencyPrefix: "$",
     buyNowButton: "Buy Now",
     addToCartButton: "Add to Cart",
     convertingText: "Converting...",

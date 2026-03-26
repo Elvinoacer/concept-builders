@@ -242,7 +242,7 @@ const CustomDesignForm = () => {
             <Input
               type="text"
               id="budget"
-              placeholder="e.g., KES 4,000,000 - 8,000,000"
+              placeholder="e.g., USD 4,000,000 - 8,000,000"
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
               className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"

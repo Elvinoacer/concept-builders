@@ -213,7 +213,7 @@ const RecommendedDesigns = ({ compact = false }: RecommendedDesignsProps) => {
                     <p className="text-xs text-cream-dim">
                       {getCategoryName(design)}
                       {design.basePrice
-                        ? ` • KES ${design.basePrice.toLocaleString()}`
+                        ? ` • $${design.basePrice.toLocaleString()}`
                         : ""}
                     </p>
                   </div>

@@ -73,7 +73,7 @@ const CostCalculator = () => {
   };
 
   const formatCurrency = (amount) => {
-    return "KES " + Math.round(amount).toLocaleString();
+    return "$" + Math.round(amount).toLocaleString();
   };
 
   const resetCalculator = () => {

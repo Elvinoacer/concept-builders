@@ -390,7 +390,7 @@ export default function CategoryPage() {
                       className="text-2xl font-light text-cream"
                       style={{ fontFamily: serifSystem }}
                     >
-                      KES {design.basePrice.toLocaleString()}
+                      ${design.basePrice.toLocaleString()}
                     </p>
                     <span
                       className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold"

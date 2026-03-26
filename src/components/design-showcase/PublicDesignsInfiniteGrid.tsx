@@ -209,7 +209,7 @@ export default function PublicDesignsInfiniteGrid({
                     <span className="mr-1 text-[10px] uppercase tracking-[0.15em] text-muted">
                       from
                     </span>
-                    KES {design.basePrice.toLocaleString()}
+                    ${design.basePrice.toLocaleString()}
                   </p>
                   <Link
                     href={`/designs/${design.id}`}
