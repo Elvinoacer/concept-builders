@@ -3,39 +3,39 @@ const { FileType } = require("../src/generated/prisma");
 const categoriesData = [
   {
     name: "Bungalows",
-    image: "/images/banners/banner1.jpg",
+    image: "/images/banners/banner1.webp",
   },
   {
     name: "Duplexes",
-    image: "/images/banners/banner2.jpg",
+    image: "/images/banners/banner2.webp",
   },
   {
     name: "Apartments",
-    image: "/images/banners/banner3.jpg",
+    image: "/images/banners/banner3.webp",
   },
   {
     name: "Modern",
-    image: "/images/banners/banner1.jpg",
+    image: "/images/banners/banner1.webp",
   },
   {
     name: "Traditional",
-    image: "/images/banners/banner2.jpg",
+    image: "/images/banners/banner2.webp",
   },
   {
     name: "Luxury",
-    image: "/images/banners/banner3.jpg",
+    image: "/images/banners/banner3.webp",
   },
   {
     name: "Mansion",
-    image: "/images/banners/banner1.jpg",
+    image: "/images/banners/banner1.webp",
   },
   {
     name: "Tiny Homes",
-    image: "/images/banners/banner2.jpg",
+    image: "/images/banners/banner2.webp",
   },
   {
     name: "Farmhouse",
-    image: "/images/banners/banner3.jpg",
+    image: "/images/banners/banner3.webp",
   },
 ];
 

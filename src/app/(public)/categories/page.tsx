@@ -147,7 +147,7 @@ export default function CategoriesPage() {
     if (category.designs?.[0]?.images?.[0]?.url) {
       return category.designs[0].images[0].url;
     }
-    return "/images/banners/banner1.jpg";
+    return "/images/banners/banner1.webp";
   };
 
   return (

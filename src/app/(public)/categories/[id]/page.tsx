@@ -125,7 +125,7 @@ export default function CategoryPage() {
   };
 
   const getDesignImage = (design: Design) => {
-    return design.images?.[0]?.url || "/images/banners/banner1.jpg";
+    return design.images?.[0]?.url || "/images/banners/banner1.webp";
   };
 
   if (loading) {
@@ -203,7 +203,7 @@ export default function CategoryPage() {
           <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.03)_1px,transparent_1px)] bg-[size:88px_88px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.5)_26%,rgba(0,0,0,0.5)_74%,transparent)]" />
         </div>
         <Image
-          src={category.image || "/images/banners/banner2.jpg"}
+          src={category.image || "/images/banners/banner2.webp"}
           alt={category.name}
           fill
           className="object-cover opacity-35"

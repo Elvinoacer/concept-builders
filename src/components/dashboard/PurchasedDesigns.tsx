@@ -349,7 +349,7 @@ const PurchasedDesigns = ({
                   {/* Image Section */}
                   <div className="relative w-full lg:w-72 h-48 lg:h-auto flex-shrink-0 bg-surface">
                     <Image
-                      src={design.images[0]?.url || "/images/category-placeholder.png"}
+                      src={design.images[0]?.url || "/images/category-placeholder.webp"}
                       alt={design.name}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"

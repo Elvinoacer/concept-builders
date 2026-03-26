@@ -43,12 +43,12 @@ export default function Home() {
 
   const heroBanners = useMemo(
     () => [
-      "/images/banners/banner1.jpg",
-      "/images/banners/banner2.jpg",
-      "/images/banners/banner3.jpg",
-      "/images/banners/banner4.jpg",
-      "/images/banners/banner5.jpg",
-      "/images/banners/banner6.jpg",
+      "/images/banners/banner1.webp",
+      "/images/banners/banner2.webp",
+      "/images/banners/banner3.webp",
+      "/images/banners/banner4.webp",
+      "/images/banners/banner5.webp",
+      "/images/banners/banner6.webp",
     ],
     [],
   );
@@ -653,7 +653,7 @@ export default function Home() {
                   <Image
                     src={
                       design.images?.[0]?.url ||
-                      "/images/category-placeholder.png"
+                      "/images/category-placeholder.webp"
                     }
                     alt={design.name}
                     fill
@@ -780,7 +780,7 @@ export default function Home() {
           <div className="relative">
             <div className="relative overflow-hidden">
               <Image
-                src="/images/banners/banner4.jpg"
+                src="/images/banners/banner4.webp"
                 alt="Concept Builders project"
                 width={900}
                 height={1100}

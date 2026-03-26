@@ -6,39 +6,39 @@ const { prisma, pool } = createPrismaClient();
 const categoriesData = [
   {
     name: "Bungalows",
-    image: "/images/banners/banner1.jpg",
+    image: "/images/banners/banner1.webp",
   },
   {
     name: "Duplexes",
-    image: "/images/banners/banner2.jpg",
+    image: "/images/banners/banner2.webp",
   },
   {
     name: "Apartments",
-    image: "/images/banners/banner3.jpg",
+    image: "/images/banners/banner3.webp",
   },
   {
     name: "Modern",
-    image: "/images/banners/banner1.jpg",
+    image: "/images/banners/banner1.webp",
   },
   {
     name: "Traditional",
-    image: "/images/banners/banner2.jpg",
+    image: "/images/banners/banner2.webp",
   },
   {
     name: "Luxury",
-    image: "/images/banners/banner3.jpg",
+    image: "/images/banners/banner3.webp",
   },
   {
     name: "Mansion",
-    image: "/images/banners/banner1.jpg",
+    image: "/images/banners/banner1.webp",
   },
   {
     name: "Tiny Homes",
-    image: "/images/banners/banner2.jpg",
+    image: "/images/banners/banner2.webp",
   },
   {
     name: "Farmhouse",
-    image: "/images/banners/banner3.jpg",
+    image: "/images/banners/banner3.webp",
   },
 ];
 
@@ -55,7 +55,7 @@ const designsData = [
     area: 2200,
     floors: 2,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{ url: "/images/banners/banner1.jpg", type: FileType.IMAGE }],
+    files: [{ url: "/images/banners/banner1.webp", type: FileType.IMAGE }],
   },
   {
     name: "Cozy Cottage",
@@ -69,7 +69,7 @@ const designsData = [
     area: 1500,
     floors: 1,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{ url: "/images/banners/banner2.jpg", type: FileType.IMAGE }],
+    files: [{ url: "/images/banners/banner2.webp", type: FileType.IMAGE }],
   },
   {
     name: "Luxury Villa",
@@ -83,7 +83,7 @@ const designsData = [
     area: 5000,
     floors: 2,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{ url: "/images/banners/banner3.jpg", type: FileType.IMAGE }],
+    files: [{ url: "/images/banners/banner3.webp", type: FileType.IMAGE }],
   },
   {
     name: "The Grandeur",
@@ -101,7 +101,7 @@ const designsData = [
       "Electrical Plans",
       "Smart Home Integration",
     ],
-    files: [{ url: "/images/banners/banner1.jpg", type: FileType.IMAGE }],
+    files: [{ url: "/images/banners/banner1.webp", type: FileType.IMAGE }],
   },
   {
     name: "The Homesteader",
@@ -119,7 +119,7 @@ const designsData = [
       "Electrical Plans",
       "Barn and Stable Plans",
     ],
-    files: [{ url: "/images/banners/banner2.jpg", type: FileType.IMAGE }],
+    files: [{ url: "/images/banners/banner2.webp", type: FileType.IMAGE }],
   },
   {
     name: "The Urbanite",
@@ -132,7 +132,7 @@ const designsData = [
     area: 800,
     floors: 1,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{ url: "/images/banners/banner3.jpg", type: FileType.IMAGE }],
+    files: [{ url: "/images/banners/banner3.webp", type: FileType.IMAGE }],
   },
   {
     name: "The Weekender",
@@ -145,7 +145,7 @@ const designsData = [
     area: 400,
     floors: 1,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{ url: "/images/banners/banner1.jpg", type: FileType.IMAGE }],
+    files: [{ url: "/images/banners/banner1.webp", type: FileType.IMAGE }],
   },
   {
     name: "The Gemini",
@@ -159,7 +159,7 @@ const designsData = [
     area: 4000,
     floors: 2,
     planDetails: ["Detailed Floor Plans", "3D Renderings", "Electrical Plans"],
-    files: [{ url: "/images/banners/banner2.jpg", type: FileType.IMAGE }],
+    files: [{ url: "/images/banners/banner2.webp", type: FileType.IMAGE }],
   },
 ];
 

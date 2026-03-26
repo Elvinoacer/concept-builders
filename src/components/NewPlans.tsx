@@ -137,7 +137,7 @@ const NewPlans = ({ newPlans }: NewPlansProps) => {
                     <Image
                       src={
                         design.images?.[0]?.url ||
-                        "/images/category-placeholder.png"
+                        "/images/category-placeholder.webp"
                       }
                       alt={design.name}
                       fill

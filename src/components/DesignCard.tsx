@@ -102,7 +102,7 @@ const DesignCard = ({
 
   const categoryName = design.category.name;
   const imageUrl =
-    design.images?.[0]?.url || "/images/category-placeholder.png";
+    design.images?.[0]?.url || "/images/category-placeholder.webp";
   const price = design.basePrice;
   const bedrooms = design.bedrooms;
   const bathrooms = design.bathrooms;

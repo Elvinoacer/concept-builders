@@ -233,7 +233,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 <Image
                   src={
                     item.design.images?.[0]?.url ||
-                    "/images/category-placeholder.png"
+                    "/images/category-placeholder.webp"
                   }
                   alt={item.design.name}
                   width={80}

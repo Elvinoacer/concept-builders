@@ -200,7 +200,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdate }) => {
             src={
               item.design.images && item.design.images.length > 0
                 ? item.design.images[0].url
-                : "/images/category-placeholder.png"
+                : "/images/category-placeholder.webp"
             }
             width={112}
             height={112}

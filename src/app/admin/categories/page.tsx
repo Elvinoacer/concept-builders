@@ -349,7 +349,7 @@ const AdminCategoriesPage = () => {
                             src={
                               category.designs?.[0]?.images?.[0]?.url ||
                               category.image ||
-                              "/images/category-placeholder.png"
+                              "/images/category-placeholder.webp"
                             }
                             alt={category.name}
                             fill
@@ -433,7 +433,7 @@ const AdminCategoriesPage = () => {
                       src={
                         category.designs?.[0]?.images?.[0]?.url ||
                         category.image ||
-                        "/images/category-placeholder.png"
+                        "/images/category-placeholder.webp"
                       }
                       alt={category.name}
                       fill

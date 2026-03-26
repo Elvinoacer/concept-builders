@@ -35,7 +35,7 @@ const ItemsPurchased = ({ items }) => {
 
       <div className="space-y-3 sm:space-y-4">
         {items.map((item, index) => {
-          const imageUrl = item.design.purchasedFiles.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.png";
+          const imageUrl = item.design.purchasedFiles.find(file => file.type === 'IMAGE')?.url || "/images/category-placeholder.webp";
           const selectedExtras = item.selectedExtras
             ? JSON.parse(item.selectedExtras)
             : [];

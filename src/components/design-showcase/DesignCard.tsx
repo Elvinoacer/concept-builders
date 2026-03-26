@@ -74,7 +74,7 @@ const DesignCard: React.FC<DesignCardProps> = ({
   const isPopular = design.orderItems && design.orderItems.length > 5;
   const hasDiscount = design.discounts && design.discounts.length > 0;
   const imageUrl =
-    design.images?.[0]?.url || "/images/category-placeholder.png";
+    design.images?.[0]?.url || "/images/category-placeholder.webp";
 
   const minPrice = design.basePrice;
   const maxPrice =

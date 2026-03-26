@@ -93,7 +93,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
   ]);
 
   const allCategories = ["All", ...categories.map((item) => item.name)];
-  const fallbackImage = "/images/banners/banner1.jpg";
+  const fallbackImage = "/images/banners/banner1.webp";
   const serifSystem =
     'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
   const monoSystem =
