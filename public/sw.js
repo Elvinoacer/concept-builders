@@ -1,4 +1,4 @@
-const CACHE_VERSION = "concept-builders-static-v2";
+const CACHE_VERSION = "concept-builders-static-v3";
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
@@ -12,7 +12,7 @@ self.addEventListener("install", (event) => {
     caches
       .open(CACHE_VERSION)
       .then((cache) =>
-        cache.addAll(["/images/concept-builders-logo-free-bg.png"]),
+        cache.addAll(["/images/concept-builders-logo-free-bg.webp"]),
       ),
   );
 });

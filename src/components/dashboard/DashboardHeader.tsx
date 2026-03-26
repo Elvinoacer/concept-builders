@@ -151,7 +151,7 @@ const DashboardHeader = ({
           >
             <div className="relative">
               <Image
-                src="/images/concept-builders-logo-free-bg.png"
+                src="/images/concept-builders-logo-free-bg.webp"
                 alt="Concept Builders Logo"
                 width={40}
                 height={40}

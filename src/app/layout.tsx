@@ -88,10 +88,16 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico" },
-      { url: "/images/concept-builders-logo-free-bg.png", type: "image/png" },
+      {
+        url: "/images/concept-builders-logo-free-bg.webp",
+        type: "image/webp",
+      },
     ],
     apple: [
-      { url: "/images/concept-builders-logo-free-bg.png", type: "image/png" },
+      {
+        url: "/images/concept-builders-logo-free-bg.webp",
+        type: "image/webp",
+      },
     ],
   },
   appleWebApp: {
@@ -121,9 +127,9 @@ export default function RootLayout({
         {/* Preload critical resources */}
         <link
           rel="preload"
-          href="/images/concept-builders-logo-free-bg.png"
+          href="/images/concept-builders-logo-free-bg.webp"
           as="image"
-          type="image/png"
+          type="image/webp"
         />
 
         {/* DNS Prefetch for external domains */}

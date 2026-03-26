@@ -70,7 +70,7 @@ const AuthForm = () => {
 
         <div className="relative z-10 flex flex-col items-center text-center">
           <Image
-            src="/images/concept-builders-logo-free-bg.png"
+            src="/images/concept-builders-logo-free-bg.webp"
             alt="Concept Builders Logo"
             width={160}
             height={160}

@@ -1,77 +1,13 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { headers } from "next/headers";
 import LandingNav from "@/components/landing/LandingNav";
+import FeaturedDesignsSection from "@/components/landing/FeaturedDesignsSection";
+import TestimonialSection from "@/components/landing/TestimonialSection";
 
 export const revalidate = 300;
 
-type DesignItem = {
-  id: string;
-  name: string;
-  views?: number;
-  category?: {
-    name: string;
-  } | null;
-  images?: Array<{ url: string }>;
-};
-
-type FeaturedFeedback = {
-  name: string;
-  message: string;
-};
-
-async function getBaseUrl() {
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "https";
-
-  if (host) {
-    return `${proto}://${host}`;
-  }
-
-  return (
-    process.env.NEXT_PUBLIC_URL ??
-    process.env.NEXTAUTH_URL ??
-    "http://localhost:3000"
-  );
-}
-
-async function getHomepageData() {
-  const baseUrl = await getBaseUrl();
-
-  try {
-    const [designsRes, feedbackRes] = await Promise.all([
-      fetch(
-        `${baseUrl}/api/designs?limit=12&mode=cursor&includeTotals=false&lite=true`,
-        { next: { revalidate } },
-      ),
-      fetch(`${baseUrl}/api/featured-feedback`, { next: { revalidate } }),
-    ]);
-
-    const designsPayload = designsRes.ok ? await designsRes.json() : null;
-    const feedbackPayload = feedbackRes.ok ? await feedbackRes.json() : null;
-
-    const designs: DesignItem[] = Array.isArray(designsPayload?.designs)
-      ? designsPayload.designs
-      : [];
-
-    const feedback: FeaturedFeedback | null =
-      Array.isArray(feedbackPayload) && feedbackPayload.length > 0
-        ? {
-            name: feedbackPayload[0].name,
-            message: feedbackPayload[0].message,
-          }
-        : null;
-
-    return { designs, feedback };
-  } catch {
-    return { designs: [] as DesignItem[], feedback: null };
-  }
-}
-
 export default async function Home() {
-  const { designs, feedback } = await getHomepageData();
-
   const heroBanners = [
     "/images/banners/banner1.webp",
     "/images/banners/banner2.webp",
@@ -81,10 +17,6 @@ export default async function Home() {
     "/images/banners/banner6.webp",
   ];
 
-  const bestSellingPlans = [...designs]
-    .sort((a, b) => (b.views || 0) - (a.views || 0))
-    .slice(0, 3);
-
   const activeBannerIndex = 0;
   const countPlans = 500;
   const countHomeowners = 1200;
@@ -92,9 +24,7 @@ export default async function Home() {
   const countYears = 12;
   const revealClass = "reveal visible";
   const revealDelay0 = { transitionDelay: "0ms" };
-  const revealDelay100 = { transitionDelay: "100ms" };
   const revealDelay150 = { transitionDelay: "150ms" };
-  const revealDelay200 = { transitionDelay: "200ms" };
   const revealDelay300 = { transitionDelay: "300ms" };
 
   const marqueeItems = [
@@ -437,172 +367,21 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="border-b border-cb-border px-6 py-24 lg:px-[60px] max-[900px]:px-6 max-[900px]:py-16">
-        <div className={revealClass} style={revealDelay0}>
-          <div className="mb-16 flex items-start justify-between gap-10 max-[900px]:flex-col">
-            <div>
-              <p className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-gold">
-                <span className="h-px w-7 bg-gold" />
-                Featured Designs
-              </p>
-              <h2
-                className="text-[clamp(36px,4.5vw,60px)] font-light leading-[1.1]"
-                style={{
-                  fontFamily:
-                    'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-                }}
-              >
-                Most Sought
-                <br />
-                After <em className="text-gold">Plans</em>
-              </h2>
-            </div>
-            <p className="max-w-[360px] pt-12 text-[14px] leading-[1.8] text-cream-dim max-[900px]:pt-0">
-              Our best-selling architectural designs chosen by discerning
-              homeowners across Kenya.
-            </p>
-          </div>
+      <Suspense
+        fallback={
+          <section className="h-[520px] border-b border-cb-border px-6 py-24 lg:px-[60px]" />
+        }
+      >
+        <FeaturedDesignsSection />
+      </Suspense>
 
-          <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-px bg-cb-border max-[900px]:grid-cols-1">
-            {bestSellingPlans.map((design) => (
-              <article
-                key={design.id}
-                className="group bg-ink transition-colors hover:bg-card"
-              >
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <Image
-                    src={
-                      design.images?.[0]?.url ||
-                      "/images/category-placeholder.webp"
-                    }
-                    alt={design.name}
-                    fill
-                    className="object-cover brightness-[0.85] saturate-90 transition duration-500 group-hover:scale-105 group-hover:brightness-95 group-hover:saturate-100"
-                    sizes="(max-width: 900px) 100vw, 33vw"
-                  />
-                </div>
-                <div className="p-5 sm:p-8">
-                  <span className="mb-4 inline-flex items-center border border-gold/30 bg-gold/10 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-gold">
-                    Best Seller
-                  </span>
-                  <h3
-                    className="mb-2.5 text-[22px] leading-[1.3]"
-                    style={{
-                      fontFamily:
-                        'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-                    }}
-                  >
-                    {design.name}
-                  </h3>
-                  <div className="mt-5 flex items-center justify-between border-t border-cb-border pt-5">
-                    <span className="text-[11px] uppercase tracking-[0.15em] text-cb-muted">
-                      {design.category?.name || "House Plans"}
-                    </span>
-                    <Link
-                      href={`/designs/${design.id}`}
-                      className="group/link flex items-center gap-2 text-[12px] tracking-[0.1em] text-gold"
-                    >
-                      View Plan
-                      <svg
-                        className="transition-transform duration-300 group-hover/link:translate-x-1.5"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                        <polyline points="12 5 19 12 12 19" />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div
-            className={`${revealClass} mt-12 flex items-center justify-between gap-6 max-[900px]:flex-col max-[900px]:items-start`}
-            style={revealDelay100}
-          >
-            <p
-              className="text-[16px] text-cb-muted"
-              style={{
-                fontFamily:
-                  'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-              }}
-            >
-              Showing {bestSellingPlans.length} of{" "}
-              <span className="text-gold">500+</span> available designs
-            </p>
-            <Link
-              href="/designs"
-              className="group relative overflow-hidden bg-gold px-9 py-4 text-[13px] font-medium uppercase tracking-[0.14em] text-ink"
-            >
-              <span className="absolute inset-0 -translate-x-full bg-gold-light transition-transform duration-300 group-hover:translate-x-0" />
-              <span className="relative z-10">Explore All Designs</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-2 items-center gap-24 border-b border-cb-border px-5 py-16 sm:px-6 sm:py-28 lg:px-[60px] max-[900px]:grid-cols-1 max-[900px]:gap-10">
-        <div className={revealClass} style={revealDelay0}>
-          <p className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-gold">
-            <span className="h-px w-7 bg-gold" />
-            Client Stories
-          </p>
-          <blockquote
-            className="relative pt-10 text-[clamp(22px,5vw,46px)] font-light italic leading-[1.4] sm:text-[clamp(28px,3.5vw,46px)]"
-            style={{
-              fontFamily:
-                'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-            }}
-          >
-            <span className="absolute -left-2 -top-3 text-[80px] not-italic leading-none text-[rgba(200,137,42,0.15)] sm:-left-4 sm:-top-5 sm:text-[120px]">
-              &quot;
-            </span>
-            {feedback?.message ||
-              "Concept Builders did not just sell us a plan - they understood exactly how we wanted to live and translated that into every square metre."}
-          </blockquote>
-          <div className="mt-8 flex items-center gap-4">
-            <div
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--gold)_0%,var(--gold-light)_100%)] text-[18px] font-semibold text-ink"
-              style={{
-                fontFamily:
-                  'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-              }}
-            >
-              {(feedback?.name?.[0] || "A").toUpperCase()}
-            </div>
-            <div>
-              <p className="text-[14px] font-medium text-cream">
-                {feedback?.name || "Amina Wanjiku"}
-              </p>
-              <p className="mt-1 text-[12px] tracking-[0.08em] text-cb-muted">
-                Homeowner · Nairobi, Kenya
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className={revealClass} style={revealDelay200}>
-          <div className="relative">
-            <div className="relative overflow-hidden">
-              <Image
-                src="/images/banners/banner4.webp"
-                alt="Concept Builders project"
-                width={900}
-                height={1100}
-                className="aspect-[4/5] w-full object-cover brightness-75 saturate-[0.8] transition duration-500 hover:brightness-90 hover:saturate-100"
-                sizes="(max-width: 900px) 100vw, 50vw"
-              />
-            </div>
-            <div className="pointer-events-none absolute bottom-[-10px] left-[10px] right-[-10px] top-[10px] border border-gold/30 sm:bottom-[-20px] sm:left-[20px] sm:right-[-20px] sm:top-[20px]" />
-          </div>
-        </div>
-      </section>
+      <Suspense
+        fallback={
+          <section className="grid h-[560px] grid-cols-2 border-b border-cb-border px-5 py-16 sm:px-6 sm:py-28 lg:px-[60px] max-[900px]:grid-cols-1" />
+        }
+      >
+        <TestimonialSection />
+      </Suspense>
 
       <section className="relative overflow-hidden px-5 py-16 text-center sm:px-6 sm:py-20 lg:px-[60px] lg:py-28">
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(200,137,42,0.08)_0%,transparent_70%)]" />
@@ -661,7 +440,7 @@ export default async function Home() {
             <div className="mb-5 flex items-center gap-3">
               <span className="relative h-10 w-10">
                 <Image
-                  src="/images/concept-builders-logo-free-bg.png"
+                  src="/images/concept-builders-logo-free-bg.webp"
                   alt="Concept Builders logo"
                   fill
                   sizes="40px"

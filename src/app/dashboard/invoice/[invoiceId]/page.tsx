@@ -92,7 +92,7 @@ const InvoicePage = () => {
           <div className="flex justify-between items-start pb-8 border-b border-cb-border">
             <div>
               <Image
-                src="/images/concept-builders-logo-free-bg.png"
+                src="/images/concept-builders-logo-free-bg.webp"
                 alt="Concept Builders Logo"
                 width={150}
                 height={40}

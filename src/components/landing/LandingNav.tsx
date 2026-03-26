@@ -39,7 +39,7 @@ export default function LandingNav() {
         >
           <span className="relative h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14">
             <Image
-              src="/images/concept-builders-logo-free-bg.png"
+              src="/images/concept-builders-logo-free-bg.webp"
               alt="Concept Builders logo"
               fill
               priority

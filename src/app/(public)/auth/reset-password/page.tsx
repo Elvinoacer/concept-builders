@@ -90,7 +90,7 @@ const ResetPasswordPage = () => {
         <div className="text-center">
           <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-3 sm:mb-4">
             <Image
-              src="/images/concept-builders-logo-free-bg.png"
+              src="/images/concept-builders-logo-free-bg.webp"
               alt="Concept Builders Logo"
               fill
               className="object-contain"

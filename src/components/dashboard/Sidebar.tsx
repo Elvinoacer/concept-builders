@@ -295,7 +295,7 @@ const Sidebar = ({
           <div className="flex items-center justify-between gap-3 text-cream pb-3 border-b border-cb-border flex-shrink-0">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <Image
-                src="/images/concept-builders-logo-free-bg.png"
+                src="/images/concept-builders-logo-free-bg.webp"
                 alt="Concept Builders Logo"
                 width={40}
                 height={40}
