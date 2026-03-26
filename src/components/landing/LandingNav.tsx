@@ -15,11 +15,6 @@ export default function LandingNav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    document.body.classList.add("landing-redesign-active");
-    return () => document.body.classList.remove("landing-redesign-active");
-  }, []);
-
   return (
     <>
       <nav

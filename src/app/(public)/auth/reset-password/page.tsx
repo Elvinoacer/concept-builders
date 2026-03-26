@@ -15,13 +15,9 @@ const ResetPasswordPage = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    document.body.classList.add("landing-redesign-active");
-
     if (!token) {
       setError("Password reset token is missing.");
     }
-
-    return () => document.body.classList.remove("landing-redesign-active");
   }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -1,14 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import AuthForm from "@/components/auth/AuthForm";
 
 const AuthPage = () => {
-  useEffect(() => {
-    document.body.classList.add("landing-redesign-active");
-    return () => document.body.classList.remove("landing-redesign-active");
-  }, []);
-
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-ink px-6 py-12 safe-area-inset">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_80%_0%,rgba(200,137,42,0.18),transparent_62%),radial-gradient(ellipse_55%_40%_at_15%_20%,rgba(200,137,42,0.1),transparent_68%)]" />

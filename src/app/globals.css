@@ -333,11 +333,6 @@
   animation: cartBump 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-body.landing-redesign-active .min-h-screen.flex.flex-col > header,
-body.landing-redesign-active .min-h-screen.flex.flex-col > footer {
-  display: none !important;
-}
-
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }

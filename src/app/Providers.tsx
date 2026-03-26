@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { SessionProvider, signOut, useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Toaster } from "sonner";
 import type { Socket } from "socket.io-client";
@@ -30,9 +31,17 @@ export const useSocket = () => {
 };
 
 function SocketProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname() ?? "";
   const { data: session } = useSession();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+
+  const isSocketEnabledRoute =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/chat") ||
+    pathname.startsWith("/messages") ||
+    pathname.startsWith("/notifications");
 
   useEffect(() => {
     if (session?.error === "UserNotFound") {
@@ -43,6 +52,12 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
     let cleanupSocket: (() => void) | null = null;
+
+    if (!isSocketEnabledRoute) {
+      setOnlineUsers([]);
+      setSocket(null);
+      return;
+    }
 
     if (session?.user?.id) {
       (async () => {
@@ -97,7 +112,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       cleanupSocket?.();
     };
-  }, [session?.user?.id]);
+  }, [isSocketEnabledRoute, session?.user?.id]);
 
   return (
     <SocketContext.Provider value={{ socket, onlineUsers }}>
@@ -107,11 +122,43 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 }
 
 export default function Providers({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname() ?? "";
+  const isLandingPage = pathname === "/";
+
+  const showCartSync = pathname !== "/" && !pathname.startsWith("/auth");
+  const showImpersonationBanner =
+    pathname.startsWith("/admin") || pathname.startsWith("/dashboard");
+
+  if (isLandingPage) {
+    return (
+      <>
+        {children}
+        <Toaster
+          richColors
+          toastOptions={{
+            style: {
+              borderRadius: "8px",
+              border: "1px solid var(--border-color)",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            },
+            classNames: {
+              toast: "bg-card text-cream",
+              title: "text-sm font-semibold",
+              description: "text-sm",
+              actionButton: "bg-gold text-ink",
+              cancelButton: "bg-muted text-cream",
+            },
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <SessionProvider>
       <SocketProvider>
-        <CartSync />
-        <ImpersonationBanner />
+        {showCartSync ? <CartSync /> : null}
+        {showImpersonationBanner ? <ImpersonationBanner /> : null}
         {children}
         <Toaster
           richColors
