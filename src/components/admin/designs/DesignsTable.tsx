@@ -30,6 +30,7 @@ const DesignsTable = ({ onEditClick, refreshKey = 0 }: DesignsTableProps) => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
+  const [deletingDesignId, setDeletingDesignId] = useState<string | null>(null);
 
   const fetcher = async (url: string) => {
     const response = await fetch(url);
@@ -91,6 +92,41 @@ const DesignsTable = ({ onEditClick, refreshKey = 0 }: DesignsTableProps) => {
     setRefreshing(true);
     await mutate();
     toast.success("Designs refreshed");
+  };
+
+  const handleDeleteDesign = async (designId: string, designName?: string) => {
+    const confirmed = window.confirm(
+      `Delete design${designName ? ` \"${designName}\"` : ""}? This action cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingDesignId(designId);
+
+    try {
+      const response = await fetch(`/api/designs/${designId}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to delete design");
+      }
+
+      toast.success(data?.message || "Design deleted successfully");
+      await mutate();
+    } catch (deleteError) {
+      const message =
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Failed to delete design";
+      toast.error(message);
+    } finally {
+      setDeletingDesignId(null);
+    }
   };
 
   // Generate pagination items with ellipsis for mobile
@@ -334,7 +370,12 @@ const DesignsTable = ({ onEditClick, refreshKey = 0 }: DesignsTableProps) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <DesignsList designs={designs} onEditClick={onEditClick} />
+              <DesignsList
+                designs={designs}
+                onEditClick={onEditClick}
+                onDeleteClick={handleDeleteDesign}
+                deletingDesignId={deletingDesignId}
+              />
 
               {/* Empty State */}
               {designs.length === 0 && (

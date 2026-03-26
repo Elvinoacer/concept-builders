@@ -8,6 +8,7 @@ import Link from "next/link";
 import {
   FiEye,
   FiEdit,
+  FiTrash2,
   FiMoreVertical,
   FiCalendar,
   FiDollarSign,
@@ -27,6 +28,8 @@ import Image from "next/image";
 interface DesignsListProps {
   designs: DesignListItem[];
   onEditClick?: (designId: string) => void;
+  onDeleteClick?: (designId: string, designName?: string) => void;
+  deletingDesignId?: string | null;
 }
 
 interface DesignListItem {
@@ -52,7 +55,12 @@ interface DesignListItem {
   } | null;
 }
 
-const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
+const DesignsList = ({
+  designs,
+  onEditClick,
+  onDeleteClick,
+  deletingDesignId = null,
+}: DesignsListProps) => {
   const desktopParentRef = useRef<HTMLDivElement>(null);
   const shouldVirtualizeDesktop = designs.length > 50;
   const rowVirtualizer = useVirtualizer({
@@ -188,6 +196,14 @@ const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
                     <FiEdit className="w-4 h-4" />
                     Edit In Page
                   </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onDeleteClick?.(design.id, design.name)}
+                  className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                  disabled={deletingDesignId === design.id}
+                >
+                  <FiTrash2 className="w-4 h-4" />
+                  {deletingDesignId === design.id ? "Deleting..." : "Delete"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -355,6 +371,14 @@ const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
                   <FiEdit className="w-4 h-4" />
                   Edit In Page
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onDeleteClick?.(design.id, design.name)}
+                className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                disabled={deletingDesignId === design.id}
+              >
+                <FiTrash2 className="w-4 h-4" />
+                {deletingDesignId === design.id ? "Deleting..." : "Delete"}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
