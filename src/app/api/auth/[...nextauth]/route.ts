@@ -76,7 +76,7 @@ async function refreshAccessToken(token: any) {
         refresh_token: token.refreshToken,
       });
 
-    console.log("Refreshing access token; url:", url);
+    console.log("Refreshing access token");
 
     const response = await fetch(url, {
       headers: {
