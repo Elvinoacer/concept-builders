@@ -262,6 +262,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [draftRestored, setDraftRestored] = useState(false);
+  const [isPersistenceEnabled, setIsPersistenceEnabled] = useState(true);
 
   // Local storage persistence for form data
   const formData = {
@@ -291,6 +292,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
     "design-form-draft",
     formData,
     1000, // 1 second debounce
+    isPersistenceEnabled,
   );
 
   // Restore from local storage on mount (only for new designs, not edits)
@@ -653,6 +655,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
       if (response.ok) {
         // Clear local storage on successful submission
         if (!design) {
+          setIsPersistenceEnabled(false);
           clearStorage();
         }
         toast.success(`Design ${design ? "updated" : "created"} successfully!`);

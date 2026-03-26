@@ -1,6 +1,6 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef } from "react";
 
-const STORAGE_VERSION = '1.0';
+const STORAGE_VERSION = "1.0";
 
 interface StorageData<T> {
   version: string;
@@ -18,7 +18,8 @@ interface StorageData<T> {
 export function useFormPersistence<T>(
   key: string,
   data: T,
-  debounceMs: number = 1000
+  debounceMs: number = 1000,
+  enabled: boolean = true,
 ) {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
@@ -32,13 +33,20 @@ export function useFormPersistence<T>(
       };
       localStorage.setItem(key, JSON.stringify(storageData));
     } catch (error) {
-      console.error('Failed to save to localStorage:', error);
+      console.error("Failed to save to localStorage:", error);
       // Handle quota exceeded or other errors silently
     }
   }, [key, data]);
 
   // Debounced auto-save effect
   useEffect(() => {
+    if (!enabled) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      return;
+    }
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -52,7 +60,7 @@ export function useFormPersistence<T>(
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [data, debounceMs, saveToStorage]);
+  }, [data, debounceMs, saveToStorage, enabled]);
 
   // Load data from localStorage
   const loadFromStorage = useCallback((): T | null => {
@@ -61,17 +69,17 @@ export function useFormPersistence<T>(
       if (!stored) return null;
 
       const parsed: StorageData<T> = JSON.parse(stored);
-      
+
       // Version check for future compatibility
       if (parsed.version !== STORAGE_VERSION) {
-        console.warn('Stored data version mismatch, clearing storage');
+        console.warn("Stored data version mismatch, clearing storage");
         localStorage.removeItem(key);
         return null;
       }
 
       return parsed.data;
     } catch (error) {
-      console.error('Failed to load from localStorage:', error);
+      console.error("Failed to load from localStorage:", error);
       // Clear corrupted data
       localStorage.removeItem(key);
       return null;
@@ -86,7 +94,7 @@ export function useFormPersistence<T>(
         clearTimeout(timeoutRef.current);
       }
     } catch (error) {
-      console.error('Failed to clear localStorage:', error);
+      console.error("Failed to clear localStorage:", error);
     }
   }, [key]);
 

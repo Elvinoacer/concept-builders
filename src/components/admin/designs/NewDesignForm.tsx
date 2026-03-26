@@ -142,6 +142,7 @@ const NewDesignForm = ({
   const [floorPlans, setFloorPlans] = useState<UploadedFile[]>([]);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [draftRestored, setDraftRestored] = useState(false);
+  const [isPersistenceEnabled, setIsPersistenceEnabled] = useState(true);
 
   const isEditMode = Boolean(designToEdit);
 
@@ -173,6 +174,7 @@ const NewDesignForm = ({
     "design-form-draft", // Same key as DesignForm
     formData,
     1000, // 1 second debounce
+    isPersistenceEnabled,
   );
 
   // Restore from local storage on mount (only for new designs, not edits)
@@ -380,6 +382,7 @@ const NewDesignForm = ({
       if (response.ok) {
         // Clear local storage on successful submission (only for new designs)
         if (!isEditMode) {
+          setIsPersistenceEnabled(false);
           clearStorage();
         }
         toast.success(
