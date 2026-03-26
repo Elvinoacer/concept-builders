@@ -25,8 +25,31 @@ import {
 import Image from "next/image";
 
 interface DesignsListProps {
-  designs: any[];
+  designs: DesignListItem[];
   onEditClick?: (designId: string) => void;
+}
+
+interface DesignListItem {
+  id: string;
+  name: string;
+  basePrice: number;
+  isFeatured?: boolean;
+  createdAt: string;
+  updatedAt: string;
+  category?: { name: string } | null;
+  images?: Array<{ url: string }>;
+  floorPlans?: Array<{ url: string }>;
+  architecturalDesign?: {
+    pdfFiles?: Array<{ url: string }>;
+    cadFiles?: Array<{ url: string }>;
+  } | null;
+  structuralDesign?: {
+    pdfFiles?: Array<{ url: string }>;
+    cadFiles?: Array<{ url: string }>;
+  } | null;
+  billOfQuantities?: {
+    excelFiles?: Array<{ url: string }>;
+  } | null;
 }
 
 const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
@@ -51,16 +74,16 @@ const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
   const formatDate = (dateString: string) => {
     try {
       return formatDistanceToNow(new Date(dateString), { addSuffix: true });
-    } catch (error) {
+    } catch {
       return "Invalid date";
     }
   };
 
-  const getDesignImage = (design) => {
+  const getDesignImage = (design: DesignListItem) => {
     return design.images?.[0]?.url || "/images/design-placeholder.png";
   };
 
-  const getTotalFileCount = (design) => {
+  const getTotalFileCount = (design: DesignListItem) => {
     const architecturalFiles =
       (design.architecturalDesign?.pdfFiles?.length || 0) +
       (design.architecturalDesign?.cadFiles?.length || 0);
@@ -71,7 +94,7 @@ const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
     return architecturalFiles + structuralFiles + boqFiles;
   };
 
-  const getImageCount = (design) => {
+  const getImageCount = (design: DesignListItem) => {
     return (design.images?.length || 0) + (design.floorPlans?.length || 0);
   };
 
@@ -155,7 +178,16 @@ const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
                   className="flex items-center gap-2 cursor-pointer"
                 >
                   <FiEdit className="w-4 h-4" />
-                  Edit Design
+                  Quick Edit (Modal)
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href={`/admin/designs/${design.id}/edit`}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <FiEdit className="w-4 h-4" />
+                    Edit In Page
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -313,7 +345,16 @@ const DesignsList = ({ designs, onEditClick }: DesignsListProps) => {
                 className="flex items-center gap-2 cursor-pointer"
               >
                 <FiEdit className="w-4 h-4" />
-                Edit Design
+                Quick Edit (Modal)
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`/admin/designs/${design.id}/edit`}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <FiEdit className="w-4 h-4" />
+                  Edit In Page
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import FileUpload from "./FileUpload";
 import { useUpload } from "@/contexts/UploadContext";
 import { useFormPersistence } from "@/hooks/useFormPersistence";
+import { buildDesignUpsertPayload } from "@/lib/admin/design-payload";
 
 interface UploadedFile {
   url: string;
@@ -35,7 +36,7 @@ interface PackageOptionState {
   file: UploadedFile[];
 }
 
-interface DesignToEdit {
+export interface DesignToEdit {
   id: string;
   name?: string;
   description?: string;
@@ -339,154 +340,35 @@ const NewDesignForm = ({
 
     setIsSubmitting(true);
 
-    const fileListPayload = (
-      files: Array<{ originalFileName?: string; name?: string; url: string }>,
-      type: string,
-    ) =>
-      files.map((file) => ({
-        name:
-          file.originalFileName ||
-          file.name ||
-          decodeURIComponent(file.url.split("/").pop() || "file"),
-        url: file.url,
-        type,
-      }));
-
-    const archPdfPrice = parseFloat(architecturalPdfPrice) || 0;
-    const archCadPrice = parseFloat(architecturalCadPrice) || 0;
-    const structPdfPrice = parseFloat(structuralPdfPrice) || 0;
-    const structCadPrice = parseFloat(structuralCadPrice) || 0;
-    const boqExcelPrice = parseFloat(billOfQuantitiesPrice) || 0;
-    const boqPdfPrice = parseFloat(billOfQuantitiesPdfPrice) || 0;
-
-    const calculatedBasePrice = archPdfPrice;
-    const totalPrice =
-      archPdfPrice +
-      archCadPrice +
-      structPdfPrice +
-      structCadPrice +
-      boqExcelPrice +
-      boqPdfPrice;
-    const calculatedPriceRange = `${calculatedBasePrice.toLocaleString()} - ${totalPrice.toLocaleString()}`;
-
-    const commonData = {
-      name,
-      description,
-      basePrice: calculatedBasePrice,
-      priceRange: calculatedPriceRange,
-      bedrooms: bedrooms ? parseInt(bedrooms) : null,
-      bathrooms: bathrooms ? parseInt(bathrooms) : null,
-      area: area ? parseFloat(area) : null,
-      floors: floors ? parseInt(floors) : null,
-      categoryId,
-      architecturalPdfPrice: archPdfPrice || null,
-      architecturalCadPrice: archCadPrice || null,
-      structuralPdfPrice: structPdfPrice || null,
-      structuralCadPrice: structCadPrice || null,
-      billOfQuantitiesPrice: boqExcelPrice || null,
-      billOfQuantitiesPdfPrice: boqPdfPrice || null,
-    };
-
-    const packageOptionsPayload = packageOptions
-      .filter((opt) => opt.name?.trim() && opt.price !== "")
-      .map((opt) => {
-        const firstFile = opt.file?.[0];
-
-        return {
-          name: opt.name,
-          price: parseFloat(opt.price) || 0,
-          ...(firstFile
-            ? {
-                file: {
-                  create: {
-                    name:
-                      firstFile.originalFileName ||
-                      firstFile.name ||
-                      decodeURIComponent(
-                        firstFile.url.split("/").pop() || "file",
-                      ),
-                    url: firstFile.url,
-                    type: "FILE",
-                  },
-                },
-              }
-            : {}),
-        };
-      });
-
-    let payload;
     const url =
       isEditMode && designToEdit
         ? `/api/designs/${designToEdit.id}`
         : "/api/designs";
     const method = isEditMode ? "PUT" : "POST";
 
-    if (isEditMode) {
-      payload = {
-        ...commonData,
-        images: { create: fileListPayload(images, "IMAGE") },
-        floorPlans: { create: fileListPayload(floorPlans, "FLOOR_PLAN") },
-        files: { create: fileListPayload(files, "FILE") },
-        architecturalDesign: {
-          pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
-          cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
-        },
-        structuralDesign: {
-          pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
-          cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
-        },
-        billOfQuantities: {
-          excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
-          pdfFiles: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
-        },
-        packageOptions: {
-          deleteMany: {},
-          create: packageOptionsPayload,
-        },
-      };
-    } else {
-      payload = {
-        ...commonData,
-        folderId,
-        images: { create: fileListPayload(images, "IMAGE") },
-        floorPlans: { create: fileListPayload(floorPlans, "FLOOR_PLAN") },
-        files: { create: fileListPayload(files, "FILE") },
-        architecturalDesign: {
-          create: {
-            type: "ARCHITECTURAL",
-            pdfFiles: {
-              create: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
-            },
-            cadFiles: {
-              create: fileListPayload(architecturalDesign.cadFiles, "CAD"),
-            },
-          },
-        },
-        structuralDesign: {
-          create: {
-            type: "STRUCTURAL",
-            pdfFiles: {
-              create: fileListPayload(structuralDesign.pdfFiles, "PDF"),
-            },
-            cadFiles: {
-              create: fileListPayload(structuralDesign.cadFiles, "CAD"),
-            },
-          },
-        },
-        billOfQuantities: {
-          create: {
-            type: "BILL_OF_QUANTITIES",
-            excelFiles: {
-              create: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
-            },
-            pdfFiles: {
-              create: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
-            },
-          },
-        },
-        packageOptions: { create: packageOptionsPayload },
-      };
-    }
+    const payload = buildDesignUpsertPayload({
+      name,
+      description,
+      bedrooms,
+      bathrooms,
+      area,
+      floors,
+      categoryId,
+      folderId,
+      architecturalPdfPrice,
+      architecturalCadPrice,
+      structuralPdfPrice,
+      structuralCadPrice,
+      billOfQuantitiesPrice,
+      billOfQuantitiesPdfPrice,
+      images,
+      floorPlans,
+      files,
+      architecturalDesign,
+      structuralDesign,
+      billOfQuantities,
+      packageOptions,
+    });
 
     try {
       const response = await fetch(url, {

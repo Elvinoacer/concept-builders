@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { CgSpinner } from "react-icons/cg";
@@ -24,7 +25,6 @@ import {
   FiPackage,
   FiPlus,
   FiSave,
-  FiTrash,
   FiUpload,
   FiX,
 } from "react-icons/fi";
@@ -32,6 +32,42 @@ import { toast } from "sonner";
 import FileUpload from "./FileUpload";
 import { useFormPersistence } from "@/hooks/useFormPersistence";
 import { useUpload } from "@/contexts/UploadContext";
+import { buildDesignUpsertPayload } from "@/lib/admin/design-payload";
+import type { DesignToEdit } from "./NewDesignForm";
+
+interface FileType {
+  url: string;
+  name?: string;
+  type?: string;
+  size?: number;
+  originalFileName?: string;
+}
+
+const toInitialFiles = (items: FileType[], fallbackType: string) =>
+  items.map((file) => ({
+    url: file.url,
+    name:
+      file.name ||
+      file.originalFileName ||
+      decodeURIComponent(file.url.split("/").pop() || "file"),
+    type: file.type || fallbackType,
+  }));
+
+interface PackageOptionForm {
+  id?: string;
+  name: string;
+  price: string;
+  file: FileType[];
+}
+
+type EditableDesign = Partial<DesignToEdit> & {
+  packageOptions?: Array<{
+    id?: string;
+    name: string;
+    price: number | string;
+    file?: FileType | null;
+  }>;
+};
 
 const SectionHeader = ({
   icon: Icon,
@@ -39,7 +75,7 @@ const SectionHeader = ({
   description,
   required,
 }: {
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
   required?: boolean;
@@ -108,7 +144,7 @@ const FormField = ({
 );
 
 interface DesignFormProps {
-  design?: any;
+  design?: EditableDesign;
 }
 
 const steps = [
@@ -177,7 +213,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [packageOptions, setPackageOptions] = useState<any[]>([]);
+  const [packageOptions, setPackageOptions] = useState<PackageOptionForm[]>([]);
 
   const [architecturalDesign, setArchitecturalDesign] = useState(
     design?.architecturalDesign || {
@@ -216,9 +252,11 @@ const DesignForm = ({ design }: DesignFormProps) => {
   const [billOfQuantitiesPdfPrice, setBillOfQuantitiesPdfPrice] = useState(
     design?.billOfQuantitiesPdfPrice?.toString() || "",
   );
-  const [images, setImages] = useState<any[]>(design?.images || []);
-  const [floorPlans, setFloorPlans] = useState<any[]>(design?.floorPlans || []);
-  const [files, setFiles] = useState<any[]>(design?.files || []);
+  const [images, setImages] = useState<FileType[]>(design?.images || []);
+  const [floorPlans, setFloorPlans] = useState<FileType[]>(
+    design?.floorPlans || [],
+  );
+  const [files, setFiles] = useState<FileType[]>(design?.files || []);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
@@ -343,7 +381,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
       setFiles(design.files || []);
       if (design.packageOptions) {
         setPackageOptions(
-          design.packageOptions.map((opt: any) => ({
+          design.packageOptions.map((opt) => ({
             ...opt,
             price: opt.price.toString(),
             file: opt.file ? [opt.file] : [],
@@ -359,7 +397,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
   useEffect(() => {
     if (design?.packageOptions) {
       setPackageOptions(
-        design.packageOptions.map((opt: any) => ({
+        design.packageOptions.map((opt) => ({
           ...opt,
           price: opt.price.toString(),
           file: opt.file ? [opt.file] : [], // FileUpload expects an array
@@ -370,53 +408,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
         { name: "", price: "", file: [] }, // Start with one empty package
       ]);
     }
-  }, [design]);
-
-  const steps = [
-    {
-      id: "basic",
-      label: "Basic Information",
-      icon: FiHome,
-      description: "Design name, description, and category",
-      required: true,
-    },
-    {
-      id: "specifications",
-      label: "Specifications",
-      icon: FiLayers,
-      description: "Dimensions and layout details",
-      required: false,
-    },
-    {
-      id: "pricing",
-      label: "Pricing",
-      icon: FiDollarSign,
-      description: "Pricing and document costs",
-      required: true,
-    },
-    {
-      id: "files",
-      label: "Files & Documents",
-      icon: FiUpload,
-      description: "Images, plans, and design files",
-      required: true,
-    },
-
-    {
-      id: "packages",
-      label: "Package Options",
-      icon: FiPackage,
-      description: "Additional services and packages",
-      required: false,
-    },
-    {
-      id: "review",
-      label: "Review & Submit",
-      icon: FiCheck,
-      description: "Final check before creating the design",
-      required: true,
-    },
-  ];
+  }, [design, packageOptions.length]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -492,7 +484,6 @@ const DesignForm = ({ design }: DesignFormProps) => {
     bathrooms,
     area,
     floors, // Step 1
-    floors, // Step 1
     architecturalPdfPrice, // Step 2 (proxy for basePrice check)
     images, // Step 3
     packageOptions, // Step 4
@@ -562,13 +553,17 @@ const DesignForm = ({ design }: DesignFormProps) => {
     }
   };
 
-  const handlePackageChange = (index: number, field: string, value: string) => {
+  const handlePackageChange = (
+    index: number,
+    field: "name" | "price",
+    value: string,
+  ) => {
     const newOptions = [...packageOptions];
     newOptions[index][field] = value;
     setPackageOptions(newOptions);
   };
 
-  const handlePackageFile = (index: number, files: any[]) => {
+  const handlePackageFile = (index: number, files: FileType[]) => {
     const newOptions = [...packageOptions];
     newOptions[index].file = files;
     setPackageOptions(newOptions);
@@ -589,6 +584,12 @@ const DesignForm = ({ design }: DesignFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Guard against implicit submits while navigating steps.
+    if (currentStep !== steps.length - 1) {
+      setCurrentStep(steps.length - 1);
+      return;
+    }
 
     const formErrors = validateForm();
     if (formErrors.length > 0) {
@@ -614,168 +615,31 @@ const DesignForm = ({ design }: DesignFormProps) => {
 
     setIsSubmitting(true);
 
-    const fileListPayload = (files: any[], type: string) =>
-      files.map((file: any) => ({
-        name: file.originalFileName || file.name || file.url.split("/").pop(),
-        url: file.url,
-        type,
-      }));
-
-    const packageOptionsPayload = packageOptions
-      .filter((opt) => opt.name.trim() && opt.price.trim())
-      .map((option) => {
-        const file = option.file?.[0];
-        let fileCreate = undefined;
-        if (file) {
-          fileCreate = {
-            create: {
-              name:
-                file.originalFileName || file.name || file.url.split("/").pop(),
-              url: file.url,
-              type: "FILE",
-            },
-          };
-        }
-        return {
-          name: option.name,
-          price: parseFloat(option.price) || 0,
-          file: fileCreate,
-        };
-      });
-
-    const archPdfPrice = parseFloat(architecturalPdfPrice) || 0;
-    const archCadPrice = parseFloat(architecturalCadPrice) || 0;
-    const structPdfPrice = parseFloat(structuralPdfPrice) || 0;
-    const structCadPrice = parseFloat(structuralCadPrice) || 0;
-    const boqExcelPrice = parseFloat(billOfQuantitiesPrice) || 0;
-    const boqPdfPrice = parseFloat(billOfQuantitiesPdfPrice) || 0;
-
-    const calculatedBasePrice = archPdfPrice;
-    const totalPrice =
-      archPdfPrice +
-      archCadPrice +
-      structPdfPrice +
-      structCadPrice +
-      boqExcelPrice +
-      boqPdfPrice;
-    const calculatedPriceRange = `${calculatedBasePrice.toLocaleString()} - ${totalPrice.toLocaleString()}`;
-
-    const commonData = {
-      name,
-      description,
-      basePrice: calculatedBasePrice,
-      priceRange: calculatedPriceRange,
-      bedrooms: bedrooms ? parseInt(bedrooms) : null,
-      bathrooms: bathrooms ? parseInt(bathrooms) : null,
-      area: area ? parseFloat(area) : null,
-      floors: floors ? parseInt(floors) : null,
-      planDetails: [],
-      categoryId,
-
-      architecturalPdfPrice: architecturalPdfPrice
-        ? parseFloat(architecturalPdfPrice)
-        : null,
-      architecturalCadPrice: architecturalCadPrice
-        ? parseFloat(architecturalCadPrice)
-        : null,
-      structuralPdfPrice: structuralPdfPrice
-        ? parseFloat(structuralPdfPrice)
-        : null,
-      structuralCadPrice: structuralCadPrice
-        ? parseFloat(structuralCadPrice)
-        : null,
-      billOfQuantitiesPrice: billOfQuantitiesPrice
-        ? parseFloat(billOfQuantitiesPrice)
-        : null,
-      billOfQuantitiesPdfPrice: billOfQuantitiesPdfPrice
-        ? parseFloat(billOfQuantitiesPdfPrice)
-        : null,
-    };
-
-    let payload;
     const url = design ? `/api/designs/${design.id}` : "/api/designs";
     const method = design ? "PUT" : "POST";
 
-    if (design) {
-      // UPDATE PAYLOAD - Definitive structure based on schema analysis
-      payload = {
-        ...commonData,
-        // --- Fields with custom backend logic (expect flat object) ---
-        architecturalDesign: {
-          pdfFiles: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
-          cadFiles: fileListPayload(architecturalDesign.cadFiles, "CAD"),
-        },
-        structuralDesign: {
-          pdfFiles: fileListPayload(structuralDesign.pdfFiles, "PDF"),
-          cadFiles: fileListPayload(structuralDesign.cadFiles, "CAD"),
-        },
-        billOfQuantities: {
-          excelFiles: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
-          pdfFiles: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
-        },
-
-        // --- True relational fields (expect Prisma update object) ---
-        images: {
-          deleteMany: {},
-          create: fileListPayload(images, "IMAGE"),
-        },
-        floorPlans: {
-          deleteMany: {},
-          create: fileListPayload(floorPlans, "FLOOR_PLAN"),
-        },
-        files: {
-          deleteMany: {},
-          create: fileListPayload(files, "FILE"),
-        },
-        packageOptions: {
-          deleteMany: {},
-          create: packageOptionsPayload,
-        },
-      };
-    } else {
-      // CREATE PAYLOAD
-      payload = {
-        ...commonData,
-        images: { create: fileListPayload(images, "IMAGE") },
-        floorPlans: { create: fileListPayload(floorPlans, "FLOOR_PLAN") },
-        files: { create: fileListPayload(files, "FILE") },
-        packageOptions: { create: packageOptionsPayload },
-
-        architecturalDesign: {
-          create: {
-            type: "ARCHITECTURAL",
-            pdfFiles: {
-              create: fileListPayload(architecturalDesign.pdfFiles, "PDF"),
-            },
-            cadFiles: {
-              create: fileListPayload(architecturalDesign.cadFiles, "CAD"),
-            },
-          },
-        },
-        structuralDesign: {
-          create: {
-            type: "STRUCTURAL",
-            pdfFiles: {
-              create: fileListPayload(structuralDesign.pdfFiles, "PDF"),
-            },
-            cadFiles: {
-              create: fileListPayload(structuralDesign.cadFiles, "CAD"),
-            },
-          },
-        },
-        billOfQuantities: {
-          create: {
-            type: "BILL_OF_QUANTITIES",
-            excelFiles: {
-              create: fileListPayload(billOfQuantities.excelFiles, "EXCEL"),
-            },
-            pdfFiles: {
-              create: fileListPayload(billOfQuantities.pdfFiles, "PDF"),
-            },
-          },
-        },
-      };
-    }
+    const payload = buildDesignUpsertPayload({
+      name,
+      description,
+      bedrooms,
+      bathrooms,
+      area,
+      floors,
+      categoryId,
+      architecturalPdfPrice,
+      architecturalCadPrice,
+      structuralPdfPrice,
+      structuralCadPrice,
+      billOfQuantitiesPrice,
+      billOfQuantitiesPdfPrice,
+      images,
+      floorPlans,
+      files,
+      architecturalDesign,
+      structuralDesign,
+      billOfQuantities,
+      packageOptions,
+    });
 
     try {
       const response = await fetch(url, {
@@ -803,7 +667,7 @@ const DesignForm = ({ design }: DesignFormProps) => {
           }`,
         );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("An unexpected error occurred.");
       console.error(`Error ${design ? "updating" : "creating"} design:`, error);
     } finally {
@@ -837,8 +701,13 @@ const DesignForm = ({ design }: DesignFormProps) => {
         </Button>
         <div className="flex items-center gap-3">
           <Button
-            type="submit"
-            disabled={!canSubmit() || isSubmitting || activeUploads.length > 0}
+            type={currentStep === steps.length - 1 ? "submit" : "button"}
+            onClick={() => {
+              if (currentStep !== steps.length - 1) {
+                setCurrentStep(steps.length - 1);
+              }
+            }}
+            disabled={isSubmitting || activeUploads.length > 0}
             className="rounded-full font-bold shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 disabled:opacity-50"
           >
             {isSubmitting ? (
@@ -846,7 +715,11 @@ const DesignForm = ({ design }: DesignFormProps) => {
             ) : (
               <FiSave className="w-5 h-5 mr-2" />
             )}
-            {design ? "Save Changes" : "Create Design"}
+            {currentStep === steps.length - 1
+              ? design
+                ? "Save Changes"
+                : "Create Design"
+              : "Go To Review"}
           </Button>
         </div>
       </div>
@@ -965,8 +838,6 @@ const DesignForm = ({ design }: DesignFormProps) => {
                       setBillOfQuantitiesPrice={setBillOfQuantitiesPrice}
                       billOfQuantitiesPdfPrice={billOfQuantitiesPdfPrice}
                       setBillOfQuantitiesPdfPrice={setBillOfQuantitiesPdfPrice}
-                      fieldErrors={fieldErrors}
-                      setFieldErrors={setFieldErrors}
                     />
                   )}
                   {currentStep === 3 && (
@@ -1262,8 +1133,6 @@ interface PricingStepProps {
   setBillOfQuantitiesPrice: (value: string) => void;
   billOfQuantitiesPdfPrice: string;
   setBillOfQuantitiesPdfPrice: (value: string) => void;
-  fieldErrors: Record<string, string>;
-  setFieldErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 // Define the component separately with a named function
@@ -1280,8 +1149,6 @@ const PricingStepComponent: React.FC<PricingStepProps> = ({
   setBillOfQuantitiesPrice,
   billOfQuantitiesPdfPrice,
   setBillOfQuantitiesPdfPrice,
-  fieldErrors,
-  setFieldErrors,
 }) => (
   <div className="space-y-8">
     <SectionHeader
@@ -1361,18 +1228,7 @@ const PricingStepComponent: React.FC<PricingStepProps> = ({
 const PricingStep = React.memo(PricingStepComponent);
 PricingStep.displayName = "PricingStep";
 
-interface FileType {
-  url: string;
-  name: string;
-  type: string;
-  size: number;
-}
-
-interface DocumentState {
-  pdfFiles: FileType[];
-  cadFiles: FileType[];
-  excelFiles: FileType[];
-}
+type DocumentState = Record<string, FileType[]>;
 
 interface FilesStepProps {
   images: FileType[];
@@ -1455,7 +1311,7 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
               onFileRemove={(fileUrl) =>
                 setImages((prev) => prev.filter((f) => f.url !== fileUrl))
               }
-              initialFiles={images}
+              initialFiles={toInitialFiles(images, "IMAGE")}
               fileTypeCategory="IMAGE"
               multiple
               accept="image/jpeg, image/png, image/gif, image/webp"
@@ -1502,7 +1358,7 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
               onFileRemove={(fileUrl) =>
                 setFloorPlans((prev) => prev.filter((f) => f.url !== fileUrl))
               }
-              initialFiles={floorPlans}
+              initialFiles={toInitialFiles(floorPlans, "FLOOR_PLAN")}
               fileTypeCategory="FLOOR_PLAN"
               multiple
               accept="image/jpeg, image/png, image/gif, image/webp, application/pdf"
@@ -1543,7 +1399,7 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
               onFileRemove={(fileUrl) =>
                 setFiles((prev) => prev.filter((f) => f.url !== fileUrl))
               }
-              initialFiles={files}
+              initialFiles={toInitialFiles(files, "FILE")}
               fileTypeCategory="FILE"
               multiple
             />
@@ -1648,21 +1504,21 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
                       };
                       doc.setState((prev) => ({
                         ...prev,
-                        [field.id]: [
-                          ...prev[field.id as keyof DocumentState],
-                          mappedFile,
-                        ],
+                        [field.id]: [...(prev[field.id] || []), mappedFile],
                       }));
                     }}
                     onFileRemove={(fileUrl) =>
                       doc.setState((prev) => ({
                         ...prev,
-                        [field.id]: prev[
-                          field.id as keyof DocumentState
-                        ].filter((f: FileType) => f.url !== fileUrl),
+                        [field.id]: (prev[field.id] || []).filter(
+                          (f: FileType) => f.url !== fileUrl,
+                        ),
                       }))
                     }
-                    initialFiles={doc.state[field.id as keyof DocumentState]}
+                    initialFiles={toInitialFiles(
+                      doc.state[field.id] || [],
+                      categoryMap[field.id] || "OTHER",
+                    )}
                     fileTypeCategory={categoryMap[field.id] || "OTHER"}
                     multiple
                     accept={field.accept}
@@ -1690,7 +1546,11 @@ interface PackageOptionsStepProps {
   packageOptions: PackageOption[];
   addPackageOption: () => void;
   removePackageOption: (index: number) => void;
-  handlePackageChange: (index: number, field: string, value: string) => void;
+  handlePackageChange: (
+    index: number,
+    field: "name" | "price",
+    value: string,
+  ) => void;
   handlePackageFile: (index: number, files: FileType[]) => void;
 }
 
@@ -1767,7 +1627,7 @@ const PackageOptionsStepComponent: React.FC<PackageOptionsStepProps> = ({
                     option.file.filter((f) => f.url !== fileUrl),
                   )
                 }
-                initialFiles={option.file}
+                initialFiles={toInitialFiles(option.file, "FILE")}
                 fileTypeCategory="FILE"
                 multiple={false}
               />
@@ -1791,7 +1651,15 @@ const PackageOptionsStepComponent: React.FC<PackageOptionsStepProps> = ({
 const PackageOptionsStep = React.memo(PackageOptionsStepComponent);
 PackageOptionsStep.displayName = "PackageOptionsStep";
 
-const ReviewStep = ({ designData }: { designData: any }) => {
+interface ReviewData {
+  name?: string;
+  description?: string;
+  basePrice?: number;
+  images: Array<{ url: string }>;
+  floorPlans?: Array<{ url: string }>;
+}
+
+const ReviewStep = ({ designData }: { designData: ReviewData }) => {
   return (
     <div className="space-y-8">
       <SectionHeader
@@ -1810,7 +1678,7 @@ const ReviewStep = ({ designData }: { designData: any }) => {
           <p className="text-lg font-semibold">
             Base Price:{" "}
             <span className="font-bold text-blue-600 dark:text-blue-400">
-              ${parseFloat(designData.basePrice || 0).toFixed(2)}
+              ${Number(designData.basePrice || 0).toFixed(2)}
             </span>
           </p>
         </div>
@@ -1818,11 +1686,13 @@ const ReviewStep = ({ designData }: { designData: any }) => {
           <h4 className="font-semibold text-lg mb-2">Uploaded Images:</h4>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
             {designData.images.length > 0 ? (
-              designData.images.map((img: any, index: number) => (
-                <img
+              designData.images.map((img, index: number) => (
+                <Image
                   key={index}
                   src={img.url}
                   alt={`preview ${index}`}
+                  width={96}
+                  height={96}
                   className="w-full h-24 object-cover rounded-lg shadow-md"
                 />
               ))

@@ -1,13 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FiFolderPlus, FiGrid, FiPlus, FiTag } from "react-icons/fi";
+import { FiEdit3, FiFolderPlus, FiGrid, FiPlus, FiTag } from "react-icons/fi";
 
 interface DesignsHeaderProps {
   activeTab: string;
   newfolder?: boolean;
   onTabChange?: (tab: string) => void;
   onNewDesignClick: () => void;
+  onNewDesignPageClick: () => void;
   onNewFolderClick: () => void;
   onManageCategoriesClick: () => void;
 }
@@ -16,6 +17,7 @@ const DesignsHeader = ({
   activeTab,
   newfolder,
   onNewDesignClick,
+  onNewDesignPageClick,
   onNewFolderClick,
   onManageCategoriesClick,
 }: DesignsHeaderProps) => {
@@ -73,6 +75,16 @@ const DesignsHeader = ({
               <span>New Folder</span>
             </motion.button>
           )}
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onNewDesignPageClick}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-sm font-medium text-foreground"
+          >
+            <FiEdit3 className="w-4 h-4 text-indigo-500" />
+            <span>New Design Page</span>
+          </motion.button>
 
           <motion.button
             whileHover={{ scale: 1.02 }}

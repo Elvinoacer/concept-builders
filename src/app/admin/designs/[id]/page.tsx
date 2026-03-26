@@ -4,7 +4,6 @@ import BuildingCostEstimatesModal from "@/components/admin/designs/BuildingCostE
 import ConfirmationModal from "@/components/admin/designs/ConfirmationModal";
 import DesignFilePreview from "@/components/admin/designs/DesignFilePreview";
 import DesignFileUpload from "@/components/admin/designs/DesignFileUpload";
-import NewDesignForm from "@/components/admin/designs/NewDesignForm";
 import PackageOptionsManager from "@/components/admin/designs/PackageOptionsManager";
 import VersionControl from "@/components/admin/designs/VersionControl";
 import { useParams, useRouter } from "next/navigation";
@@ -80,7 +79,6 @@ interface DesignDetail {
 const DesignPage = () => {
   const [design, setDesign] = useState<DesignDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isFormOpen, setFormOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEstimatesModalOpen, setIsEstimatesModalOpen] = useState(false);
@@ -147,11 +145,6 @@ const DesignPage = () => {
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  const handleUpdateSuccess = () => {
-    setFormOpen(false);
-    fetchDesign();
   };
 
   const handleLinkToFolder = async (newFolderId: string | null) => {
@@ -304,11 +297,11 @@ const DesignPage = () => {
           </div>
           <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
             <button
-              onClick={() => setFormOpen(true)}
+              onClick={() => router.push(`/admin/designs/${id}/edit`)}
               className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex-1 sm:flex-none order-2 xs:order-1"
             >
               <FiEdit size={16} />
-              <span>Edit Design</span>
+              <span>Edit In Page</span>
             </button>
             <button
               onClick={() => setModalOpen(true)}
@@ -533,13 +526,6 @@ const DesignPage = () => {
       </div>
 
       {/* Modals */}
-      {isFormOpen && (
-        <NewDesignForm
-          designToEdit={design}
-          onClose={() => setFormOpen(false)}
-          onSuccess={handleUpdateSuccess}
-        />
-      )}
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}

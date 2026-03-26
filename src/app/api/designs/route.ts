@@ -30,6 +30,10 @@ type PackageOptionPayload = {
 };
 
 type DesignDocumentPayload = {
+  type?: string;
+  pdfFiles?: FilePayload[];
+  cadFiles?: FilePayload[];
+  excelFiles?: FilePayload[];
   create?: {
     type: string;
     pdfFiles?: FileListCreatePayload;
@@ -529,35 +533,47 @@ export async function POST(request: Request) {
       };
     }
 
-    const handleDesignDocument = (doc?: DesignDocumentPayload) => {
-      if (!doc?.create) return undefined;
-      const { type, pdfFiles, cadFiles, excelFiles } = doc.create;
+    const handleDesignDocument = (
+      doc: DesignDocumentPayload | undefined,
+      fallbackType: "ARCHITECTURAL" | "STRUCTURAL" | "BILL_OF_QUANTITIES",
+    ) => {
+      if (!doc) return undefined;
+
+      const type = doc.create?.type || doc.type || fallbackType;
+      const pdfFiles = doc.create?.pdfFiles?.create || doc.pdfFiles || [];
+      const cadFiles = doc.create?.cadFiles?.create || doc.cadFiles || [];
+      const excelFiles = doc.create?.excelFiles?.create || doc.excelFiles || [];
+
       const createData: Record<string, unknown> = { type };
 
-      // These are also sent as { create: [...] } from frontend helper fileListPayload
-      if (pdfFiles?.create && pdfFiles.create.length > 0) {
-        createData.pdfFiles = { create: pdfFiles.create };
+      if (pdfFiles.length > 0) {
+        createData.pdfFiles = { create: pdfFiles };
       }
-      if (cadFiles?.create && cadFiles.create.length > 0) {
-        createData.cadFiles = { create: cadFiles.create };
+      if (cadFiles.length > 0) {
+        createData.cadFiles = { create: cadFiles };
       }
-      if (excelFiles?.create && excelFiles.create.length > 0) {
-        createData.excelFiles = { create: excelFiles.create };
+      if (excelFiles.length > 0) {
+        createData.excelFiles = { create: excelFiles };
       }
 
-      // Only add if we have at least one file type or it's just a container (though usually we want files)
-      // The frontend sends empty arrays if no files, so we should check if we actually have content to create
-      // But the structure requires the document type to exist if we are creating it.
+      if (
+        pdfFiles.length === 0 &&
+        cadFiles.length === 0 &&
+        excelFiles.length === 0
+      ) {
+        return undefined;
+      }
+
       return { create: createData };
     };
 
-    const ad = handleDesignDocument(architecturalDesign);
+    const ad = handleDesignDocument(architecturalDesign, "ARCHITECTURAL");
     if (ad) designData.architecturalDesign = ad;
 
-    const sd = handleDesignDocument(structuralDesign);
+    const sd = handleDesignDocument(structuralDesign, "STRUCTURAL");
     if (sd) designData.structuralDesign = sd;
 
-    const bq = handleDesignDocument(billOfQuantities);
+    const bq = handleDesignDocument(billOfQuantities, "BILL_OF_QUANTITIES");
     if (bq) designData.billOfQuantities = bq;
 
     const newDesign = await prisma.design.create({

@@ -6,6 +6,7 @@ import DesignsTable from "@/components/admin/designs/DesignsTable";
 import DesignsTabs from "@/components/admin/designs/DesignsTabs";
 import FoldersPage from "@/components/admin/designs/FoldersPage";
 import NewDesignForm from "@/components/admin/designs/NewDesignForm";
+import type { DesignToEdit } from "@/components/admin/designs/NewDesignForm";
 import CreateFolderModal from "@/components/admin/designs/CreateFolderModal";
 import CategoriesModal from "@/components/admin/designs/CategoriesModal";
 import RenameFolderModal from "@/components/admin/designs/RenameFolderModal";
@@ -14,8 +15,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const DesignsPage = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
   const [isFormOpen, setFormOpen] = useState(false);
   const [isFolderModalOpen, setFolderModalOpen] = useState(false);
@@ -29,7 +32,7 @@ const DesignsPage = () => {
   const [loadingFolders, setLoadingFolders] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [editingDesign, setEditingDesign] = useState<unknown>(null);
+  const [editingDesign, setEditingDesign] = useState<DesignToEdit | null>(null);
   const [designsRefreshKey, setDesignsRefreshKey] = useState(0);
 
   const handleOpenRenameModal = (folder: { id: string; name: string }) => {
@@ -214,6 +217,7 @@ const DesignsPage = () => {
           newfolder={activeTab === "folders"}
           onTabChange={setActiveTab}
           onNewDesignClick={() => setFormOpen(true)}
+          onNewDesignPageClick={() => router.push("/admin/designs/new")}
           onNewFolderClick={() => setFolderModalOpen(true)}
           onManageCategoriesClick={() => setCategoriesModalOpen(true)}
         />
@@ -315,7 +319,7 @@ const DesignsPage = () => {
             setFormOpen(false);
             setEditingDesign(null);
           }}
-          designToEdit={editingDesign}
+          designToEdit={editingDesign ?? undefined}
           onSuccess={() => {
             setFormOpen(false);
             setEditingDesign(null);
