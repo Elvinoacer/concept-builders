@@ -871,19 +871,7 @@ export default function Home() {
           <div className="relative">
             <div className="relative overflow-hidden">
               <Image
-                src={(() => {
-                  const url = bestSellingPlans[0]?.images?.[0]?.url;
-                  if (
-                    url &&
-                    !url.includes("placeholder") &&
-                    !url.includes("placehold") &&
-                    !url.includes("dummyimage") &&
-                    (url.startsWith("/") || url.startsWith("http"))
-                  ) {
-                    return url;
-                  }
-                  return "/images/banners/banner4.jpg";
-                })()}
+                src="/images/banners/banner4.jpg"
                 alt="Concept Builders project"
                 width={900}
                 height={1100}
