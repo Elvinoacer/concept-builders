@@ -66,6 +66,10 @@ async function syncUserContext(token: any) {
 }
 
 async function refreshAccessToken(token: any) {
+  if (!token?.refreshToken) {
+    return token;
+  }
+
   try {
     const url =
       "https://oauth2.googleapis.com/token?" +
@@ -88,6 +92,17 @@ async function refreshAccessToken(token: any) {
     const refreshedTokens = await response.json();
 
     if (!response.ok) {
+      if (refreshedTokens?.error === "invalid_grant") {
+        return {
+          ...token,
+          accessToken: undefined,
+          accessTokenExpires: 0,
+          refreshToken: undefined,
+          refreshRetryAt: Date.now() + TOKEN_SYNC_INTERVAL_MS,
+          error: "RefreshAccessTokenError",
+        };
+      }
+
       console.error("Error refreshing access token:", refreshedTokens);
       throw refreshedTokens;
     }
@@ -99,12 +114,15 @@ async function refreshAccessToken(token: any) {
       accessToken: refreshedTokens.access_token,
       accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+      refreshRetryAt: undefined,
+      error: undefined,
     };
   } catch (error) {
     console.error("Error in refreshAccessToken:", error);
 
     return {
       ...token,
+      refreshRetryAt: Date.now() + 60 * 1000,
       error: "RefreshAccessTokenError",
     };
   }
@@ -233,9 +251,19 @@ export const authOptions: AuthOptions = {
           token.id = dbUser.id;
           token.baseUserId = dbUser.id;
           token.role = dbUser.role;
-          token.accessToken = account.access_token;
-          token.refreshToken = account.refresh_token;
-          token.accessTokenExpires = (account.expires_at ?? 0) * 1000;
+          token.authProvider = account.provider;
+
+          if (account.provider === "google") {
+            token.accessToken = account.access_token;
+            token.refreshToken = account.refresh_token;
+            token.accessTokenExpires = (account.expires_at ?? 0) * 1000;
+          } else {
+            token.accessToken = undefined;
+            token.refreshToken = undefined;
+            token.accessTokenExpires = 0;
+          }
+
+          token.refreshRetryAt = undefined;
           token.lastSyncedAt = Date.now();
 
           if (dbUser.impersonatingUserId) {
@@ -263,9 +291,19 @@ export const authOptions: AuthOptions = {
       }
 
       const accessTokenExpires = Number(token.accessTokenExpires || 0);
+      const refreshRetryAt = Number(token.refreshRetryAt || 0);
+      const canAttemptGoogleRefresh =
+        token.authProvider === "google" &&
+        typeof token.refreshToken === "string" &&
+        token.refreshToken.length > 0 &&
+        accessTokenExpires > 0;
 
       // Access token has expired, try to update it first.
-      if (Date.now() >= accessTokenExpires) {
+      if (
+        canAttemptGoogleRefresh &&
+        Date.now() >= accessTokenExpires &&
+        Date.now() >= refreshRetryAt
+      ) {
         const refreshed = await refreshAccessToken(token);
         return await syncUserContext(refreshed);
       }

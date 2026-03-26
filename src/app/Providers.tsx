@@ -35,6 +35,11 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (session?.user?.id) {
       const newSocket = getSocket(session.user.id as string);
+      if (!newSocket) {
+        setSocket(null);
+        return;
+      }
+
       setSocket(newSocket);
 
       newSocket.on("currentOnlineUsers", (users: string[]) => {

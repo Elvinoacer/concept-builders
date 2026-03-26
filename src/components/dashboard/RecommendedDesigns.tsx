@@ -10,9 +10,9 @@ import { ChevronLeft, ChevronRight, RefreshCw, Sparkles } from "lucide-react";
 interface RecommendedDesign {
   id: string;
   name: string;
-  category?: string;
+  category?: string | { name?: string | null } | null;
   basePrice?: number;
-  images?: string[];
+  images?: Array<string | { url?: string | null; image?: string | null }>;
 }
 
 interface RecommendedDesignsProps {
@@ -23,10 +23,31 @@ const RecommendedDesigns = ({ compact = false }: RecommendedDesignsProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-  const [recommendedDesigns, setRecommendedDesigns] = useState<RecommendedDesign[]>([]);
+  const [recommendedDesigns, setRecommendedDesigns] = useState<
+    RecommendedDesign[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+
+  const getCategoryName = (design: RecommendedDesign) => {
+    if (typeof design.category === "string") {
+      return design.category;
+    }
+
+    return design.category?.name || "Design";
+  };
+
+  const getPreviewImageSrc = (design: RecommendedDesign): string | null => {
+    const firstImage = design.images?.[0];
+    const rawSrc =
+      typeof firstImage === "string"
+        ? firstImage
+        : firstImage?.url || firstImage?.image || "";
+
+    const src = rawSrc.trim();
+    return src.length > 0 ? src : null;
+  };
 
   // Detect screen size
   useEffect(() => {
@@ -48,7 +69,7 @@ const RecommendedDesigns = ({ compact = false }: RecommendedDesignsProps) => {
         setLoading(true);
         const response = await fetch("/api/dashboard/recommendations");
         const data = await response.json();
-        setRecommendedDesigns(data);
+        setRecommendedDesigns(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching recommended designs:", error);
       } finally {
@@ -82,10 +103,10 @@ const RecommendedDesigns = ({ compact = false }: RecommendedDesignsProps) => {
     try {
       setLoading(true);
       const response = await fetch(
-        "/api/dashboard/recommendations?refresh=true"
+        "/api/dashboard/recommendations?refresh=true",
       );
       const data = await response.json();
-      setRecommendedDesigns(data);
+      setRecommendedDesigns(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error refreshing recommendations:", error);
     } finally {
@@ -128,14 +149,19 @@ const RecommendedDesigns = ({ compact = false }: RecommendedDesignsProps) => {
             className="rounded-lg border border-cb-border bg-surface p-2 text-cream-dim transition hover:text-gold"
             title="Refresh recommendations"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
+            />
           </motion.button>
         </div>
 
         {loading && (
           <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-28 animate-pulse border border-cb-border bg-surface" />
+              <div
+                key={i}
+                className="h-28 animate-pulse border border-cb-border bg-surface"
+              />
             ))}
           </div>
         )}
@@ -157,35 +183,43 @@ const RecommendedDesigns = ({ compact = false }: RecommendedDesignsProps) => {
 
         {!loading && recommendedDesigns.length > 0 && (
           <div className="space-y-3">
-            {recommendedDesigns.slice(0, 2).map((design) => (
-              <Link
-                key={design.id}
-                href={`/designs/${design.id}`}
-                className="group block overflow-hidden border border-cb-border bg-surface transition hover:border-gold/50"
-              >
-                <div className="relative h-28 w-full border-b border-cb-border">
-                  {design.images?.[0] ? (
-                    <Image
-                      src={design.images[0]}
-                      alt={design.name}
-                      fill
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-xs text-muted">
-                      No Preview
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-1 p-3">
-                  <p className="line-clamp-1 text-sm font-semibold text-cream">{design.name}</p>
-                  <p className="text-xs text-cream-dim">
-                    {design.category || "Design"}
-                    {design.basePrice ? ` • KES ${design.basePrice.toLocaleString()}` : ""}
-                  </p>
-                </div>
-              </Link>
-            ))}
+            {recommendedDesigns.slice(0, 2).map((design) => {
+              const previewImageSrc = getPreviewImageSrc(design);
+
+              return (
+                <Link
+                  key={design.id}
+                  href={`/designs/${design.id}`}
+                  className="group block overflow-hidden border border-cb-border bg-surface transition hover:border-gold/50"
+                >
+                  <div className="relative h-28 w-full border-b border-cb-border">
+                    {previewImageSrc ? (
+                      <Image
+                        src={previewImageSrc}
+                        alt={design.name}
+                        fill
+                        className="object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-xs text-muted">
+                        No Preview
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-1 p-3">
+                    <p className="line-clamp-1 text-sm font-semibold text-cream">
+                      {design.name}
+                    </p>
+                    <p className="text-xs text-cream-dim">
+                      {getCategoryName(design)}
+                      {design.basePrice
+                        ? ` • KES ${design.basePrice.toLocaleString()}`
+                        : ""}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
 
             <button
               onClick={() => (window.location.href = "/designs")}
@@ -323,10 +357,7 @@ const RecommendedDesigns = ({ compact = false }: RecommendedDesignsProps) => {
             <div className="flex justify-center mt-4">
               <div className="flex gap-1">
                 {[1, 2, 3].map((dot) => (
-                  <div
-                    key={dot}
-                    className="w-2 h-2 bg-muted rounded-full"
-                  />
+                  <div key={dot} className="w-2 h-2 bg-muted rounded-full" />
                 ))}
               </div>
             </div>
