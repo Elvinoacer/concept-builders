@@ -319,6 +319,20 @@ export default function RootLayout({
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js').then(
                     function(registration) {
+                      if (registration.waiting) {
+                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                      }
+
+                      registration.addEventListener('updatefound', function() {
+                        const installingWorker = registration.installing;
+                        if (!installingWorker) return;
+                        installingWorker.addEventListener('statechange', function() {
+                          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            window.location.reload();
+                          }
+                        });
+                      });
+
                       console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     },
                     function(err) {
