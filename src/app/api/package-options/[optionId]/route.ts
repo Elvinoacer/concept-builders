@@ -1,12 +1,12 @@
-
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 import {
   s3Client,
   getDoSpacesKeyFromUrl,
   DO_SPACES_BUCKET_NAME,
-} from '@/lib/do-spaces';
-import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+} from "@/lib/do-spaces";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 async function deleteFileFromSpaces(fileUrl: string) {
   try {
@@ -17,19 +17,25 @@ async function deleteFileFromSpaces(fileUrl: string) {
     });
     await s3Client.send(command);
   } catch (error) {
-    console.error('Error deleting file from Spaces:', error);
+    console.error("Error deleting file from Spaces:", error);
     // Don't throw error, just log it
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ optionId: string }> }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ optionId: string }> },
+) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const { optionId } = await params;
     const body = await req.json();
     const { name, price, file } = body;
 
     if (!name || !price) {
-      return new NextResponse('Missing name or price', { status: 400 });
+      return new NextResponse("Missing name or price", { status: 400 });
     }
 
     const existingOption = await prisma.packageOption.findUnique({
@@ -38,7 +44,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ opti
     });
 
     if (!existingOption) {
-      return new NextResponse('Package option not found', { status: 404 });
+      return new NextResponse("Package option not found", { status: 404 });
     }
 
     const packageOptionData: any = {
@@ -55,16 +61,16 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ opti
         newVersion = oldFile.version + 1;
         fileIdentifier = oldFile.fileIdentifier;
         await prisma.file.update({
-            where: { id: oldFile.id },
-            data: { isLatest: false },
+          where: { id: oldFile.id },
+          data: { isLatest: false },
         });
       }
-      
+
       packageOptionData.file = {
         create: {
           name: file.originalFileName,
           url: file.url,
-          type: 'FILE',
+          type: "FILE",
           version: newVersion,
           isLatest: true,
           fileIdentifier: fileIdentifier,
@@ -96,12 +102,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ opti
 
     return NextResponse.json(updatedPackageOption, { status: 200 });
   } catch (error) {
-    console.error('Error updating package option:', error);
+    console.error("Error updating package option:", error);
     return new NextResponse(error.message, { status: 500 });
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ optionId: string }> }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ optionId: string }> },
+) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const { optionId } = await params;
 
@@ -111,7 +123,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ o
     });
 
     if (!existingOption) {
-      return new NextResponse('Package option not found', { status: 404 });
+      return new NextResponse("Package option not found", { status: 404 });
     }
 
     if (existingOption.file) {
@@ -132,7 +144,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ o
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error deleting package option:', error);
+    console.error("Error deleting package option:", error);
     return new NextResponse(error.message, { status: 500 });
   }
 }

@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { calculateItemTotal } from "@/lib/calculate-total";
-import { DiscountType } from "@/generated/prisma/client";
+import { validateAndApplyDiscount } from "@/lib/validate-discount";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -45,100 +45,49 @@ export async function POST(req: NextRequest) {
 
     // Calculate total amount from cart items
     let calculatedTotal = userCart.items.reduce((total, item) => {
+      const selectedExtras = Array.isArray(item.selectedExtras)
+        ? (item.selectedExtras as Array<{ price?: number }>).map((extra) => ({
+            price: typeof extra?.price === "number" ? extra.price : 0,
+          }))
+        : [];
+
       const itemForCalculation = {
         ...item,
-        selectedExtras: item.selectedExtras as any[],
+        selectedExtras,
       };
       return total + calculateItemTotal(itemForCalculation);
     }, 0);
 
     let appliedDiscountAmount = 0;
+    let appliedDiscountId: string | null = null;
 
     // Handle Discount
     if (discountCode) {
-      const discount = await prisma.discount.findUnique({
-        where: { code: discountCode },
-      });
+      const discountResult = await validateAndApplyDiscount(
+        discountCode,
+        calculatedTotal,
+        userId,
+      );
 
-      if (discount) {
-        // Validate Discount
-        let isValid = true;
-        let errorMessage = "";
-
-        if (!discount.isActive) {
-          isValid = false;
-          errorMessage = "Discount is not active";
-        } else if (
-          discount.expiresAt &&
-          new Date(discount.expiresAt) < new Date()
-        ) {
-          isValid = false;
-          errorMessage = "Discount has expired";
-        } else if (discount.maxUses && discount.uses >= discount.maxUses) {
-          isValid = false;
-          errorMessage = "Discount has reached its maximum uses";
-        } else if (
-          discount.minPurchaseAmount &&
-          calculatedTotal < discount.minPurchaseAmount
-        ) {
-          isValid = false;
-          errorMessage = `Minimum purchase of ${discount.minPurchaseAmount.toFixed(2)} required`;
-        }
-
-        if (isValid) {
-          // Check if user already used it
-          const existingOrderWithDiscount = await prisma.order.findFirst({
-            where: {
-              userId: userId,
-              discountId: discount.id,
-              status: {
-                in: ["PAID", "REFUND_REQUESTED"],
-              },
-            },
-          });
-
-          if (existingOrderWithDiscount) {
-            isValid = false;
-            errorMessage = "You have already used this discount code";
-          }
-        }
-
-        if (isValid) {
-          if (discount.type === DiscountType.PERCENTAGE) {
-            appliedDiscountAmount = calculatedTotal * (discount.value / 100);
-          } else if (discount.type === DiscountType.FIXED_AMOUNT) {
-            appliedDiscountAmount = discount.value;
-          }
-
-          // Cap discount at total
-          appliedDiscountAmount = Math.min(
-            appliedDiscountAmount,
-            calculatedTotal,
-          );
-
-          calculatedTotal -= appliedDiscountAmount;
-
-          // Update cart with valid discount
-          await prisma.cart.update({
-            where: { id: userCart.id },
-            data: {
-              discountAmount: appliedDiscountAmount,
-              discountCode: discountCode,
-              discountId: discount.id,
-            },
-          });
-        } else {
-          console.warn(
-            `Invalid discount code provided: ${discountCode} - ${errorMessage}`,
-          );
-          return NextResponse.json({ error: errorMessage }, { status: 400 });
-        }
-      } else {
+      if (!discountResult.valid) {
         return NextResponse.json(
-          { error: "Invalid discount code" },
-          { status: 404 },
+          { error: discountResult.error },
+          { status: 400 },
         );
       }
+
+      appliedDiscountAmount = discountResult.appliedAmount;
+      appliedDiscountId = discountResult.discount.id;
+      calculatedTotal = discountResult.finalTotal;
+
+      await prisma.cart.update({
+        where: { id: userCart.id },
+        data: {
+          discountAmount: appliedDiscountAmount,
+          discountCode,
+          discountId: appliedDiscountId,
+        },
+      });
     }
 
     if (calculatedTotal <= 0) {

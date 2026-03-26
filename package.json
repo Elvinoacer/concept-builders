@@ -12,6 +12,8 @@
     "seed": "tsx prisma/dev-seed.ts",
     "seed:users": "tsx prisma/seed-users.ts",
     "seed:designs": "tsx prisma/seed-designs.ts",
+    "db:dedupe:payment-attempt-apiref": "tsx prisma/scripts/dedupe-payment-attempt-apiref.ts",
+    "db:dedupe:payment-attempt-apiref:apply": "tsx prisma/scripts/dedupe-payment-attempt-apiref.ts --apply",
     "export:users": "tsx scripts/export-users.ts",
     "sitemap": "prisma generate && tsx scripts/generate-sitemap.mjs",
     "postinstall": "prisma generate"

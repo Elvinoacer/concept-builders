@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
+import { Role, UserStatus } from "@/generated/prisma/client";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   const { id } = await params;
   try {
     const user = await prisma.user.findUnique({
@@ -29,7 +34,7 @@ export async function GET(
         wishlist: { select: { id: true, name: true } },
         folders: { select: { id: true, name: true } },
         loginHistory: {
-          select: { createdAt: true, ipAddress: true },
+          select: { createdAt: true },
           orderBy: { createdAt: "desc" },
           take: 5,
         }, // Latest 5 logins
@@ -39,40 +44,76 @@ export async function GET(
       return new NextResponse("Not Found", { status: 404 });
     }
     return NextResponse.json(user);
-  } catch (error) {
+  } catch {
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   const { id } = await params;
   try {
     const data = await request.json();
 
+    const updateData: {
+      name?: string;
+      email?: string;
+      role?: Role;
+      status?: UserStatus;
+      bio?: string | null;
+      adminRole?: string | null;
+    } = {};
+
+    if (typeof data.name === "string") updateData.name = data.name;
+    if (typeof data.email === "string") updateData.email = data.email;
+    if (typeof data.bio === "string" || data.bio === null)
+      updateData.bio = data.bio;
+    if (typeof data.adminRole === "string" || data.adminRole === null)
+      updateData.adminRole = data.adminRole;
+
+    if (data.role) {
+      if (!Object.values(Role).includes(data.role)) {
+        return new NextResponse("Invalid role", { status: 400 });
+      }
+      updateData.role = data.role;
+    }
+
+    if (data.status) {
+      if (!Object.values(UserStatus).includes(data.status)) {
+        return new NextResponse("Invalid status", { status: 400 });
+      }
+      updateData.status = data.status;
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id },
-      data,
+      data: updateData,
     });
     return NextResponse.json(updatedUser);
-  } catch (error) {
+  } catch {
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   const { id } = await params;
   try {
     await prisma.user.delete({
       where: { id },
     });
     return new NextResponse(null, { status: 204 });
-  } catch (error) {
+  } catch {
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

@@ -1,7 +1,11 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function GET() {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5); // Go back 5 months to include the current month as one of the six
@@ -10,13 +14,13 @@ export async function GET() {
 
     const orders = await prisma.order.findMany({
       where: {
-        status: 'PAID',
+        status: "PAID",
         createdAt: {
           gte: sixMonthsAgo,
         },
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: "asc",
       },
       select: {
         createdAt: true,
@@ -29,15 +33,17 @@ export async function GET() {
     for (let i = 0; i < 6; i++) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
-      const monthName = date.toLocaleString('default', { month: 'short' });
+      const monthName = date.toLocaleString("default", { month: "short" });
       const year = date.getFullYear();
       const key = `${monthName} ${year}`;
       monthlySalesMap.set(key, { month: monthName, sales: 0 });
     }
 
     // Aggregate sales
-    orders.forEach(order => {
-      const monthName = order.createdAt.toLocaleString('default', { month: 'short' });
+    orders.forEach((order) => {
+      const monthName = order.createdAt.toLocaleString("default", {
+        month: "short",
+      });
       const year = order.createdAt.getFullYear();
       const key = `${monthName} ${year}`;
       if (monthlySalesMap.has(key)) {
@@ -52,7 +58,7 @@ export async function GET() {
 
     return NextResponse.json(monthlySales);
   } catch (error) {
-    console.error('Error fetching monthly sales:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Error fetching monthly sales:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

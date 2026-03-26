@@ -79,6 +79,7 @@ export async function POST(req: NextRequest) {
     const apiRef = data.api_ref || data.invoice?.api_ref;
     const paymentId =
       data.invoice_id || data.invoice?.invoice_id || data.invoice?.id;
+    const cartId = extractCartIdFromApiRef(apiRef);
 
     logPaymentEvent("WEBHOOK_RECEIVED", {
       state,
@@ -87,8 +88,6 @@ export async function POST(req: NextRequest) {
     });
 
     if (state === "COMPLETE") {
-      const cartId = extractCartIdFromApiRef(apiRef);
-
       if (!paymentId || !cartId) {
         return NextResponse.json(
           { error: "Invalid webhook payload." },
@@ -145,6 +144,20 @@ export async function POST(req: NextRequest) {
         });
 
         if (existingOrder) {
+          if (apiRef) {
+            const attempt = await tx.paymentAttempt.findFirst({
+              where: { apiRef },
+              orderBy: { createdAt: "desc" },
+            });
+
+            if (attempt) {
+              await tx.paymentAttempt.update({
+                where: { id: attempt.id },
+                data: { status: "COMPLETE" },
+              });
+            }
+          }
+
           return existingOrder;
         }
 
@@ -164,7 +177,7 @@ export async function POST(req: NextRequest) {
 
         await tx.orderItem.createMany({
           data: userCart.items.map((item) => ({
-            orderId: order.id,
+            orderId: createdOrder.id,
             designId: item.designId,
             quantity: item.quantity,
             selectedFileTypes: item.selectedFileTypes,
@@ -192,14 +205,24 @@ export async function POST(req: NextRequest) {
           },
         });
 
+        if (apiRef) {
+          const attempt = await tx.paymentAttempt.findFirst({
+            where: { apiRef },
+            orderBy: { createdAt: "desc" },
+          });
+
+          if (attempt) {
+            await tx.paymentAttempt.update({
+              where: { id: attempt.id },
+              data: { status: "COMPLETE" },
+            });
+          }
+        }
+
         // Clear cart after successful order creation while preserving cartId in order.
+        await tx.paymentAttempt.deleteMany({ where: { cartId: userCart.id } });
         await tx.cartItem.deleteMany({ where: { cartId: userCart.id } });
         await tx.cart.delete({ where: { id: userCart.id } });
-
-        await tx.paymentAttempt.updateMany({
-          where: { apiRef },
-          data: { status: "COMPLETE" },
-        });
 
         return createdOrder;
       });
@@ -272,12 +295,20 @@ export async function POST(req: NextRequest) {
       }
     } else if (state === "FAILED") {
       console.log("Payment failed:", data);
-      const cartId = extractCartIdFromApiRef(apiRef);
 
-      await prisma.paymentAttempt.updateMany({
-        where: { apiRef },
-        data: { status: "FAILED" },
-      });
+      if (apiRef) {
+        const attempt = await prisma.paymentAttempt.findFirst({
+          where: { apiRef },
+          orderBy: { createdAt: "desc" },
+        });
+
+        if (attempt) {
+          await prisma.paymentAttempt.update({
+            where: { id: attempt.id },
+            data: { status: "FAILED" },
+          });
+        }
+      }
 
       if (!cartId) {
         return NextResponse.json({ success: true });

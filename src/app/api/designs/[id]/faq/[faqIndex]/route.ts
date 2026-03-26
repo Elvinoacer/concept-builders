@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function PUT(
   req: Request,
-  { params }: { params: Promise<{ id: string; faqIndex: string }> }
+  { params }: { params: Promise<{ id: string; faqIndex: string }> },
 ) {
-  const { id, faqIndex } = params;
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
+  const { id, faqIndex } = await params;
   const { answer } = await req.json();
 
   if (!answer) {
@@ -40,7 +44,7 @@ export async function PUT(
     console.error("Failed to submit FAQ answer:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

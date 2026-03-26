@@ -584,7 +584,7 @@ model PaymentAttempt {
   amountKES     Float
   amountInCents Int
   phoneNumber   String
-  apiRef        String
+  apiRef        String   @unique
   status        String // initiated, success, failed
   gateway       String // intasend
   response      String? // JSON response from gateway

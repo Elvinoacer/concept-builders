@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function GET() {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const filePath = path.join(process.cwd(), "docs/routes/PAGES.md");
     const fileContent = await fs.readFile(filePath, "utf-8");

@@ -1,13 +1,12 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function GET() {
-  try {
-    const now = new Date();
-    const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
-    const sixtyDaysAgo = new Date(now.setDate(now.getDate() - 30)); // This will be 60 days ago from original 'now'
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
 
-    // Reset 'now' for accurate calculations
+  try {
     const currentEndDate = new Date();
     const currentStartDate = new Date(currentEndDate);
     currentStartDate.setDate(currentEndDate.getDate() - 30);
@@ -20,7 +19,7 @@ export async function GET() {
     const currentPeriodSalesAggregate = await prisma.order.aggregate({
       _sum: { amount: true },
       where: {
-        status: 'PAID',
+        status: "PAID",
         createdAt: {
           gte: currentStartDate,
           lt: currentEndDate,
@@ -40,7 +39,7 @@ export async function GET() {
 
     const currentPeriodOrders = await prisma.order.count({
       where: {
-        status: 'PAID',
+        status: "PAID",
         createdAt: {
           gte: currentStartDate,
           lt: currentEndDate,
@@ -52,7 +51,7 @@ export async function GET() {
     const previousPeriodSalesAggregate = await prisma.order.aggregate({
       _sum: { amount: true },
       where: {
-        status: 'PAID',
+        status: "PAID",
         createdAt: {
           gte: previousStartDate,
           lt: previousEndDate,
@@ -72,7 +71,7 @@ export async function GET() {
 
     const previousPeriodOrders = await prisma.order.count({
       where: {
-        status: 'PAID',
+        status: "PAID",
         createdAt: {
           gte: previousStartDate,
           lt: previousEndDate,
@@ -88,9 +87,18 @@ export async function GET() {
       return ((current - previous) / previous) * 100;
     };
 
-    const salesChange = calculatePercentageChange(currentPeriodSales, previousPeriodSales);
-    const visitorsChange = calculatePercentageChange(currentPeriodVisitors, previousPeriodVisitors);
-    const ordersChange = calculatePercentageChange(currentPeriodOrders, previousPeriodOrders);
+    const salesChange = calculatePercentageChange(
+      currentPeriodSales,
+      previousPeriodSales,
+    );
+    const visitorsChange = calculatePercentageChange(
+      currentPeriodVisitors,
+      previousPeriodVisitors,
+    );
+    const ordersChange = calculatePercentageChange(
+      currentPeriodOrders,
+      previousPeriodOrders,
+    );
 
     const stats = {
       totalSales: currentPeriodSales,
@@ -99,12 +107,15 @@ export async function GET() {
       visitorsChange,
       totalOrders: currentPeriodOrders,
       ordersChange,
-      conversionRate: currentPeriodVisitors > 0 ? (currentPeriodOrders / currentPeriodVisitors) * 100 : 0,
+      conversionRate:
+        currentPeriodVisitors > 0
+          ? (currentPeriodOrders / currentPeriodVisitors) * 100
+          : 0,
     };
 
     return NextResponse.json(stats);
   } catch (error) {
-    console.error('Error fetching admin stats:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Error fetching admin stats:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

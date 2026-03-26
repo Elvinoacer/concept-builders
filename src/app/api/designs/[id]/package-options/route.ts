@@ -1,15 +1,21 @@
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id: designId } = params;
+    const { id: designId } = await params;
     const body = await req.json();
     const { name, price, file } = body;
 
     if (!name || !price) {
-      return new NextResponse('Missing name or price', { status: 400 });
+      return new NextResponse("Missing name or price", { status: 400 });
     }
 
     const packageOptionData: any = {
@@ -25,7 +31,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         create: {
           name: file.originalFileName,
           url: file.url,
-          type: 'FILE',
+          type: "FILE",
           version: 1,
           isLatest: true,
           fileIdentifier: file.originalFileName,
@@ -42,7 +48,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     return NextResponse.json(newPackageOption, { status: 201 });
   } catch (error) {
-    console.error('Error creating package option:', error);
+    console.error("Error creating package option:", error);
     return new NextResponse(error.message, { status: 500 });
   }
 }

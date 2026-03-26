@@ -1,14 +1,25 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function GET() {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { success: false, error: "Disabled in production" },
+      { status: 403 },
+    );
+  }
+
   const resend = new Resend(process.env.RESEND_API_KEY);
   const adminEmail = process.env.ADMIN_EMAIL;
 
   try {
     console.log(
       "Testing Resend with API Key:",
-      process.env.RESEND_API_KEY ? "Set" : "Missing"
+      process.env.RESEND_API_KEY ? "Set" : "Missing",
     );
 
     const { data, error } = await resend.emails.send({
@@ -29,7 +40,7 @@ export async function GET() {
     console.error("Unexpected error:", error);
     return NextResponse.json(
       { success: false, error: String(error) },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { revalidateTag } from "next/cache";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const { id } = await params;
     const { searchParams } = request.nextUrl;
@@ -96,6 +100,9 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -121,6 +128,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const { id } = await params;
     await prisma.category.delete({

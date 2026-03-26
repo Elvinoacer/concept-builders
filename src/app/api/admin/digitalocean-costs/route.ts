@@ -1,25 +1,37 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function GET(request: NextRequest) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const digitalOceanApiKey = process.env.DIGITALOCEAN_API_KEY;
 
     if (!digitalOceanApiKey) {
-      return new NextResponse('DigitalOcean API Key not configured.', { status: 500 });
+      return new NextResponse("DigitalOcean API Key not configured.", {
+        status: 500,
+      });
     }
 
     // Fetch Billing History
-    const billingHistoryResponse = await fetch('https://api.digitalocean.com/v2/customers/my/billing_history', {
-      headers: {
-        'Authorization': `Bearer ${digitalOceanApiKey}`,
-        'Content-Type': 'application/json',
+    const billingHistoryResponse = await fetch(
+      "https://api.digitalocean.com/v2/customers/my/billing_history",
+      {
+        headers: {
+          Authorization: `Bearer ${digitalOceanApiKey}`,
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
 
     if (!billingHistoryResponse.ok) {
       const errorData = await billingHistoryResponse.json();
-      console.error('Error fetching DigitalOcean billing history:', errorData);
-      return new NextResponse(`Error fetching billing history: ${errorData.message || billingHistoryResponse.statusText}`, { status: billingHistoryResponse.status });
+      console.error("Error fetching DigitalOcean billing history:", errorData);
+      return new NextResponse(
+        `Error fetching billing history: ${errorData.message || billingHistoryResponse.statusText}`,
+        { status: billingHistoryResponse.status },
+      );
     }
 
     const billingHistory = await billingHistoryResponse.json();
@@ -30,28 +42,37 @@ export async function GET(request: NextRequest) {
     });
 
     // Fetch Account Information for Spaces Usage
-    const accountResponse = await fetch('https://api.digitalocean.com/v2/account', {
-      headers: {
-        'Authorization': `Bearer ${digitalOceanApiKey}`,
-        'Content-Type': 'application/json',
+    const accountResponse = await fetch(
+      "https://api.digitalocean.com/v2/account",
+      {
+        headers: {
+          Authorization: `Bearer ${digitalOceanApiKey}`,
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
 
     if (!accountResponse.ok) {
       const errorData = await accountResponse.json();
-      console.error('Error fetching DigitalOcean account info:', errorData);
-      return new NextResponse(`Error fetching account info: ${errorData.message || accountResponse.statusText}`, { status: accountResponse.status });
+      console.error("Error fetching DigitalOcean account info:", errorData);
+      return new NextResponse(
+        `Error fetching account info: ${errorData.message || accountResponse.statusText}`,
+        { status: accountResponse.status },
+      );
     }
 
     const accountInfo = await accountResponse.json();
     // DigitalOcean API does not directly provide 'storageUsedGB' in /v2/account
     // This would typically be part of a more detailed billing or usage report,
-    // or calculated from individual Spaces object sizes. 
+    // or calculated from individual Spaces object sizes.
     // For now, we'll use a placeholder or assume it's part of the billing breakdown if available.
     // If not directly available, a more complex solution involving listing spaces and summing object sizes would be needed.
-    const storageUsedGB = accountInfo.account.spaces_usage_bytes ? accountInfo.account.spaces_usage_bytes / (1024 * 1024 * 1024) : 0;
-    const bandwidthUsedGB = accountInfo.account.bandwidth_usage_bytes ? accountInfo.account.bandwidth_usage_bytes / (1024 * 1024 * 1024) : 0;
-
+    const storageUsedGB = accountInfo.account.spaces_usage_bytes
+      ? accountInfo.account.spaces_usage_bytes / (1024 * 1024 * 1024)
+      : 0;
+    const bandwidthUsedGB = accountInfo.account.bandwidth_usage_bytes
+      ? accountInfo.account.bandwidth_usage_bytes / (1024 * 1024 * 1024)
+      : 0;
 
     const digitalOceanCosts = {
       totalUsage: totalUsage,
@@ -61,7 +82,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(digitalOceanCosts);
   } catch (error) {
-    console.error('Error fetching DigitalOcean costs:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Error fetching DigitalOcean costs:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

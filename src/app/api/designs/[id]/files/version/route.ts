@@ -7,21 +7,39 @@ import {
   getDoSpacesPublicUrl,
   DO_SPACES_BUCKET_NAME,
 } from "@/lib/do-spaces";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function POST(
   request: NextRequest,
   {
     params,
   }: {
-    params: { id: string };
-  }
+    params: Promise<{ id: string }>;
+  },
 ) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const { id: designId } = await params;
-    const { fileIdentifier, fileName, fileType, fileTypeCategory, originalFileName } = await request.json();
+    const {
+      fileIdentifier,
+      fileName,
+      fileType,
+      fileTypeCategory,
+      originalFileName,
+    } = await request.json();
 
-    if (!fileIdentifier || !fileName || !fileType || !fileTypeCategory || !originalFileName) {
-      return new NextResponse("Missing required fields for version upload", { status: 400 });
+    if (
+      !fileIdentifier ||
+      !fileName ||
+      !fileType ||
+      !fileTypeCategory ||
+      !originalFileName
+    ) {
+      return new NextResponse("Missing required fields for version upload", {
+        status: 400,
+      });
     }
 
     // 1. Find the current latest version and mark it as not latest

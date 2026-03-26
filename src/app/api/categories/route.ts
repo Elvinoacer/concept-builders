@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { revalidateTag, unstable_cache } from "next/cache";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function GET(request: NextRequest) {
   try {
@@ -130,6 +131,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: Request) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   try {
     const body = await request.json();
     const { name } = body;

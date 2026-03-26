@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { Resend } from "resend";
+import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { error } = await requireAdminOrTeam();
+  if (error) return error;
+
   const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const { id } = await params;
@@ -19,7 +23,14 @@ export async function POST(
     if (!purchase) {
       return NextResponse.json(
         { error: "Purchase not found" },
-        { status: 404 }
+        { status: 404 },
+      );
+    }
+
+    if (purchase.userId !== id) {
+      return NextResponse.json(
+        { error: "Purchase does not belong to this user" },
+        { status: 400 },
       );
     }
 
@@ -36,7 +47,7 @@ export async function POST(
     console.error("Error resending receipt:", error);
     return NextResponse.json(
       { error: "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
