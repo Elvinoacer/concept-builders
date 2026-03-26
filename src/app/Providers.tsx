@@ -5,8 +5,7 @@ import { SessionProvider, signOut, useSession } from "next-auth/react";
 import { Toaster } from "sonner";
 import ImpersonationBanner from "@/components/admin/ImpersonationBanner";
 import { CartSync } from "@/components/cart/CartSync";
-import { getSocket, disconnectSocket } from "@/lib/socket";
-import { Socket } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 
 // Create a SocketContext
 interface SocketContextType {
@@ -33,39 +32,62 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
   }, [session?.error]);
 
   useEffect(() => {
+    let mounted = true;
+    let cleanupSocket: (() => void) | null = null;
+
     if (session?.user?.id) {
-      const newSocket = getSocket(session.user.id as string);
-      if (!newSocket) {
-        setSocket(null);
-        return;
-      }
+      (async () => {
+        const { getSocket, disconnectSocket } = await import("@/lib/socket");
+        if (!mounted) return;
 
-      setSocket(newSocket);
+        const newSocket = getSocket(session.user.id as string);
+        if (!newSocket) {
+          setSocket(null);
+          return;
+        }
 
-      newSocket.on("currentOnlineUsers", (users: string[]) => {
-        setOnlineUsers(users);
-      });
+        setSocket(newSocket);
 
-      newSocket.on("userOnline", (userId: string) => {
-        setOnlineUsers((prevUsers) => [...prevUsers, userId]);
-      });
+        const handleCurrentOnlineUsers = (users: string[]) => {
+          setOnlineUsers(users);
+        };
 
-      newSocket.on("userOffline", (userId: string) => {
-        setOnlineUsers((prevUsers) =>
-          prevUsers.filter((user) => user !== userId),
-        );
-      });
+        const handleUserOnline = (userId: string) => {
+          setOnlineUsers((prevUsers) => [...prevUsers, userId]);
+        };
 
-      // Emit join event when socket is connected
-      newSocket.on("connect", () => {
-        newSocket.emit("join", session.user.id);
-      });
+        const handleUserOffline = (userId: string) => {
+          setOnlineUsers((prevUsers) =>
+            prevUsers.filter((user) => user !== userId),
+          );
+        };
 
-      return () => {
-        disconnectSocket();
-        setSocket(null);
-      };
+        const handleConnect = () => {
+          newSocket.emit("join", session.user.id);
+        };
+
+        newSocket.on("currentOnlineUsers", handleCurrentOnlineUsers);
+        newSocket.on("userOnline", handleUserOnline);
+        newSocket.on("userOffline", handleUserOffline);
+        newSocket.on("connect", handleConnect);
+
+        cleanupSocket = () => {
+          newSocket.off("currentOnlineUsers", handleCurrentOnlineUsers);
+          newSocket.off("userOnline", handleUserOnline);
+          newSocket.off("userOffline", handleUserOffline);
+          newSocket.off("connect", handleConnect);
+          disconnectSocket();
+          if (mounted) {
+            setSocket(null);
+          }
+        };
+      })();
     }
+
+    return () => {
+      mounted = false;
+      cleanupSocket?.();
+    };
   }, [session?.user?.id]);
 
   return (

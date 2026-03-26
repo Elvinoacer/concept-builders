@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Toaster } from "sonner";
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
@@ -211,13 +210,6 @@ export default function RootLayout({
         <meta name="google" content="notranslate" />
       </head>
       <body className="antialiased min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary-foreground">
-        <div id="cb-cursor" className="cb-cursor hidden" aria-hidden="true" />
-        <div
-          id="cb-cursor-ring"
-          className="cb-cursor-ring hidden"
-          aria-hidden="true"
-        />
-
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -231,33 +223,6 @@ export default function RootLayout({
               {children}
             </div>
           </Providers>
-
-          {/* Enhanced Toaster with mobile positioning */}
-          <Toaster
-            position="top-center"
-            duration={4000}
-            closeButton
-            richColors
-            theme="system"
-            visibleToasts={3}
-            toastOptions={{
-              style: {
-                background: "hsl(var(--background))",
-                color: "hsl(var(--foreground))",
-                border: "1px solid hsl(var(--border))",
-                fontSize: "14px",
-                maxWidth: "calc(100vw - 32px)",
-                margin: "8px",
-              },
-              classNames: {
-                toast: "!rounded-xl !shadow-lg !border",
-                success: "!border-green-200 dark:!border-green-800",
-                error: "!border-red-200 dark:!border-red-800",
-                warning: "!border-yellow-200 dark:!border-yellow-800",
-                info: "!border-blue-200 dark:!border-blue-800",
-              },
-            }}
-          />
         </ThemeProvider>
 
         {/* Performance and Analytics */}
@@ -323,68 +288,6 @@ export default function RootLayout({
               } else {
                 document.body.classList.add('no-touch-device');
               }
-            `,
-          }}
-        />
-
-        <Script
-          id="custom-cursor"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function () {
-                const supportsFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-                if (!supportsFinePointer) return;
-
-                const cursor = document.getElementById('cb-cursor');
-                const ring = document.getElementById('cb-cursor-ring');
-                if (!cursor || !ring) return;
-
-                document.body.classList.add('custom-cursor-enabled');
-                cursor.classList.remove('hidden');
-                ring.classList.remove('hidden');
-
-                let mx = 0;
-                let my = 0;
-                let rx = 0;
-                let ry = 0;
-
-                const animateCursor = () => {
-                  rx += (mx - rx) * 0.15;
-                  ry += (my - ry) * 0.15;
-                  cursor.style.left = mx + 'px';
-                  cursor.style.top = my + 'px';
-                  ring.style.left = rx + 'px';
-                  ring.style.top = ry + 'px';
-                  requestAnimationFrame(animateCursor);
-                };
-
-                document.addEventListener('mousemove', function (event) {
-                  mx = event.clientX;
-                  my = event.clientY;
-                }, { passive: true });
-
-                const onPointerOver = function (event) {
-                  const target = event.target;
-                  if (!(target instanceof Element)) return;
-                  if (target.closest('a, button, input, textarea, select, label, [role="button"], [tabindex]:not([tabindex="-1"])')) {
-                    ring.classList.add('expand');
-                  }
-                };
-
-                const onPointerOut = function (event) {
-                  const target = event.target;
-                  if (!(target instanceof Element)) return;
-                  if (target.closest('a, button, input, textarea, select, label, [role="button"], [tabindex]:not([tabindex="-1"])')) {
-                    ring.classList.remove('expand');
-                  }
-                };
-
-                document.addEventListener('mouseover', onPointerOver, { passive: true });
-                document.addEventListener('mouseout', onPointerOut, { passive: true });
-
-                animateCursor();
-              })();
             `,
           }}
         />
