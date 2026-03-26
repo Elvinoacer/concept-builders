@@ -58,6 +58,30 @@ Impact:
 - Removes unnecessary relationship assumption in client ranking logic.
 - More deterministic and cheap ranking path.
 
+### 5) Designs sales path optimization (list + detail)
+
+- List API optimized: src/app/api/designs/route.ts
+- Infinite grid consumer updated: src/components/design-showcase/PublicDesignsInfiniteGrid.tsx
+- Homepage list consumer updated: src/app/(public)/page.tsx
+- Featured list consumer updated: src/components/design-showcase/FeaturedDesigns.tsx
+- Design detail page optimized: src/app/(public)/designs/[id]/page.tsx
+- Design tabs count endpoint optimized: src/app/api/designs/tabs-count/route.ts
+
+Changes:
+
+- Added cursor-first public list mode for faster first and subsequent pages.
+- Added includeTotals=false mode to skip expensive count queries for feed consumers.
+- Added lite=true mode for minimal card payloads in high-traffic lists.
+- Added cached query path for public design detail page with tags.
+- Removed unused heavy relations from public design detail query.
+- Parallelized tab count queries via transaction and added cache headers.
+
+Impact:
+
+- Better throughput for design listing requests (the platform core path).
+- Lower DB work and payload size for homepage, featured strip, and grids.
+- Faster repeat detail page responses under high traffic.
+
 ## API best practices for massive growth
 
 1. Always bound result size
@@ -133,24 +157,19 @@ Note:
 
 ## High-priority next optimization targets in this codebase
 
-1. Public feed endpoints
-
-- src/app/api/designs/route.ts
-- Add optional “includeTotals=false” path to skip count queries for infinite scroll clients.
-
-2. Admin heavy tables
+1. Admin heavy tables
 
 - src/app/api/admin/users/route.ts
 - src/app/api/admin/projects/route.ts
 - src/app/api/admin/custom-design-requests/route.ts
 - Ensure all are paginated, searchable, and field-limited.
 
-3. Content/admin posts endpoint
+2. Content/admin posts endpoint
 
 - src/app/api/posts/route.ts
 - Move to paginated contract and avoid full-table reads for large blog volumes.
 
-4. Count-heavy dashboards
+3. Count-heavy dashboards
 
 - src/app/api/admin/dashboard/kpis/route.ts
 - src/app/api/admin/analytics/route.ts

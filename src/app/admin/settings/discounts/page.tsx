@@ -72,9 +72,24 @@ interface DiscountFormState {
   description?: string;
 }
 
+type DiscountWithRelations = Discount & {
+  description?: string | null;
+  designs?: Array<{ designId: string }>;
+};
+
+type DesignOptionApiItem = {
+  id: string;
+  name: string;
+};
+
+const getErrorMessage = (err: unknown) =>
+  err instanceof Error ? err.message : "Something went wrong";
+
 const DiscountsPage = () => {
-  const [discounts, setDiscounts] = useState<Discount[]>([]);
-  const [filteredDiscounts, setFilteredDiscounts] = useState<Discount[]>([]);
+  const [discounts, setDiscounts] = useState<DiscountWithRelations[]>([]);
+  const [filteredDiscounts, setFilteredDiscounts] = useState<
+    DiscountWithRelations[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formState, setFormState] = useState<DiscountFormState>({
@@ -90,11 +105,11 @@ const DiscountsPage = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentDiscountId, setCurrentDiscountId] = useState<string | null>(
-    null
+    null,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [designs, setDesigns] = useState<{ value: string; label: string }[]>(
-    []
+    [],
   );
   const [selectedDesigns, setSelectedDesigns] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -102,11 +117,11 @@ const DiscountsPage = () => {
     "all" | "active" | "inactive"
   >("all");
   const [typeFilter, setTypeFilter] = useState<"all" | DiscountType>(
-    DiscountType.PERCENTAGE
+    DiscountType.PERCENTAGE,
   );
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [activeOperations, setActiveOperations] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   const fetchDiscounts = async () => {
@@ -117,12 +132,13 @@ const DiscountsPage = () => {
       if (!res.ok) {
         throw new Error("Failed to fetch discounts");
       }
-      const data: Discount[] = await res.json();
+      const data: DiscountWithRelations[] = await res.json();
       setDiscounts(data);
       setFilteredDiscounts(data);
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(err.message);
+    } catch (err: unknown) {
+      const message = getErrorMessage(err);
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -144,14 +160,14 @@ const DiscountsPage = () => {
           discount.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
           discount.description
             ?.toLowerCase()
-            .includes(searchQuery.toLowerCase())
+            .includes(searchQuery.toLowerCase()),
       );
     }
 
     // Status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter((discount) =>
-        statusFilter === "active" ? discount.isActive : !discount.isActive
+        statusFilter === "active" ? discount.isActive : !discount.isActive,
       );
     }
 
@@ -165,21 +181,21 @@ const DiscountsPage = () => {
 
   const fetchDesigns = async () => {
     try {
-      const res = await fetch("/api/designs");
+      const res = await fetch(
+        "/api/designs?limit=200&lite=true&includeTotals=false",
+      );
       if (!res.ok) {
         throw new Error("Failed to fetch designs");
       }
-      const data = await res.json();
-      setDesigns(
-        data.designs.map((d: any) => ({ value: d.id, label: d.name }))
-      );
-    } catch (err: any) {
-      toast.error(err.message);
+      const data: { designs: DesignOptionApiItem[] } = await res.json();
+      setDesigns(data.designs.map((d) => ({ value: d.id, label: d.name })));
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value, type } = e.target;
     setFormState((prev) => ({
@@ -226,7 +242,7 @@ const DiscountsPage = () => {
       newCode = "";
       for (let i = 0; i < codeLength; i++) {
         newCode += characters.charAt(
-          Math.floor(Math.random() * characters.length)
+          Math.floor(Math.random() * characters.length),
         );
       }
     } while (discounts.some((d) => d.code === newCode));
@@ -253,7 +269,7 @@ const DiscountsPage = () => {
 
     setIsSubmitting(true);
     setActiveOperations((prev) =>
-      new Set(prev).add(formState.id ? `edit-${formState.id}` : "create")
+      new Set(prev).add(formState.id ? `edit-${formState.id}` : "create"),
     );
 
     try {
@@ -282,13 +298,13 @@ const DiscountsPage = () => {
       }
 
       toast.success(
-        `Discount ${formState.id ? "updated" : "created"} successfully!`
+        `Discount ${formState.id ? "updated" : "created"} successfully!`,
       );
       resetForm();
       setIsEditDialogOpen(false);
       fetchDiscounts();
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
       setActiveOperations((prev) => {
@@ -299,7 +315,7 @@ const DiscountsPage = () => {
     }
   };
 
-  const handleEdit = (discount: any) => {
+  const handleEdit = (discount: DiscountWithRelations) => {
     setFormState({
       id: discount.id,
       code: discount.code,
@@ -313,7 +329,7 @@ const DiscountsPage = () => {
       isActive: discount.isActive,
       description: discount.description || "",
     });
-    setSelectedDesigns(discount.designs?.map((d: any) => d.designId) || []);
+    setSelectedDesigns(discount.designs?.map((d) => d.designId) || []);
     setIsEditDialogOpen(true);
   };
 
@@ -321,7 +337,7 @@ const DiscountsPage = () => {
     if (!currentDiscountId) return;
 
     setActiveOperations((prev) =>
-      new Set(prev).add(`delete-${currentDiscountId}`)
+      new Set(prev).add(`delete-${currentDiscountId}`),
     );
     try {
       const res = await fetch(`/api/admin/discounts?id=${currentDiscountId}`, {
@@ -337,8 +353,8 @@ const DiscountsPage = () => {
       setIsDeleteDialogOpen(false);
       setCurrentDiscountId(null);
       fetchDiscounts();
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setActiveOperations((prev) => {
         const newSet = new Set(prev);
@@ -360,22 +376,22 @@ const DiscountsPage = () => {
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(
-          errorData.message || "Failed to update discount status"
+          errorData.message || "Failed to update discount status",
         );
       }
 
       toast.success(`Discount ${newIsActive ? "activated" : "deactivated"}!`);
       setDiscounts((prevDiscounts) =>
         prevDiscounts.map((d) =>
-          d.id === id ? { ...d, isActive: newIsActive } : d
-        )
+          d.id === id ? { ...d, isActive: newIsActive } : d,
+        ),
       );
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
       setDiscounts((prevDiscounts) =>
         prevDiscounts.map((d) =>
-          d.id === id ? { ...d, isActive: !newIsActive } : d
-        )
+          d.id === id ? { ...d, isActive: !newIsActive } : d,
+        ),
       );
     } finally {
       setActiveOperations((prev) => {
@@ -476,7 +492,7 @@ const DiscountsPage = () => {
   );
 
   // Discount Card Component
-  const DiscountCard = ({ discount }: { discount: Discount }) => (
+  const DiscountCard = ({ discount }: { discount: DiscountWithRelations }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -1026,7 +1042,6 @@ const DiscountsPage = () => {
                       options={designs}
                       selected={selectedDesigns}
                       onChange={setSelectedDesigns}
-                      placeholder="Select designs (leave empty for all designs)"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Select specific designs this discount applies to. Leave
@@ -1089,7 +1104,9 @@ const DiscountsPage = () => {
               {/* Status Filter */}
               <Select
                 value={statusFilter}
-                onValueChange={(value: any) => setStatusFilter(value)}
+                onValueChange={(value: "all" | "active" | "inactive") =>
+                  setStatusFilter(value)
+                }
               >
                 <SelectTrigger className="h-11 min-w-[140px]">
                   <SelectValue placeholder="Status" />
@@ -1104,7 +1121,9 @@ const DiscountsPage = () => {
               {/* Type Filter */}
               <Select
                 value={typeFilter}
-                onValueChange={(value: any) => setTypeFilter(value)}
+                onValueChange={(value: "all" | DiscountType) =>
+                  setTypeFilter(value)
+                }
               >
                 <SelectTrigger className="h-11 min-w-[140px]">
                   <SelectValue placeholder="Type" />
@@ -1159,7 +1178,7 @@ const DiscountsPage = () => {
               </span>
               {searchQuery && (
                 <Badge variant="secondary" className="text-sm">
-                  Search: "{searchQuery}"
+                  Search: {searchQuery}
                   <button
                     onClick={() => setSearchQuery("")}
                     className="ml-1 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full p-0.5"

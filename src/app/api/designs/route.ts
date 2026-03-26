@@ -46,9 +46,17 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const search = (searchParams.get("search") || "").trim();
     const cursor = searchParams.get("cursor");
+    const mode = searchParams.get("mode");
+    const lite = searchParams.get("lite") === "true";
+    const includeTotals = searchParams.get("includeTotals") !== "false";
+    const useCursorPagination =
+      !isAdmin &&
+      (mode === "cursor" || Boolean(cursor) || !searchParams.has("page"));
+
+    const maxLimit = lite ? 200 : 50;
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const limit = Math.min(
-      50,
+      maxLimit,
       Math.max(1, parseInt(searchParams.get("limit") || "10", 10)),
     );
     const skip = (page - 1) * limit;
@@ -79,7 +87,7 @@ export async function GET(request: NextRequest) {
       const matchedIds = ftsMatches.map((row) => row.id);
       if (matchedIds.length === 0) {
         return NextResponse.json(
-          cursor
+          useCursorPagination
             ? {
                 designs: [],
                 nextCursor: null,
@@ -179,12 +187,25 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    if (!isAdmin && cursor) {
-      const designs = await prisma.design.findMany({
-        where,
-        take: limit + 1,
-        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-        select: {
+    const publicSelect: NonNullable<FindManyArgs["select"]> = lite
+      ? {
+          id: true,
+          name: true,
+          basePrice: true,
+          bedrooms: true,
+          bathrooms: true,
+          area: true,
+          floors: true,
+          isFeatured: true,
+          views: true,
+          category: { select: { id: true, name: true } },
+          images: {
+            where: { type: "IMAGE" },
+            take: 1,
+            select: { url: true, name: true, type: true },
+          },
+        }
+      : {
           id: true,
           name: true,
           description: true,
@@ -210,7 +231,14 @@ export async function GET(request: NextRequest) {
               },
             },
           },
-        },
+        };
+
+    if (!isAdmin && useCursorPagination) {
+      const designs = await prisma.design.findMany({
+        where,
+        take: limit + 1,
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+        select: publicSelect,
         orderBy,
       });
 
@@ -223,6 +251,88 @@ export async function GET(request: NextRequest) {
           designs: items,
           nextCursor,
           hasMore,
+        },
+        {
+          headers: {
+            "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+          },
+        },
+      );
+    }
+
+    if (isAdmin && lite) {
+      if (!includeTotals) {
+        const designs = await prisma.design.findMany({
+          where,
+          skip,
+          take: limit,
+          select: {
+            id: true,
+            name: true,
+            basePrice: true,
+            isFeatured: true,
+          },
+          orderBy,
+        });
+
+        return NextResponse.json(
+          {
+            designs,
+            totalPages: null,
+            totalDesigns: null,
+          },
+          {
+            headers: {
+              "Cache-Control": "private, no-store",
+            },
+          },
+        );
+      }
+
+      const [designs, totalDesigns] = await prisma.$transaction([
+        prisma.design.findMany({
+          where,
+          skip,
+          take: limit,
+          select: {
+            id: true,
+            name: true,
+            basePrice: true,
+            isFeatured: true,
+          },
+          orderBy,
+        }),
+        prisma.design.count({ where }),
+      ]);
+
+      return NextResponse.json(
+        {
+          designs,
+          totalPages: Math.ceil(totalDesigns / limit),
+          totalDesigns,
+        },
+        {
+          headers: {
+            "Cache-Control": "private, no-store",
+          },
+        },
+      );
+    }
+
+    if (!isAdmin && !includeTotals) {
+      const designs = await prisma.design.findMany({
+        where,
+        skip,
+        take: limit,
+        select: publicSelect,
+        orderBy,
+      });
+
+      return NextResponse.json(
+        {
+          designs,
+          totalPages: null,
+          totalDesigns: null,
         },
         {
           headers: {
@@ -277,33 +387,7 @@ export async function GET(request: NextRequest) {
             where,
             skip,
             take: limit,
-            select: {
-              id: true,
-              name: true,
-              description: true,
-              basePrice: true,
-              bedrooms: true,
-              bathrooms: true,
-              area: true,
-              floors: true,
-              isFeatured: true,
-              createdAt: true,
-              updatedAt: true,
-              views: true,
-              category: { select: { id: true, name: true } },
-              images: {
-                where: { type: "IMAGE" },
-                take: 1,
-                select: { url: true, name: true, type: true },
-              },
-              discounts: {
-                select: {
-                  discount: {
-                    select: { value: true, code: true, isActive: true },
-                  },
-                },
-              },
-            },
+            select: publicSelect,
             orderBy,
           }),
           prisma.design.count({ where }),

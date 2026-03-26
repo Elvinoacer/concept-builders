@@ -27,7 +27,13 @@ export async function GET(
         floorPlans: true,
         reviews: {
           include: {
-            author: true,
+            author: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
           },
         },
 

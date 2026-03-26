@@ -62,6 +62,9 @@ export default function PublicDesignsInfiniteGrid({
 
     const params = new URLSearchParams();
     params.set("limit", "9");
+    params.set("mode", "cursor");
+    params.set("includeTotals", "false");
+    params.set("lite", "true");
     if (search) params.set("search", search);
     if (category && category !== "All") {
       params.set("styles", category);

@@ -15,7 +15,9 @@ const FeaturedDesigns = () => {
     const fetchDesigns = async () => {
       setLoading(true);
       try {
-        const response = await fetch("/api/designs?limit=5&isFeatured=true");
+        const response = await fetch(
+          "/api/designs?limit=5&isFeatured=true&mode=cursor&includeTotals=false&lite=true",
+        );
         const data = await response.json();
         setFeaturedDesigns(data.designs);
       } catch (error) {

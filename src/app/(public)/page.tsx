@@ -127,7 +127,9 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const [designsRes, feedbackRes] = await Promise.all([
-          fetch("/api/designs?limit=12&page=1"),
+          fetch(
+            "/api/designs?limit=12&mode=cursor&includeTotals=false&lite=true",
+          ),
           fetch("/api/featured-feedback"),
         ]);
 
