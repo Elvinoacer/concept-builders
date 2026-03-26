@@ -2,10 +2,19 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { SessionProvider, signOut, useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
 import { Toaster } from "sonner";
-import ImpersonationBanner from "@/components/admin/ImpersonationBanner";
-import { CartSync } from "@/components/cart/CartSync";
 import type { Socket } from "socket.io-client";
+
+const CartSync = dynamic(
+  () => import("@/components/cart/CartSync").then((mod) => mod.CartSync),
+  { ssr: false },
+);
+
+const ImpersonationBanner = dynamic(
+  () => import("@/components/admin/ImpersonationBanner"),
+  { ssr: false },
+);
 
 // Create a SocketContext
 interface SocketContextType {

@@ -1,9 +1,9 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
-import PublicThemeToggle from "@/components/ui/public-theme-toggle";
+import { headers } from "next/headers";
+import LandingNav from "@/components/landing/LandingNav";
+
+export const revalidate = 300;
 
 type DesignItem = {
   id: string;
@@ -20,99 +20,82 @@ type FeaturedFeedback = {
   message: string;
 };
 
-function useReveal<T extends HTMLElement>(delay = 0) {
-  const ref = useRef<T | null>(null);
+async function getBaseUrl() {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
 
-  return {
-    ref,
-    className: "reveal visible",
-    style: { transitionDelay: `${delay}ms` },
-  };
-}
+  if (host) {
+    return `${proto}://${host}`;
+  }
 
-function useCountUp(target: number) {
-  return target;
-}
-
-export default function Home() {
-  const [navScrolled, setNavScrolled] = useState(false);
-  const activeBannerIndex = 0;
-  const [designs, setDesigns] = useState<DesignItem[]>([]);
-  const [feedback, setFeedback] = useState<FeaturedFeedback | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const heroBanners = useMemo(
-    () => [
-      "/images/banners/banner1.webp",
-      "/images/banners/banner2.webp",
-      "/images/banners/banner3.webp",
-      "/images/banners/banner4.webp",
-      "/images/banners/banner5.webp",
-      "/images/banners/banner6.webp",
-    ],
-    [],
+  return (
+    process.env.NEXT_PUBLIC_URL ??
+    process.env.NEXTAUTH_URL ??
+    "http://localhost:3000"
   );
+}
 
-  useEffect(() => {
-    const onScroll = () => setNavScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+async function getHomepageData() {
+  const baseUrl = await getBaseUrl();
 
-  useEffect(() => {
-    document.body.classList.add("landing-redesign-active");
-    return () => document.body.classList.remove("landing-redesign-active");
-  }, []);
+  try {
+    const [designsRes, feedbackRes] = await Promise.all([
+      fetch(
+        `${baseUrl}/api/designs?limit=12&mode=cursor&includeTotals=false&lite=true`,
+        { next: { revalidate } },
+      ),
+      fetch(`${baseUrl}/api/featured-feedback`, { next: { revalidate } }),
+    ]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [designsRes, feedbackRes] = await Promise.all([
-          fetch(
-            "/api/designs?limit=12&mode=cursor&includeTotals=false&lite=true",
-          ),
-          fetch("/api/featured-feedback"),
-        ]);
+    const designsPayload = designsRes.ok ? await designsRes.json() : null;
+    const feedbackPayload = feedbackRes.ok ? await feedbackRes.json() : null;
 
-        if (designsRes.ok) {
-          const data = await designsRes.json();
-          setDesigns(data.designs || []);
-        }
+    const designs: DesignItem[] = Array.isArray(designsPayload?.designs)
+      ? designsPayload.designs
+      : [];
 
-        if (feedbackRes.ok) {
-          const data = await feedbackRes.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setFeedback({ name: data[0].name, message: data[0].message });
+    const feedback: FeaturedFeedback | null =
+      Array.isArray(feedbackPayload) && feedbackPayload.length > 0
+        ? {
+            name: feedbackPayload[0].name,
+            message: feedbackPayload[0].message,
           }
-        }
-      } catch (error) {
-        console.error("Failed to load landing data:", error);
-      }
-    };
+        : null;
 
-    fetchData();
-  }, []);
+    return { designs, feedback };
+  } catch {
+    return { designs: [] as DesignItem[], feedback: null };
+  }
+}
 
-  const bestSellingPlans = useMemo(() => {
-    return [...designs]
-      .sort((a, b) => (b.views || 0) - (a.views || 0))
-      .slice(0, 3);
-  }, [designs]);
+export default async function Home() {
+  const { designs, feedback } = await getHomepageData();
 
-  const countPlans = useCountUp(500);
-  const countHomeowners = useCountUp(1200);
-  const countCounties = useCountUp(47);
-  const countYears = useCountUp(12);
+  const heroBanners = [
+    "/images/banners/banner1.webp",
+    "/images/banners/banner2.webp",
+    "/images/banners/banner3.webp",
+    "/images/banners/banner4.webp",
+    "/images/banners/banner5.webp",
+    "/images/banners/banner6.webp",
+  ];
 
-  const headerReveal = useReveal<HTMLDivElement>(0);
-  const stepRevealOne = useReveal<HTMLDivElement>(0);
-  const stepRevealTwo = useReveal<HTMLDivElement>(150);
-  const stepRevealThree = useReveal<HTMLDivElement>(300);
-  const plansReveal = useReveal<HTMLDivElement>(0);
-  const plansFooterReveal = useReveal<HTMLDivElement>(100);
-  const testimonialLeftReveal = useReveal<HTMLDivElement>(0);
-  const testimonialRightReveal = useReveal<HTMLDivElement>(200);
-  const ctaReveal = useReveal<HTMLDivElement>(0);
+  const bestSellingPlans = [...designs]
+    .sort((a, b) => (b.views || 0) - (a.views || 0))
+    .slice(0, 3);
+
+  const activeBannerIndex = 0;
+  const countPlans = 500;
+  const countHomeowners = 1200;
+  const countCounties = 47;
+  const countYears = 12;
+  const revealClass = "reveal visible";
+  const revealDelay0 = { transitionDelay: "0ms" };
+  const revealDelay100 = { transitionDelay: "100ms" };
+  const revealDelay150 = { transitionDelay: "150ms" };
+  const revealDelay200 = { transitionDelay: "200ms" };
+  const revealDelay300 = { transitionDelay: "300ms" };
 
   const marqueeItems = [
     "Architectural Excellence",
@@ -125,160 +108,7 @@ export default function Home() {
 
   return (
     <div className="relative w-full overflow-x-hidden bg-ink text-cream">
-      <nav
-        className={`fixed inset-x-0 top-0 z-[100] mx-auto flex w-full items-center justify-between border-b px-6 py-6 transition-all duration-300 lg:px-[60px] ${
-          navScrolled
-            ? "border-cb-border bg-[var(--landing-nav-bg)] py-4 backdrop-blur-[20px]"
-            : "border-transparent bg-transparent"
-        }`}
-      >
-        <Link
-          href="/"
-          className="flex items-center gap-3"
-          style={{
-            fontFamily:
-              'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-          }}
-        >
-          <span className="relative h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14">
-            <Image
-              src="/images/concept-builders-logo-free-bg.png"
-              alt="Concept Builders logo"
-              fill
-              priority
-              sizes="(max-width: 640px) 40px, (max-width: 1024px) 48px, 56px"
-              className="object-contain"
-            />
-          </span>
-          <span className="text-[20px] font-medium tracking-[0.06em] text-cream sm:text-[22px]">
-            Concept Builders
-          </span>
-        </Link>
-
-        <ul className="hidden items-center gap-10 lg:flex">
-          <li>
-            <Link
-              href="/designs"
-              className="text-xs uppercase tracking-[0.12em] text-cream-dim hover:text-gold transition-colors"
-            >
-              Plans
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/categories"
-              className="text-xs uppercase tracking-[0.12em] text-cream-dim hover:text-gold transition-colors"
-            >
-              Categories
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/design-showcase"
-              className="text-xs uppercase tracking-[0.12em] text-cream-dim hover:text-gold transition-colors"
-            >
-              Showcase
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/ongoing-projects"
-              className="text-xs uppercase tracking-[0.12em] text-cream-dim hover:text-gold transition-colors"
-            >
-              Projects
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/custom-design"
-              className="border border-gold px-6 py-2.5 text-[12px] uppercase tracking-[0.16em] text-gold transition-colors hover:bg-gold hover:text-ink"
-            >
-              Start a Project
-            </Link>
-          </li>
-          <li>
-            <PublicThemeToggle className="h-9 w-9" />
-          </li>
-        </ul>
-
-        {/* Mobile hamburger button */}
-        <div className="flex items-center gap-2 lg:hidden">
-          <PublicThemeToggle className="h-9 w-9" />
-          <button
-            className="relative z-[110] flex h-10 w-10 flex-col items-center justify-center gap-[5px]"
-            onClick={() => setMobileMenuOpen((o) => !o)}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            <span
-              className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-                mobileMenuOpen ? "translate-y-[6.5px] rotate-45" : ""
-              }`}
-            />
-            <span
-              className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-                mobileMenuOpen ? "opacity-0" : ""
-              }`}
-            />
-            <span
-              className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${
-                mobileMenuOpen ? "-translate-y-[6.5px] -rotate-45" : ""
-              }`}
-            />
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile menu overlay */}
-      <div
-        className={`fixed inset-0 z-[99] bg-ink/95 backdrop-blur-md transition-all duration-500 lg:pointer-events-none lg:hidden ${
-          mobileMenuOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
-      >
-        <div className="flex h-full flex-col items-center justify-center gap-8">
-          {[
-            { href: "/designs", label: "Plans" },
-            { href: "/categories", label: "Categories" },
-            { href: "/design-showcase", label: "Showcase" },
-            { href: "/ongoing-projects", label: "Projects" },
-            { href: "/custom-design", label: "Custom Design" },
-            { href: "/contact", label: "Contact" },
-          ].map((link, i) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`text-[28px] font-light tracking-[0.08em] text-cream transition-all duration-500 hover:text-gold ${
-                mobileMenuOpen
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-4 opacity-0"
-              }`}
-              style={{
-                transitionDelay: mobileMenuOpen ? `${150 + i * 60}ms` : "0ms",
-                fontFamily:
-                  'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href="/custom-design"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`mt-4 border border-gold px-8 py-3 text-[13px] uppercase tracking-[0.16em] text-gold transition-all duration-500 hover:bg-gold hover:text-ink ${
-              mobileMenuOpen
-                ? "translate-y-0 opacity-100"
-                : "translate-y-4 opacity-0"
-            }`}
-            style={{
-              transitionDelay: mobileMenuOpen ? "510ms" : "0ms",
-            }}
-          >
-            Start a Project
-          </Link>
-        </div>
-      </div>
+      <LandingNav />
 
       <section className="relative flex min-h-screen flex-col justify-end overflow-hidden px-5 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-40 lg:px-[60px]">
         <div className="absolute inset-0 bg-[var(--surface)]" />
@@ -289,6 +119,7 @@ export default function Home() {
             alt="Concept Builders hero banner"
             fill
             priority={activeBannerIndex === 0}
+            fetchPriority="high"
             sizes="100vw"
             className="object-cover object-center opacity-40 scale-100 transition-transform duration-[5200ms] ease-out"
             style={{ opacity: "var(--landing-hero-image-opacity)" }}
@@ -451,11 +282,7 @@ export default function Home() {
       </section>
 
       <section className="border-b border-cb-border px-6 py-24 lg:px-[60px] max-[900px]:px-6 max-[900px]:py-16">
-        <div
-          ref={headerReveal.ref}
-          className={headerReveal.className}
-          style={headerReveal.style}
-        >
+        <div className={revealClass} style={revealDelay0}>
           <div className="mb-16 flex items-start justify-between gap-10 max-[900px]:flex-col">
             <div>
               <p className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-gold">
@@ -484,9 +311,8 @@ export default function Home() {
 
         <div className="grid grid-cols-3 max-[900px]:grid-cols-1">
           <div
-            ref={stepRevealOne.ref}
-            className={`${stepRevealOne.className} border-r border-cb-border pr-12 max-[900px]:border-b max-[900px]:border-r-0 max-[900px]:py-10 max-[900px]:pr-0`}
-            style={stepRevealOne.style}
+            className={`${revealClass} border-r border-cb-border pr-12 max-[900px]:border-b max-[900px]:border-r-0 max-[900px]:py-10 max-[900px]:pr-0`}
+            style={revealDelay0}
           >
             <p
               className="mb-6 text-[80px] font-light leading-none text-[rgba(200,137,42,0.12)]"
@@ -526,9 +352,8 @@ export default function Home() {
           </div>
 
           <div
-            ref={stepRevealTwo.ref}
-            className={`${stepRevealTwo.className} border-r border-cb-border px-12 max-[900px]:border-b max-[900px]:border-r-0 max-[900px]:px-0 max-[900px]:py-10`}
-            style={stepRevealTwo.style}
+            className={`${revealClass} border-r border-cb-border px-12 max-[900px]:border-b max-[900px]:border-r-0 max-[900px]:px-0 max-[900px]:py-10`}
+            style={revealDelay150}
           >
             <p
               className="mb-6 text-[80px] font-light leading-none text-[rgba(200,137,42,0.12)]"
@@ -568,9 +393,8 @@ export default function Home() {
           </div>
 
           <div
-            ref={stepRevealThree.ref}
-            className={`${stepRevealThree.className} pl-12 max-[900px]:pl-0 max-[900px]:py-10`}
-            style={stepRevealThree.style}
+            className={`${revealClass} pl-12 max-[900px]:pl-0 max-[900px]:py-10`}
+            style={revealDelay300}
           >
             <p
               className="mb-6 text-[80px] font-light leading-none text-[rgba(200,137,42,0.12)]"
@@ -614,11 +438,7 @@ export default function Home() {
       </section>
 
       <section className="border-b border-cb-border px-6 py-24 lg:px-[60px] max-[900px]:px-6 max-[900px]:py-16">
-        <div
-          ref={plansReveal.ref}
-          className={plansReveal.className}
-          style={plansReveal.style}
-        >
+        <div className={revealClass} style={revealDelay0}>
           <div className="mb-16 flex items-start justify-between gap-10 max-[900px]:flex-col">
             <div>
               <p className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-gold">
@@ -703,9 +523,8 @@ export default function Home() {
           </div>
 
           <div
-            ref={plansFooterReveal.ref}
-            className={`${plansFooterReveal.className} mt-12 flex items-center justify-between gap-6 max-[900px]:flex-col max-[900px]:items-start`}
-            style={plansFooterReveal.style}
+            className={`${revealClass} mt-12 flex items-center justify-between gap-6 max-[900px]:flex-col max-[900px]:items-start`}
+            style={revealDelay100}
           >
             <p
               className="text-[16px] text-cb-muted"
@@ -729,11 +548,7 @@ export default function Home() {
       </section>
 
       <section className="grid grid-cols-2 items-center gap-24 border-b border-cb-border px-5 py-16 sm:px-6 sm:py-28 lg:px-[60px] max-[900px]:grid-cols-1 max-[900px]:gap-10">
-        <div
-          ref={testimonialLeftReveal.ref}
-          className={testimonialLeftReveal.className}
-          style={testimonialLeftReveal.style}
-        >
+        <div className={revealClass} style={revealDelay0}>
           <p className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-gold">
             <span className="h-px w-7 bg-gold" />
             Client Stories
@@ -772,11 +587,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div
-          ref={testimonialRightReveal.ref}
-          className={testimonialRightReveal.className}
-          style={testimonialRightReveal.style}
-        >
+        <div className={revealClass} style={revealDelay200}>
           <div className="relative">
             <div className="relative overflow-hidden">
               <Image
@@ -795,11 +606,7 @@ export default function Home() {
 
       <section className="relative overflow-hidden px-5 py-16 text-center sm:px-6 sm:py-20 lg:px-[60px] lg:py-28">
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(200,137,42,0.08)_0%,transparent_70%)]" />
-        <div
-          ref={ctaReveal.ref}
-          className={ctaReveal.className}
-          style={ctaReveal.style}
-        >
+        <div className={revealClass} style={revealDelay0}>
           <p className="mb-5 text-[11px] uppercase tracking-[0.25em] text-gold">
             Begin Your Journey
           </p>
