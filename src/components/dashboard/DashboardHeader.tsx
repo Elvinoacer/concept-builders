@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,6 +29,13 @@ const DashboardHeader = ({
   setIsSidebarOpen: (isOpen: boolean) => void;
   isSidebarOpen: boolean;
 }) => {
+  type DashboardNotification = {
+    id: string;
+    title: string;
+    read: boolean;
+    createdAt: string;
+  };
+
   const { searchQuery, setSearchQuery, resultsRef } = useSearch();
   const { data: session } = useSession();
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
@@ -79,33 +86,35 @@ const DashboardHeader = ({
     }
   };
 
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<DashboardNotification[]>(
+    [],
+  );
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (session?.user?.id) {
       try {
         const response = await fetch("/api/notifications");
         if (response.ok) {
-          const data = await response.json();
+          const data: DashboardNotification[] = await response.json();
           setNotifications(data);
-          setUnreadNotificationCount(data.filter(n => !n.read).length);
+          setUnreadNotificationCount(data.filter((n) => !n.read).length);
         }
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
       }
     }
-  };
+  }, [session?.user?.id]);
 
   useEffect(() => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, [session]);
+  }, [fetchNotifications]);
 
   const handleNotificationClick = async (notificationId: string) => {
     try {
       await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'PUT',
+        method: "PUT",
       });
       fetchNotifications();
     } catch (error) {
@@ -178,18 +187,16 @@ const DashboardHeader = ({
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                 <div className="h-6 w-px bg-cb-border mx-2" />
                 <div className="flex items-center gap-1">
-                  {quickActions
-                    .slice(0, isMobile ? 1 : 2)
-                    .map((action, index) => (
-                      <Link
-                        key={action.label}
-                        href={action.href}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-cream-dim hover:text-gold hover:bg-gold/10 transition-all duration-200"
-                      >
-                        <action.icon size={12} />
-                        <span className="hidden sm:inline">{action.label}</span>
-                      </Link>
-                    ))}
+                  {quickActions.slice(0, isMobile ? 1 : 2).map((action) => (
+                    <Link
+                      key={action.label}
+                      href={action.href}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-cream-dim hover:text-gold hover:bg-gold/10 transition-all duration-200"
+                    >
+                      <action.icon size={12} />
+                      <span className="hidden sm:inline">{action.label}</span>
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>
@@ -274,17 +281,13 @@ const DashboardHeader = ({
                         key={notification.id}
                         onClick={() => handleNotificationClick(notification.id)}
                         className={`p-4 border-b border-cb-border/50 hover:bg-surface/50 transition-colors cursor-pointer ${
-                          !notification.read
-                            ? "bg-gold/5"
-                            : ""
+                          !notification.read ? "bg-gold/5" : ""
                         }`}
                       >
                         <div className="flex items-start gap-3">
                           <div
                             className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                              !notification.read
-                                ? "bg-gold"
-                                : "bg-cb-muted"
+                              !notification.read ? "bg-gold" : "bg-cb-muted"
                             }`}
                           />
                           <div className="flex-1 min-w-0">
@@ -292,7 +295,9 @@ const DashboardHeader = ({
                               {notification.title}
                             </p>
                             <p className="text-xs text-cream-dim">
-                              {new Date(notification.createdAt).toLocaleDateString()}
+                              {new Date(
+                                notification.createdAt,
+                              ).toLocaleDateString()}
                             </p>
                           </div>
                         </div>

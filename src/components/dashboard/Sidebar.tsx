@@ -505,7 +505,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
 
 const navSections = [
@@ -570,7 +570,7 @@ const Sidebar = ({
 }: SidebarProps) => {
   const pathname = usePathname();
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(
-    {}
+    {},
   );
 
   // Calculate default heights based on window height - 2/3 for top, 1/3 for bottom
@@ -715,7 +715,7 @@ const Sidebar = ({
     };
   }, [isResizingBottom]);
 
-  const sidebarVariants = {
+  const sidebarVariants: Variants = {
     open: {
       x: 0,
       transition: {
@@ -817,10 +817,7 @@ const Sidebar = ({
                 className="p-1.5 rounded-lg hover:bg-card transition-colors flex-shrink-0"
                 title="Collapse sidebar"
               >
-                <ChevronLeft
-                  size={18}
-                  className="text-cream-dim"
-                />
+                <ChevronLeft size={18} className="text-cream-dim" />
               </motion.button>
             )}
           </div>
@@ -990,10 +987,7 @@ const Sidebar = ({
           className="fixed top-4 left-4 z-40 p-2 rounded-lg bg-surface border border-cb-border shadow-lg hover:shadow-xl transition-all md:block hidden"
           title="Expand sidebar"
         >
-          <ChevronRight
-            size={18}
-            className="text-cream-dim"
-          />
+          <ChevronRight size={18} className="text-cream-dim" />
         </motion.button>
       )}
     </>

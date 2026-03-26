@@ -3,16 +3,16 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session || !session.user || !session.user.id) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const userId = session.user.id;
-
   try {
+    const userId = session.user.id;
+
     const purchasedPlans = await prisma.order.count({
       where: {
         userId,
