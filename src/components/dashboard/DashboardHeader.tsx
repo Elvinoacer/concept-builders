@@ -333,6 +333,7 @@ const DashboardHeader = ({
                     alt={session.user.name || "User Avatar"}
                     width={36}
                     height={36}
+                    unoptimized
                     className="rounded-full w-9 h-9 border-2 border-cb-border group-hover:border-gold/50 transition-colors"
                   />
                 ) : (
@@ -378,6 +379,7 @@ const DashboardHeader = ({
                           alt={session.user.name || "User"}
                           width={48}
                           height={48}
+                          unoptimized
                           className="rounded-full w-12 h-12 border-2 border-cb-border"
                         />
                       ) : (
