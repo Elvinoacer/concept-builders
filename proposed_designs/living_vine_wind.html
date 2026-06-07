@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(180deg, #d4e8c2 0%, #b5d98a 60%, #8fc455 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="vineCanvas"></canvas>
+<script>
+const canvas = document.getElementById('vineCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const W = canvas.width;
+const H = canvas.height;
+
+let time = 0;
+
+// Wind parameters
+let windStrength = 0;
+let windTarget = 0;
+let windX = 0;
+
+function noise(x, t, freq, amp) {
+  return Math.sin(x * freq + t) * amp + Math.sin(x * freq * 1.7 + t * 1.3) * amp * 0.5;
+}
+
+// Vine structure: a horizontal main stem with nodes
+const STEM_Y = H * 0.5;
+const STEM_START = W * 0.03;
+const STEM_END = W * 0.97;
+const NUM_NODES = 16;
+const NODES = [];
+
+for (let i = 0; i <= NUM_NODES; i++) {
+  const t = i / NUM_NODES;
+  NODES.push({
+    baseX: STEM_START + t * (STEM_END - STEM_START),
+    baseY: STEM_Y,
+    x: 0,
+    y: 0
+  });
+}
+
+// Leaves at each node
+const LEAVES = [];
+const leafColors = [
+  ['#2d6a0f','#4a9a1a'],
+  ['#3a7a12','#5db320'],
+  ['#1f5209','#347a0d'],
+  ['#4d8e18','#6db82a'],
+  ['#265c0c','#3d8015'],
+];
+
+for (let i = 0; i < NUM_NODES; i++) {
+  const numLeaves = Math.floor(Math.random() * 2) + 1;
+  for (let j = 0; j < numLeaves; j++) {
+    const side = (i + j) % 2 === 0 ? -1 : 1;
+    const [darkColor, lightColor] = leafColors[Math.floor(Math.random() * leafColors.length)];
+    LEAVES.push({
+      nodeIdx: i,
+      offsetX: (Math.random() - 0.5) * 20,
+      offsetY: (Math.random() - 0.5) * 12,
+      stemLen: 35 + Math.random() * 40,
+      stemAngle: side * (Math.PI * 0.3 + Math.random() * 0.5),
+      leafSize: 22 + Math.random() * 28,
+      leafRatio: 0.55 + Math.random() * 0.3,
+      leafAngle: side * (Math.PI * 0.1 + Math.random() * 0.3),
+      phase: Math.random() * Math.PI * 2,
+      phaseSpeed: 0.6 + Math.random() * 0.8,
+      dark: darkColor,
+      light: lightColor,
+      side: side,
+      wiltFactor: 0.6 + Math.random() * 0.4
+    });
+  }
+}
+
+// Tendrils
+const TENDRILS = [];
+for (let i = 1; i < NUM_NODES - 1; i += 3) {
+  const side = i % 2 === 0 ? 1 : -1;
+  TENDRILS.push({
+    nodeIdx: i,
+    side: side,
+    length: 50 + Math.random() * 60,
+    phase: Math.random() * Math.PI * 2,
+    coils: 2.5 + Math.random() * 2
+  });
+}
+
+function drawStem() {
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // Main stem - thick, woody, slightly brownish-green
+  ctx.beginPath();
+  ctx.moveTo(NODES[0].x, NODES[0].y);
+
+  for (let i = 1; i <= NUM_NODES; i++) {
+    const prev = NODES[i - 1];
+    const curr = NODES[i];
+    const cpx = (prev.x + curr.x) / 2;
+    const cpy = (prev.y + curr.y) / 2;
+    ctx.quadraticCurveTo(prev.x, prev.y, cpx, cpy);
+  }
+
+  const stemGrad = ctx.createLinearGradient(STEM_START, STEM_Y - 6, STEM_START, STEM_Y + 6);
+  stemGrad.addColorStop(0, '#4a3010');
+  stemGrad.addColorStop(0.35, '#5a4020');
+  stemGrad.addColorStop(0.65, '#6b5230');
+  stemGrad.addColorStop(1, '#3a2208');
+  ctx.strokeStyle = stemGrad;
+  ctx.lineWidth = 9;
+  ctx.stroke();
+
+  // Highlight on stem
+  ctx.beginPath();
+  ctx.moveTo(NODES[0].x, NODES[0].y - 2);
+  for (let i = 1; i <= NUM_NODES; i++) {
+    const prev = NODES[i - 1];
+    const curr = NODES[i];
+    ctx.quadraticCurveTo(prev.x, prev.y - 2, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2 - 2);
+  }
+  ctx.strokeStyle = 'rgba(120,90,40,0.3)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawLeafShape(ctx, size, ratio, color1, color2, wilt) {
+  ctx.save();
+  const hw = size * ratio;
+  const hh = size;
+
+  const grad = ctx.createRadialGradient(0, -hh * 0.2, 0, 0, 0, size);
+  grad.addColorStop(0, color2);
+  grad.addColorStop(1, color1);
+
+  ctx.beginPath();
+  ctx.moveTo(0, -hh);
+  ctx.bezierCurveTo(hw * 0.9, -hh * 0.5, hw * (1 + wilt * 0.1), hh * 0.1, 0, hh * 0.3);
+  ctx.bezierCurveTo(-hw * (1 + wilt * 0.1), hh * 0.1, -hw * 0.9, -hh * 0.5, 0, -hh);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Midrib
+  ctx.beginPath();
+  ctx.moveTo(0, -hh);
+  ctx.quadraticCurveTo(0, 0, 0, hh * 0.3);
+  ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Veins
+  for (let i = 0; i < 3; i++) {
+    const vt = (i + 1) / 4;
+    const vy = -hh + vt * (hh * 1.3);
+    const vx = hw * 0.7 * (1 - vt);
+    ctx.beginPath();
+    ctx.moveTo(0, vy);
+    ctx.quadraticCurveTo(vx * 0.5, vy - hh * 0.08, vx, vy + hh * 0.1);
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, vy);
+    ctx.quadraticCurveTo(-vx * 0.5, vy - hh * 0.08, -vx, vy + hh * 0.1);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+function drawLeaves() {
+  for (const leaf of LEAVES) {
+    const node = NODES[leaf.nodeIdx];
+    const lx = node.x + leaf.offsetX;
+    const ly = node.y + leaf.offsetY;
+
+    const windSway = windStrength * 0.18 * leaf.wiltFactor;
+    const swayAngle = Math.sin(time * leaf.phaseSpeed + leaf.phase) * 0.12 + windSway;
+    const stemAngle = leaf.stemAngle + swayAngle;
+
+    // Leaf stem
+    const sx = lx + Math.cos(stemAngle - Math.PI / 2) * leaf.stemLen;
+    const sy = ly + Math.sin(stemAngle - Math.PI / 2) * leaf.stemLen;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(lx, ly);
+    ctx.lineTo(sx, sy);
+    ctx.strokeStyle = '#3a5a10';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // Leaf blade
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.rotate(stemAngle + leaf.leafAngle + swayAngle * 0.6);
+    drawLeafShape(ctx, leaf.leafSize, leaf.leafRatio, leaf.dark, leaf.light, windStrength * 0.04);
+    ctx.restore();
+  }
+}
+
+function drawTendrils() {
+  for (const t of TENDRILS) {
+    const node = NODES[t.nodeIdx];
+    const windPush = windStrength * 0.08 * t.side;
+    const wobble = Math.sin(time * 0.7 + t.phase) * 0.25 + windPush;
+
+    ctx.save();
+    ctx.translate(node.x, node.y);
+    ctx.strokeStyle = '#5a8a20';
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.7;
+    ctx.beginPath();
+    const steps = 40;
+    let firstPoint = true;
+    for (let i = 0; i <= steps; i++) {
+      const tt = i / steps;
+      const angle = tt * t.coils * Math.PI * 2 + wobble;
+      const radius = tt * t.length / (t.coils * Math.PI * 2) * 4;
+      const tx = Math.cos(angle) * radius * t.side;
+      const ty = Math.sin(angle) * radius + t.length * tt * 0.5;
+      if (firstPoint) { ctx.moveTo(tx, ty); firstPoint = false; }
+      else ctx.lineTo(tx, ty);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function updateWind() {
+  // Random wind gusts
+  if (Math.random() < 0.005) {
+    windTarget = (Math.random() - 0.3) * 3.5;
+  }
+  if (Math.random() < 0.002) {
+    windTarget = 0;
+  }
+  windStrength += (windTarget - windStrength) * 0.015;
+}
+
+function updateNodes() {
+  for (let i = 0; i <= NUM_NODES; i++) {
+    const t = i / NUM_NODES;
+    const n = NODES[i];
+
+    // Wave from wind
+    const wave = noise(t, time * 0.8, 2.5, 1) * windStrength * 4;
+    const sag = Math.sin(t * Math.PI) * 18 + noise(t, time * 0.4, 1.5, 3);
+
+    n.x = n.baseX + wave * 6;
+    n.y = n.baseY + sag + wave * 2;
+  }
+}
+
+function drawBackground() {
+  // Sky/ambience gradient
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#c5dfa8');
+  bg.addColorStop(0.5, '#b0d07a');
+  bg.addColorStop(1, '#8ab850');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Soft light rays
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  for (let i = 0; i < 5; i++) {
+    const rx = W * (0.1 + i * 0.22);
+    const grad = ctx.createRadialGradient(rx, H * 0.1, 10, rx, H * 0.4, H * 0.6);
+    grad.addColorStop(0, '#ffffee');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  }
+  ctx.restore();
+}
+
+function loop() {
+  time += 0.016;
+  updateWind();
+  updateNodes();
+
+  ctx.clearRect(0, 0, W, H);
+  drawBackground();
+
+  // Shadow under vine
+  ctx.save();
+  ctx.globalAlpha = 0.12;
+  ctx.filter = 'blur(6px)';
+  ctx.beginPath();
+  ctx.moveTo(NODES[0].x, NODES[0].y + 10);
+  for (let i = 1; i <= NUM_NODES; i++) {
+    ctx.quadraticCurveTo(NODES[i-1].x, NODES[i-1].y + 14, (NODES[i-1].x + NODES[i].x)/2, (NODES[i-1].y + NODES[i].y)/2 + 12);
+  }
+  ctx.strokeStyle = '#1a4005';
+  ctx.lineWidth = 12;
+  ctx.stroke();
+  ctx.filter = 'none';
+  ctx.restore();
+
+  drawStem();
+  drawTendrils();
+  drawLeaves();
+
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+loop();
+</script>
+</body>
+</html>

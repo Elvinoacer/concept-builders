@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Featured Collections — Concept Builders</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Barlow:wght@200;300;400;500;600&family=Barlow+Condensed:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:        #C9A84C;
+      --gold-light:  #E4C97E;
+      --gold-dark:   #8A6830;
+      --gold-glow:   rgba(201,168,76,0.18);
+      --charcoal:    #0D0D0B;
+      --surface:     #131310;
+      --surface-2:   #1A1A16;
+      --surface-3:   #222220;
+      --border:      rgba(201,168,76,0.14);
+      --border-soft: rgba(255,255,255,0.06);
+      --text-primary: #F0EDE6;
+      --text-secondary: #8A8880;
+      --text-muted:  #4A4A46;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--charcoal);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── GRAIN OVERLAY ──────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.55;
+    }
+
+    /* ─── SECTION WRAPPER ────────────────────────────── */
+    .fc {
+      position: relative;
+      padding: 7rem 0 8rem;
+      overflow: hidden;
+    }
+
+    /* Ambient radial glow behind section */
+    .fc::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 600px;
+      background: radial-gradient(ellipse, rgba(201,168,76,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .fc-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+    }
+
+    /* ─── HEADER ─────────────────────────────────────── */
+    .fc-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 2rem;
+      margin-bottom: 3.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    }
+
+    .fc-header-left {}
+
+    .fc-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .fc-eyebrow::before {
+      content: '';
+      display: block;
+      width: 28px; height: 1px;
+      background: var(--gold);
+    }
+
+    .fc-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(36px, 5vw, 58px);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+    .fc-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .fc-subtitle {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      margin-top: 0.75rem;
+      max-width: 380px;
+      line-height: 1.6;
+    }
+
+    .fc-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1rem;
+      padding-bottom: 4px;
+    }
+    .fc-count-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+    .fc-count-badge strong {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--gold);
+      display: block;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    /* ─── CATEGORY RAIL ──────────────────────────────── */
+    .fc-rail-wrapper {
+      position: relative;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+    }
+    .fc-rail-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 80px;
+      background: linear-gradient(to left, var(--charcoal), transparent);
+      pointer-events: none;
+    }
+
+    .fc-rail {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .fc-rail::-webkit-scrollbar { display: none; }
+
+    .fc-cat {
+      position: relative;
+      flex-shrink: 0;
+      background: none;
+      border: 1px solid var(--border-soft);
+      border-radius: 100px;
+      padding: 9px 20px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .fc-cat::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 100px;
+      background: var(--gold);
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fc-cat span { position: relative; z-index: 1; }
+    .fc-cat:hover {
+      border-color: rgba(201,168,76,0.3);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+    .fc-cat.active {
+      border-color: var(--gold);
+      color: var(--charcoal);
+      font-weight: 600;
+    }
+    .fc-cat.active::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .fc-cat-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      margin-right: 7px;
+      vertical-align: middle;
+    }
+
+    /* ─── MAIN STAGE ─────────────────────────────────── */
+    .fc-stage {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      grid-template-rows: auto;
+      gap: 3px;
+      min-height: 580px;
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+    }
+
+    /* ─── FEATURED HERO CARD ─────────────────────────── */
+    .fc-hero {
+      position: relative;
+      border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      min-height: 580px;
+      background: var(--surface-2);
+      grid-row: span 2;
+    }
+    .fc-hero-bg {
+      position: absolute; inset: 0;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fc-hero:hover .fc-hero-bg { transform: scale(1.04); }
+
+    .fc-hero-gradient {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(13,13,11,0.05) 0%,
+        rgba(13,13,11,0.1) 30%,
+        rgba(13,13,11,0.75) 70%,
+        rgba(13,13,11,0.95) 100%
+      );
+      z-index: 1;
+    }
+
+    /* Decorative corner accent */
+    .fc-hero::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 120px; height: 120px;
+      background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, transparent 60%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .fc-hero-content {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 2.5rem;
+      z-index: 3;
+    }
+
+    .fc-hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gold);
+      color: var(--charcoal);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      transform: translateY(0);
+      transition: transform 0.3s ease;
+    }
+    .fc-hero:hover .fc-hero-tag { transform: translateY(-2px); }
+
+    .fc-hero-cat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.7);
+      margin-bottom: 0.5rem;
+    }
+
+    .fc-hero-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 400;
+      line-height: 1.15;
+      color: #fff;
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.01em;
+    }
+
+    .fc-hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .fc-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.55);
+    }
+    .fc-meta-item svg {
+      width: 12px; height: 12px;
+      opacity: 0.6;
+    }
+
+    .fc-hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 1.5rem;
+      background: rgba(201,168,76,0.12);
+      border: 1px solid rgba(201,168,76,0.35);
+      border-radius: var(--radius-md);
+      padding: 10px 22px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gold-light);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.03em;
+    }
+    .fc-hero-cta:hover {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--charcoal);
+      transform: translateX(3px);
+    }
+    .fc-hero-cta svg {
+      width: 14px; height: 14px;
+      transition: transform 0.3s ease;
+    }
+    .fc-hero-cta:hover svg { transform: translateX(3px); }
+
+    /* ─── SIDE STACK ─────────────────────────────────── */
+    .fc-side {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .fc-side-card {
+      position: relative;
+      flex: 1;
+      background: var(--surface-2);
+      overflow: hidden;
+      cursor: pointer;
+      min-height: 140px;
+      transition: flex 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fc-side-card:first-child { border-radius: 0 var(--radius-lg) 0 0; }
+    .fc-side-card:last-child  { border-radius: 0 0 var(--radius-lg) 0; }
+    .fc-side-card:hover { flex: 2; }
+
+    .fc-side-bg {
+      position: absolute; inset: 0;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fc-side-card:hover .fc-side-bg { transform: scale(1.07); }
+
+    .fc-side-grad {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(13,13,11,0.9) 0%, rgba(13,13,11,0.25) 100%);
+      z-index: 1;
+    }
+
+    .fc-side-info {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 1rem 1.2rem;
+      z-index: 2;
+    }
+    .fc-side-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.65);
+      margin-bottom: 3px;
+    }
+    .fc-side-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 15px;
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.25;
+    }
+    .fc-side-beds {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      font-weight: 300;
+      margin-top: 3px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all 0.3s ease 0.05s;
+    }
+    .fc-side-card:hover .fc-side-beds {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fc-side-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      z-index: 3;
+      background: rgba(201,168,76,0.15);
+      border: 0.5px solid rgba(201,168,76,0.4);
+      border-radius: 100px;
+      padding: 3px 10px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+    }
+
+    /* ─── BOTTOM STRIP ───────────────────────────────── */
+    .fc-bottom {
+      margin-top: 3px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.75s forwards;
+    }
+
+    .fc-thumb {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+    }
+    .fc-thumb:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-lg); }
+    .fc-thumb:last-child  { border-radius: 0 var(--radius-sm) var(--radius-lg) 0; }
+
+    .fc-thumb-bg {
+      position: absolute; inset: 0;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fc-thumb:hover .fc-thumb-bg { transform: scale(1.1); }
+
+    .fc-thumb-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(13,13,11,0.88) 0%, transparent 60%);
+      z-index: 1;
+    }
+    .fc-thumb-info {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 0.7rem 0.8rem;
+      z-index: 2;
+    }
+    .fc-thumb-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 11px;
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .fc-thumb-meta {
+      font-size: 9px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 2px;
+    }
+    .fc-thumb-badge {
+      position: absolute;
+      top: 7px; left: 8px;
+      z-index: 3;
+      background: var(--gold);
+      color: var(--charcoal);
+      border-radius: 100px;
+      padding: 2px 8px;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ─── FOOTER ROW ─────────────────────────────────── */
+    .fc-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2.25rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(14px);
+      animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+    }
+
+    .fc-footer-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .fc-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .fc-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .fc-stat-num em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .fc-stat-label {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .fc-stat-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--border);
+    }
+
+    .fc-showing {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+    .fc-showing strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .fc-footer-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fc-btn-ghost {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 22px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      letter-spacing: 0.02em;
+    }
+    .fc-btn-ghost:hover {
+      border-color: rgba(201,168,76,0.4);
+      color: var(--text-primary);
+    }
+
+    .fc-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 11px 26px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--charcoal);
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .fc-btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .fc-btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(201,168,76,0.25);
+    }
+    .fc-btn-primary:hover::before { opacity: 1; }
+    .fc-btn-primary svg { width: 14px; height: 14px; }
+
+    /* ─── COLLECTION SWITCHER ANIMATION ──────────────── */
+    .fc-stage-inner {
+      display: contents;
+    }
+
+    /* Card enter animation */
+    @keyframes cardReveal {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+        filter: brightness(0.7);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: brightness(1);
+      }
+    }
+
+    .card-enter {
+      animation: cardReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .card-enter-delay-1 { animation-delay: 0.06s; }
+    .card-enter-delay-2 { animation-delay: 0.12s; }
+    .card-enter-delay-3 { animation-delay: 0.18s; }
+    .card-enter-delay-4 { animation-delay: 0.24s; }
+    .card-enter-delay-5 { animation-delay: 0.30s; }
+
+    /* ─── SCROLL REVEAL ──────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── BACKGROUND FILL DIVS ───────────────────────── */
+    .bg-fill {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+    }
+
+    /* ─── COUNTER ANIMATION ──────────────────────────── */
+    @keyframes countUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .count-anim {
+      animation: countUp 0.4s ease forwards;
+    }
+
+    /* ─── PROGRESS BAR ───────────────────────────────── */
+    .fc-progress {
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--gold), var(--gold-light));
+      border-radius: 1px;
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fc-hero { position: relative; }
+
+    /* ─── GOLD SHIMMER ON FEATURED NAME ─────────────── */
+    .shimmer {
+      background: linear-gradient(
+        90deg,
+        var(--text-primary) 0%,
+        var(--text-primary) 35%,
+        var(--gold-light) 50%,
+        var(--text-primary) 65%,
+        var(--text-primary) 100%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .shimmer.animate {
+      animation: shimmerMove 2s ease forwards;
+    }
+    @keyframes shimmerMove {
+      from { background-position: 100% center; }
+      to   { background-position: -100% center; }
+    }
+
+    /* ─── NUMBER TICKER ──────────────────────────────── */
+    .ticker-wrap { overflow: hidden; display: inline-block; vertical-align: bottom; }
+    .ticker { display: inline-block; }
+    @keyframes tickDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+    .tick-in { animation: tickDown 0.35s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────── */
+    @media (max-width: 900px) {
+      .fc-stage {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        min-height: unset;
+      }
+      .fc-hero {
+        grid-row: span 1;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        min-height: 380px;
+      }
+      .fc-side {
+        flex-direction: row;
+        height: 160px;
+      }
+      .fc-side-card:first-child { border-radius: 0; }
+      .fc-side-card:last-child { border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+      .fc-bottom { grid-template-columns: repeat(2, 1fr); }
+      .fc-header { grid-template-columns: 1fr; }
+      .fc-header-right { align-items: flex-start; }
+    }
+
+    @media (max-width: 560px) {
+      .fc-inner { padding: 0 1.25rem; }
+      .fc-bottom { grid-template-columns: repeat(2, 1fr); }
+      .fc-footer-left { gap: 1rem; }
+      .fc-title { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<section class="fc" aria-label="Featured House Plan Collections">
+  <div class="fc-inner">
+
+    <!-- HEADER -->
+    <div class="fc-header">
+      <div class="fc-header-left">
+        <p class="fc-eyebrow">Curated by our architects</p>
+        <h2 class="fc-title">
+          Featured <em>Collections</em>
+        </h2>
+        <p class="fc-subtitle">100+ professionally designed house plans, each crafted for the way Kenyans truly live.</p>
+      </div>
+      <div class="fc-header-right">
+        <div class="fc-stat">
+          <span class="fc-stat-num"><em id="totalCount">100</em>+</span>
+          <span class="fc-stat-label">Plans Available</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY RAIL -->
+    <div class="fc-rail-wrapper">
+      <div class="fc-rail" id="catRail" role="tablist"></div>
+    </div>
+
+    <!-- MAIN STAGE -->
+    <div class="fc-stage" id="mainStage"></div>
+
+    <!-- BOTTOM THUMBNAILS -->
+    <div class="fc-bottom" id="bottomStrip"></div>
+
+    <!-- FOOTER -->
+    <div class="fc-footer">
+      <div class="fc-footer-left">
+        <div class="fc-stat">
+          <span class="fc-stat-num"><em id="activePlanCount">5</em></span>
+          <span class="fc-stat-label">Plans shown</span>
+        </div>
+        <div class="fc-stat-divider"></div>
+        <div class="fc-stat">
+          <span class="fc-stat-num" id="catTotalEl">18</span>
+          <span class="fc-stat-label">In collection</span>
+        </div>
+        <div class="fc-stat-divider"></div>
+        <span class="fc-showing" id="footerLabel">Browsing <strong>Modern Homes</strong></span>
+      </div>
+      <div class="fc-footer-right">
+        <button class="fc-btn-ghost" id="filterBtn">Filter Plans</button>
+        <button class="fc-btn-primary" id="viewAllBtn">
+          View All Plans
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 8h10M9 4l4 4-4 4"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+/* ─────────────────────────────────────────────────────
+   DATA
+────────────────────────────────────────────────────── */
+const collections = [
+  {
+    id: "modern", label: "Modern", dot: "#5B9FD6", count: 18,
+    accent: "#5B9FD6",
+    bg1: "linear-gradient(135deg,#1a3a5c 0%,#0e2240 100%)",
+    bg2: "linear-gradient(135deg,#1d3f6e 0%,#112648 100%)",
+    bg3: "linear-gradient(135deg,#142e52 0%,#0b1d38 100%)",
+    bg4: "linear-gradient(135deg,#1a3f6f 0%,#0d2647 100%)",
+    bg5: "linear-gradient(135deg,#163358 0%,#0c2040 100%)",
+    plans: [
+      { name: "Horizon Residence",  beds: "4 bed · 3 bath", sqft: "2,400 sqft", badge: "New",      price: "KES 12M" },
+      { name: "Vista Pavilion",     beds: "3 bed · 2 bath", sqft: "1,850 sqft", badge: null,       price: "KES 9.5M" },
+      { name: "Skyline Loft",       beds: "5 bed · 4 bath", sqft: "3,100 sqft", badge: "Popular",  price: "KES 16M" },
+      { name: "Zenith Flat-Roof",   beds: "3 bed · 3 bath", sqft: "2,050 sqft", badge: null,       price: "KES 11M" },
+      { name: "Linear House",       beds: "4 bed · 2 bath", sqft: "2,200 sqft", badge: null,       price: "KES 13M" },
+    ]
+  },
+  {
+    id: "luxury", label: "Luxury", dot: "#C49A3C", count: 14,
+    accent: "#C49A3C",
+    bg1: "linear-gradient(135deg,#3b2810 0%,#211500 100%)",
+    bg2: "linear-gradient(135deg,#4a3012 0%,#2a1a06 100%)",
+    bg3: "linear-gradient(135deg,#3d2a0e 0%,#231600 100%)",
+    bg4: "linear-gradient(135deg,#422e10 0%,#281900 100%)",
+    bg5: "linear-gradient(135deg,#3a2609 0%,#1f1300 100%)",
+    plans: [
+      { name: "Grand Palazzo",      beds: "6 bed · 5 bath", sqft: "5,800 sqft", badge: "Exclusive",  price: "KES 45M" },
+      { name: "The Riviera",        beds: "5 bed · 5 bath", sqft: "4,900 sqft", badge: null,         price: "KES 38M" },
+      { name: "Monte Bellavista",   beds: "7 bed · 6 bath", sqft: "6,500 sqft", badge: "Top Rated",  price: "KES 52M" },
+      { name: "Sunset Manor",       beds: "4 bed · 4 bath", sqft: "4,200 sqft", badge: null,         price: "KES 33M" },
+      { name: "The Windsor",        beds: "6 bed · 6 bath", sqft: "5,400 sqft", badge: null,         price: "KES 42M" },
+    ]
+  },
+  {
+    id: "bungalow", label: "Bungalows", dot: "#4EA870", count: 22,
+    accent: "#4EA870",
+    bg1: "linear-gradient(135deg,#12381f 0%,#081a0e 100%)",
+    bg2: "linear-gradient(135deg,#163d22 0%,#0a1f10 100%)",
+    bg3: "linear-gradient(135deg,#123520 0%,#071911 100%)",
+    bg4: "linear-gradient(135deg,#163820 0%,#091c0f 100%)",
+    bg5: "linear-gradient(135deg,#113018 0%,#06160c 100%)",
+    plans: [
+      { name: "The Homestead",      beds: "3 bed · 2 bath", sqft: "1,600 sqft", badge: "Best Seller", price: "KES 7.5M" },
+      { name: "Meadow Bungalow",    beds: "4 bed · 2 bath", sqft: "1,900 sqft", badge: null,          price: "KES 9M" },
+      { name: "Rosewood Cottage",   beds: "3 bed · 3 bath", sqft: "1,750 sqft", badge: "New",         price: "KES 8.2M" },
+      { name: "Prairie House",      beds: "4 bed · 3 bath", sqft: "2,100 sqft", badge: null,          price: "KES 10M" },
+      { name: "Garden Retreat",     beds: "3 bed · 2 bath", sqft: "1,500 sqft", badge: null,          price: "KES 7M" },
+    ]
+  },
+  {
+    id: "duplex", label: "Duplex", dot: "#A85CB0", count: 11,
+    accent: "#A85CB0",
+    bg1: "linear-gradient(135deg,#2e1035 0%,#17071c 100%)",
+    bg2: "linear-gradient(135deg,#351238 0%,#1b0820 100%)",
+    bg3: "linear-gradient(135deg,#2a0e30 0%,#15071a 100%)",
+    bg4: "linear-gradient(135deg,#311136 0%,#19091e 100%)",
+    bg5: "linear-gradient(135deg,#2c1032 0%,#16081b 100%)",
+    plans: [
+      { name: "Twin Peaks Duplex",  beds: "2×3 bed · 2×2 bath", sqft: "3,200 sqft", badge: "Popular", price: "KES 22M" },
+      { name: "Mirror House",       beds: "2×4 bed · 2×3 bath", sqft: "3,800 sqft", badge: null,      price: "KES 26M" },
+      { name: "Urban Pair",         beds: "2×2 bed · 2×2 bath", sqft: "2,600 sqft", badge: "New",     price: "KES 18M" },
+      { name: "Symmetra",           beds: "2×3 bed · 2×3 bath", sqft: "3,400 sqft", badge: null,      price: "KES 24M" },
+      { name: "Duo Residence",      beds: "2×4 bed · 2×2 bath", sqft: "3,600 sqft", badge: null,      price: "KES 25M" },
+    ]
+  },
+  {
+    id: "smallplot", label: "Small Plot", dot: "#E06A50", count: 17,
+    accent: "#E06A50",
+    bg1: "linear-gradient(135deg,#3d1008 0%,#1e0500 100%)",
+    bg2: "linear-gradient(135deg,#45120a 0%,#240600 100%)",
+    bg3: "linear-gradient(135deg,#3a0f07 0%,#1c0400 100%)",
+    bg4: "linear-gradient(135deg,#401108 0%,#200500 100%)",
+    bg5: "linear-gradient(135deg,#361009 0%,#1a0400 100%)",
+    plans: [
+      { name: "The Compact",          beds: "2 bed · 1 bath", sqft: "900 sqft",   badge: "Efficient", price: "KES 4.5M" },
+      { name: "Urban Micro",           beds: "3 bed · 2 bath", sqft: "1,100 sqft", badge: null,        price: "KES 5.8M" },
+      { name: "Corner Plot Special",   beds: "3 bed · 2 bath", sqft: "1,250 sqft", badge: "Popular",   price: "KES 6.5M" },
+      { name: "Space Saver",           beds: "2 bed · 2 bath", sqft: "980 sqft",   badge: null,        price: "KES 5M" },
+      { name: "The Petite",            beds: "3 bed · 1 bath", sqft: "1,050 sqft", badge: null,        price: "KES 5.2M" },
+    ]
+  },
+  {
+    id: "contemporary", label: "Contemporary", dot: "#4FA3BF", count: 18,
+    accent: "#4FA3BF",
+    bg1: "linear-gradient(135deg,#0d2f3d 0%,#051a26 100%)",
+    bg2: "linear-gradient(135deg,#0f3547 0%,#071f2e 100%)",
+    bg3: "linear-gradient(135deg,#0c2c3a 0%,#051920 100%)",
+    bg4: "linear-gradient(135deg,#0e3245 0%,#071d2c 100%)",
+    bg5: "linear-gradient(135deg,#0d2e40 0%,#061a28 100%)",
+    plans: [
+      { name: "The Studio Home",    beds: "4 bed · 3 bath", sqft: "2,300 sqft", badge: "Award Win", price: "KES 14M" },
+      { name: "Cascade Residence",  beds: "5 bed · 4 bath", sqft: "2,900 sqft", badge: null,        price: "KES 18M" },
+      { name: "Open Concept",       beds: "3 bed · 3 bath", sqft: "2,000 sqft", badge: "New",       price: "KES 12M" },
+      { name: "Floating Volumes",   beds: "4 bed · 3 bath", sqft: "2,500 sqft", badge: null,        price: "KES 15M" },
+      { name: "The Glass House",    beds: "4 bed · 4 bath", sqft: "2,700 sqft", badge: "Popular",   price: "KES 17M" },
+    ]
+  },
+];
+
+/* ─── STATE ─────────────────────────────────────────── */
+let activeId = collections[0].id;
+const get = () => collections.find(c => c.id === activeId);
+
+/* ─── ICON HELPERS ──────────────────────────────────── */
+const iconBed = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="1" y="5" width="14" height="9" rx="1.5"/><path d="M1 10h14M5 10V7h6v3"/></svg>`;
+const iconSqft = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M2 6h12M6 2v12"/></svg>`;
+const iconArrow = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>`;
+const iconTag = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="11" height="11"><path d="M9.5 2H3a1 1 0 00-1 1v6.5l6 6 6-6-4.5-7.5z"/><circle cx="5.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>`;
+
+/* ─── RENDER CATEGORY RAIL ──────────────────────────── */
+function renderRail() {
+  const rail = document.getElementById('catRail');
+  rail.innerHTML = collections.map(c => `
+    <button class="fc-cat ${c.id === activeId ? 'active' : ''}" data-id="${c.id}" role="tab" aria-selected="${c.id === activeId}">
+      <span><span class="fc-cat-dot" style="background:${c.dot}"></span>${c.label}</span>
+    </button>
+  `).join('');
+  rail.querySelectorAll('.fc-cat').forEach(btn =>
+    btn.addEventListener('click', () => switchTo(btn.dataset.id))
+  );
+}
+
+/* ─── RENDER MAIN STAGE ─────────────────────────────── */
+function renderStage() {
+  const col = get();
+  const stage = document.getElementById('mainStage');
+  const [hero, s1, s2, s3, s4] = col.plans;
+  const bgs = [col.bg1, col.bg2, col.bg3, col.bg4, col.bg5];
+
+  stage.innerHTML = `
+    <!-- HERO -->
+    <div class="fc-hero card-enter" data-idx="0" style="">
+      <div class="fc-hero-bg bg-fill" style="background:${bgs[0]}"></div>
+      <div class="fc-hero-gradient"></div>
+      ${hero.badge ? `<span class="fc-side-badge" style="top:16px;right:16px;font-size:10px;">${iconTag}${hero.badge}</span>` : ''}
+      <div class="fc-hero-content">
+        <div class="fc-hero-tag">${iconTag}&nbsp;${col.label}</div>
+        <div class="fc-hero-cat-label">Featured Plan</div>
+        <div class="fc-hero-name shimmer animate">${hero.name}</div>
+        <div class="fc-hero-meta">
+          <span class="fc-meta-item">${iconBed}<span>${hero.beds}</span></span>
+          <span class="fc-meta-item">${iconSqft}<span>${hero.sqft}</span></span>
+          <span class="fc-meta-item" style="margin-left:auto;font-size:13px;color:var(--gold);font-weight:500;opacity:1;">${hero.price}</span>
+        </div>
+        <button class="fc-hero-cta">
+          View Plan ${iconArrow}
+        </button>
+      </div>
+      <div class="fc-progress" id="heroProgress"></div>
+    </div>
+
+    <!-- SIDE STACK -->
+    <div class="fc-side">
+      <div class="fc-side-card card-enter card-enter-delay-1">
+        <div class="fc-side-bg bg-fill" style="background:${bgs[1]}"></div>
+        <div class="fc-side-grad"></div>
+        ${s1.badge ? `<span class="fc-side-badge">${s1.badge}</span>` : ''}
+        <div class="fc-side-info">
+          <div class="fc-side-label">${col.label}</div>
+          <div class="fc-side-name">${s1.name}</div>
+          <div class="fc-side-beds">${s1.beds} · ${s1.sqft}</div>
+        </div>
+      </div>
+      <div class="fc-side-card card-enter card-enter-delay-2">
+        <div class="fc-side-bg bg-fill" style="background:${bgs[2]}"></div>
+        <div class="fc-side-grad"></div>
+        ${s2.badge ? `<span class="fc-side-badge">${s2.badge}</span>` : ''}
+        <div class="fc-side-info">
+          <div class="fc-side-label">${col.label}</div>
+          <div class="fc-side-name">${s2.name}</div>
+          <div class="fc-side-beds">${s2.beds} · ${s2.sqft}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Trigger shimmer re-animation
+  setTimeout(() => {
+    const s = stage.querySelector('.shimmer');
+    if (s) { s.classList.remove('animate'); void s.offsetWidth; s.classList.add('animate'); }
+  }, 50);
+
+  // Progress bar animation on hero hover
+  const hero_el = stage.querySelector('.fc-hero');
+  const prog = stage.querySelector('#heroProgress');
+  if (hero_el && prog) {
+    hero_el.addEventListener('mouseenter', () => {
+      prog.style.width = '100%';
+      prog.style.transition = 'width 3s linear';
+    });
+    hero_el.addEventListener('mouseleave', () => {
+      prog.style.width = '0%';
+      prog.style.transition = 'width 0.3s ease';
+    });
+  }
+}
+
+/* ─── RENDER BOTTOM STRIP ───────────────────────────── */
+function renderBottom() {
+  const col = get();
+  const strip = document.getElementById('bottomStrip');
+  const bgs = [col.bg1, col.bg2, col.bg3, col.bg4, col.bg5];
+
+  strip.innerHTML = col.plans.map((plan, i) => `
+    <div class="fc-thumb card-enter" style="animation-delay:${0.1 + i * 0.07}s">
+      <div class="fc-thumb-bg bg-fill" style="background:${bgs[i]}"></div>
+      <div class="fc-thumb-overlay"></div>
+      ${plan.badge ? `<span class="fc-thumb-badge">${plan.badge}</span>` : ''}
+      <div class="fc-thumb-info">
+        <div class="fc-thumb-name">${plan.name}</div>
+        <div class="fc-thumb-meta">${plan.sqft} &middot; ${plan.price}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ─── RENDER FOOTER ─────────────────────────────────── */
+function renderFooter() {
+  const col = get();
+  const el = document.getElementById('footerLabel');
+  if (el) {
+    el.innerHTML = `Browsing <strong>${col.label} ${col.id === 'bungalow' ? '' : ''}</strong>`;
+  }
+  const catTotal = document.getElementById('catTotalEl');
+  if (catTotal) {
+    catTotal.innerHTML = col.count;
+  }
+  const viewBtn = document.getElementById('viewAllBtn');
+  if (viewBtn) {
+    viewBtn.onclick = () => (window.location.href = `/plans?category=${col.id}`);
+  }
+}
+
+/* ─── SWITCH COLLECTION ─────────────────────────────── */
+function switchTo(id) {
+  if (id === activeId) return;
+  activeId = id;
+  render();
+}
+
+/* ─── FULL RENDER ───────────────────────────────────── */
+function render() {
+  renderRail();
+  renderStage();
+  renderBottom();
+  renderFooter();
+
+  // Update total count
+  const col = get();
+  const totalEl = document.getElementById('totalCount');
+  if (totalEl) {
+    const totalPlans = collections.reduce((s, c) => s + c.count, 0);
+    totalEl.innerHTML = totalPlans;
+  }
+}
+
+render();
+
+/* ─── INTERSECTION OBSERVER for scroll reveal ───────── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.animationPlayState = 'running';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fc-header, .fc-rail-wrapper, .fc-stage, .fc-bottom, .fc-footer').forEach(el => {
+  observer.observe(el);
+});
+</script>
+</body>
+</html>

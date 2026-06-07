@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Type of House Fits Your Lifestyle?</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5EFE4;
+    --sand: #E8D9C0;
+    --clay: #C4956A;
+    --terracotta: #B5602E;
+    --umber: #3D2B1F;
+    --charcoal: #1C1612;
+    --moss: #4A5240;
+    --stone: #8A8278;
+    --gold: #C9A84C;
+    --white: #FAF8F4;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--charcoal);
+    color: var(--cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  .bg-canvas {
+    position: fixed; inset: 0; z-index: 0;
+    background: var(--charcoal);
+    overflow: hidden;
+  }
+  .bg-canvas::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(196,149,106,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 85% 80%, rgba(181,96,46,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(61,43,31,0.4) 0%, transparent 70%);
+  }
+  .bg-canvas::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.04; mix-blend-mode: overlay;
+  }
+
+  /* ── FLOATING BLUEPRINT LINES ── */
+  .blueprint-lines {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
+  }
+  .bp-line {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.12), transparent);
+    height: 1px;
+    animation: bp-drift linear infinite;
+    opacity: 0;
+  }
+  .bp-line:nth-child(1) { width: 60%; top: 15%; animation-duration: 18s; animation-delay: 0s; }
+  .bp-line:nth-child(2) { width: 40%; top: 35%; animation-duration: 22s; animation-delay: 3s; }
+  .bp-line:nth-child(3) { width: 70%; top: 55%; animation-duration: 16s; animation-delay: 6s; }
+  .bp-line:nth-child(4) { width: 50%; top: 72%; animation-duration: 20s; animation-delay: 9s; }
+  .bp-line:nth-child(5) { width: 35%; top: 88%; animation-duration: 25s; animation-delay: 2s; }
+  @keyframes bp-drift {
+    0%   { transform: translateX(-100%); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateX(200vw); opacity: 0; }
+  }
+
+  /* ── WRAPPER ── */
+  .quiz-wrapper {
+    position: relative; z-index: 2;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 60px 20px;
+  }
+
+  .quiz-container {
+    width: 100%; max-width: 780px;
+  }
+
+  /* ── HEADER ── */
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 56px;
+    animation: fade-up 0.9s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .quiz-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+  }
+  .quiz-eyebrow::before, .quiz-eyebrow::after {
+    content: ''; display: block;
+    width: 40px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+  }
+  .quiz-eyebrow::after { transform: scaleX(-1); }
+
+  .quiz-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 16px;
+  }
+  .quiz-title em {
+    font-style: italic;
+    color: var(--clay);
+  }
+  .quiz-subtitle {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--stone);
+    max-width: 420px; margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-track {
+    display: flex; gap: 6px;
+    margin-bottom: 40px;
+    animation: fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s both;
+  }
+  .progress-dot {
+    flex: 1; height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-dot-fill {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, var(--clay), var(--gold));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    border-radius: 2px;
+  }
+  .progress-dot.active .progress-dot-fill { transform: scaleX(1); }
+  .progress-dot.done .progress-dot-fill { transform: scaleX(1); opacity: 0.5; }
+
+  /* ── QUESTION CARD ── */
+  .question-card {
+    background: rgba(245,239,228,0.04);
+    border: 1px solid rgba(196,149,106,0.18);
+    border-radius: 24px;
+    padding: 44px 44px 40px;
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+    animation: fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.25s both;
+  }
+  .question-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+  }
+  .question-card::after {
+    content: '';
+    position: absolute; bottom: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196,149,106,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .q-number {
+    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--clay); font-weight: 500; margin-bottom: 14px;
+  }
+  .q-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 3.5vw, 32px);
+    font-weight: 400; line-height: 1.3;
+    color: var(--cream);
+    margin-bottom: 32px;
+  }
+  .q-icon {
+    font-size: 32px; margin-bottom: 10px; display: block;
+    animation: q-icon-bounce 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes q-icon-bounce {
+    from { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  /* ── OPTIONS GRID ── */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .option-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(196,149,106,0.2);
+    border-radius: 14px;
+    padding: 18px 20px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .option-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(196,149,106,0.12), rgba(201,168,76,0.06));
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .option-btn:hover { border-color: rgba(196,149,106,0.5); transform: translateY(-2px); }
+  .option-btn:hover::before { opacity: 1; }
+  .option-btn.selected {
+    border-color: var(--clay);
+    background: rgba(196,149,106,0.12);
+  }
+  .option-btn.selected::before { opacity: 1; }
+  .option-btn.selected .option-check { opacity: 1; transform: scale(1); }
+
+  .option-emoji { font-size: 22px; flex-shrink: 0; }
+  .option-text-wrap { flex: 1; }
+  .option-label {
+    font-size: 14px; font-weight: 500;
+    color: var(--cream); line-height: 1.3;
+  }
+  .option-sub {
+    font-size: 12px; color: var(--stone);
+    margin-top: 2px; font-weight: 300;
+  }
+  .option-check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--clay), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    font-size: 11px;
+  }
+
+  /* ── NAV ── */
+  .q-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 28px;
+  }
+  .btn-prev {
+    background: none; border: 1px solid rgba(255,255,255,0.12);
+    color: var(--stone); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; padding: 10px 20px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-prev:hover { border-color: rgba(255,255,255,0.3); color: var(--cream); }
+  .btn-prev:disabled { opacity: 0.3; pointer-events: none; }
+
+  .btn-next {
+    background: linear-gradient(135deg, var(--terracotta), var(--clay));
+    border: none; color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 12px 28px; border-radius: 10px;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+    display: flex; align-items: center; gap: 8px;
+    position: relative; overflow: hidden;
+  }
+  .btn-next::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--clay), var(--gold));
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(181,96,46,0.4); }
+  .btn-next:hover::before { opacity: 1; }
+  .btn-next span { position: relative; z-index: 1; }
+  .btn-next:disabled { opacity: 0.4; pointer-events: none; }
+
+  /* ── SLIDE TRANSITIONS ── */
+  .slide { display: none; }
+  .slide.active { display: block; animation: slide-in 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+  .slide.exit { animation: slide-out 0.35s cubic-bezier(0.4,0,1,1) both; }
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes slide-out {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(-16px) scale(0.97); }
+  }
+
+  /* ── RESULT ── */
+  .result-card {
+    display: none;
+    animation: fade-up 0.8s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .result-card.show { display: block; }
+
+  .result-header {
+    text-align: center; margin-bottom: 40px;
+  }
+  .result-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(196,149,106,0.2), rgba(201,168,76,0.1));
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold);
+    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+    padding: 6px 18px; border-radius: 20px; margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .result-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 300; line-height: 1.15;
+    color: var(--cream); margin-bottom: 12px;
+  }
+  .result-title strong {
+    font-weight: 600; color: var(--clay);
+    font-style: italic;
+  }
+  .result-desc {
+    font-size: 15px; color: var(--stone);
+    max-width: 480px; margin: 0 auto;
+    line-height: 1.7; font-weight: 300;
+  }
+
+  /* ── RESULT DESIGNS ── */
+  .designs-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-bottom: 32px;
+  }
+  .design-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(196,149,106,0.15);
+    border-radius: 16px; overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    cursor: pointer; position: relative;
+    animation: fade-up 0.7s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .design-card:nth-child(1) { animation-delay: 0.1s; }
+  .design-card:nth-child(2) { animation-delay: 0.2s; }
+  .design-card:nth-child(3) { animation-delay: 0.3s; }
+  .design-card:hover { transform: translateY(-6px); border-color: rgba(196,149,106,0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+
+  .design-visual {
+    height: 120px; position: relative; overflow: hidden;
+    display: flex; align-items: flex-end; padding: 16px;
+  }
+  .design-card:nth-child(1) .design-visual { background: linear-gradient(135deg, #2D3B2D, #1A2A1A); }
+  .design-card:nth-child(2) .design-visual { background: linear-gradient(135deg, #3B2D1A, #2A1A0A); }
+  .design-card:nth-child(3) .design-visual { background: linear-gradient(135deg, #1A2B3B, #0A1A2A); }
+
+  .house-svg { width: 100%; }
+
+  .design-badge {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(201,168,76,0.2); border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold); font-size: 9px; letter-spacing: 0.2em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 10px;
+    font-weight: 500;
+  }
+
+  .design-info { padding: 16px; }
+  .design-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 400;
+    color: var(--cream); margin-bottom: 6px;
+  }
+  .design-specs {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .spec-pill {
+    font-size: 11px; color: var(--stone);
+    background: rgba(255,255,255,0.06);
+    padding: 3px 10px; border-radius: 20px;
+  }
+
+  /* ── MATCH METER ── */
+  .match-meter {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 10px;
+  }
+  .match-label { font-size: 11px; color: var(--stone); white-space: nowrap; }
+  .match-bar-track {
+    flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px;
+    overflow: hidden;
+  }
+  .match-bar-fill {
+    height: 100%; border-radius: 2px;
+    background: linear-gradient(90deg, var(--clay), var(--gold));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 1s cubic-bezier(0.16,1,0.3,1) 0.5s;
+  }
+  .result-card.show .match-bar-fill { transform: scaleX(1); }
+  .match-pct { font-size: 12px; color: var(--gold); font-weight: 500; }
+
+  /* ── CTA ── */
+  .result-cta {
+    text-align: center;
+    padding: 36px 40px;
+    background: linear-gradient(135deg, rgba(196,149,106,0.08), rgba(201,168,76,0.04));
+    border: 1px solid rgba(196,149,106,0.2);
+    border-radius: 20px;
+    position: relative; overflow: hidden;
+    animation: fade-up 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s both;
+  }
+  .result-cta::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.6), transparent);
+  }
+  .cta-sub {
+    font-size: 12px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--clay); margin-bottom: 10px; font-weight: 500;
+  }
+  .cta-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 300; color: var(--cream);
+    margin-bottom: 8px; line-height: 1.2;
+  }
+  .cta-body {
+    font-size: 14px; color: var(--stone);
+    margin-bottom: 28px; line-height: 1.6;
+    max-width: 380px; margin-left: auto; margin-right: auto; margin-bottom: 28px;
+  }
+  .cta-summary {
+    display: flex; justify-content: center; gap: 24px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .summary-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .summary-icon { font-size: 18px; }
+  .summary-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; font-weight: 600; color: var(--clay);
+  }
+  .summary-key { font-size: 10px; color: var(--stone); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .btn-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, var(--terracotta), var(--clay));
+    color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    padding: 16px 36px; border-radius: 12px;
+    border: none; cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+    text-decoration: none; position: relative; overflow: hidden;
+    letter-spacing: 0.02em;
+  }
+  .btn-cta::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--clay), var(--gold));
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(181,96,46,0.45); }
+  .btn-cta:hover::before { opacity: 1; }
+  .btn-cta span { position: relative; z-index: 1; }
+  .btn-cta-arrow {
+    position: relative; z-index: 1;
+    transition: transform 0.3s; font-size: 18px;
+  }
+  .btn-cta:hover .btn-cta-arrow { transform: translateX(4px); }
+
+  .btn-restart {
+    display: inline-block; margin-top: 16px;
+    background: none; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; color: var(--stone);
+    text-decoration: underline; text-underline-offset: 3px;
+    transition: color 0.2s;
+  }
+  .btn-restart:hover { color: var(--cream); }
+
+  /* ── GLOBAL ANIMS ── */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    .question-card { padding: 28px 22px 24px; }
+    .options-grid { grid-template-columns: 1fr; }
+    .designs-grid { grid-template-columns: 1fr; }
+    .cta-summary { gap: 16px; }
+  }
+
+  /* ── PARTICLE BURST on result ── */
+  .particle {
+    position: fixed; pointer-events: none; z-index: 999;
+    border-radius: 50%;
+    animation: particle-burst 1.2s cubic-bezier(0.1,0.8,0.2,1) forwards;
+  }
+  @keyframes particle-burst {
+    0%   { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+  }
+
+  /* ── SHIMMER on load ── */
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .shimmer-text {
+    background: linear-gradient(90deg, var(--cream) 0%, var(--gold) 50%, var(--cream) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite;
+  }
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-canvas"></div>
+<div class="blueprint-lines">
+  <div class="bp-line"></div><div class="bp-line"></div>
+  <div class="bp-line"></div><div class="bp-line"></div><div class="bp-line"></div>
+</div>
+
+<div class="quiz-wrapper">
+  <div class="quiz-container">
+
+    <!-- HEADER -->
+    <div class="quiz-header">
+      <div class="quiz-eyebrow">House Plan Discovery</div>
+      <h1 class="quiz-title">
+        What Type of Home<br>
+        <em>Fits Your Lifestyle?</em>
+      </h1>
+      <p class="quiz-subtitle">Answer four questions and we'll match you with the perfect architectural designs — curated just for you.</p>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-dot" id="dot-0"><div class="progress-dot-fill"></div></div>
+      <div class="progress-dot" id="dot-1"><div class="progress-dot-fill"></div></div>
+      <div class="progress-dot" id="dot-2"><div class="progress-dot-fill"></div></div>
+      <div class="progress-dot" id="dot-3"><div class="progress-dot-fill"></div></div>
+    </div>
+
+    <!-- QUESTION CARD -->
+    <div class="question-card" id="questionCard">
+
+      <!-- Q1 -->
+      <div class="slide active" id="q1">
+        <div class="q-number">Question 1 of 4</div>
+        <span class="q-icon">👨‍👩‍👧‍👦</span>
+        <div class="q-text">How many people will call this house home?</div>
+        <div class="options-grid">
+          <button class="option-btn" onclick="select(1,'single')">
+            <span class="option-emoji">🧍</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Just Me</div>
+              <div class="option-sub">Solo living</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(1,'couple')">
+            <span class="option-emoji">👫</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Couple</div>
+              <div class="option-sub">2 adults</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(1,'small')">
+            <span class="option-emoji">👨‍👩‍👦</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Small Family</div>
+              <div class="option-sub">2 – 4 members</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(1,'large')">
+            <span class="option-emoji">👨‍👩‍👧‍👦</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Large Family</div>
+              <div class="option-sub">5+ members</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+        </div>
+        <div class="q-nav">
+          <button class="btn-prev" disabled onclick="prevQ()">← Back</button>
+          <button class="btn-next" id="next1" disabled onclick="nextQ()"><span>Continue</span> <span>→</span></button>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="slide" id="q2">
+        <div class="q-number">Question 2 of 4</div>
+        <span class="q-icon">💰</span>
+        <div class="q-text">What is your approximate budget range?</div>
+        <div class="options-grid">
+          <button class="option-btn" onclick="select(2,'budget')">
+            <span class="option-emoji">🌱</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Starter</div>
+              <div class="option-sub">Under KSh 3M</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(2,'mid')">
+            <span class="option-emoji">🏡</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Mid-Range</div>
+              <div class="option-sub">KSh 3M – 8M</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(2,'premium')">
+            <span class="option-emoji">🏠</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Premium</div>
+              <div class="option-sub">KSh 8M – 20M</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(2,'luxury')">
+            <span class="option-emoji">✨</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Luxury</div>
+              <div class="option-sub">KSh 20M+</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+        </div>
+        <div class="q-nav">
+          <button class="btn-prev" onclick="prevQ()">← Back</button>
+          <button class="btn-next" id="next2" disabled onclick="nextQ()"><span>Continue</span> <span>→</span></button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="slide" id="q3">
+        <div class="q-number">Question 3 of 4</div>
+        <span class="q-icon">📐</span>
+        <div class="q-text">What is your available plot size?</div>
+        <div class="options-grid">
+          <button class="option-btn" onclick="select(3,'compact')">
+            <span class="option-emoji">🔲</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Compact</div>
+              <div class="option-sub">50 × 100 ft or less</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(3,'standard')">
+            <span class="option-emoji">⬜</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Standard</div>
+              <div class="option-sub">100 × 100 ft</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(3,'halfacre')">
+            <span class="option-emoji">🌿</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Half Acre</div>
+              <div class="option-sub">Up to 0.5 acres</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(3,'acre')">
+            <span class="option-emoji">🌳</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Acre+</div>
+              <div class="option-sub">Over 1 acre</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+        </div>
+        <div class="q-nav">
+          <button class="btn-prev" onclick="prevQ()">← Back</button>
+          <button class="btn-next" id="next3" disabled onclick="nextQ()"><span>Continue</span> <span>→</span></button>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="slide" id="q4">
+        <div class="q-number">Question 4 of 4</div>
+        <span class="q-icon">🏛️</span>
+        <div class="q-text">Which architectural style speaks to you?</div>
+        <div class="options-grid">
+          <button class="option-btn" onclick="select(4,'modern')">
+            <span class="option-emoji">🔷</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Modern / Minimalist</div>
+              <div class="option-sub">Clean lines, open spaces</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(4,'colonial')">
+            <span class="option-emoji">🏛️</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Colonial / Classic</div>
+              <div class="option-sub">Timeless elegance</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(4,'contemporary')">
+            <span class="option-emoji">🌐</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Contemporary</div>
+              <div class="option-sub">Smart & stylish</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+          <button class="option-btn" onclick="select(4,'bungalow')">
+            <span class="option-emoji">🌅</span>
+            <div class="option-text-wrap">
+              <div class="option-label">Bungalow</div>
+              <div class="option-sub">Single-storey comfort</div>
+            </div>
+            <div class="option-check">✓</div>
+          </button>
+        </div>
+        <div class="q-nav">
+          <button class="btn-prev" onclick="prevQ()">← Back</button>
+          <button class="btn-next" id="next4" disabled onclick="showResult()"><span>See My Matches</span> <span>→</span></button>
+        </div>
+      </div>
+
+    </div><!-- /question-card -->
+
+    <!-- ── RESULT ── -->
+    <div class="result-card" id="resultCard">
+
+      <div class="result-header">
+        <div class="result-tag">Your Recommended Designs</div>
+        <h2 class="result-title">We Found Your <strong id="resultStyleName">Perfect Match</strong></h2>
+        <p class="result-desc" id="resultDesc">Based on your preferences, here are three architectural designs curated just for you.</p>
+      </div>
+
+      <div class="designs-grid">
+        <div class="design-card">
+          <div class="design-visual">
+            <div class="design-badge">Best Match</div>
+            <svg class="house-svg" viewBox="0 0 200 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Modern House -->
+              <rect x="20" y="45" width="160" height="45" fill="rgba(196,149,106,0.3)" rx="2"/>
+              <polygon points="20,45 100,10 180,45" fill="rgba(201,168,76,0.4)" stroke="rgba(201,168,76,0.6)" stroke-width="1"/>
+              <rect x="40" y="58" width="25" height="32" fill="rgba(100,140,180,0.5)" rx="1"/>
+              <rect x="130" y="58" width="25" height="32" fill="rgba(100,140,180,0.5)" rx="1"/>
+              <rect x="85" y="60" width="30" height="30" fill="rgba(100,140,180,0.3)" rx="1"/>
+              <line x1="85" y1="75" x2="115" y2="75" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+              <line x1="100" y1="60" x2="100" y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+              <!-- windows glow -->
+              <rect x="40" y="58" width="25" height="32" fill="rgba(255,220,100,0.08)" rx="1"/>
+              <rect x="130" y="58" width="25" height="32" fill="rgba(255,220,100,0.08)" rx="1"/>
+            </svg>
+          </div>
+          <div class="design-info">
+            <div class="design-name" id="design1Name">The Serene</div>
+            <div class="design-specs">
+              <span class="spec-pill" id="design1Beds">3 Bed</span>
+              <span class="spec-pill" id="design1Bath">2 Bath</span>
+              <span class="spec-pill" id="design1Size">1,800 sqft</span>
+            </div>
+            <div class="match-meter">
+              <span class="match-label">Match</span>
+              <div class="match-bar-track"><div class="match-bar-fill" style="width:96%"></div></div>
+              <span class="match-pct">96%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="design-card">
+          <div class="design-visual">
+            <div class="design-badge">Popular</div>
+            <svg class="house-svg" viewBox="0 0 200 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Colonial House -->
+              <rect x="25" y="40" width="150" height="50" fill="rgba(181,96,46,0.25)" rx="2"/>
+              <rect x="60" y="20" width="80" height="22" fill="rgba(181,96,46,0.2)" rx="1"/>
+              <polygon points="60,20 100,2 140,20" fill="rgba(181,96,46,0.4)" stroke="rgba(196,149,106,0.5)" stroke-width="1"/>
+              <polygon points="25,40 100,12 175,40" fill="rgba(196,149,106,0.35)" stroke="rgba(196,149,106,0.5)" stroke-width="1"/>
+              <rect x="40" y="55" width="20" height="35" fill="rgba(100,140,180,0.4)" rx="1"/>
+              <rect x="140" y="55" width="20" height="35" fill="rgba(100,140,180,0.4)" rx="1"/>
+              <rect x="85" y="58" width="30" height="32" fill="rgba(100,140,180,0.3)" rx="1"/>
+              <!-- columns -->
+              <rect x="45" y="40" width="3" height="35" fill="rgba(255,255,255,0.15)"/>
+              <rect x="152" y="40" width="3" height="35" fill="rgba(255,255,255,0.15)"/>
+            </svg>
+          </div>
+          <div class="design-info">
+            <div class="design-name" id="design2Name">The Heritage</div>
+            <div class="design-specs">
+              <span class="spec-pill" id="design2Beds">4 Bed</span>
+              <span class="spec-pill" id="design2Bath">3 Bath</span>
+              <span class="spec-pill" id="design2Size">2,400 sqft</span>
+            </div>
+            <div class="match-meter">
+              <span class="match-label">Match</span>
+              <div class="match-bar-track"><div class="match-bar-fill" style="width:88%"></div></div>
+              <span class="match-pct">88%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="design-card">
+          <div class="design-visual">
+            <div class="design-badge">Premium</div>
+            <svg class="house-svg" viewBox="0 0 200 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Contemporary flat roof -->
+              <rect x="15" y="30" width="170" height="60" fill="rgba(74,82,64,0.4)" rx="3"/>
+              <rect x="15" y="25" width="170" height="8" fill="rgba(74,82,64,0.6)" rx="2"/>
+              <!-- garage -->
+              <rect x="100" y="50" width="70" height="40" fill="rgba(74,82,64,0.3)" rx="1"/>
+              <rect x="105" y="53" width="60" height="35" fill="rgba(40,60,80,0.6)" rx="1"/>
+              <!-- windows strips -->
+              <rect x="20" y="33" width="70" height="12" fill="rgba(100,160,200,0.5)" rx="1"/>
+              <rect x="20" y="52" width="70" height="8" fill="rgba(100,160,200,0.35)" rx="1"/>
+              <rect x="20" y="64" width="70" height="8" fill="rgba(100,160,200,0.35)" rx="1"/>
+              <!-- tree silhouette -->
+              <ellipse cx="185" cy="42" rx="12" ry="14" fill="rgba(74,82,64,0.5)"/>
+              <rect x="183" y="56" width="4" height="15" fill="rgba(74,82,64,0.4)"/>
+            </svg>
+          </div>
+          <div class="design-info">
+            <div class="design-name" id="design3Name">The Pinnacle</div>
+            <div class="design-specs">
+              <span class="spec-pill" id="design3Beds">5 Bed</span>
+              <span class="spec-pill" id="design3Bath">4 Bath</span>
+              <span class="spec-pill" id="design3Size">3,200 sqft</span>
+            </div>
+            <div class="match-meter">
+              <span class="match-label">Match</span>
+              <div class="match-bar-track"><div class="match-bar-fill" style="width:79%"></div></div>
+              <span class="match-pct">79%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="result-cta">
+        <div class="cta-sub">Your personalized summary</div>
+        <h3 class="cta-headline">Ready for a <em style="font-style:italic; color:var(--clay)">Custom Plan</em>?</h3>
+        <p class="cta-body">Our architects will use your answers to create a design that's 100% tailored to your family, budget, and plot — no generic templates.</p>
+
+        <div class="cta-summary">
+          <div class="summary-item">
+            <span class="summary-icon">👥</span>
+            <span class="summary-val" id="sumFamily">—</span>
+            <span class="summary-key">Family</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-icon">💰</span>
+            <span class="summary-val" id="sumBudget">—</span>
+            <span class="summary-key">Budget</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-icon">📐</span>
+            <span class="summary-val" id="sumPlot">—</span>
+            <span class="summary-key">Plot</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-icon">🏛️</span>
+            <span class="summary-val" id="sumStyle">—</span>
+            <span class="summary-key">Style</span>
+          </div>
+        </div>
+
+        <a href="#contact" class="btn-cta">
+          <span>Get a Custom Plan Now</span>
+          <span class="btn-cta-arrow">→</span>
+        </a>
+        <br>
+        <button class="btn-restart" onclick="restart()">↺ Retake the quiz</button>
+      </div>
+
+    </div><!-- /result-card -->
+
+  </div>
+</div>
+
+<script>
+  let current = 1;
+  const total = 4;
+  const answers = { 1: null, 2: null, 3: null, 4: null };
+
+  function select(q, val) {
+    answers[q] = val;
+    // deselect all in this slide
+    document.querySelectorAll('#q' + q + ' .option-btn').forEach(b => b.classList.remove('selected'));
+    // select clicked
+    event.currentTarget.classList.add('selected');
+    // enable next
+    document.getElementById('next' + q).disabled = false;
+  }
+
+  function updateProgress() {
+    for (let i = 0; i < total; i++) {
+      const dot = document.getElementById('dot-' + i);
+      dot.classList.remove('active', 'done');
+      if (i + 1 < current) dot.classList.add('done');
+      else if (i + 1 === current) dot.classList.add('active');
+    }
+  }
+
+  function nextQ() {
+    if (!answers[current]) return;
+    const old = document.getElementById('q' + current);
+    old.classList.add('exit');
+    setTimeout(() => { old.classList.remove('active', 'exit'); }, 350);
+
+    current++;
+    if (current <= total) {
+      updateProgress();
+      setTimeout(() => {
+        const nxt = document.getElementById('q' + current);
+        nxt.classList.add('active');
+      }, 200);
+    }
+  }
+
+  function prevQ() {
+    if (current <= 1) return;
+    const old = document.getElementById('q' + current);
+    old.classList.remove('active');
+
+    current--;
+    updateProgress();
+    const nxt = document.getElementById('q' + current);
+    nxt.classList.add('active');
+  }
+
+  function showResult() {
+    if (!answers[4]) return;
+
+    // Hide question card
+    document.getElementById('questionCard').style.display = 'none';
+    document.getElementById('progressTrack').style.display = 'none';
+    document.querySelector('.quiz-header').style.display = 'none';
+
+    // Fill summary
+    const familyMap = { single: 'Solo', couple: 'Couple', small: '2–4', large: '5+' };
+    const budgetMap = { budget: '<3M', mid: '3–8M', premium: '8–20M', luxury: '20M+' };
+    const plotMap = { compact: '50×100', standard: '100×100', halfacre: '½ acre', acre: '1 acre+' };
+    const styleMap = { modern: 'Modern', colonial: 'Colonial', contemporary: 'Contemporary', bungalow: 'Bungalow' };
+
+    document.getElementById('sumFamily').textContent = familyMap[answers[1]];
+    document.getElementById('sumBudget').textContent = budgetMap[answers[2]];
+    document.getElementById('sumPlot').textContent = plotMap[answers[3]];
+    document.getElementById('sumStyle').textContent = styleMap[answers[4]];
+
+    // Personalize designs
+    const style = answers[4];
+    const fam = answers[1];
+
+    const beds = fam === 'single' ? 2 : fam === 'couple' ? 2 : fam === 'small' ? 3 : 5;
+    const bathBase = fam === 'large' ? 3 : 2;
+
+    document.getElementById('design1Beds').textContent = beds + ' Bed';
+    document.getElementById('design1Bath').textContent = bathBase + ' Bath';
+    document.getElementById('design2Beds').textContent = (beds + 1) + ' Bed';
+    document.getElementById('design2Bath').textContent = (bathBase + 1) + ' Bath';
+    document.getElementById('design3Beds').textContent = (beds + 2) + ' Bed';
+    document.getElementById('design3Bath').textContent = (bathBase + 2) + ' Bath';
+
+    const nameMap = {
+      modern: ['The Nova', 'The Axis', 'The Grid'],
+      colonial: ['The Heritage', 'The Manor', 'The Estate'],
+      contemporary: ['The Horizon', 'The Vertex', 'The Zenith'],
+      bungalow: ['The Serenity', 'The Haven', 'The Retreat']
+    };
+    const names = nameMap[style] || ['The Serene', 'The Heritage', 'The Pinnacle'];
+    document.getElementById('design1Name').textContent = names[0];
+    document.getElementById('design2Name').textContent = names[1];
+    document.getElementById('design3Name').textContent = names[2];
+    document.getElementById('resultStyleName').textContent = styleMap[style];
+
+    const descMap = {
+      modern: 'Your minimalist sensibility paired with smart living needs calls for clean geometry, open-plan living, and abundant natural light.',
+      colonial: 'Your appreciation for timeless elegance points to grand facades, symmetrical layouts, and generous entertaining spaces.',
+      contemporary: 'Your forward-thinking style and lifestyle needs align perfectly with fluid spaces, smart-home integration, and bold design.',
+      bungalow: 'Your preference for comfort and simplicity is best served by single-storey living with seamless indoor-outdoor connection.'
+    };
+    document.getElementById('resultDesc').textContent = descMap[style];
+
+    // Show result
+    const rc = document.getElementById('resultCard');
+    rc.classList.add('show');
+
+    // Particle burst
+    fireworks();
+  }
+
+  function fireworks() {
+    const colors = ['#C4956A','#C9A84C','#B5602E','#F5EFE4','#4A5240'];
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 3;
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 8 + 4;
+      const angle = Math.random() * 360;
+      const dist = Math.random() * 200 + 80;
+      const tx = Math.cos(angle * Math.PI / 180) * dist + 'px';
+      const ty = Math.sin(angle * Math.PI / 180) * dist + 'px';
+      p.style.cssText = `
+        left:${cx}px; top:${cy}px;
+        width:${size}px; height:${size}px;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        --tx:${tx}; --ty:${ty};
+        animation-duration:${0.8 + Math.random()*0.8}s;
+        animation-delay:${Math.random()*0.2}s;
+      `;
+      document.body.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+  }
+
+  function restart() {
+    current = 1;
+    Object.keys(answers).forEach(k => answers[k] = null);
+    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.btn-next').forEach(b => b.disabled = true);
+
+    document.getElementById('resultCard').classList.remove('show');
+    document.getElementById('questionCard').style.display = '';
+    document.getElementById('progressTrack').style.display = '';
+    document.querySelector('.quiz-header').style.display = '';
+
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active', 'exit'));
+    document.getElementById('q1').classList.add('active');
+    updateProgress();
+  }
+
+  // Init
+  updateProgress();
+</script>
+</body>
+</html>

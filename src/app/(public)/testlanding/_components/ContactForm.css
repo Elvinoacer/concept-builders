@@ -1,0 +1,165 @@
+.cf-wrapper {
+  --sand: #F5F0E8;
+  --sand-dark: #E8E0D0;
+  --ink: #141414; /* Adjusted to match testlanding page bg */
+  --ink-mid: #3D3830;
+  --ink-light: #7A7268;
+  --gold: #B8935A;
+  --gold-light: #D4AD7A;
+  --gold-pale: #F0E4CC;
+  --white: #FDFCFA;
+  --radius: 2px;
+
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+}
+
+/* ── CONSULTATION FORM ── */
+.cf-wrapper .form-section {
+  padding: 6rem 3rem;
+  background: var(--ink);
+  position: relative; overflow: hidden;
+}
+
+.cf-wrapper .form-section::before {
+  content: ''; position: absolute; top: -200px; right: -200px;
+  width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(184,147,90,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cf-wrapper .form-inner {
+  display: grid; grid-template-columns: 1fr 540px;
+  gap: 6rem; position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cf-wrapper .form-intro { }
+.cf-wrapper .form-intro .section-label { 
+  color: var(--gold);
+  font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+  font-weight: 500;
+}
+.cf-wrapper .form-intro .section-title { 
+  color: var(--white); margin-top: 0.5rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 400;
+}
+
+.cf-wrapper .form-intro-text {
+  font-size: 1rem; line-height: 1.8; color: rgba(255,255,255,0.55);
+  margin-top: 1.5rem; max-width: 420px;
+}
+
+.cf-wrapper .trust-badges { display: flex; flex-direction: column; gap: 1rem; margin-top: 2.5rem; }
+.cf-wrapper .trust-badge {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-size: 0.82rem; color: rgba(255,255,255,0.6);
+}
+.cf-wrapper .trust-dot { width: 4px; height: 4px; background: var(--gold); border-radius: 50%; flex-shrink: 0; }
+
+.cf-wrapper .consult-form { position: relative; }
+
+.cf-wrapper .form-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 2.5rem;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.cf-wrapper .form-card.fade-out {
+  opacity: 0;
+  transform: scale(0.96);
+  pointer-events: none;
+}
+
+.cf-wrapper .form-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 400; color: var(--white);
+  margin-bottom: 0.5rem;
+}
+.cf-wrapper .form-subtitle { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-bottom: 2rem; letter-spacing: 0.05em; }
+
+.cf-wrapper .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+
+.cf-wrapper .form-group { margin-bottom: 1rem; }
+
+.cf-wrapper .form-label {
+  display: block; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); margin-bottom: 0.5rem;
+}
+
+.cf-wrapper .form-input, .cf-wrapper .form-select, .cf-wrapper .form-textarea {
+  width: 100%; padding: 0.85rem 1rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+  outline: none; transition: border-color 0.25s, background 0.25s;
+  border-radius: 0;
+  appearance: none;
+}
+.cf-wrapper .form-input::placeholder, .cf-wrapper .form-textarea::placeholder { color: rgba(255,255,255,0.25); }
+.cf-wrapper .form-input:focus, .cf-wrapper .form-select:focus, .cf-wrapper .form-textarea:focus {
+  border-color: var(--gold); background: rgba(255,255,255,0.09);
+}
+.cf-wrapper .form-select option { background: #1A1714; color: white; }
+
+.cf-wrapper .form-textarea { resize: vertical; min-height: 100px; }
+
+.cf-wrapper .form-submit {
+  width: 100%; padding: 1.1rem;
+  background: #000; color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .75rem; letter-spacing: .22em; text-transform: uppercase; font-weight: 500;
+  border: none; cursor: pointer;
+  margin-top: 0.5rem;
+  position: relative; overflow: hidden;
+  transition: color 0.4s;
+  display: inline-block;
+}
+.cf-wrapper .form-submit::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--gold); transform: scaleX(0); transform-origin: left;
+  transition: transform .5s cubic-bezier(.16,1,.3,1);
+}
+.cf-wrapper .form-submit:hover::before { transform: scaleX(1); }
+.cf-wrapper .form-submit:hover { color: #000; }
+.cf-wrapper .form-submit span { position: relative; z-index: 1; }
+
+/* ── SCROLL REVEAL ── */
+.cf-wrapper .reveal {
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.cf-wrapper .reveal.revealed { opacity: 1; transform: translateY(0); }
+.cf-wrapper .reveal-delay-2 { transition-delay: 0.2s; }
+
+/* ── SUCCESS STATE ── */
+.cf-wrapper .form-success {
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 3rem; min-height: 400px;
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+}
+.cf-wrapper .form-success.show {
+  display: flex;
+  animation: fadeUp 0.6s ease both;
+}
+
+@keyframes fadeUp { 
+  from { opacity: 0; transform: translateY(30px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+
+.cf-wrapper .success-icon { font-size: 3rem; margin-bottom: 1rem; color: var(--gold); }
+.cf-wrapper .success-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; color: var(--white); margin-bottom: 0.75rem;
+}
+.cf-wrapper .success-text { color: rgba(255,255,255,0.5); font-size: 0.9rem; line-height: 1.7; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .cf-wrapper .form-inner { grid-template-columns: 1fr; gap: 3rem; }
+}
