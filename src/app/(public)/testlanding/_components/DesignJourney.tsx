@@ -394,13 +394,13 @@ export default function DesignJourney() {
       </section>
 
       {/* ─── CTA BANNER ─── */}
-      <section className="cta-banner dj-reveal">
-        <div className="cta-text">
+      <section className="cta-banner">
+        <div className="cta-text dj-reveal">
           <div className="section-eyebrow"><span>Start Today</span></div>
           <h2>Ready to design your<br/><em>dream home?</em></h2>
           <p>Tell us about your plot, budget, and vision. We'll respond within 24 hours with an initial assessment — no obligation, no rush.</p>
         </div>
-        <div className="cta-actions">
+        <div className="cta-actions dj-reveal dj-reveal-delay-1">
           <a href="#consult" className="btn-primary">
             Start Your Project
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
