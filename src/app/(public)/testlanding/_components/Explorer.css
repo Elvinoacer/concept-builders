@@ -596,4 +596,14 @@
   .ex-section-title { font-size: clamp(32px, 10vw, 40px); }
   .ex-slider-card { flex: 0 0 clamp(260px, 85vw, 320px); height: 380px; }
   .ex-card-name { font-size: 28px; }
+  
+  .ex-modal-overlay { padding: 16px; }
+  .ex-modal { border-radius: 14px; max-height: calc(100vh - 32px); }
+  .ex-modal-img-side { min-height: 200px; }
+  .ex-modal-content-side { padding: 20px 16px; }
+  .ex-modal-title { font-size: 24px; margin-bottom: 16px; }
+  .ex-modal-stats { gap: 8px; margin-bottom: 20px; }
+  .ex-stat-box { padding: 10px 8px; }
+  .ex-stat-value { font-size: 18px; }
+  .ex-features-list li { font-size: 13px; }
 }
