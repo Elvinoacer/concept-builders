@@ -292,30 +292,27 @@ export default function RuinsBackground() {
           pointer-events: none;
           position: fixed;
           inset: 0;
-          z-index: 20;
-          opacity: 0.75;
+          /*
+           * z-index: 15 layers bricks above page content (z-10)
+           * but below nav overlays. pointer-events: none ensures
+           * clicks pass through to content underneath.
+           */
+          z-index: 15;
           display: flex;
           justify-content: space-between;
           overflow: hidden;
+          /* Slightly dimmer on mobile — content legibility first */
+          opacity: 0.55;
         }
 
         /*
-         * Strategy: scale the container width so bricks render at the
-         * right size for the viewport, THEN use a small negative margin
-         * to push ~60% offscreen — only the ragged inner edge shows.
+         * Each ruin container scales with the viewport.
+         * Negative margin = -(width × 0.6) → 40% stays visible.
          *
-         * Visible peek per breakpoint:
-         *   mobile  (< 641px)  → container 60px  → ~24px peek
-         *   tablet  (641–1023) → container 100px → ~40px peek
-         *   desktop (≥ 1024px) → container 140px → ~56px peek
-         *   wide    (≥ 1440px) → container 180px → ~72px peek
-         *
-         * The negative margin = -(container × 0.6), so 40% shows.
-         * On mobile this is tiny — just enough to register as ruins
-         * without eating into content.
+         * Both ruins use scaleX(-1) so the SVG's dense/solid left
+         * edge is always pushed offscreen and only the organic
+         * ragged/crumbled inner edge peeks in — on both sides.
          */
-
-        /* ── Mobile base: very slim ── */
         .ruin {
           width: 60px;
           flex-shrink: 0;
@@ -329,46 +326,59 @@ export default function RuinsBackground() {
           display: block;
         }
 
-        /* RIGHT: flip so ragged interior edge faces inward */
+        /*
+         * BOTH ruins flip horizontally:
+         * - Left:  scaleX(-1) + transform-origin right → solid edge
+         *          goes offscreen left, ragged edge faces content
+         * - Right: scaleX(-1) mirrors same SVG, ragged edge right
+         */
+        .ruin-left {
+          transform: scaleX(-1);
+          transform-origin: left center;
+        }
         .ruin-right {
           transform: scaleX(-1);
+          transform-origin: right center;
         }
 
-        /* Mobile: push 60% offscreen → ~24px visible */
-        .ruin-left  { margin-left:  -36px; }
-        .ruin-right { margin-right: -36px; }
+        /* Mobile base (<641px): ~20px peek */
+        .ruin-left  { margin-left:  -40px; }
+        .ruin-right { margin-right: -40px; }
 
-        /* ── Tiny phones (< 400px): even slimmer, ~18px peek ── */
+        /* Tiny phones (<400px): ~16px peek */
         @media (max-width: 400px) {
           .ruin { width: 50px; }
-          .ruin-left  { margin-left:  -30px; }
-          .ruin-right { margin-right: -30px; }
+          .ruin-left  { margin-left:  -34px; }
+          .ruin-right { margin-right: -34px; }
         }
 
-        /* ── Tablets (641px – 1023px): ~40px peek ── */
+        /* Tablets (641–1023px): ~36px peek */
         @media (min-width: 641px) and (max-width: 1023px) {
-          .ruin { width: 100px; }
-          .ruin-left  { margin-left:  -60px; }
-          .ruin-right { margin-right: -60px; }
+          .ruin { width: 90px; }
+          .ruin-left  { margin-left:  -54px; }
+          .ruin-right { margin-right: -54px; }
+          .ruins-wrapper { opacity: 0.65; }
         }
 
-        /* ── Desktop (≥ 1024px): ~56px peek ── */
+        /* Desktop (≥1024px): ~52px peek */
         @media (min-width: 1024px) {
-          .ruin { width: 140px; }
-          .ruin-left  { margin-left:  -84px; }
-          .ruin-right { margin-right: -84px; }
+          .ruin { width: 130px; }
+          .ruin-left  { margin-left:  -78px; }
+          .ruin-right { margin-right: -78px; }
+          .ruins-wrapper { opacity: 0.72; }
         }
 
-        /* ── Wide desktop (≥ 1440px): ~72px peek ── */
+        /* Wide desktop (≥1440px): ~68px peek */
         @media (min-width: 1440px) {
-          .ruin { width: 180px; }
-          .ruin-left  { margin-left:  -108px; }
-          .ruin-right { margin-right: -108px; }
+          .ruin { width: 170px; }
+          .ruin-left  { margin-left:  -102px; }
+          .ruin-right { margin-right: -102px; }
+          .ruins-wrapper { opacity: 0.75; }
         }
 
-        /* Reduced motion: slightly dimmer */
+        /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
-          .ruins-wrapper { opacity: 0.45; }
+          .ruins-wrapper { opacity: 0.3; }
         }
       `}</style>
     </motion.div>
