@@ -570,3 +570,30 @@
   border-color: rgba(255,255,255,0.3);
   color: var(--ex-charcoal);
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .ex-container { padding: 60px 24px 80px; }
+  .ex-slider-card { height: clamp(400px, 55vh, 600px); }
+}
+
+@media (max-width: 768px) {
+  .ex-section-header { margin-bottom: 32px; }
+  .ex-filter-bar { margin-bottom: 32px; gap: 6px; }
+  .ex-pill { padding: 6px 12px; font-size: 12px; }
+  .ex-slider-card { flex: 0 0 clamp(280px, 70vw, 400px); height: 420px; }
+  .ex-slider-track { gap: 20px; }
+}
+
+@media (max-width: 680px) {
+  .ex-modal { grid-template-columns: 1fr; }
+  .ex-modal-img-side { min-height: 240px; }
+  .ex-modal-content-side { padding: 24px 20px; }
+}
+
+@media (max-width: 480px) {
+  .ex-container { padding: 40px 16px 60px; }
+  .ex-section-title { font-size: clamp(32px, 10vw, 40px); }
+  .ex-slider-card { flex: 0 0 clamp(260px, 85vw, 320px); height: 380px; }
+  .ex-card-name { font-size: 28px; }
+}

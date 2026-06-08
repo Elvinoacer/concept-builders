@@ -324,7 +324,7 @@ export default function DesignIdeas() {
       </section>
 
       <footer>
-        <span>© 2025 Arctura House Plans. All rights reserved.</span>
+        <span>© 2025 Concept Builders. All rights reserved.</span>
         <span>
           <a href="#" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>Privacy</a> &nbsp;·&nbsp;
           <a href="#" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>Terms</a> &nbsp;·&nbsp;

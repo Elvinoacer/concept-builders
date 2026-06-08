@@ -15,9 +15,9 @@ export default function RuinsBackground() {
       {/* ── LEFT RUIN ── */}
       <div className="ruin ruin-left">
         <svg
-          viewBox="0 0 180 1200"
+          viewBox="0 0 130 1200"
           xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="xMinYMin slice"
+          preserveAspectRatio="xMaxYMin slice"
         >
           <defs>
             <filter id="roughL" x="-5%" y="-5%" width="110%" height="110%">
@@ -27,18 +27,13 @@ export default function RuinsBackground() {
             <filter id="shadowL">
               <feDropShadow dx="6" dy="0" stdDeviation="12" floodColor="#0a0500" floodOpacity="0.9"/>
             </filter>
-            <linearGradient id="brickEdgeGrad" x1="1" y1="0" x2="0" y2="0">
-              <stop offset="0%"   stopColor="#0d0603" stopOpacity="1"/>
-              <stop offset="35%"  stopColor="#1a1008" stopOpacity="0.7"/>
-              <stop offset="100%" stopColor="#1a1008" stopOpacity="0"/>
-            </linearGradient>
             <clipPath id="leftClip">
-              <rect x="0" y="0" width="180" height="1200"/>
+              <rect x="0" y="0" width="130" height="1200"/>
             </clipPath>
           </defs>
 
           <g clipPath="url(#leftClip)" filter="url(#shadowL)">
-            <rect x="0" y="0" width="180" height="1200" fill="#0d0603"/>
+
 
             {/* ROW 0 */}
             <rect x="0" y="0"   width="128" height="19" fill="#6b3018" stroke="#3a1a0a" strokeWidth="1" filter="url(#roughL)"/>
@@ -153,10 +148,6 @@ export default function RuinsBackground() {
             <ellipse cx="122" cy="720"  rx="6" ry="3" fill="#50200a" opacity="0.7"/>
             <ellipse cx="142" cy="830"  rx="4" ry="2" fill="#5a2810" opacity="0.65"/>
             <ellipse cx="110" cy="940"  rx="5" ry="3" fill="#5c2a10" opacity="0.75"/>
-
-            {/* Fade-to-transparent on right + left deep shadow */}
-            <rect x="0" y="0" width="180" height="1200" fill="url(#brickEdgeGrad)"/>
-            <rect x="0" y="0" width="40"  height="1200" fill="rgba(5,2,1,0.6)"/>
           </g>
         </svg>
       </div>
@@ -164,7 +155,7 @@ export default function RuinsBackground() {
       {/* ── RIGHT RUIN ── */}
       <div className="ruin ruin-right">
         <svg
-          viewBox="0 0 180 1200"
+          viewBox="0 0 130 1200"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="xMaxYMin slice"
         >
@@ -176,18 +167,13 @@ export default function RuinsBackground() {
             <filter id="shadowR">
               <feDropShadow dx="6" dy="0" stdDeviation="12" floodColor="#0a0500" floodOpacity="0.9"/>
             </filter>
-            <linearGradient id="brickEdgeGradR" x1="1" y1="0" x2="0" y2="0">
-              <stop offset="0%"   stopColor="#0d0603" stopOpacity="1"/>
-              <stop offset="40%"  stopColor="#1a1008" stopOpacity="0.7"/>
-              <stop offset="100%" stopColor="#1a1008" stopOpacity="0"/>
-            </linearGradient>
             <clipPath id="rightClip">
-              <rect x="0" y="0" width="180" height="1200"/>
+              <rect x="0" y="0" width="130" height="1200"/>
             </clipPath>
           </defs>
 
           <g clipPath="url(#rightClip)" filter="url(#shadowR)">
-            <rect x="0" y="0" width="180" height="1200" fill="#0d0603"/>
+
 
             <rect x="0"  y="5"   width="135" height="19" fill="#6b3018" stroke="#3a1a0a" strokeWidth="1" filter="url(#roughR)"/>
             <rect x="0"  y="27"  width="58"  height="20" fill="#7a3820" stroke="#3a1a0a" strokeWidth="1" filter="url(#roughR)"/>
@@ -278,10 +264,6 @@ export default function RuinsBackground() {
             <ellipse cx="143" cy="258"  rx="6" ry="3" fill="#5c2a10" opacity="0.75"/>
             <ellipse cx="120" cy="350"  rx="3" ry="2" fill="#50200a" opacity="0.65"/>
             <ellipse cx="136" cy="440"  rx="5" ry="3" fill="#5a2810" opacity="0.7"/>
-
-            {/* Fade + shadow */}
-            <rect x="0" y="0" width="180" height="1200" fill="url(#brickEdgeGradR)"/>
-            <rect x="0" y="0" width="40"  height="1200" fill="rgba(5,2,1,0.6)"/>
           </g>
         </svg>
       </div>
@@ -301,23 +283,18 @@ export default function RuinsBackground() {
           display: flex;
           justify-content: space-between;
           overflow: hidden;
-          /* Slightly dimmer on mobile — content legibility first */
-          opacity: 0.55;
+          /* Blend nicely with the page content below */
+          opacity: 0.85;
         }
 
         /*
-         * Each ruin container scales with the viewport.
-         * Negative margin = -(width × 0.6) → 40% stays visible.
-         *
-         * Both ruins use scaleX(-1) so the SVG's dense/solid left
-         * edge is always pushed offscreen and only the organic
-         * ragged/crumbled inner edge peeks in — on both sides.
+         * Ruins now use a fixed thin width (0.4cm) hugging the edges.
          */
         .ruin {
-          width: 40px;
+          width: 0.4cm;
           flex-shrink: 0;
           height: 100vh;
-          overflow: visible;
+          overflow: hidden;
         }
 
         .ruin svg {
@@ -327,54 +304,18 @@ export default function RuinsBackground() {
         }
 
         /*
-         * BOTH ruins flip horizontally:
-         * - Left:  scaleX(-1) + transform-origin right → solid edge
-         *          goes offscreen left, ragged edge faces content
-         * - Right: scaleX(-1) mirrors same SVG, ragged edge right
+         * Left ruin needs no flip. Right ruin is flipped to face center.
          */
         .ruin-left {
-          transform: scaleX(-1);
-          transform-origin: right center;
+          /* No transform needed */
         }
         .ruin-right {
           transform: scaleX(-1);
-          transform-origin: left center;
+          transform-origin: center;
         }
 
-        /* Mobile base (<641px): ~20px peek */
-        .ruin-left  { margin-left:  -25px; }
-        .ruin-right { margin-right: -25px; }
-
-        /* Tiny phones (<400px): ~16px peek */
-        @media (max-width: 400px) {
-          .ruin { width: 40px; }
-          .ruin-left  { margin-left:  -25px; }
-          .ruin-right { margin-right: -25px; }
-        }
-
-        /* Tablets (641–1023px): ~36px peek */
-        @media (min-width: 641px) and (max-width: 1023px) {
-          .ruin { width: 50px; }
-          .ruin-left  { margin-left:  -35px; }
-          .ruin-right { margin-right: -35px; }
-          .ruins-wrapper { opacity: 0.65; }
-        }
-
-        /* Desktop (≥1024px): ~52px peek */
-        @media (min-width: 1024px) {
-          .ruin { width: 60px; }
-          .ruin-left  { margin-left:  -45px; }
-          .ruin-right { margin-right: -45px; }
-          .ruins-wrapper { opacity: 0.72; }
-        }
-
-        /* Wide desktop (≥1440px): ~68px peek */
-        @media (min-width: 1440px) {
-          .ruin { width: 70px; }
-          .ruin-left  { margin-left:  -55px; }
-          .ruin-right { margin-right: -55px; }
-          .ruins-wrapper { opacity: 0.75; }
-        }
+        .ruin-left  { margin-left: 0; }
+        .ruin-right { margin-right: 0; }
 
         /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {

@@ -291,7 +291,7 @@
   position: relative; overflow: hidden;
 }
 .di-wrapper .featured-row::before {
-  content: 'ARCTURA'; position: absolute;
+  content: 'CONCEPT'; position: absolute;
   font-family: 'Cormorant Garamond', serif;
   font-size: 18vw; font-weight: 600; color: transparent;
   -webkit-text-stroke: 1px rgba(200,169,110,.08);
@@ -491,4 +491,13 @@
   .di-wrapper .mini-grid { grid-template-columns: 1fr; }
   .di-wrapper .library-header { flex-direction: column; }
   .di-wrapper .hero h1 { font-size: 3rem; }
+}
+@media (max-width: 480px) {
+  .di-wrapper .hero { padding: 6rem 1.25rem 4rem; }
+  .di-wrapper .library { padding: 4rem 1.25rem; }
+  .di-wrapper .featured-row { padding: 4rem 1.25rem; }
+  .di-wrapper .mini-articles { padding: 4rem 1.25rem; }
+  .di-wrapper .cta-band { padding: 4rem 1.25rem; }
+  .di-wrapper footer { padding: 2rem 1.25rem; flex-direction: column; align-items: flex-start; }
+  .di-wrapper .card-body { padding: 1.5rem; }
 }

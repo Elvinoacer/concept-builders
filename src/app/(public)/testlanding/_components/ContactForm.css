@@ -163,3 +163,10 @@
 @media (max-width: 1024px) {
   .cf-wrapper .form-inner { grid-template-columns: 1fr; gap: 3rem; }
 }
+
+@media (max-width: 600px) {
+  .cf-wrapper .form-section { padding: 4rem 1.25rem; }
+  .cf-wrapper .form-row { grid-template-columns: 1fr; gap: 0; }
+  .cf-wrapper .form-card { padding: 1.5rem; }
+  .cf-wrapper .form-intro .section-title { font-size: 2.2rem; }
+}
