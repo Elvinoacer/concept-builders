@@ -10,6 +10,10 @@ import RuinsBackground from "./_components/RuinsBackground";
 export default function LandingPage() {
   return (
     <div style={{ backgroundColor: '#141414' }} className="relative">
+      {/* Bricks sit above page content (z-10) but below nav (z-50).
+          Must live OUTSIDE the z-10 stacking context so that
+          position:fixed on the ruins-wrapper resolves correctly. */}
+      <RuinsBackground />
       <div className="relative z-10">
         <DreamPlan />
         <Featured />
@@ -19,7 +23,6 @@ export default function LandingPage() {
         <DesignIdeas />
         <ContactForm />
       </div>
-      <RuinsBackground />
     </div>
   );
 }

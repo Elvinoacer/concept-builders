@@ -293,11 +293,11 @@ export default function RuinsBackground() {
           position: fixed;
           inset: 0;
           /*
-           * z-index: 15 layers bricks above page content (z-10)
+           * z-index: 20 layers bricks above page content (z-10)
            * but below nav overlays. pointer-events: none ensures
            * clicks pass through to content underneath.
            */
-          z-index: 15;
+          z-index: 20;
           display: flex;
           justify-content: space-between;
           overflow: hidden;
@@ -314,7 +314,7 @@ export default function RuinsBackground() {
          * ragged/crumbled inner edge peeks in — on both sides.
          */
         .ruin {
-          width: 60px;
+          width: 40px;
           flex-shrink: 0;
           height: 100vh;
           overflow: visible;
@@ -334,45 +334,45 @@ export default function RuinsBackground() {
          */
         .ruin-left {
           transform: scaleX(-1);
-          transform-origin: left center;
+          transform-origin: right center;
         }
         .ruin-right {
           transform: scaleX(-1);
-          transform-origin: right center;
+          transform-origin: left center;
         }
 
         /* Mobile base (<641px): ~20px peek */
-        .ruin-left  { margin-left:  -40px; }
-        .ruin-right { margin-right: -40px; }
+        .ruin-left  { margin-left:  -25px; }
+        .ruin-right { margin-right: -25px; }
 
         /* Tiny phones (<400px): ~16px peek */
         @media (max-width: 400px) {
-          .ruin { width: 50px; }
-          .ruin-left  { margin-left:  -34px; }
-          .ruin-right { margin-right: -34px; }
+          .ruin { width: 40px; }
+          .ruin-left  { margin-left:  -25px; }
+          .ruin-right { margin-right: -25px; }
         }
 
         /* Tablets (641–1023px): ~36px peek */
         @media (min-width: 641px) and (max-width: 1023px) {
-          .ruin { width: 90px; }
-          .ruin-left  { margin-left:  -54px; }
-          .ruin-right { margin-right: -54px; }
+          .ruin { width: 50px; }
+          .ruin-left  { margin-left:  -35px; }
+          .ruin-right { margin-right: -35px; }
           .ruins-wrapper { opacity: 0.65; }
         }
 
         /* Desktop (≥1024px): ~52px peek */
         @media (min-width: 1024px) {
-          .ruin { width: 130px; }
-          .ruin-left  { margin-left:  -78px; }
-          .ruin-right { margin-right: -78px; }
+          .ruin { width: 60px; }
+          .ruin-left  { margin-left:  -45px; }
+          .ruin-right { margin-right: -45px; }
           .ruins-wrapper { opacity: 0.72; }
         }
 
         /* Wide desktop (≥1440px): ~68px peek */
         @media (min-width: 1440px) {
-          .ruin { width: 170px; }
-          .ruin-left  { margin-left:  -102px; }
-          .ruin-right { margin-right: -102px; }
+          .ruin { width: 70px; }
+          .ruin-left  { margin-left:  -55px; }
+          .ruin-right { margin-right: -55px; }
           .ruins-wrapper { opacity: 0.75; }
         }
 
