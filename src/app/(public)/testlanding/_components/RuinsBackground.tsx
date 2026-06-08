@@ -293,24 +293,31 @@ export default function RuinsBackground() {
           position: fixed;
           inset: 0;
           z-index: 20;
-          opacity: 0.4;
+          /* Raised from 0.4 — bricks need to register as atmosphere */
+          opacity: 0.75;
           display: flex;
           justify-content: space-between;
+          /* Clip anything pushed offscreen */
           overflow: hidden;
         }
 
-        /* The ruin container scales via fluid width */
+        /*
+         * Each ruin div is 180px wide so SVG renders at full fidelity.
+         * Negative margin slides it mostly offscreen; only --peek px show.
+         *
+         * peek targets (visible brick width):
+         *   tiny phone  (< 380px)   → 40px
+         *   mobile      (< 641px)   → 52px
+         *   tablet      (641–1023)  → 68px
+         *   desktop     (≥ 1024px)  → 80px
+         *   wide        (≥ 1440px)  → 90px
+         */
+
         .ruin {
-          /* clamp(min, preferred, max):
-             – mobile  ~320px viewport → ~70px ruin (≈22vw)
-             – tablet  ~768px viewport → ~120px ruin
-             – desktop ≥1024px         → 180px max            */
-          width: clamp(60px, 18vw, 180px);
-          /* Height is always full viewport so bricks fill the screen */
-          height: 100vh;
-          /* Stretch the SVG to fill the container */
+          width: 180px;
           flex-shrink: 0;
-          overflow: hidden;
+          height: 100vh;
+          overflow: visible;
         }
 
         .ruin svg {
@@ -319,44 +326,42 @@ export default function RuinsBackground() {
           display: block;
         }
 
-        /*
-         * RIGHT ruin: flip horizontally so the ragged edge faces inward.
-         * We mirror the entire div so we don't need a duplicate SVG path set.
-         */
+        /* RIGHT: flip so ragged interior edge faces inward */
         .ruin-right {
           transform: scaleX(-1);
         }
 
-        /* ── Breakpoint fine-tuning ── */
+        /* ── Mobile default: 52px peek ── */
+        .ruin-left  { margin-left:  -128px; }
+        .ruin-right { margin-right: -128px; }
 
-        /* Small phones (< 400px) — keep ruins very slim */
-        @media (max-width: 400px) {
-          .ruin {
-            width: clamp(50px, 16vw, 80px);
-          }
+        /* ── Tiny phones (< 380px): 40px peek ── */
+        @media (max-width: 380px) {
+          .ruin-left  { margin-left:  -140px; }
+          .ruin-right { margin-right: -140px; }
         }
 
-        /* Tablets (641px – 1023px) */
+        /* ── Tablets (641px – 1023px): 68px peek ── */
         @media (min-width: 641px) and (max-width: 1023px) {
-          .ruin {
-            width: clamp(100px, 14vw, 150px);
-          }
+          .ruin-left  { margin-left:  -112px; }
+          .ruin-right { margin-right: -112px; }
         }
 
-        /* Large desktops (≥ 1440px) — allow a touch wider */
+        /* ── Desktop (≥ 1024px): 80px peek ── */
+        @media (min-width: 1024px) {
+          .ruin-left  { margin-left:  -100px; }
+          .ruin-right { margin-right: -100px; }
+        }
+
+        /* ── Wide desktop (≥ 1440px): 90px peek ── */
         @media (min-width: 1440px) {
-          .ruin {
-            width: 180px;
-          }
+          .ruin-left  { margin-left:  -90px; }
+          .ruin-right { margin-right: -90px; }
         }
 
-        /* Reduce parallax motion on devices that prefer it */
+        /* Reduced motion: keep visible but freeze parallax feel */
         @media (prefers-reduced-motion: reduce) {
-          .ruins-wrapper {
-            /* motion.div's inline style still applies; JS handles this,
-               but we can flatten opacity for safety */
-            opacity: 0.25;
-          }
+          .ruins-wrapper { opacity: 0.5; }
         }
       `}</style>
     </motion.div>
