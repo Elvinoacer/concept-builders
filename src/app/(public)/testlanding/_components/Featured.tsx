@@ -154,7 +154,7 @@ export default function Featured() {
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Barlow:wght@200;300;400;500;600&family=Barlow+Condensed:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-      <section className="fc" aria-label="Featured House Plan Collections" ref={sectionRef}>
+      <section className="fc" id="featured" aria-label="Featured House Plan Collections" ref={sectionRef}>
         <div className="fc-inner">
 
           {/* HEADER */}
@@ -277,8 +277,10 @@ export default function Featured() {
             </div>
             <div className="fc-footer-right">
               <button className="fc-btn-ghost">Filter Plans</button>
-              <button className="fc-btn-primary" onClick={() => window.location.href = `/plans?category=${activeCol.id}`}>
-                View All Plans
+              <button className="fc-btn-primary" onClick={() => {
+                document.getElementById('explorer')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                View Full Collection
                 {iconArrow}
               </button>
             </div>

@@ -119,6 +119,7 @@
   background: var(--ex-pill-hover-bg);
   border-color: rgba(255, 255, 255, 0.2);
   color: var(--ex-charcoal);
+  transform: translateY(-2px);
 }
 .ex-pill.active {
   background: var(--ex-pill-active-bg);
@@ -126,6 +127,19 @@
   border-color: var(--ex-pill-active-bg);
 }
 .ex-pill:active { transform: scale(0.97); }
+
+/* ── SCROLL REVEAL ── */
+.ex-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ex-reveal.ex-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.ex-delay-1 { transition-delay: 0.15s; }
+.ex-delay-2 { transition-delay: 0.3s; }
 
 /* ── CINEMATIC SLIDER ── */
 .ex-slider-wrap {

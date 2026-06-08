@@ -1,11 +1,29 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import './DesignJourney.css';
 
 export default function DesignJourney() {
+  const sectionRef = useRef<HTMLElement>(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('dj-revealed');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    if (sectionRef.current) {
+      const els = sectionRef.current.querySelectorAll('.dj-reveal');
+      els.forEach(el => observer.observe(el));
+    }
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="dj-wrapper">
+    <div className="dj-wrapper" ref={sectionRef}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -102,7 +120,7 @@ export default function DesignJourney() {
             From hand-drafted concepts to construction-ready documents — we craft house plans that transform your idea of home into something you can actually build.
           </p>
           <div className="hero-actions">
-            <a href="#" className="btn-primary">
+            <a href="#explorer" className="btn-primary">
               Explore Plans
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1 7H13M7 1L13 7L7 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -141,7 +159,7 @@ export default function DesignJourney() {
 
       {/* ─── DESIGN JOURNEY SECTION ─── */}
       <section className="journey" id="journey">
-        <div className="section-header">
+        <div className="section-header dj-reveal">
           <div>
             <div className="section-eyebrow"><span>Design Journey</span></div>
             <h2>We sell the <em>process</em>,<br/>not just the image.</h2>
@@ -151,7 +169,7 @@ export default function DesignJourney() {
           </p>
         </div>
 
-        <div className="journey-stages">
+        <div className="journey-stages dj-reveal dj-reveal-delay-1">
 
           {/* Stage 1 */}
           <div className="stage">
@@ -376,14 +394,14 @@ export default function DesignJourney() {
       </section>
 
       {/* ─── CTA BANNER ─── */}
-      <section className="cta-banner">
+      <section className="cta-banner dj-reveal">
         <div className="cta-text">
           <div className="section-eyebrow"><span>Start Today</span></div>
           <h2>Ready to design your<br/><em>dream home?</em></h2>
           <p>Tell us about your plot, budget, and vision. We'll respond within 24 hours with an initial assessment — no obligation, no rush.</p>
         </div>
         <div className="cta-actions">
-          <a href="#" className="btn-primary">
+          <a href="#consult" className="btn-primary">
             Start Your Project
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path d="M1 7H13M7 1L13 7L7 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

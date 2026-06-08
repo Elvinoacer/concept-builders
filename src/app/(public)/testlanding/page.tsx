@@ -10,6 +10,7 @@ import RuinsBackground from "./_components/RuinsBackground";
 export default function LandingPage() {
   return (
     <div style={{ backgroundColor: '#141414' }} className="relative">
+      <style dangerouslySetInnerHTML={{ __html: `html { scroll-behavior: smooth; }` }} />
       {/* Bricks sit above page content (z-10) but below nav (z-50).
           Must live OUTSIDE the z-10 stacking context so that
           position:fixed on the ruins-wrapper resolves correctly. */}

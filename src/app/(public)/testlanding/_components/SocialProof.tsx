@@ -34,6 +34,12 @@ export default function SocialProof() {
     const cards = document.querySelectorAll('.sp-wrapper .card');
     cards.forEach(c => observerRef.current?.observe(c));
 
+    // Heading reveal
+    const reveals = document.querySelectorAll('.sp-wrapper .sp-reveal');
+    reveals.forEach(el => {
+      observerRef.current?.observe(el);
+    });
+
     // Stats count up
     statsObserverRef.current = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -98,9 +104,9 @@ export default function SocialProof() {
   return (
     <div className="sp-wrapper">
       <div className="cursor-glow" ref={cursorRef}></div>
-      <section className="social-section">
+      <section className="social-section" id="testimonials">
         {/* Heading */}
-        <div className="section-head">
+        <div className="section-head sp-reveal">
           <p className="eyebrow"><span></span> Client Stories <span></span></p>
           <h2 className="section-title">Homes Built on <em>Trust</em></h2>
           <p className="section-sub">Real families. Real blueprints. Real transformations.</p>

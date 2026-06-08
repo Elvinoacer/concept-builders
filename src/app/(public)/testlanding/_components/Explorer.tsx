@@ -38,6 +38,23 @@ export default function Explorer() {
     return () => { document.body.style.overflow = ''; };
   }, [selectedPlan]);
 
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('ex-revealed');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    if (sectionRef.current) {
+      const els = sectionRef.current.querySelectorAll('.ex-reveal');
+      els.forEach(el => observer.observe(el));
+    }
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSelectedPlan(null);
@@ -142,14 +159,14 @@ export default function Explorer() {
   };
 
   return (
-    <section className="ex-section">
+    <section className="ex-section" id="explorer" ref={sectionRef}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
       <div className="ex-container">
         {/* HEADER */}
-        <div className="ex-section-header">
+        <div className="ex-section-header ex-reveal">
           <div className="ex-header-left">
             <p className="ex-eyebrow">Design Gallery</p>
             <h2 className="ex-section-title">Find Your <em>Dream</em><br/>Home Style</h2>
@@ -158,7 +175,7 @@ export default function Explorer() {
         </div>
 
         {/* FILTER BAR */}
-        <div className="ex-filter-bar">
+        <div className="ex-filter-bar ex-reveal ex-delay-1">
           <span className="ex-filter-label">Style</span>
           <div className="ex-filter-group">
             {['all', 'modern', 'luxury', 'minimalist', 'bungalow'].map(f => (
@@ -188,7 +205,7 @@ export default function Explorer() {
 
         {/* CINEMATIC SLIDER */}
         {visiblePlans.length > 0 ? (
-          <div className="ex-slider-wrap">
+          <div className="ex-slider-wrap ex-reveal ex-delay-2">
             <div 
               className="ex-slider-track" 
               ref={trackRef}

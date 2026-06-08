@@ -81,7 +81,7 @@ export default function DesignIdeas() {
   };
 
   return (
-    <div className="di-wrapper">
+    <div className="di-wrapper" id="design-ideas">
       {/* Custom cursor */}
       <div id="cursor-dot" className="cursor-dot" ref={dotRef}></div>
       <div id="cursor-ring" className="cursor-ring" ref={ringRef}></div>
@@ -131,7 +131,7 @@ export default function DesignIdeas() {
 
         <div className="cards-grid">
           {/* Card 1 */}
-          <a href="#consultation" className="card" style={{ transitionDelay: '.05s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
+          <a href="#consult" className="card" style={{ transitionDelay: '.05s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
             <div className="card-img-wrap">
               <img src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_3-Bedroom_Flat-Roof_Three-Quarter_Exterior_Perspectives1.jpeg" alt="Modern House Designs" />
               <span className="card-tag">Collection 01</span>
@@ -149,7 +149,7 @@ export default function DesignIdeas() {
           </a>
 
           {/* Card 2 */}
-          <a href="#consultation" className="card" style={{ transitionDelay: '.15s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
+          <a href="#consult" className="card" style={{ transitionDelay: '.15s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
             <div className="card-img-wrap">
               <img src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/4-Bedroom_L-Shaped_Bungalow_Front_Elevation1.jpg" alt="4 Bedroom Plans" />
               <span className="card-tag">Collection 02</span>
@@ -167,7 +167,7 @@ export default function DesignIdeas() {
           </a>
 
           {/* Card 3 */}
-          <a href="#consultation" className="card" style={{ transitionDelay: '.25s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
+          <a href="#consult" className="card" style={{ transitionDelay: '.25s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
             <div className="card-img-wrap">
               <img src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa3.jpg" alt="Luxury Villa" />
               <span className="card-tag">Collection 03</span>
@@ -185,7 +185,7 @@ export default function DesignIdeas() {
           </a>
 
           {/* Card 4 */}
-          <a href="#consultation" className="card" style={{ transitionDelay: '.35s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
+          <a href="#consult" className="card" style={{ transitionDelay: '.35s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
             <div className="card-img-wrap">
               <img src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg" alt="Small Plot" />
               <span className="card-tag">Collection 04</span>
@@ -230,7 +230,7 @@ export default function DesignIdeas() {
             <span className="section-label" style={{ color: 'rgba(200,169,110,.8)' }}>Your Home, Designed</span>
             <h2>Turn Inspiration<br/>into Your <em>Dream</em><br/>Blueprint</h2>
             <p>Every great home in our library started with a single conversation. Our architects translate your ideas, lifestyle, and plot into a fully personalised plan — ready for construction.</p>
-            <a className="featured-cta" href="#consultation" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}><span>Book a Free Consultation →</span></a>
+            <a className="featured-cta" href="#consult" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}><span>Book a Free Consultation →</span></a>
           </div>
           <div className="steps">
             <div className="step" style={{ transitionDelay: '.1s' }}>
@@ -273,7 +273,7 @@ export default function DesignIdeas() {
         </header>
         <div className="mini-grid">
 
-          <a href="#consultation" className="mini-card" style={{ transitionDelay: '.05s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
+          <a href="#consult" className="mini-card" style={{ transitionDelay: '.05s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
             <div className="mini-img">
               <img src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg" alt="Guide 05" />
             </div>
@@ -282,7 +282,7 @@ export default function DesignIdeas() {
             <span className="mini-read"><span className="mini-read-line"></span>Read More</span>
           </a>
 
-          <a href="#consultation" className="mini-card" style={{ transitionDelay: '.15s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
+          <a href="#consult" className="mini-card" style={{ transitionDelay: '.15s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
             <div className="mini-img">
               <img src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg" alt="Guide 06" />
             </div>
@@ -291,7 +291,7 @@ export default function DesignIdeas() {
             <span className="mini-read"><span className="mini-read-line"></span>Read More</span>
           </a>
 
-          <a href="#consultation" className="mini-card" style={{ transitionDelay: '.25s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
+          <a href="#consult" className="mini-card" style={{ transitionDelay: '.25s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
             <div className="mini-img">
               <img src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Townhouse_Community_Architectural_Detail1.jpg" alt="Guide 07" />
             </div>
@@ -300,7 +300,7 @@ export default function DesignIdeas() {
             <span className="mini-read"><span className="mini-read-line"></span>Read More</span>
           </a>
 
-          <a href="#consultation" className="mini-card" style={{ transitionDelay: '.35s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
+          <a href="#consult" className="mini-card" style={{ transitionDelay: '.35s' }} onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>
             <div className="mini-img">
               <img src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg" alt="Guide 08" />
             </div>
@@ -320,7 +320,7 @@ export default function DesignIdeas() {
         <p className="reveal">
           Our architects are ready to transform the inspiration you've found here into a fully personalised blueprint for your plot and lifestyle.
         </p>
-        <a className="cta-main" href="#consultation" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}><span>Book a Free Consultation Today →</span></a>
+        <a className="cta-main" href="#consult" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}><span>Book a Free Consultation Today →</span></a>
       </section>
 
       <footer>
@@ -328,7 +328,7 @@ export default function DesignIdeas() {
         <span>
           <a href="#" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>Privacy</a> &nbsp;·&nbsp;
           <a href="#" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>Terms</a> &nbsp;·&nbsp;
-          <a href="#consultation" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>Contact Us</a>
+          <a href="#consult" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}>Contact Us</a>
         </span>
       </footer>
 

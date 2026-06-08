@@ -281,7 +281,7 @@ export default function DreamPlan() {
 
       <div className="dreamplan-root">
         {/* ─── HERO ─── */}
-        <section className="dp-hero">
+        <section className="dp-hero" id="hero">
           <CinematicBackground />
 
           <div className="dp-hero-body">
@@ -305,13 +305,13 @@ export default function DreamPlan() {
               </p>
 
               <div className="dp-hero-actions">
-                <a href="#" className="dp-btn-primary">
+                <a href="#explorer" className="dp-btn-primary">
                   View House Plans
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </a>
-                <a href="#" className="dp-btn-secondary">
+                <a href="#journey" className="dp-btn-secondary">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1" />
                     <path d="M5.5 4.5l4 2.5-4 2.5V4.5z" fill="currentColor" />
