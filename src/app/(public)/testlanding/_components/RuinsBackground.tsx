@@ -293,28 +293,31 @@ export default function RuinsBackground() {
           position: fixed;
           inset: 0;
           z-index: 20;
-          /* Raised from 0.4 — bricks need to register as atmosphere */
           opacity: 0.75;
           display: flex;
           justify-content: space-between;
-          /* Clip anything pushed offscreen */
           overflow: hidden;
         }
 
         /*
-         * Each ruin div is 180px wide so SVG renders at full fidelity.
-         * Negative margin slides it mostly offscreen; only --peek px show.
+         * Strategy: scale the container width so bricks render at the
+         * right size for the viewport, THEN use a small negative margin
+         * to push ~60% offscreen — only the ragged inner edge shows.
          *
-         * peek targets (visible brick width):
-         *   tiny phone  (< 380px)   → 40px
-         *   mobile      (< 641px)   → 52px
-         *   tablet      (641–1023)  → 68px
-         *   desktop     (≥ 1024px)  → 80px
-         *   wide        (≥ 1440px)  → 90px
+         * Visible peek per breakpoint:
+         *   mobile  (< 641px)  → container 60px  → ~24px peek
+         *   tablet  (641–1023) → container 100px → ~40px peek
+         *   desktop (≥ 1024px) → container 140px → ~56px peek
+         *   wide    (≥ 1440px) → container 180px → ~72px peek
+         *
+         * The negative margin = -(container × 0.6), so 40% shows.
+         * On mobile this is tiny — just enough to register as ruins
+         * without eating into content.
          */
 
+        /* ── Mobile base: very slim ── */
         .ruin {
-          width: 180px;
+          width: 60px;
           flex-shrink: 0;
           height: 100vh;
           overflow: visible;
@@ -331,37 +334,41 @@ export default function RuinsBackground() {
           transform: scaleX(-1);
         }
 
-        /* ── Mobile default: 52px peek ── */
-        .ruin-left  { margin-left:  -128px; }
-        .ruin-right { margin-right: -128px; }
+        /* Mobile: push 60% offscreen → ~24px visible */
+        .ruin-left  { margin-left:  -36px; }
+        .ruin-right { margin-right: -36px; }
 
-        /* ── Tiny phones (< 380px): 40px peek ── */
-        @media (max-width: 380px) {
-          .ruin-left  { margin-left:  -140px; }
-          .ruin-right { margin-right: -140px; }
+        /* ── Tiny phones (< 400px): even slimmer, ~18px peek ── */
+        @media (max-width: 400px) {
+          .ruin { width: 50px; }
+          .ruin-left  { margin-left:  -30px; }
+          .ruin-right { margin-right: -30px; }
         }
 
-        /* ── Tablets (641px – 1023px): 68px peek ── */
+        /* ── Tablets (641px – 1023px): ~40px peek ── */
         @media (min-width: 641px) and (max-width: 1023px) {
-          .ruin-left  { margin-left:  -112px; }
-          .ruin-right { margin-right: -112px; }
+          .ruin { width: 100px; }
+          .ruin-left  { margin-left:  -60px; }
+          .ruin-right { margin-right: -60px; }
         }
 
-        /* ── Desktop (≥ 1024px): 80px peek ── */
+        /* ── Desktop (≥ 1024px): ~56px peek ── */
         @media (min-width: 1024px) {
-          .ruin-left  { margin-left:  -100px; }
-          .ruin-right { margin-right: -100px; }
+          .ruin { width: 140px; }
+          .ruin-left  { margin-left:  -84px; }
+          .ruin-right { margin-right: -84px; }
         }
 
-        /* ── Wide desktop (≥ 1440px): 90px peek ── */
+        /* ── Wide desktop (≥ 1440px): ~72px peek ── */
         @media (min-width: 1440px) {
-          .ruin-left  { margin-left:  -90px; }
-          .ruin-right { margin-right: -90px; }
+          .ruin { width: 180px; }
+          .ruin-left  { margin-left:  -108px; }
+          .ruin-right { margin-right: -108px; }
         }
 
-        /* Reduced motion: keep visible but freeze parallax feel */
+        /* Reduced motion: slightly dimmer */
         @media (prefers-reduced-motion: reduce) {
-          .ruins-wrapper { opacity: 0.5; }
+          .ruins-wrapper { opacity: 0.45; }
         }
       `}</style>
     </motion.div>
