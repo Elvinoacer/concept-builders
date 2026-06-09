@@ -9,7 +9,7 @@ export default async function PublicLayout({
   const headerStore = await headers();
   const pathname =
     headerStore.get("x-pathname") ?? headerStore.get("next-url") ?? "";
-  const hideSharedChrome = pathname === "/" || pathname.startsWith("/auth");
+  const hideSharedChrome = pathname.startsWith("/auth");
 
   return (
     <PublicShell hideSharedChrome={hideSharedChrome}>{children}</PublicShell>
