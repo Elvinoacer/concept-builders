@@ -1,5 +1,6 @@
 import CustomDesignForm from "@/components/custom-design/CustomDesignForm";
 import CustomDesignHeader from "@/components/custom-design/CustomDesignHeader";
+import { Suspense } from "react";
 import {
   DraftingCompass,
   ShieldCheck,
@@ -91,7 +92,9 @@ const CustomDesignPage = () => {
         <div className="mx-auto w-full max-w-6xl overflow-hidden border border-cb-border bg-[linear-gradient(180deg,rgba(26,24,19,0.95),rgba(17,16,9,0.98))] shadow-[0_24px_80px_rgba(0,0,0,0.4)]">
           <CustomDesignHeader />
           <div className="border-t border-cb-border px-4 py-6 sm:px-6 md:px-8 lg:px-10">
-            <CustomDesignForm />
+            <Suspense fallback={<div className="h-[500px] animate-pulse bg-cb-border/10 rounded-sm" />}>
+              <CustomDesignForm />
+            </Suspense>
           </div>
         </div>
       </section>

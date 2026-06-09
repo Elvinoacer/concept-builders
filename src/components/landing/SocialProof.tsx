@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import './SocialProof.css';
 
 export default function SocialProof() {
@@ -270,6 +271,16 @@ export default function SocialProof() {
             <span className="stat__num">Thousands</span>
             <span className="stat__label">Family Members Living in Homes We Helped Design</span>
           </div>
+        </div>
+
+        {/* CTA Row */}
+        <div className="sp-cta-row">
+          <Link href="/ongoing-projects" className="sp-btn-ghost">
+            View Our Work
+          </Link>
+          <Link href="/designs" className="sp-btn-primary">
+            Browse All Plans →
+          </Link>
         </div>
 
       </section>

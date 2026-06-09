@@ -6,6 +6,17 @@ import './ContactForm.css';
 export default function ContactForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [location, setLocation] = useState('');
+  const [plotSize, setPlotSize] = useState('');
+  const [message, setMessage] = useState('');
+  
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -30,12 +41,38 @@ export default function ContactForm() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsFadingOut(true);
-    setTimeout(() => {
-      setIsSubmitted(true);
-    }, 400); // Matches the fade out animation duration in CSS
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${firstName} ${lastName}`.trim(),
+          email,
+          phone,
+          subject: `Consultation Request: ${location || 'General'}`,
+          message: `Plot Location: ${location || 'Not provided'}\nPlot Size: ${plotSize || 'Not provided'}\n\nMessage:\n${message}`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
+
+      setIsFadingOut(true);
+      setTimeout(() => {
+        setIsSubmitted(true);
+        setIsLoading(false);
+      }, 400); // Matches the fade out animation duration in CSS
+    } catch (err) {
+      console.error(err);
+      setError('Something went wrong. Please try again later.');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -68,29 +105,29 @@ export default function ContactForm() {
                 <div className="form-row">
                   <div className="form-group">
                     <label className="form-label">First Name</label>
-                    <input type="text" className="form-input" placeholder="John" required />
+                    <input type="text" className="form-input" placeholder="John" value={firstName} onChange={e => setFirstName(e.target.value)} required />
                   </div>
                   <div className="form-group">
                     <label className="form-label">Last Name</label>
-                    <input type="text" className="form-input" placeholder="Kamau" />
+                    <input type="text" className="form-input" placeholder="Kamau" value={lastName} onChange={e => setLastName(e.target.value)} />
                   </div>
                 </div>
                 <div className="form-group">
                   <label className="form-label">Email Address</label>
-                  <input type="email" className="form-input" placeholder="john@example.com" required />
+                  <input type="email" className="form-input" placeholder="john@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Phone / WhatsApp</label>
-                  <input type="tel" className="form-input" placeholder="+254 7xx xxx xxx" />
+                  <input type="tel" className="form-input" placeholder="+254 7xx xxx xxx" value={phone} onChange={e => setPhone(e.target.value)} />
                 </div>
                 <div className="form-row">
                   <div className="form-group">
                     <label className="form-label">Plot Location</label>
-                    <input type="text" className="form-input" placeholder="e.g. Nakuru, Rongai" />
+                    <input type="text" className="form-input" placeholder="e.g. Nakuru, Rongai" value={location} onChange={e => setLocation(e.target.value)} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">Plot Size</label>
-                    <select className="form-select form-input">
+                    <select className="form-select form-input" value={plotSize} onChange={e => setPlotSize(e.target.value)}>
                       <option value="">Select…</option>
                       <option>50×100 ft</option>
                       <option>40×80 ft</option>
@@ -103,9 +140,10 @@ export default function ContactForm() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Message / Customisation Requests</label>
-                  <textarea className="form-textarea form-input" placeholder="Tell us about your project, timeline, or any specific requirements…"></textarea>
+                  <textarea className="form-textarea form-input" placeholder="Tell us about your project, timeline, or any specific requirements…" value={message} onChange={e => setMessage(e.target.value)} required></textarea>
                 </div>
-                <button type="submit" className="form-submit"><span>Send Consultation Request →</span></button>
+                {error && <div className="form-error" style={{ color: '#ff4d4f', fontSize: '12px', marginBottom: '10px' }}>{error}</div>}
+                <button type="submit" className="form-submit" disabled={isLoading}><span>{isLoading ? 'Sending...' : 'Send Consultation Request →'}</span></button>
               </form>
             ) : (
               <div className="form-success show">

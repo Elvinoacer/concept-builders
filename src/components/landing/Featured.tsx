@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import './Featured.css';
 
 const collections = [
@@ -113,8 +114,16 @@ const iconTag = (
     <circle cx="5.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
   </svg>
 );
+const CATEGORY_MAP: Record<string, string> = {
+  "modern": "Modern",
+  "luxury": "Luxury",
+  "bungalow": "Bungalows",
+  "duplex": "Duplex",
+  "smallplot": "Small Plot",
+  "contemporary": "Contemporary",
+};
 
-export default function Featured() {
+export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
   const [activeId, setActiveId] = useState(collections[0].id);
   const [shimmerKey, setShimmerKey] = useState(0);
   const [isHeroHovered, setIsHeroHovered] = useState(false);
@@ -146,7 +155,35 @@ export default function Featured() {
 
   if (!activeCol) return null;
 
-  const [hero, s1, s2, s3, s4] = activeCol.plans;
+  const dbCategoryName = CATEGORY_MAP[activeId] || activeCol.label;
+  const categoryDbDesigns = allDesigns.filter(d => 
+    d.category?.name?.toLowerCase() === dbCategoryName.toLowerCase() ||
+    d.category?.name?.toLowerCase() === activeId.toLowerCase()
+  );
+
+  const mergedPlans = (function mergePlansWithFallback(dbDesigns: any[], fallbacks: any[], count: number) {
+    const merged = dbDesigns.map(d => ({
+      id: d.id,
+      tag: d.category?.name,
+      name: d.name,
+      beds: `${d.bedrooms || 0} bed · ${d.bathrooms || 0} bath`,
+      sqft: `${d.area || 0} sqft`,
+      price: d.basePrice ? `KES ${d.basePrice.toLocaleString()}` : "",
+      img: d.images?.[0]?.url || fallbacks[0]?.img || "",
+      badge: d.isFeatured ? "Featured" : null,
+    }));
+    
+    const remaining = count - merged.length;
+    if (remaining > 0) {
+      merged.push(...fallbacks.slice(0, remaining).map(f => ({
+        ...f,
+        id: undefined,
+      })));
+    }
+    return merged.slice(0, count);
+  })(categoryDbDesigns, activeCol.plans, activeCol.plans.length);
+
+  const [hero, s1, s2, s3, s4] = mergedPlans;
 
   return (
     <div className="fc-container">
@@ -215,9 +252,9 @@ export default function Featured() {
                   <span className="fc-meta-item">{iconSqft}<span>{hero.sqft}</span></span>
                   <span className="fc-meta-item" style={{ marginLeft: 'auto', fontSize: '13px', color: 'var(--gold)', fontWeight: 500, opacity: 1 }}>{hero.price}</span>
                 </div>
-                <button className="fc-hero-cta">
+                <Link href={hero.id ? `/designs/${hero.id}` : `/designs?category=${encodeURIComponent(activeCol.label)}`} className="fc-hero-cta" style={{ textDecoration: 'none' }}>
                   View Plan {iconArrow}
-                </button>
+                </Link>
               </div>
               <div 
                 className="fc-progress" 
@@ -231,24 +268,34 @@ export default function Featured() {
             {/* SIDE STACK */}
             <div className="fc-side">
               {[s1, s2, s3, s4].map((plan, i) => (
-                <div className={`fc-side-card card-enter card-enter-delay-${i + 1}`} key={`s${i}-${activeId}`}>
-                  <img className="fc-side-bg bg-fill" src={plan.img} alt={plan.name} />
+                <Link 
+                  href={plan?.id ? `/designs/${plan.id}` : `/designs?category=${encodeURIComponent(activeCol.label)}`}
+                  className={`fc-side-card card-enter card-enter-delay-${i + 1}`} 
+                  key={`s${i}-${activeId}`}
+                  style={{ textDecoration: 'none', display: 'block' }}
+                >
+                  <img className="fc-side-bg bg-fill" src={plan?.img} alt={plan?.name} />
                   <div className="fc-side-grad"></div>
-                  {plan.badge && <span className="fc-side-badge">{plan.badge}</span>}
+                  {plan?.badge && <span className="fc-side-badge">{plan.badge}</span>}
                   <div className="fc-side-info">
                     <div className="fc-side-label">{activeCol.label}</div>
-                    <div className="fc-side-name" style={{ fontSize: '13px' }}>{plan.name}</div>
-                    <div className="fc-side-beds">{plan.beds}</div>
+                    <div className="fc-side-name" style={{ fontSize: '13px' }}>{plan?.name}</div>
+                    <div className="fc-side-beds">{plan?.beds}</div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
 
           {/* BOTTOM THUMBNAILS */}
           <div className="fc-bottom animate-on-scroll" id="bottomStrip">
-            {activeCol.plans.map((plan, i) => (
-              <div key={`${activeId}-${i}`} className="fc-thumb card-enter" style={{ animationDelay: `${0.1 + i * 0.07}s` }}>
+            {mergedPlans.map((plan, i) => (
+              <Link 
+                href={plan.id ? `/designs/${plan.id}` : `/designs?category=${encodeURIComponent(activeCol.label)}`}
+                key={`${activeId}-${i}`} 
+                className="fc-thumb card-enter" 
+                style={{ animationDelay: `${0.1 + i * 0.07}s`, textDecoration: 'none', display: 'block' }}
+              >
                 <img className="fc-thumb-bg bg-fill" src={plan.img} alt={plan.name} />
                 <div className="fc-thumb-overlay"></div>
                 {plan.badge && <span className="fc-thumb-badge">{plan.badge}</span>}
@@ -256,7 +303,7 @@ export default function Featured() {
                   <div className="fc-thumb-name">{plan.name}</div>
                   <div className="fc-thumb-meta">{plan.sqft} &middot; {plan.price}</div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
@@ -264,7 +311,7 @@ export default function Featured() {
           <div className="fc-footer animate-on-scroll">
             <div className="fc-footer-left">
               <div className="fc-stat">
-                <span className="fc-stat-num"><em>{activeCol.plans.length}</em></span>
+                <span className="fc-stat-num"><em>{mergedPlans.length}</em></span>
                 <span className="fc-stat-label">Plans shown</span>
               </div>
               <div className="fc-stat-divider"></div>
@@ -276,16 +323,21 @@ export default function Featured() {
               <span className="fc-showing">Browsing <strong>{activeCol.label}</strong></span>
             </div>
             <div className="fc-footer-right">
-              <button className="fc-btn-ghost">Filter Plans</button>
-              <button className="fc-btn-primary" onClick={() => {
-                document.getElementById('explorer')?.scrollIntoView({ behavior: 'smooth' });
-              }}>
+              <Link href="#explorer" className="fc-btn-ghost" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Filter Plans</Link>
+              <Link 
+                href={`/designs?category=${encodeURIComponent(activeCol.label)}`}
+                className="fc-btn-primary" 
+                style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={(e) => {
+                  // Keep scroll behavior if staying on page, but since we are linking, we can omit it 
+                  // or keep it if they prefer just scrolling down. The plan says "update to also pass category as query param to /designs?category=..."
+                }}
+              >
                 View Full Collection
                 {iconArrow}
-              </button>
+              </Link>
             </div>
           </div>
-
         </div>
       </section>
     </div>

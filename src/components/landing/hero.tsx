@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import "./DreamPlan.css";
 
 
@@ -67,10 +68,17 @@ const PLANS = [
 
 
 
+// ── Routing Logic ──
+function getCardDestination(plan: any): string {
+  if (plan.id) return `/designs/${plan.id}`;
+  const cat = plan.category || plan.tag;
+  return `/designs?category=${encodeURIComponent(cat)}`;
+}
+
 // ── HouseCard ──
-function HouseCard({ plan, cardStyle, onClick }) {
+function HouseCard({ plan, cardStyle }) {
   return (
-    <div className="dp-house-card" style={cardStyle} onClick={onClick}>
+    <Link href={getCardDestination(plan)} className="dp-house-card" style={{ ...cardStyle, textDecoration: 'none' }}>
       <img src={plan.image} alt={plan.name} className="dp-card-img-full" />
       <div className="dp-card-overlay">
         <div className="dp-card-content">
@@ -85,7 +93,7 @@ function HouseCard({ plan, cardStyle, onClick }) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -228,8 +236,30 @@ function CinematicBackground() {
 }
 
 // ── Main DreamPlan Component ──
-export default function DreamPlan() {
-  const N = PLANS.length;
+export default function DreamPlan({ featuredDesigns = [] }: { featuredDesigns?: any[] }) {
+  const mergedPlans = (function mergePlansWithFallback(dbDesigns: any[], fallbacks: any[], count: number) {
+    const merged = dbDesigns.map(d => ({
+      id: d.id,
+      tag: d.category?.name || "Featured",
+      name: d.name,
+      beds: `${d.bedrooms || 0} Bed · ${d.bathrooms || 0} Bath`,
+      area: `${d.area || 0} sqft`,
+      price: d.basePrice ? `KES ${d.basePrice.toLocaleString()}` : "",
+      image: d.images?.[0]?.url || fallbacks[0].image,
+      category: d.category?.name
+    }));
+    
+    const remaining = count - merged.length;
+    if (remaining > 0) {
+      merged.push(...fallbacks.slice(0, remaining).map(f => ({
+        ...f,
+        id: undefined,
+      })));
+    }
+    return merged.slice(0, count);
+  })(featuredDesigns, PLANS, 7);
+
+  const N = mergedPlans.length;
   const { current, animated, goTo, next, prev } = useCarousel(N, 3800);
   const stageRef = useRef(null);
   const [stageDims, setStageDims] = useState({ w: 500, h: 580 });
@@ -345,7 +375,7 @@ export default function DreamPlan() {
                 onTouchEnd={onTouchEnd}
               >
                 <div className="dp-stage-inner">
-                  {PLANS.map((plan, i) => {
+                  {mergedPlans.map((plan, i) => {
                     const pos = positions[i];
                     const transition = animated
                       ? "transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.7s ease, filter 0.7s ease"
@@ -356,14 +386,13 @@ export default function DreamPlan() {
                       zIndex: pos.zIndex,
                       filter: `blur(${pos.blur}px)`,
                       transition,
-                      cursor: i === current ? "default" : "pointer",
+                      cursor: "pointer",
                     };
                     return (
                       <HouseCard
-                        key={plan.name}
+                        key={plan.name + i}
                         plan={plan}
                         cardStyle={cardStyle}
-                        onClick={() => goTo(i)}
                       />
                     );
                   })}
@@ -372,7 +401,7 @@ export default function DreamPlan() {
 
               {/* Dots */}
               <div className="dp-carousel-nav">
-                {PLANS.map((_, i) => (
+                {mergedPlans.map((_, i) => (
                   <button
                     key={i}
                     className={`dp-dot${i === current ? " dp-dot--active" : ""}`}

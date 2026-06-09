@@ -342,3 +342,68 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ─── CTA ROW ─── */
+.sp-wrapper .sp-cta-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 60px;
+  opacity: 0; transform: translateY(20px);
+  animation: spFadeUp .8s 1.3s forwards;
+}
+
+.sp-wrapper .sp-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid rgba(181,129,59,0.3);
+  color: var(--copper);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.sp-wrapper .sp-btn-ghost:hover {
+  background: rgba(181,129,59,0.05);
+  border-color: var(--copper);
+}
+
+.sp-wrapper .sp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--copper);
+  color: #141414;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 14px 32px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.sp-wrapper .sp-btn-primary:hover {
+  background: var(--copper2);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .sp-wrapper .sp-cta-row {
+    flex-direction: column;
+    width: 100%;
+    padding: 0 20px;
+  }
+  .sp-wrapper .sp-cta-row a {
+    width: 100%;
+    justify-content: center;
+  }
+}

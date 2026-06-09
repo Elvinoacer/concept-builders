@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +29,23 @@ const CustomDesignForm = () => {
   const [loading, setLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const inspiredBy = searchParams.get('inspired_by');
+    const style = searchParams.get('style');
+    const beds = searchParams.get('beds');
+
+    if (inspiredBy) {
+      setDescription(prev => prev ? prev : `I would like a custom design inspired by plan ID: ${inspiredBy}.`);
+      setDesignType("Residential");
+    } else if (style || beds) {
+      const styleText = style ? ` in ${style} style` : "";
+      const bedText = beds ? ` with ${beds} bedrooms` : "";
+      setDescription(prev => prev ? prev : `I'm interested in a custom design${styleText}${bedText}.`);
+      setDesignType("Residential");
+    }
+  }, [searchParams]);
 
   const resetForm = () => {
     setName("");
