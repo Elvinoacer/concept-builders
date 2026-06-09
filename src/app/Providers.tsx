@@ -123,36 +123,9 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "";
-  const isLandingPage = pathname === "/";
-
-  const showCartSync = pathname !== "/" && !pathname.startsWith("/auth");
+  const showCartSync = !pathname.startsWith("/auth");
   const showImpersonationBanner =
     pathname.startsWith("/admin") || pathname.startsWith("/dashboard");
-
-  if (isLandingPage) {
-    return (
-      <>
-        {children}
-        <Toaster
-          richColors
-          toastOptions={{
-            style: {
-              borderRadius: "8px",
-              border: "1px solid var(--border-color)",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-            },
-            classNames: {
-              toast: "bg-card text-cream",
-              title: "text-sm font-semibold",
-              description: "text-sm",
-              actionButton: "bg-gold text-ink",
-              cancelButton: "bg-muted text-cream",
-            },
-          }}
-        />
-      </>
-    );
-  }
 
   return (
     <SessionProvider>
