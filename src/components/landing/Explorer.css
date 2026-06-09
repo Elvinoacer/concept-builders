@@ -361,9 +361,10 @@
   background: rgba(0,0,0,0.85);
   z-index: 1000;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 24px;
+  overflow-y: auto;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -380,8 +381,7 @@
   overflow: hidden;
   width: 100%;
   max-width: 920px;
-  max-height: 90vh;
-  overflow-y: auto;
+  margin: auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   position: relative;
@@ -449,7 +449,7 @@
   font-size: 18px;
   line-height: 1;
   transition: background var(--ex-transition);
-  z-index: 10;
+  z-index: 50;
 }
 .ex-modal-close:hover { background: rgba(0,0,0,0.8); }
 
@@ -611,8 +611,8 @@
   .ex-slider-card { flex: 0 0 clamp(260px, 85vw, 320px); height: 380px; }
   .ex-card-name { font-size: 28px; }
   
-  .ex-modal-overlay { padding: 16px; }
-  .ex-modal { border-radius: 14px; max-height: calc(100vh - 32px); }
+  .ex-modal-overlay { padding: 16px; align-items: flex-start; }
+  .ex-modal { border-radius: 14px; margin: auto; }
   .ex-modal-img-side { min-height: 200px; }
   .ex-modal-content-side { padding: 20px 16px; }
   .ex-modal-title { font-size: 24px; margin-bottom: 16px; }

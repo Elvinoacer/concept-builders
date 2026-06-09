@@ -295,7 +295,7 @@ export default function DreamPlan() {
                 <span className="dp-eyebrow-text">Award-winning Architecture</span>
               </div>
 
-              <h1 className="dp-hero-headline text-[clamp(2.5rem,5vw,4.5rem)] leading-tight tracking-tight">
+              <h1 className="dp-hero-headline leading-tight tracking-tight">
                 Your House Should Fit Your<br />
                 Land, Budget, and Family<br />
                 <em>— Not the Other Way Around.</em>
