@@ -295,15 +295,14 @@ export default function DreamPlan() {
                 <span className="dp-eyebrow-text">Award-winning Architecture</span>
               </div>
 
-              <h1 className="dp-hero-headline">
-                Design Your<br />
-                Dream Home<br />
-                <em>Before You Build It</em>
+              <h1 className="dp-hero-headline text-[clamp(2.5rem,5vw,4.5rem)] leading-tight tracking-tight">
+                Your House Should Fit Your<br />
+                Land, Budget, and Family<br />
+                <em>— Not the Other Way Around.</em>
               </h1>
 
               <p className="dp-hero-sub">
-                Explore 100+ professionally designed house plans tailored for modern living.
-                From luxury villas to contemporary bungalows — every plan crafted to perfection.
+                We design practical, beautiful homes that can actually be built on your plot, within your budget, and without costly mistakes during construction.
               </p>
 
               <div className="dp-hero-actions">
@@ -313,12 +312,11 @@ export default function DreamPlan() {
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </a>
-                <a href={conceptbuildersStoryLink} target="_blank" rel="noopener noreferrer" className="dp-btn-secondary">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1" />
-                    <path d="M5.5 4.5l4 2.5-4 2.5V4.5z" fill="currentColor" />
+                <a href="/contact" className="dp-btn-secondary">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                   </svg>
-                  Watch Our Story
+                  Talk to an Architect
                 </a>
               </div>
 

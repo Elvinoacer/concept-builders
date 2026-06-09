@@ -169,7 +169,10 @@ export default function Explorer() {
         <div className="ex-section-header ex-reveal">
           <div className="ex-header-left">
             <p className="ex-eyebrow">Design Gallery</p>
-            <h2 className="ex-section-title">Find Your <em>Dream</em><br/>Home Style</h2>
+            <h2 className="ex-section-title">Not Every Plan Works<br/>for <em>Every Plot</em></h2>
+            <p className="ex-section-subtitle" style={{ color: 'var(--text-muted)', marginTop: '0.5rem', maxWidth: '400px' }}>
+              Filter by plot size, budget, and style to find a design that fits your reality.
+            </p>
           </div>
           <div className="ex-result-count"><span>{visiblePlans.length}</span> designs shown</div>
         </div>

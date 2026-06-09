@@ -108,8 +108,8 @@ export default function SocialProof() {
         {/* Heading */}
         <div className="section-head sp-reveal">
           <p className="eyebrow"><span></span> Client Stories <span></span></p>
-          <h2 className="section-title">Homes Built on <em>Trust</em></h2>
-          <p className="section-sub">Real families. Real blueprints. Real transformations.</p>
+          <h2 className="section-title">The Best Proof Is a Family Living in a Home They Love</h2>
+          <p className="section-sub">Every project starts as a conversation and ends as a place people proudly call home.</p>
         </div>
 
         {/* Cards */}
@@ -255,20 +255,20 @@ export default function SocialProof() {
         {/* Stats Strip */}
         <div className="stats-strip">
           <div className="stat">
-            <span className="stat__num"><span className="count-up" data-target="2400">0</span>+</span>
-            <span className="stat__label">Plans Delivered</span>
+            <span className="stat__num"><span className="count-up" data-target="22">0</span>+</span>
+            <span className="stat__label">Years Designing Homes Across Kenya</span>
           </div>
           <div className="stat">
-            <span className="stat__num"><span className="count-up" data-target="98">0</span>%</span>
-            <span className="stat__label">Client Satisfaction</span>
+            <span className="stat__num"><span className="count-up" data-target="1000">0</span>+</span>
+            <span className="stat__label">House Plans Delivered</span>
           </div>
           <div className="stat">
-            <span className="stat__num"><span className="count-up" data-target="47">0</span></span>
-            <span className="stat__label">Counties Served</span>
+            <span className="stat__num"><span className="count-up" data-target="500">0</span>+</span>
+            <span className="stat__label">Successful Residential Projects</span>
           </div>
           <div className="stat">
-            <span className="stat__num"><span className="count-up" data-target="12">0</span></span>
-            <span className="stat__label">Years of Excellence</span>
+            <span className="stat__num">Thousands</span>
+            <span className="stat__label">Family Members Living in Homes We Helped Design</span>
           </div>
         </div>
 

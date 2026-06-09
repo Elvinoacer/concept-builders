@@ -162,9 +162,9 @@ export default function Featured() {
             <div className="fc-header-left">
               <p className="fc-eyebrow">Curated by our architects</p>
               <h2 className="fc-title">
-                Featured <em>Collections</em>
+                Find a Design That Fits<br /><em>Your Lifestyle</em>
               </h2>
-              <p className="fc-subtitle">100+ professionally designed house plans, each crafted for the way Kenyans truly live.</p>
+              <p className="fc-subtitle">From compact family bungalows to luxury maisonettes, every plan can be customized to your land and requirements.</p>
             </div>
             <div className="fc-header-right">
               <div className="fc-stat">

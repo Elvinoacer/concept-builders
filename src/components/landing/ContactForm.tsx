@@ -44,9 +44,9 @@ export default function ContactForm() {
         <div className="form-inner">
           <div className="form-intro reveal">
             <div className="section-label">Start Your Journey</div>
-            <h2 className="section-title">Let's Talk About<br />Your Dream Home</h2>
+            <h2 className="section-title">Tell Us What You<br />Want to Build</h2>
             <p className="form-intro-text">
-              Our senior architect will personally review your site details and advise on the best plan for your plot, budget, and lifestyle — at no charge.
+              Whether you're starting with a rough idea or already have a plot, we'll help you determine the best design approach for your project.
             </p>
             <div className="trust-badges">
               <div className="trust-badge"><span className="trust-dot"></span> Free, no-obligation consultation call</div>
@@ -63,8 +63,8 @@ export default function ContactForm() {
                 className={`form-card ${isFadingOut ? 'fade-out' : ''}`} 
                 onSubmit={handleSubmit}
               >
-                <div className="form-title">Book a Consultation</div>
-                <div className="form-subtitle">Re: Architectural Design Discussion</div>
+                <div className="form-title">Book a Free Architectural Consultation</div>
+                <div className="form-subtitle">Speak directly with our team about your plot, design requirements, budget, and next steps.</div>
                 <div className="form-row">
                   <div className="form-group">
                     <label className="form-label">First Name</label>

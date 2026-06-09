@@ -105,9 +105,9 @@ export default function DesignIdeas() {
           <div className="shape"></div>
         </div>
         <p className="hero-eyebrow">Design Ideas Library</p>
-        <h1>Where <em>Great</em><br/>Homes Begin</h1>
+        <h1>Not Sure What<br/><em>You Want Yet?</em></h1>
         <p className="hero-sub">
-          Curated collections of architecture that inspire. Explore design concepts, discover trending styles, and find the blueprint for your perfect home.
+          Browse real projects, compare layouts, and discover ideas that match your lifestyle before making a decision.
         </p>
         <div className="hero-scroll">
           <div className="scroll-line"></div>
@@ -227,38 +227,34 @@ export default function DesignIdeas() {
       <section className="featured-row" id="consultation">
         <div className="featured-inner">
           <div className="featured-text reveal">
-            <span className="section-label" style={{ color: 'rgba(200,169,110,.8)' }}>Your Home, Designed</span>
-            <h2>Turn Inspiration<br/>into Your <em>Dream</em><br/>Blueprint</h2>
-            <p>Every great home in our library started with a single conversation. Our architects translate your ideas, lifestyle, and plot into a fully personalised plan — ready for construction.</p>
+            <span className="section-label" style={{ color: 'rgba(200,169,110,.8)' }}>Why Choose Us</span>
+            <h2>Why Homeowners<br/>Trust <em>Concept Builders</em></h2>
+            <p>Every great home starts with a solid foundation of trust. We bring expertise, transparency, and a commitment to quality that ensures your project is a success from start to finish.</p>
             <a className="featured-cta" href="#consult" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}><span>Book a Free Consultation →</span></a>
           </div>
           <div className="steps">
             <div className="step" style={{ transitionDelay: '.1s' }}>
-              <span className="step-num">01</span>
               <div>
-                <p className="step-title">Share Your Vision</p>
-                <p className="step-desc">A brief call to understand your lifestyle, preferences, and the plot you're working with.</p>
+                <p className="step-title">We Design for Real Kenyan Plots</p>
+                <p className="step-desc">Whether you own a 40×80, 50×100, or larger parcel, we create designs that maximize your space.</p>
               </div>
             </div>
             <div className="step" style={{ transitionDelay: '.22s' }}>
-              <span className="step-num">02</span>
               <div>
-                <p className="step-title">Concept Presentation</p>
-                <p className="step-desc">We present 3 tailored design concepts with mood boards, drawn from the latest collections.</p>
+                <p className="step-title">We Help You Avoid Expensive Mistakes</p>
+                <p className="step-desc">Design issues discovered during construction are costly. We solve them before building begins.</p>
               </div>
             </div>
             <div className="step" style={{ transitionDelay: '.34s' }}>
-              <span className="step-num">03</span>
               <div>
-                <p className="step-title">Full Technical Plans</p>
-                <p className="step-desc">Complete architectural drawings, structural plans, and specifications — ready to submit for approval.</p>
+                <p className="step-title">Customisation Comes Standard</p>
+                <p className="step-desc">Need more bedrooms, a larger kitchen, a home office, or future expansion space? We tailor plans around your needs.</p>
               </div>
             </div>
             <div className="step" style={{ transitionDelay: '.46s' }}>
-              <span className="step-num">04</span>
               <div>
-                <p className="step-title">Build with Confidence</p>
-                <p className="step-desc">We remain your partner throughout construction, answering queries and reviewing progress.</p>
+                <p className="step-title">Support Beyond Drawings</p>
+                <p className="step-desc">We guide you through approvals, planning, and construction considerations.</p>
               </div>
             </div>
           </div>
@@ -316,11 +312,11 @@ export default function DesignIdeas() {
 
       {/* FINAL CTA */}
       <section className="cta-band">
-        <h2 className="reveal">Ready to Design<br/>Your <em>Dream</em> Home?</h2>
+        <h2 className="reveal">Building Starts Long<br/>Before <em>Construction</em> Begins.</h2>
         <p className="reveal">
-          Our architects are ready to transform the inspiration you've found here into a fully personalised blueprint for your plot and lifestyle.
+          The right design can save money, reduce stress, and prevent costly changes later. Talk to us before you break ground.
         </p>
-        <a className="cta-main" href="#consult" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}><span>Book a Free Consultation Today →</span></a>
+        <a className="cta-main" href="#consult" onMouseEnter={handleLinkEnter} onMouseLeave={handleLinkLeave}><span>Schedule a Consultation →</span></a>
       </section>
 
       <footer>

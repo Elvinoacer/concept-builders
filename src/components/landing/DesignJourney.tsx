@@ -162,10 +162,10 @@ export default function DesignJourney() {
         <div className="section-header dj-reveal">
           <div>
             <div className="section-eyebrow"><span>Design Journey</span></div>
-            <h2>We sell the <em>process</em>,<br/>not just the image.</h2>
+            <h2>From Idea to Approved<br/><em>Building Plans</em></h2>
           </div>
           <p className="section-desc">
-            Every plan begins as a dream. Our three-stage process turns that dream into documents your builder can actually use — with full transparency at every step.
+            A clear process that removes guesswork and keeps your project moving.
           </p>
         </div>
 
@@ -179,7 +179,7 @@ export default function DesignJourney() {
             </div>
 
             <div className="stage-visual">
-              <div className="stage-tag">Concept & Planning</div>
+              <div className="stage-tag">Step 1</div>
               {/* Concept sketch illustration */}
               <svg viewBox="0 0 380 285" xmlns="http://www.w3.org/2000/svg">
                 <rect width="380" height="285" fill="#1A1A16"/>
@@ -216,14 +216,8 @@ export default function DesignJourney() {
               </svg>
             </div>
 
-            <h3>Concept &amp; Planning</h3>
-            <p>We start by listening. Your lot, your lifestyle, your budget — everything feeds into a design brief before a single line is drawn.</p>
-            <ul className="stage-features">
-              <li>Site analysis &amp; orientation study</li>
-              <li>Space planning &amp; room adjacency</li>
-              <li>Preliminary sketches &amp; layouts</li>
-              <li>Budget feasibility review</li>
-            </ul>
+            <h3>Tell Us About Your Project</h3>
+            <p>Share your plot size, budget, family needs, and preferred style.</p>
           </div>
 
           {/* Stage 2 */}
@@ -234,7 +228,7 @@ export default function DesignJourney() {
             </div>
 
             <div className="stage-visual">
-              <div className="stage-tag">3D Visualization</div>
+              <div className="stage-tag">Step 2</div>
               {/* 3D perspective illustration */}
               <svg viewBox="0 0 380 285" xmlns="http://www.w3.org/2000/svg">
                 <rect width="380" height="285" fill="#141410"/>
@@ -297,24 +291,19 @@ export default function DesignJourney() {
               </svg>
             </div>
 
-            <h3>3D Visualization</h3>
-            <p>Before a single brick is laid, you walk through your future home. Photorealistic renders let you feel the space and refine every detail with confidence.</p>
-            <ul className="stage-features">
-              <li>Exterior 3D renders &amp; perspectives</li>
-              <li>Interior space visualization</li>
-              <li>Material &amp; finish previews</li>
-              <li>Revision rounds included</li>
-            </ul>
+            <h3>We Develop the Design</h3>
+            <p>Our architects create a concept that balances appearance, functionality, and buildability.</p>
           </div>
 
           {/* Stage 3 */}
           <div className="stage">
             <div className="stage-number-wrap">
               <div className="stage-number">03</div>
+              <div className="stage-connector"></div>
             </div>
 
             <div className="stage-visual">
-              <div className="stage-tag">Construction Ready</div>
+              <div className="stage-tag">Step 3</div>
               {/* Technical drawings illustration */}
               <svg viewBox="0 0 380 285" xmlns="http://www.w3.org/2000/svg">
                 <rect width="380" height="285" fill="#0E0E0C"/>
@@ -380,14 +369,85 @@ export default function DesignJourney() {
               </svg>
             </div>
 
-            <h3>Construction Ready Plans</h3>
-            <p>Stamped, dimensioned, and fully compliant. Your contractor gets everything needed to break ground — no guesswork, no delays, no costly surprises.</p>
-            <ul className="stage-features">
-              <li>Full architectural drawing set</li>
-              <li>Structural &amp; electrical layouts</li>
-              <li>Bill of quantities (BQ)</li>
-              <li>Council submission ready</li>
-            </ul>
+            <h3>Review &amp; Refine</h3>
+            <p>We adjust the design until it feels right for your family and future plans.</p>
+          </div>
+
+          {/* Stage 4 */}
+          <div className="stage">
+            <div className="stage-number-wrap">
+              <div className="stage-number">04</div>
+            </div>
+
+            <div className="stage-visual">
+              <div className="stage-tag">Step 4</div>
+              {/* Technical drawings illustration */}
+              <svg viewBox="0 0 380 285" xmlns="http://www.w3.org/2000/svg">
+                <rect width="380" height="285" fill="#0E0E0C"/>
+                {/* Title block bottom */}
+                <rect x="0" y="245" width="380" height="40" fill="#141410" stroke="#C9A96E" strokeWidth="0.5" opacity="0.6"/>
+                <line x1="120" y1="245" x2="120" y2="285" stroke="#C9A96E" strokeWidth="0.5" opacity="0.6"/>
+                <line x1="240" y1="245" x2="240" y2="285" stroke="#C9A96E" strokeWidth="0.5" opacity="0.6"/>
+                <text x="60" y="268" fill="#C9A96E" fontSize="7" fontFamily="DM Sans" letterSpacing="1" textAnchor="middle" opacity="0.7">GROUND FLOOR</text>
+                <text x="180" y="268" fill="#C9A96E" fontSize="7" fontFamily="DM Sans" letterSpacing="1" textAnchor="middle" opacity="0.7">SCALE 1:100</text>
+                <text x="310" y="262" fill="#E8D5A3" fontSize="7" fontFamily="DM Sans" letterSpacing="1" textAnchor="middle" opacity="0.7">ARCHFORM LTD</text>
+                <text x="310" y="274" fill="#C9A96E" fontSize="6" fontFamily="DM Sans" letterSpacing="1" textAnchor="middle" opacity="0.5">DWG-001 REV C</text>
+
+                {/* Precise floor plan */}
+                <g transform="translate(20,15)" stroke="#C9A96E" fill="none">
+                  {/* Outer walls thick */}
+                  <rect x="10" y="10" width="340" height="220" strokeWidth="3" opacity="0.9"/>
+                  {/* Inner wall lines */}
+                  <line x1="130" y1="10" x2="130" y2="150" strokeWidth="2" opacity="0.8"/>
+                  <line x1="10" y1="150" x2="220" y2="150" strokeWidth="2" opacity="0.8"/>
+                  <line x1="220" y1="10" x2="220" y2="230" strokeWidth="2" opacity="0.8"/>
+                  <line x1="220" y1="100" x2="350" y2="100" strokeWidth="2" opacity="0.8"/>
+
+                  {/* Door swings */}
+                  <path d="M 130 95 Q 170 95 170 55" strokeWidth="0.8" strokeDasharray="2,1.5" opacity="0.6"/>
+                  <line x1="130" y1="95" x2="130" y2="55" strokeWidth="0.8" opacity="0.5"/>
+                  <line x1="130" y1="55" x2="170" y2="55" strokeWidth="0.8" opacity="0.7"/>
+
+                  <path d="M 175 150 Q 175 110 215 110" strokeWidth="0.8" strokeDasharray="2,1.5" opacity="0.6"/>
+                  <line x1="175" y1="150" x2="215" y2="150" strokeWidth="0.8" opacity="0.5"/>
+                  <line x1="215" y1="110" x2="215" y2="150" strokeWidth="0.8" opacity="0.7"/>
+
+                  {/* Window openings */}
+                  <line x1="40" y1="10" x2="80" y2="10" strokeWidth="3" stroke="#141410"/>
+                  <line x1="40" y1="10" x2="80" y2="10" strokeWidth="1.5" stroke="#E8D5A3" opacity="0.9"/>
+                  <line x1="40" y1="9" x2="80" y2="9" strokeWidth="0.5" stroke="#C9A96E" opacity="0.7"/>
+                  <line x1="40" y1="11" x2="80" y2="11" strokeWidth="0.5" stroke="#C9A96E" opacity="0.7"/>
+
+                  <line x1="160" y1="10" x2="210" y2="10" strokeWidth="3" stroke="#141410"/>
+                  <line x1="160" y1="10" x2="210" y2="10" strokeWidth="1.5" stroke="#E8D5A3" opacity="0.9"/>
+                  <line x1="160" y1="9" x2="210" y2="9" strokeWidth="0.5" stroke="#C9A96E" opacity="0.7"/>
+                  <line x1="160" y1="11" x2="210" y2="11" strokeWidth="0.5" stroke="#C9A96E" opacity="0.7"/>
+
+                  <line x1="260" y1="10" x2="330" y2="10" strokeWidth="3" stroke="#141410"/>
+                  <line x1="260" y1="10" x2="330" y2="10" strokeWidth="1.5" stroke="#E8D5A3" opacity="0.9"/>
+
+                  <line x1="350" y1="30" x2="350" y2="80" strokeWidth="3" stroke="#141410"/>
+                  <line x1="350" y1="30" x2="350" y2="80" strokeWidth="1.5" stroke="#E8D5A3" opacity="0.9"/>
+
+                  {/* Room labels precise */}
+                  <text x="65" y="90" fill="#C9A96E" fontSize="7" fontFamily="DM Sans" letterSpacing="1.5" textAnchor="middle" opacity="0.6">MASTER</text>
+                  <text x="65" y="100" fill="#C9A96E" fontSize="7" fontFamily="DM Sans" letterSpacing="1.5" textAnchor="middle" opacity="0.6">BED</text>
+                  <text x="170" y="65" fill="#C9A96E" fontSize="7" fontFamily="DM Sans" letterSpacing="1.5" textAnchor="middle" opacity="0.6">LIVING</text>
+                  <text x="65" y="195" fill="#C9A96E" fontSize="7" fontFamily="DM Sans" letterSpacing="1.5" textAnchor="middle" opacity="0.6">KITCHEN</text>
+                  <text x="285" y="60" fill="#C9A96E" fontSize="7" fontFamily="DM Sans" letterSpacing="1.5" textAnchor="middle" opacity="0.6">GARAGE</text>
+                  <text x="285" y="175" fill="#C9A96E" fontSize="7" fontFamily="DM Sans" letterSpacing="1.5" textAnchor="middle" opacity="0.6">BED 2</text>
+
+                  {/* Dimension lines crisp */}
+                  <line x1="10" y1="-8" x2="350" y2="-8" strokeWidth="0.5" stroke="#E8D5A3" opacity="0.6"/>
+                  <line x1="10" y1="-12" x2="10" y2="-4" strokeWidth="0.5" stroke="#E8D5A3" opacity="0.6"/>
+                  <line x1="350" y1="-12" x2="350" y2="-4" strokeWidth="0.5" stroke="#E8D5A3" opacity="0.6"/>
+                  <text x="180" y="-2" fill="#E8D5A3" fontSize="7" fontFamily="DM Sans" textAnchor="middle" opacity="0.7">17 000</text>
+                </g>
+              </svg>
+            </div>
+
+            <h3>Receive Ready-to-Build Drawings</h3>
+            <p>Complete architectural plans prepared for approvals and construction.</p>
           </div>
 
         </div>
