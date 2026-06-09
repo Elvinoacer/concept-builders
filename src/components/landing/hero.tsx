@@ -313,7 +313,7 @@ export default function DreamPlan() {
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </a>
-                <a href={conceptbuildersStoryLink} className="dp-btn-secondary">
+                <a href={conceptbuildersStoryLink} target="_blank" rel="noopener noreferrer" className="dp-btn-secondary">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1" />
                     <path d="M5.5 4.5l4 2.5-4 2.5V4.5z" fill="currentColor" />
