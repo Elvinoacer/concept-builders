@@ -12,12 +12,28 @@ const CustomDesignHeader: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <CardHeader className="px-2 py-5 text-center sm:px-4 sm:py-8 md:px-6">
+      <CardHeader
+        className="
+          px-4
+          py-8
+          text-center
+          sm:px-6
+          sm:py-12
+          md:px-10
+        "
+      >
         <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-gold sm:text-[11px]">
           Bespoke Project Request
         </p>
         <CardTitle
-          className="text-3xl font-light leading-[1.02] text-cream sm:text-4xl md:text-5xl lg:text-6xl"
+          className="
+text-4xl
+font-light
+leading-tight
+text-cream
+sm:text-5xl
+lg:text-7xl
+"
           style={{
             fontFamily:
               'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
@@ -35,7 +51,7 @@ const CustomDesignHeader: React.FC = () => {
           {customDesignHeader.description}
         </CardDescription>
 
-        <div className="mt-6">
+        <div className="mt-8 flex justify-center">
           <Button
             onClick={() =>
               document.getElementById("custom-design-form")?.scrollIntoView({
@@ -43,7 +59,21 @@ const CustomDesignHeader: React.FC = () => {
                 block: "start",
               })
             }
-            className="bg-gold text-black hover:bg-gold/90"
+            className="
+              h-12
+              rounded-full
+              bg-gold
+              px-8
+              text-sm
+              font-medium
+              text-black
+              shadow-lg
+              transition-all
+              hover:bg-gold/90
+              hover:scale-[1.03]
+              focus-visible:ring-2
+              focus-visible:ring-gold
+            "
           >
             Request Design
           </Button>

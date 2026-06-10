@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import PublicThemeToggle from "@/components/ui/public-theme-toggle";
 
 export default function LandingNav() {
   const [navScrolled, setNavScrolled] = useState(false);
@@ -88,13 +87,9 @@ export default function LandingNav() {
               Start a Project
             </Link>
           </li>
-          <li>
-            <PublicThemeToggle className="h-9 w-9" />
-          </li>
         </ul>
 
         <div className="flex items-center gap-2 lg:hidden">
-          <PublicThemeToggle className="h-9 w-9" />
           <button
             className="relative z-[110] flex h-10 w-10 flex-col items-center justify-center gap-[5px]"
             onClick={() => setMobileMenuOpen((o) => !o)}

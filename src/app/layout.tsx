@@ -24,10 +24,7 @@ export const viewport: Viewport = {
   minimumScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "rgb(15 23 42)" },
-  ],
+  themeColor: "#0a0907",
   viewportFit: "cover",
 };
 
@@ -136,26 +133,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Apply persisted theme class before first paint without next-themes runtime. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                var t = localStorage.getItem('concept-builders-theme') || 'dark';
-                var root = document.documentElement;
-                root.classList.remove('light', 'dark');
-                root.classList.add(t === 'light' ? 'light' : 'dark');
-                root.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
-              } catch(e) {
-                var rootFallback = document.documentElement;
-                rootFallback.classList.remove('light');
-                rootFallback.classList.add('dark');
-                rootFallback.setAttribute('data-theme', 'dark');
-              }
-            `,
-          }}
-        />
-
         {/* Preload critical resources */}
         <link
           rel="preload"

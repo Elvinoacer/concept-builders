@@ -182,7 +182,7 @@ const CustomDesignForm = () => {
             <Input
               type="text"
               id="name"
-              placeholder="John Doe"
+              placeholder="Your full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -202,7 +202,7 @@ const CustomDesignForm = () => {
             <Input
               type="email"
               id="email"
-              placeholder="john.doe@example.com"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -224,7 +224,7 @@ const CustomDesignForm = () => {
             <Input
               type="tel"
               id="phone"
-              placeholder="+254 700 000 000"
+              placeholder="Phone number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
@@ -284,7 +284,7 @@ const CustomDesignForm = () => {
             </Label>
             <Textarea
               id="description"
-              placeholder="Describe your project vision, room requirements, style direction, and special features."
+              placeholder="Tell us about your project requirements..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={5}
@@ -307,7 +307,7 @@ const CustomDesignForm = () => {
             <Input
               type="text"
               id="budget"
-              placeholder="e.g., USD 4,000,000 - 8,000,000"
+              placeholder="Estimated budget"
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
               className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"

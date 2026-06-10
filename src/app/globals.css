@@ -140,116 +140,6 @@
     --design-mobile-bar-bg: rgba(20, 18, 16, 0.96);
     --design-lightbox-bg: rgba(10, 9, 7, 0.96);
   }
-
-  /* === LIGHT MODE === */
-  .light {
-    --ink: #faf7f2;
-    --surface: #f2ece0;
-    --card: #ffffff;
-    --cream: #2c2520;
-    --cream-dim: #5a4e44;
-    --gold: #b07820;
-    --gold-light: #c89030;
-    --muted: #9e9488;
-    --border-color: rgba(80, 65, 50, 0.15);
-    --border-gold: rgba(176, 120, 32, 0.3);
-
-    /* shadcn/ui HSL tokens — light */
-    --background: 42 30% 97%;
-    --foreground: 30 18% 12%;
-    --card-bg: 0 0% 100%;
-    --card-foreground: 30 18% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 30 18% 12%;
-    --primary: 36 66% 41%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 42 20% 92%;
-    --secondary-foreground: 30 18% 20%;
-    --muted-bg: 42 20% 94%;
-    --muted-foreground: 35 13% 42%;
-    --accent: 36 66% 41%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 45%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 35 20% 82%;
-    --input: 35 20% 82%;
-    --ring: 36 66% 41%;
-
-    /* Chart colors */
-    --chart-1: 36 66% 41%;
-    --chart-2: 35 30% 35%;
-    --chart-3: 42 20% 65%;
-    --chart-4: 30 18% 45%;
-    --chart-5: 200 30% 45%;
-
-    --landing-nav-bg: rgba(250, 247, 242, 0.9);
-    --landing-hero-image-opacity: 0.5;
-    --landing-hero-overlay:
-      linear-gradient(
-        to bottom,
-        rgba(250, 247, 242, 0.52) 0%,
-        rgba(250, 247, 242, 0.42) 35%,
-        rgba(242, 236, 224, 0.82) 78%,
-        var(--ink) 100%
-      ),
-      linear-gradient(
-        130deg,
-        rgba(176, 120, 32, 0.1) 0%,
-        rgba(176, 120, 32, 0.02) 38%,
-        transparent 60%
-      ),
-      radial-gradient(
-        circle at 72% 34%,
-        rgba(200, 144, 48, 0.18) 0%,
-        transparent 44%
-      );
-    --landing-hero-grid-line: rgba(80, 65, 50, 0.06);
-    --landing-hero-grid-mask: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(0, 0, 0, 0.16) 30%,
-      rgba(0, 0, 0, 0.16) 70%,
-      transparent 100%
-    );
-
-    --design-hero-image-filter: brightness(0.82) saturate(0.9);
-    --design-hero-fallback-bg: linear-gradient(
-      130deg,
-      rgba(176, 120, 32, 0.14),
-      transparent 55%
-    );
-    --design-hero-overlay:
-      linear-gradient(
-        to bottom,
-        rgba(250, 247, 242, 0.2) 0%,
-        rgba(250, 247, 242, 0.08) 35%,
-        rgba(242, 236, 224, 0.7) 72%,
-        var(--ink) 100%
-      ),
-      linear-gradient(130deg, rgba(176, 120, 32, 0.09), transparent 58%);
-    --design-hero-grid-line: rgba(80, 65, 50, 0.06);
-    --design-hero-grid-mask: linear-gradient(
-      to bottom,
-      transparent,
-      rgba(0, 0, 0, 0.2) 40%,
-      rgba(0, 0, 0, 0.2) 70%,
-      transparent
-    );
-    --design-hero-control-bg: rgba(250, 247, 242, 0.55);
-    --design-hero-control-border: rgba(80, 65, 50, 0.18);
-    --design-hero-control-border-hover: rgba(176, 120, 32, 0.35);
-    --design-hero-breadcrumb: rgba(44, 37, 32, 0.68);
-
-    --design-border-soft: rgba(80, 65, 50, 0.16);
-    --design-border-accent: rgba(176, 120, 32, 0.34);
-    --design-text-subtle: rgba(44, 37, 32, 0.8);
-    --design-text-muted: rgba(44, 37, 32, 0.62);
-    --design-control-bg: rgba(250, 247, 242, 0.74);
-    --design-control-bg-soft: rgba(250, 247, 242, 0.66);
-    --design-row-hover: #ede4d6;
-    --design-mobile-bar-bg: rgba(250, 247, 242, 0.96);
-    --design-lightbox-bg: rgba(250, 247, 242, 0.92);
-  }
 }
 
 @layer base {
@@ -446,28 +336,11 @@
   border-top: 4px solid var(--muted);
 }
 
-/* Light mode phone input styles */
-.light .phone-input-custom .PhoneInputInput {
-  background: var(--card);
-  border-color: var(--border-color);
-  color: var(--cream);
-}
-
-.light .phone-input-custom .PhoneInputInput:focus {
-  background: var(--card);
-  border-color: var(--gold);
-}
-
-.light .phone-input-custom .PhoneInputInput:disabled {
-  background: var(--surface);
-  border-color: var(--border-color);
-  color: var(--muted);
-}
-
-.light .phone-input-custom .PhoneInputCountry {
-  border-right-color: var(--border-color);
-}
-
-.light .phone-input-custom .PhoneInputCountrySelectArrow {
-  border-top-color: var(--muted);
+@layer base {
+  input:focus,
+  textarea:focus,
+  button:focus-visible,
+  select:focus {
+    outline: none;
+  }
 }
