@@ -20,7 +20,9 @@ export async function POST(request: NextRequest) {
     const designType = formData.get("designType") as string;
     const description = formData.get("description") as string;
     const budget = formData.get("budget") as string | null;
-    const referenceDesignId = formData.get("referenceDesignId") as string | null;
+    const referenceDesignId = formData.get("referenceDesignId") as
+      | string
+      | null;
     const referenceImageUrl = formData.get("referenceImage") as string | null;
     const files = formData.getAll("files") as File[];
 
@@ -65,8 +67,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Send email to admin
-    await sendCustomDesignRequestEmail(customDesignRequest);
+    // Send email to admin (non-fatal — DB save already succeeded)
+    try {
+      await sendCustomDesignRequestEmail(customDesignRequest);
+    } catch (emailError) {
+      console.error("Custom design email failed:", emailError);
+    }
 
     // Create notification for admin
     const admin = await prisma.user.findFirst({
@@ -74,42 +80,46 @@ export async function POST(request: NextRequest) {
     });
 
     if (admin) {
-      await prisma.notification.create({
-        data: {
-          userId: admin.id,
-          title: "New Custom Design Request",
-          description: `A new custom design request has been submitted by ${name}`,
-          icon: "Paperclip",
-        },
-      });
-
-      // Send Push Notification
       try {
-        const { getAdminMessaging } = await import("@/lib/firebase-admin");
-        const adminMessaging = getAdminMessaging();
-        
-        const adminTokens = await prisma.deviceToken.findMany({
-          where: { userId: admin.id },
-          select: { token: true },
+        await prisma.notification.create({
+          data: {
+            userId: admin.id,
+            title: "New Custom Design Request",
+            description: `A new custom design request has been submitted by ${name}`,
+            icon: "Paperclip",
+          },
         });
 
-        const tokens = adminTokens.map(t => t.token);
+        // Send Push Notification
+        try {
+          const { getAdminMessaging } = await import("@/lib/firebase-admin");
+          const adminMessaging = getAdminMessaging();
 
-        if (tokens.length > 0) {
-          await adminMessaging.sendEachForMulticast({
-            tokens,
-            notification: {
-              title: "New Custom Design Request",
-              body: `${name} submitted a request for ${designType}`,
-            },
-            data: {
-              url: `/admin/custom-design-requests/${customDesignRequest.id}`,
-              requestId: customDesignRequest.id,
-            },
+          const adminTokens = await prisma.deviceToken.findMany({
+            where: { userId: admin.id },
+            select: { token: true },
           });
+
+          const tokens = adminTokens.map((t) => t.token);
+
+          if (tokens.length > 0) {
+            await adminMessaging.sendEachForMulticast({
+              tokens,
+              notification: {
+                title: "New Custom Design Request",
+                body: `${name} submitted a request for ${designType}`,
+              },
+              data: {
+                url: `/admin/custom-design-requests/${customDesignRequest.id}`,
+                requestId: customDesignRequest.id,
+              },
+            });
+          }
+        } catch (pushError) {
+          console.error("Failed to send push notification:", pushError);
         }
-      } catch (pushError) {
-        console.error("Failed to send push notification:", pushError);
+      } catch (notificationError) {
+        console.error("Notification creation failed:", notificationError);
       }
     }
 

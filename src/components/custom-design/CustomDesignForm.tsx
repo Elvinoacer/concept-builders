@@ -29,9 +29,32 @@ const CustomDesignForm = () => {
   const [loading, setLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [referenceDesignId, setReferenceDesignId] = useState<string | null>(null);
+  const [referenceDesignId, setReferenceDesignId] = useState<string | null>(
+    null,
+  );
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
   const searchParams = useSearchParams();
+
+  const inferDesignType = (style: string | null, beds: string | null) => {
+    if (!style) {
+      if (beds === "1" || beds === "2") return "Small Plot";
+      return "Modern";
+    }
+
+    const normalized = style.replace(/[-_]/g, " ").toLowerCase();
+
+    if (normalized.includes("small") && normalized.includes("plot"))
+      return "Small Plot";
+    if (normalized.includes("luxury")) return "Luxury";
+    if (normalized.includes("modern")) return "Modern";
+    if (normalized.includes("contemporary")) return "Contemporary";
+    if (normalized.includes("bungalow")) return "Bungalow";
+    if (normalized.includes("duplex")) return "Duplex";
+
+    if (beds === "1" || beds === "2") return "Small Plot";
+
+    return "Modern";
+  };
 
   useEffect(() => {
     const inspiredBy = searchParams.get("inspired_by");
@@ -43,21 +66,15 @@ const CustomDesignForm = () => {
     setReferenceImage(image);
 
     if (inspiredBy) {
-      setDescription((prev) =>
-        prev
-          ? prev
-          : `I would like a custom design inspired by plan ID: ${inspiredBy}.`,
-      );
-      setDesignType("Residential");
+      const generatedDescription = `I would like a custom design similar to the selected reference design. Please maintain the overall architectural character while tailoring the layout, dimensions, and functionality to my requirements.`;
+      setDescription((prev) => prev || generatedDescription);
+      setDesignType(inferDesignType(style, beds));
     } else if (style || beds) {
       const styleText = style ? ` in ${style} style` : "";
       const bedText = beds ? ` with ${beds} bedrooms` : "";
-      setDescription((prev) =>
-        prev
-          ? prev
-          : `I'm interested in a custom design${styleText}${bedText}.`,
-      );
-      setDesignType("Residential");
+      const generatedDescription = `I would like a custom architectural design${styleText}${bedText}. Please prepare a design proposal based on these requirements.`;
+      setDescription((prev) => prev || generatedDescription);
+      setDesignType(inferDesignType(style, beds));
     }
   }, [searchParams]);
 
@@ -103,7 +120,8 @@ const CustomDesignForm = () => {
     formData.append("description", description);
     if (phone) formData.append("phone", phone);
     if (budget) formData.append("budget", budget);
-    if (referenceDesignId) formData.append("referenceDesignId", referenceDesignId);
+    if (referenceDesignId)
+      formData.append("referenceDesignId", referenceDesignId);
     if (referenceImage) formData.append("referenceImage", referenceImage);
     files.forEach((file) => {
       formData.append("files", file);
@@ -116,8 +134,8 @@ const CustomDesignForm = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to submit request");
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to submit request");
       }
 
       toast.success(
@@ -190,148 +208,180 @@ const CustomDesignForm = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-          <div className="space-y-2">
-            <Label
-              htmlFor="name"
-              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
-            >
-              Full Name
-            </Label>
-            <Input
-              type="text"
-              id="name"
-              placeholder="Your full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
-            />
+            <div className="space-y-2">
+              <Label
+                htmlFor="name"
+                className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+              >
+                Full Name
+              </Label>
+              <Input
+                type="text"
+                id="name"
+                placeholder="Your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
+              />
 
-            <p className="mt-1 text-xs text-cream-dim">Enter your full name.</p>
+              <p className="mt-1 text-xs text-cream-dim">
+                Enter your full name.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="email"
+                className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+              >
+                Email
+              </Label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
+              />
+
+              <p className="mt-1 text-xs text-cream-dim">
+                We'll use this to contact you about your project.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="phone"
+                className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+              >
+                Phone Number (Optional)
+              </Label>
+              <Input
+                type="tel"
+                id="phone"
+                placeholder="Phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
+              />
+
+              <p className="mt-1 text-xs text-cream-dim">
+                Optional but recommended.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="designType"
+                className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+              >
+                Type of Design
+              </Label>
+              <Select value={designType} onValueChange={setDesignType} required>
+                <SelectTrigger className="h-11 border-cb-border bg-card text-cream data-[placeholder]:text-muted focus:border-gold">
+                  <SelectValue placeholder="Select design type" />
+                </SelectTrigger>
+                <SelectContent className="border-cb-border bg-card text-cream">
+                  <SelectItem
+                    value="Modern"
+                    className="focus:bg-gold/15 focus:text-gold"
+                  >
+                    Modern
+                  </SelectItem>
+                  <SelectItem
+                    value="Luxury"
+                    className="focus:bg-gold/15 focus:text-gold"
+                  >
+                    Luxury
+                  </SelectItem>
+                  <SelectItem
+                    value="Contemporary"
+                    className="focus:bg-gold/15 focus:text-gold"
+                  >
+                    Contemporary
+                  </SelectItem>
+                  <SelectItem
+                    value="Bungalow"
+                    className="focus:bg-gold/15 focus:text-gold"
+                  >
+                    Bungalow
+                  </SelectItem>
+                  <SelectItem
+                    value="Duplex"
+                    className="focus:bg-gold/15 focus:text-gold"
+                  >
+                    Duplex
+                  </SelectItem>
+                  <SelectItem
+                    value="Small Plot"
+                    className="focus:bg-gold/15 focus:text-gold"
+                  >
+                    Small Plot
+                  </SelectItem>
+                  <SelectItem
+                    value="Commercial"
+                    className="focus:bg-gold/15 focus:text-gold"
+                  >
+                    Commercial
+                  </SelectItem>
+                  <SelectItem
+                    value="Renovation"
+                    className="focus:bg-gold/15 focus:text-gold"
+                  >
+                    Renovation
+                  </SelectItem>
+                  <SelectItem
+                    value="Other"
+                    className="focus:bg-gold/15 focus:text-gold"
+                  >
+                    Other
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <Label
+                htmlFor="description"
+                className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+              >
+                Project Description
+              </Label>
+              <Textarea
+                id="description"
+                placeholder="Tell us about your project requirements..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={5}
+                className="min-h-[150px] resize-y border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
+                required
+              />
+
+              <p className="mt-1 text-xs text-cream-dim">
+                Include style preferences, room requirements and project goals.
+              </p>
+            </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <Label
+                htmlFor="budget"
+                className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
+              >
+                Estimated Budget (Optional)
+              </Label>
+              <Input
+                type="text"
+                id="budget"
+                placeholder="Estimated budget"
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                className="h-11 border-cb-border bg-card text-cream placeholder:text-cream/40 focus:border-gold"
+              />
+            </div>
           </div>
-
-          <div className="space-y-2">
-            <Label
-              htmlFor="email"
-              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
-            >
-              Email
-            </Label>
-            <Input
-              type="email"
-              id="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
-            />
-
-            <p className="mt-1 text-xs text-cream-dim">
-              We'll use this to contact you about your project.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label
-              htmlFor="phone"
-              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
-            >
-              Phone Number (Optional)
-            </Label>
-            <Input
-              type="tel"
-              id="phone"
-              placeholder="Phone number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
-            />
-
-            <p className="mt-1 text-xs text-cream-dim">
-              Optional but recommended.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label
-              htmlFor="designType"
-              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
-            >
-              Type of Design
-            </Label>
-            <Select value={designType} onValueChange={setDesignType} required>
-              <SelectTrigger className="h-11 border-cb-border bg-card text-cream data-[placeholder]:text-muted focus:border-gold">
-                <SelectValue placeholder="Select design type" />
-              </SelectTrigger>
-              <SelectContent className="border-cb-border bg-card text-cream">
-                <SelectItem
-                  value="Residential"
-                  className="focus:bg-gold/15 focus:text-gold"
-                >
-                  Residential
-                </SelectItem>
-                <SelectItem
-                  value="Commercial"
-                  className="focus:bg-gold/15 focus:text-gold"
-                >
-                  Commercial
-                </SelectItem>
-                <SelectItem
-                  value="Renovation"
-                  className="focus:bg-gold/15 focus:text-gold"
-                >
-                  Renovation
-                </SelectItem>
-                <SelectItem
-                  value="Other"
-                  className="focus:bg-gold/15 focus:text-gold"
-                >
-                  Other
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2 sm:col-span-2">
-            <Label
-              htmlFor="description"
-              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
-            >
-              Project Description
-            </Label>
-            <Textarea
-              id="description"
-              placeholder="Tell us about your project requirements..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={5}
-              className="min-h-[150px] resize-y border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
-              required
-            />
-
-            <p className="mt-1 text-xs text-cream-dim">
-              Include style preferences, room requirements and project goals.
-            </p>
-          </div>
-
-          <div className="space-y-2 sm:col-span-2">
-            <Label
-              htmlFor="budget"
-              className="text-[11px] uppercase tracking-[0.14em] text-cream-dim"
-            >
-              Estimated Budget (Optional)
-            </Label>
-            <Input
-              type="text"
-              id="budget"
-              placeholder="Estimated budget"
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
-              className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
-            />
-          </div>
-        </div>
         </div>
 
         {referenceImage && (
@@ -341,7 +391,11 @@ const CustomDesignForm = () => {
                 Reference Design
               </p>
               <p className="mt-1 text-sm text-cream-dim">
-                Inspired by {referenceDesignId ? `plan ${referenceDesignId}` : "your selected design"}.
+                Inspired by{" "}
+                {referenceDesignId
+                  ? `plan ${referenceDesignId}`
+                  : "your selected design"}
+                .
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-[220px_1fr] sm:items-center">
@@ -353,9 +407,12 @@ const CustomDesignForm = () => {
                 />
               </div>
               <div className="border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.08)] p-4">
-                <p className="text-sm font-medium text-cream">Reference Attached</p>
+                <p className="text-sm font-medium text-cream">
+                  Reference Attached
+                </p>
                 <p className="mt-2 text-sm leading-6 text-cream-dim">
-                  This inspiration image will be saved with your request so the team can review the visual direction.
+                  This inspiration image will be saved with your request so the
+                  team can review the visual direction.
                 </p>
               </div>
             </div>
@@ -397,7 +454,9 @@ const CustomDesignForm = () => {
                     multiple
                   />
                 </label>
-                <p className="text-xs text-muted">Drag files here or browse files</p>
+                <p className="text-xs text-muted">
+                  Drag files here or browse files
+                </p>
               </div>
               <p className="text-xs text-muted">
                 PNG, JPG, GIF, PDF, DOCX up to 10MB

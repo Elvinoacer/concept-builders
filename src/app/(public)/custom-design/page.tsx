@@ -27,7 +27,16 @@ const CustomDesignPageContent = () => {
 
   return (
     <div className="min-h-screen bg-ink text-cream">
-      <section className="relative overflow-hidden border-b border-cb-border px-6 pb-10 pt-28 sm:px-10 lg:px-[60px] lg:pt-36">
+      <section className="relative overflow-hidden border-b border-cb-border px-6 py-12 sm:px-10 lg:px-[60px] lg:py-16">
+        <div className="absolute inset-0">
+          <img
+            src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg"
+            alt="Custom Design"
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/70" />
+        </div>
+
         <div className="pointer-events-none absolute inset-0 opacity-70">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_80%_40%,rgba(200,137,42,0.08),transparent_65%),radial-gradient(ellipse_40%_40%_at_20%_80%,rgba(200,137,42,0.05),transparent_60%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.03)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.45)_30%,rgba(0,0,0,0.45)_70%,transparent)]" />
@@ -40,7 +49,7 @@ const CustomDesignPageContent = () => {
           </p>
 
           <h1
-            className="text-[clamp(48px,9vw,132px)] font-light leading-[0.9] tracking-[-0.03em]"
+            className="text-[clamp(38px,6vw,72px)] font-light leading-[0.9] tracking-[-0.03em]"
             style={{
               fontFamily:
                 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
@@ -73,7 +82,7 @@ const CustomDesignPageContent = () => {
             </Button>
           </div>
 
-          <div className="mt-10 grid grid-cols-2 gap-px border border-cb-border bg-cb-border md:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-px border border-cb-border bg-cb-border md:grid-cols-4">
             {[
               {
                 icon: Sparkles,
