@@ -125,7 +125,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
     setIf("pageSize", String(pageSize));
 
     Object.entries(updates).forEach(([key, value]) => {
-      if (!value || value.trim() !== "") {
+      if (!value || value.trim() === "") {
         params.delete(key);
       } else {
         params.set(key, value);
@@ -143,85 +143,93 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
 
   return (
     <div className="min-h-screen bg-ink text-cream">
-      <section className="relative overflow-hidden border-b border-[rgba(240,232,216,0.08)] px-6 pb-10 pt-28 sm:px-10 lg:px-[60px] lg:pt-40">
+      {/* UX FIX: Drastically optimized padding from pt-28/pt-40 down to compact alternative */}
+      <section className="relative overflow-hidden border-b border-[rgba(240,232,216,0.08)] px-6 pb-8 pt-24 sm:px-10 lg:px-[60px] lg:pt-28">
         <div className="pointer-events-none absolute inset-0 opacity-70">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_80%_40%,rgba(200,137,42,0.07),transparent_65%),radial-gradient(ellipse_40%_40%_at_20%_80%,rgba(200,137,42,0.04),transparent_60%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.035)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.45)_30%,rgba(0,0,0,0.45)_70%,transparent)]" />
         </div>
-        <p
-          className="pointer-events-none absolute bottom-[-40px] right-[-20px] select-none whitespace-nowrap text-[clamp(120px,18vw,240px)] font-light leading-none text-[rgba(200,137,42,0.04)]"
-          style={{ fontFamily: serifSystem }}
-        >
-          Plans
-        </p>
 
         <div className="relative mx-auto flex w-full max-w-screen-2xl flex-col">
           <p
-            className="mb-6 flex items-center gap-4 text-[11px] uppercase tracking-[0.25em] text-gold"
+            className="mb-4 flex items-center gap-4 text-[10px] uppercase tracking-[0.25em] text-gold"
             style={{ fontFamily: monoSystem }}
           >
-            <span className="h-px w-8 bg-gold" />
+            <span className="h-px w-6 bg-gold" />
             Concept Builders · Kenya · {totalDesigns}+ Designs
           </p>
 
-          <h1
-            className="mb-10 text-[clamp(64px,10vw,148px)] font-light leading-[0.9] tracking-[-0.03em]"
-            style={{ fontFamily: serifSystem }}
-          >
-            <span className="block">House</span>
-            <span className="block text-gold not-italic">
-              <em className="italic">Plans.</em>
-            </span>
-          </h1>
+          {/* UX FIX: Re-structured to two clean columns to bring the view up into the first fold */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-end">
+            <div>
+              <h1
+                className="mb-3 text-4xl font-light tracking-tight sm:text-5xl lg:text-6xl"
+                style={{ fontFamily: serifSystem }}
+              >
+                House <em className="italic text-gold">Plans.</em>
+              </h1>
 
-          <div className="flex flex-col gap-8 pb-8 md:flex-row md:items-end md:justify-between md:pb-12">
-            <p
-              className="max-w-[340px] text-[13px] font-light leading-[1.8] text-cream-dim"
-              style={{ fontFamily: monoSystem }}
-            >
-              Curated architectural designs for every Kenyan homeowner. Filter
-              by style, size, and budget to find your blueprint.
-            </p>
-            <div className="flex gap-6 sm:gap-12">
+              <p
+                className="max-w-[480px] text-[13px] font-light leading-[1.7] text-cream-dim mb-5"
+                style={{ fontFamily: monoSystem }}
+              >
+                Curated architectural designs for every Kenyan homeowner. Filter
+                by style, size, and budget to find your blueprint.
+              </p>
+
+              {/* UX FIX: Moved here, highly prominent CTA with a bouncing down arrow */}
+              <a
+                href="#plans-grid"
+                className="inline-flex items-center gap-3 border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.06)] px-4 py-2 text-[11px] uppercase tracking-[0.2em] text-gold hover:bg-[rgba(200,137,42,0.15)] hover:text-cream transition-all duration-300"
+                style={{ fontFamily: monoSystem }}
+              >
+                <span>View Blueprints</span>
+                <svg
+                  className="w-3 h-3 animate-bounce"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                  />
+                </svg>
+              </a>
+            </div>
+
+            {/* UX FIX: Clean inline condensed stats */}
+            <div className="flex flex-wrap gap-6 sm:gap-10 lg:justify-end lg:pb-2">
               <div>
-                <p className="text-[42px] font-light leading-none text-cream">
+                <p className="text-3xl font-light leading-none text-cream">
                   {totalDesigns}+
                 </p>
-                <div className="mt-1 flex items-center gap-4">
-                  <p
-                    className="text-[10px] uppercase tracking-[0.2em] text-muted"
-                    style={{ fontFamily: monoSystem }}
-                  >
-                    House Plans
-                  </p>
-
-                  {/* FIXED: Changed from button with onClick to native anchor link */}
-                  <a
-                    href="#plans-grid"
-                    className="text-[10px] uppercase tracking-[0.2em] text-gold hover:text-cream transition-colors"
-                    style={{ fontFamily: monoSystem }}
-                  >
-                    View Plans
-                  </a>
-                </div>
+                <p
+                  className="mt-1 text-[10px] uppercase tracking-[0.15em] text-muted"
+                  style={{ fontFamily: monoSystem }}
+                >
+                  House Plans
+                </p>
               </div>
               <div>
-                <p className="text-[42px] font-light leading-none text-cream">
+                <p className="text-3xl font-light leading-none text-cream">
                   {categories.length}
                 </p>
                 <p
-                  className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted"
+                  className="mt-1 text-[10px] uppercase tracking-[0.15em] text-muted"
                   style={{ fontFamily: monoSystem }}
                 >
                   Categories
                 </p>
               </div>
               <div>
-                <p className="text-[42px] font-light leading-none text-cream">
+                <p className="text-3xl font-light leading-none text-cream">
                   {totalUsers}+
                 </p>
                 <p
-                  className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted"
+                  className="mt-1 text-[10px] uppercase tracking-[0.15em] text-muted"
                   style={{ fontFamily: monoSystem }}
                 >
                   Happy Clients
@@ -546,7 +554,8 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
               </article>
             )}
 
-            <div id="plans-grid">
+            {/* UX FIX: scroll-mt-56 precisely targets the landing start of the grid block without skipping components */}
+            <div id="plans-grid" className="scroll-mt-56">
               <PublicDesignsInfiniteGrid
                 fallbackImage={fallbackImage}
                 search={search}
