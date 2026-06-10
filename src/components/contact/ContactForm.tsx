@@ -1,8 +1,16 @@
 "use client";
 import { useState } from "react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, CheckCircle2, User, Mail, Phone, MessageSquare, Tag } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Send,
+  CheckCircle2,
+  User,
+  Mail,
+  Phone,
+  MessageSquare,
+  Tag,
+} from "lucide-react";
 import GlassCard from "@/components/ui-premium/glass-card";
 import GoldButton from "@/components/ui-premium/gold-button";
 import { cn } from "@/lib/utils";
@@ -19,7 +27,7 @@ const ContactForm = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -71,8 +79,8 @@ const ContactForm = () => {
             Transmission Received
           </h2>
           <p className="text-cream-dim max-w-sm mx-auto mb-10 font-medium leading-relaxed">
-            Your inquiry has been logged in our executive queue. 
-            A specialist will reach out shortly.
+            Your inquiry has been logged in our executive queue. A specialist
+            will reach out shortly.
           </p>
           <GoldButton onClick={() => setSubmitted(false)}>
             Send Another Protocol
@@ -109,7 +117,7 @@ const ContactForm = () => {
                 onChange={handleChange}
                 required
                 placeholder="Full Name"
-                className="w-full bg-ink/50 border-2 border-cb-border focus:border-gold/50 rounded-2xl py-4 pl-12 pr-6 text-cream placeholder:text-cream/20 outline-none transition-all duration-300 font-medium"
+                className="w-full bg-black/40 backdrop-blur-md border-2 border-cb-border focus:border-gold/50 focus:bg-black/60 rounded-2xl py-4 pl-12 pr-6 text-cream placeholder:text-cream/30 outline-none transition-all duration-300 font-medium"
               />
             </div>
           </div>
@@ -128,7 +136,7 @@ const ContactForm = () => {
                 onChange={handleChange}
                 required
                 placeholder="Email Address"
-                className="w-full bg-ink/50 border-2 border-cb-border focus:border-gold/50 rounded-2xl py-4 pl-12 pr-6 text-cream placeholder:text-cream/20 outline-none transition-all duration-300 font-medium"
+                className="w-full bg-black/40 backdrop-blur-md border-2 border-cb-border focus:border-gold/50 focus:bg-black/60 rounded-2xl py-4 pl-12 pr-6 text-cream placeholder:text-cream/30 outline-none transition-all duration-300 font-medium"
               />
             </div>
           </div>
@@ -148,7 +156,7 @@ const ContactForm = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="Optional"
-                className="w-full bg-ink/50 border-2 border-cb-border focus:border-gold/50 rounded-2xl py-4 pl-12 pr-6 text-cream placeholder:text-cream/20 outline-none transition-all duration-300 font-medium"
+                className="w-full bg-black/40 backdrop-blur-md border-2 border-cb-border focus:border-gold/50 focus:bg-black/60 rounded-2xl py-4 pl-12 pr-6 text-cream placeholder:text-cream/30 outline-none transition-all duration-300 font-medium"
               />
             </div>
           </div>
@@ -167,7 +175,7 @@ const ContactForm = () => {
                 onChange={handleChange}
                 required
                 placeholder="Inquiry Topic"
-                className="w-full bg-ink/50 border-2 border-cb-border focus:border-gold/50 rounded-2xl py-4 pl-12 pr-6 text-cream placeholder:text-cream/20 outline-none transition-all duration-300 font-medium"
+                className="w-full bg-black/40 backdrop-blur-md border-2 border-cb-border focus:border-gold/50 focus:bg-black/60 rounded-2xl py-4 pl-12 pr-6 text-cream placeholder:text-cream/30 outline-none transition-all duration-300 font-medium"
               />
             </div>
           </div>
@@ -187,7 +195,7 @@ const ContactForm = () => {
               required
               rows={6}
               placeholder="Outline your requirements..."
-              className="w-full bg-ink/50 border-2 border-cb-border focus:border-gold/50 rounded-2xl py-5 pl-12 pr-6 text-cream placeholder:text-cream/20 outline-none transition-all duration-300 font-medium resize-none"
+              className="w-full bg-black/40 backdrop-blur-md border-2 border-cb-border focus:border-gold/50 focus:bg-black/60 rounded-2xl py-5 pl-12 pr-6 text-cream placeholder:text-cream/30 outline-none transition-all duration-300 font-medium resize-none"
             />
           </div>
         </div>
@@ -197,7 +205,9 @@ const ContactForm = () => {
             type="submit"
             className="w-full h-16 group"
             disabled={loading}
-            icon={<Send className={cn("w-5 h-5", loading && "animate-pulse")} />}
+            icon={
+              <Send className={cn("w-5 h-5", loading && "animate-pulse")} />
+            }
           >
             {loading ? "Transmitting..." : "Initiate Consultation"}
           </GoldButton>
