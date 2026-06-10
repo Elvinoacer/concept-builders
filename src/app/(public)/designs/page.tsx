@@ -4,6 +4,9 @@ import { Prisma } from "@/generated/prisma/browser";
 import prisma from "@/lib/prisma";
 import PublicDesignsInfiniteGrid from "@/components/design-showcase/PublicDesignsInfiniteGrid";
 
+type CategoryName = { name: string };
+type BedroomGroup = { bedrooms: number | null; _count: { _all: number } };
+
 interface AllDesignsPageProps {
   searchParams: Promise<{
     category?: string;
@@ -12,6 +15,12 @@ interface AllDesignsPageProps {
     page?: string;
     pageSize?: string;
     isFeatured?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    bedrooms?: string;
+    minSize?: string;
+    maxSize?: string;
+    priceType?: string;
   }>;
 }
 
@@ -28,6 +37,12 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
   const sort = normalizeSearchParam(resolvedSearchParams.sort) || "name";
   const search = normalizeSearchParam(resolvedSearchParams.search);
   const isFeatured = resolvedSearchParams.isFeatured === "true";
+  const minPrice = normalizeSearchParam(resolvedSearchParams.minPrice);
+  const maxPrice = normalizeSearchParam(resolvedSearchParams.maxPrice);
+  const bedrooms = normalizeSearchParam(resolvedSearchParams.bedrooms);
+  const minSize = normalizeSearchParam(resolvedSearchParams.minSize);
+  const maxSize = normalizeSearchParam(resolvedSearchParams.maxSize);
+  const priceType = normalizeSearchParam(resolvedSearchParams.priceType) || "design";
 
   const pageSize =
     Number(resolvedSearchParams.pageSize) > 0
@@ -61,6 +76,29 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
     where.isFeatured = true;
   }
 
+  if (bedrooms) {
+    where.bedrooms = bedrooms === "4+" ? { gte: 4 } : Number(bedrooms);
+  }
+
+  if (minSize || maxSize) {
+    where.area = {
+      ...(minSize ? { gte: Number(minSize) } : {}),
+      ...(maxSize ? { lte: Number(maxSize) } : {}),
+    };
+  }
+
+  if (minPrice || maxPrice) {
+    if (priceType === "building") {
+      if (minPrice) where.minBuildingCost = { gte: Number(minPrice) };
+      if (maxPrice) where.maxBuildingCost = { lte: Number(maxPrice) };
+    } else {
+      where.basePrice = {
+        ...(minPrice ? { gte: Number(minPrice) } : {}),
+        ...(maxPrice ? { lte: Number(maxPrice) } : {}),
+      };
+    }
+  }
+
   const [
     categories,
     totalDesigns,
@@ -92,16 +130,16 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
     }),
   ]);
 
-  const allCategories = ["All", ...categories.map((item) => item.name)];
+  const allCategories = ["All", ...categories.map((item: CategoryName) => item.name)];
   const fallbackImage = "/images/banners/banner1.webp";
   const serifSystem =
     'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
   const monoSystem =
     'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
-  const minPrice = priceRange._min.basePrice ?? 0;
-  const maxPrice = priceRange._max.basePrice ?? 0;
+  const displayMinPrice = priceRange._min.basePrice ?? 0;
+  const displayMaxPrice = priceRange._max.basePrice ?? 0;
   const bedroomCounts: Record<string, number> = bedroomSummary.reduce(
-    (acc, item) => {
+    (acc: Record<string, number>, item: BedroomGroup) => {
       const key = item.bedrooms === null ? "Unknown" : String(item.bedrooms);
       acc[key] = item._count._all;
       return acc;
@@ -123,6 +161,12 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
     setIf("search", search);
     setIf("isFeatured", isFeatured ? "true" : undefined);
     setIf("pageSize", String(pageSize));
+    setIf("minPrice", minPrice);
+    setIf("maxPrice", maxPrice);
+    setIf("bedrooms", bedrooms);
+    setIf("minSize", minSize);
+    setIf("maxSize", maxSize);
+    setIf("priceType", priceType);
 
     Object.entries(updates).forEach(([key, value]) => {
       if (!value || value.trim() === "") {
@@ -145,6 +189,10 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
     <div className="min-h-screen bg-ink text-cream">
       {/* UX FIX: Drastically optimized padding from pt-28/pt-40 down to compact alternative */}
       <section className="relative overflow-hidden border-b border-[rgba(240,232,216,0.08)] px-6 pb-8 pt-24 sm:px-10 lg:px-[60px] lg:pt-28">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ backgroundImage: `url('${fallbackImage}')`, backgroundSize: "cover", backgroundPosition: "center top", opacity: 0.08 }}
+        />
         <div className="pointer-events-none absolute inset-0 opacity-70">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_80%_40%,rgba(200,137,42,0.07),transparent_65%),radial-gradient(ellipse_40%_40%_at_20%_80%,rgba(200,137,42,0.04),transparent_60%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.035)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.45)_30%,rgba(0,0,0,0.45)_70%,transparent)]" />
@@ -240,7 +288,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
         </div>
       </section>
 
-      <div className="sticky top-[137px] z-[19] hidden overflow-hidden border-b border-[rgba(240,232,216,0.08)] bg-card py-4 md:block">
+      <div className="hidden overflow-hidden border-b border-[rgba(240,232,216,0.08)] bg-card py-4 md:block">
         <div className="animate-[marquee_28s_linear_infinite] whitespace-nowrap">
           {[
             "Architectural Excellence",
@@ -385,18 +433,20 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
               Bedrooms
             </p>
             <div className="space-y-1">
-              <button
-                className="flex w-full items-center justify-between border border-[rgba(200,137,42,0.22)] bg-[rgba(200,137,42,0.08)] px-3 py-2 text-left text-[12px] tracking-[0.06em] text-gold"
+              <Link
+                href={queryWith({ bedrooms: undefined, page: "1" })}
+                className={`flex w-full items-center justify-between border px-3 py-2 text-left text-[12px] tracking-[0.06em] ${!bedrooms ? "border-[rgba(200,137,42,0.22)] bg-[rgba(200,137,42,0.08)] text-gold" : "border-transparent text-cream-dim hover:border-[rgba(240,232,216,0.08)] hover:bg-card hover:text-cream"}`}
                 style={{ fontFamily: monoSystem }}
               >
                 Any
-              </button>
+              </Link>
               {Object.entries(bedroomCounts)
                 .sort((a, b) => Number(a[0]) - Number(b[0]))
                 .map(([bedroom, count]) => (
-                  <button
+                  <Link
                     key={bedroom}
-                    className="flex w-full items-center justify-between border border-transparent px-3 py-2 text-left text-[12px] tracking-[0.06em] text-cream-dim transition-colors hover:border-[rgba(240,232,216,0.08)] hover:bg-card hover:text-cream"
+                    href={queryWith({ bedrooms: bedroom === "Unknown" ? undefined : bedroom, page: "1" })}
+                    className={`flex w-full items-center justify-between border px-3 py-2 text-left text-[12px] tracking-[0.06em] transition-colors ${bedrooms === bedroom ? "border-[rgba(200,137,42,0.22)] bg-[rgba(200,137,42,0.08)] text-gold" : "border-transparent text-cream-dim hover:border-[rgba(240,232,216,0.08)] hover:bg-card hover:text-cream"}`}
                     style={{ fontFamily: monoSystem }}
                   >
                     <span>
@@ -407,7 +457,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                     <span className="text-[10px] tracking-[0.1em] text-muted">
                       {count}
                     </span>
-                  </button>
+                  </Link>
                 ))}
             </div>
           </div>
@@ -427,9 +477,9 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
               style={{ fontFamily: monoSystem }}
             >
               <span>
-                {minPrice ? `$${Math.floor(minPrice / 1000)}K` : "$0"}
+                {displayMinPrice ? `$${Math.floor(displayMinPrice / 1000)}K` : "$0"}
               </span>
-              <span>{maxPrice ? `$${Math.ceil(maxPrice / 1000)}K` : "$0"}</span>
+              <span>{displayMaxPrice ? `$${Math.ceil(displayMaxPrice / 1000)}K` : "$0"}</span>
             </div>
           </div>
 
@@ -487,7 +537,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
 
           <div className="flex flex-col gap-10">
             {featuredDesign && (
-              <article className="grid overflow-hidden border border-[rgba(240,232,216,0.08)] bg-card lg:grid-cols-[1.4fr_1fr]">
+              <article className="grid overflow-hidden border border-[rgba(240,232,216,0.08)] bg-card lg:grid-cols-[1.3fr_1fr]">
                 <div className="relative min-h-[280px] overflow-hidden sm:min-h-[380px]">
                   <Image
                     src={featuredDesign.images?.[0]?.url || fallbackImage}
@@ -555,13 +605,19 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
             )}
 
             {/* UX FIX: scroll-mt-56 precisely targets the landing start of the grid block without skipping components */}
-            <div id="plans-grid" className="scroll-mt-56">
+            <div id="plans-grid" className="scroll-mt-32">
               <PublicDesignsInfiniteGrid
                 fallbackImage={fallbackImage}
                 search={search}
                 category={category}
                 sort={sort}
                 isFeatured={isFeatured}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                bedrooms={bedrooms}
+                minSize={minSize}
+                maxSize={maxSize}
+                priceType={priceType}
               />
             </div>
           </div>

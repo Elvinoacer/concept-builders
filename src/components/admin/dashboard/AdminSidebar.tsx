@@ -25,6 +25,7 @@ const categorizedNavLinks = [
     links: [
       { href: "/admin/designs", label: "All Designs", icon: "folder" },
       { href: "/admin/categories", label: "Categories", icon: "category" },
+      { href: "/admin/collections", label: "Collections", icon: "collections_bookmark" },
     ],
   },
   {

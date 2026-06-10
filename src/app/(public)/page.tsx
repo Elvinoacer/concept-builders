@@ -8,17 +8,29 @@ import SocialProof from "@/components/landing/SocialProof";
 import DesignIdeas from "@/components/landing/DesignIdeas";
 import ContactForm from "@/components/landing/ContactForm";
 
+type LandingDesignSummary = { id: string };
+
 const getLandingData = unstable_cache(
   async () => {
     const [featured, byCategory, collections] = await Promise.all([
       prisma.design.findMany({
         where: { isFeatured: true },
-        include: { images: true, category: true },
+        include: {
+          images: true,
+          category: true,
+          architecturalDesign: { include: { pdfFiles: true } },
+          structuralDesign: { include: { pdfFiles: true } },
+        },
         orderBy: { views: "desc" },
         take: 12,
       }),
       prisma.design.findMany({
-        include: { images: true, category: true },
+        include: {
+          images: true,
+          category: true,
+          architecturalDesign: { include: { pdfFiles: true } },
+          structuralDesign: { include: { pdfFiles: true } },
+        },
         orderBy: { views: "desc" },
         take: 48,
       }),
@@ -36,6 +48,9 @@ const getLandingData = unstable_cache(
 
 export default async function LandingPage() {
   const { featured, all, collections } = await getLandingData();
+  const featuredIds = new Set(featured.map((design: LandingDesignSummary) => design.id));
+  const explorerDesigns = all.filter((design: LandingDesignSummary) => !featuredIds.has(design.id));
+
   return (
     <div style={{ backgroundColor: "#141414" }} className="relative">
       <style
@@ -45,8 +60,8 @@ export default async function LandingPage() {
       />
       <div className="relative z-10">
         <DreamPlan featuredDesigns={featured.slice(0, 7)} />
-        <Featured allDesigns={all} />
-        <Explorer allDesigns={all} />
+        <Featured allDesigns={featured} />
+        <Explorer allDesigns={explorerDesigns} />
         <DesignJourney />
         <SocialProof />
         <DesignIdeas collections={collections} />

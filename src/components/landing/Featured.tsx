@@ -3,6 +3,35 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import "./Featured.css";
+import DesignModal from "./DesignModal";
+
+type LandingDesign = {
+  id?: string;
+  name: string;
+  category?: { name?: string | null } | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  area?: number | null;
+  basePrice?: number;
+  images?: { url: string }[];
+  architecturalDesign?: { pdfFiles?: unknown[] } | null;
+  structuralDesign?: { pdfFiles?: unknown[] } | null;
+  isFeatured?: boolean;
+};
+
+type FeaturedPlan = {
+  id?: string;
+  tag?: string | null;
+  style: string;
+  name: string;
+  beds: number | string;
+  baths: number | string;
+  sqft: string;
+  img: string;
+  basePrice?: number;
+  hasFiles?: boolean;
+  badge?: string | null;
+};
 
 const collections = [
   {
@@ -450,13 +479,14 @@ const CATEGORY_MAP: Record<string, string> = {
   contemporary: "Contemporary",
 };
 
-export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
+export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesign[] }) {
   const [activeId, setActiveId] = useState(collections[0].id);
   const [shimmerKey, setShimmerKey] = useState(0);
   const [isHeroHovered, setIsHeroHovered] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<FeaturedPlan | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
-  const activeCol = collections.find((c) => c.id === activeId);
+  const activeCol = collections.find((c) => c.id === activeId)!;
   const totalPlans = collections.reduce((s, c) => s + c.count, 0);
 
   useEffect(() => {
@@ -493,17 +523,21 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
   );
 
   const mergedPlans = (function mergePlansWithFallback(
-    dbDesigns: any[],
-    fallbacks: any[],
+    dbDesigns: LandingDesign[],
+    fallbacks: Array<Omit<FeaturedPlan, "style" | "basePrice" | "hasFiles" | "id" | "baths">>,
     count: number,
   ) {
-    const merged = dbDesigns.map((d) => ({
+    const merged: FeaturedPlan[] = dbDesigns.map((d) => ({
       id: d.id,
       tag: d.category?.name,
+      style: d.category?.name || activeCol.label,
       name: d.name,
-      beds: `${d.bedrooms || 0} bed · ${d.bathrooms || 0} bath`,
+      beds: d.bedrooms || 0,
+      baths: d.bathrooms || 0,
       sqft: `${d.area || 0} sqft`,
       img: d.images?.[0]?.url || fallbacks[0]?.img || "",
+      basePrice: d.basePrice,
+      hasFiles: Boolean(d.architecturalDesign?.pdfFiles?.length || d.structuralDesign?.pdfFiles?.length),
       badge: d.isFeatured ? "Featured" : null,
     }));
 
@@ -513,6 +547,8 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
         ...fallbacks.slice(0, remaining).map((f) => ({
           ...f,
           id: undefined,
+          style: activeCol.label,
+          baths: String(f.beds || "").match(/·\s*([^·]+)/)?.[1]?.replace("bath", "").trim() || "-",
         })),
       );
     }
@@ -596,6 +632,10 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
               key={`hero-${activeId}`}
               onMouseEnter={() => setIsHeroHovered(true)}
               onMouseLeave={() => setIsHeroHovered(false)}
+              onClick={() => setSelectedPlan(hero)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedPlan(hero); }}
             >
               <img
                 className="fc-hero-bg bg-fill"
@@ -630,17 +670,13 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
                     <span>{hero.sqft}</span>
                   </span>
                 </div>
-                <Link
-                  href={
-                    hero.id
-                      ? `/designs/${hero.id}`
-                      : `/designs?category=${encodeURIComponent(activeCol.label)}`
-                  }
+                <button
+                  type="button"
                   className="fc-hero-cta"
-                  style={{ textDecoration: "none" }}
+                  onClick={(event) => { event.stopPropagation(); setSelectedPlan(hero); }}
                 >
                   View Plan {iconArrow}
-                </Link>
+                </button>
               </div>
               <div
                 className="fc-progress"
@@ -656,15 +692,12 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
             {/* SIDE STACK */}
             <div className="fc-side">
               {[s1, s2, s3, s4].map((plan, i) => (
-                <Link
-                  href={
-                    plan?.id
-                      ? `/designs/${plan.id}`
-                      : `/designs?category=${encodeURIComponent(activeCol.label)}`
-                  }
+                <button
+                  type="button"
                   className={`fc-side-card card-enter card-enter-delay-${i + 1}`}
                   key={`s${i}-${activeId}`}
-                  style={{ textDecoration: "none", display: "block" }}
+                  onClick={() => plan && setSelectedPlan(plan)}
+                  style={{ display: "block", textAlign: "left", border: 0, padding: 0 }}
                 >
                   <img
                     className="fc-side-bg bg-fill"
@@ -682,7 +715,7 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
                     </div>
                     <div className="fc-side-beds">{plan?.beds}</div>
                   </div>
-                </Link>
+                </button>
               ))}
             </div>
           </div>
@@ -690,18 +723,17 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
           {/* BOTTOM THUMBNAILS */}
           <div className="fc-bottom animate-on-scroll" id="bottomStrip">
             {mergedPlans.map((plan, i) => (
-              <Link
-                href={
-                  plan.id
-                    ? `/designs/${plan.id}`
-                    : `/designs?category=${encodeURIComponent(activeCol.label)}`
-                }
+              <button
+                type="button"
                 key={`${activeId}-${i}`}
                 className="fc-thumb card-enter"
+                onClick={() => setSelectedPlan(plan)}
                 style={{
                   animationDelay: `${0.1 + i * 0.07}s`,
-                  textDecoration: "none",
                   display: "block",
+                  textAlign: "left",
+                  border: 0,
+                  padding: 0,
                 }}
               >
                 <img
@@ -717,7 +749,7 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
                   <div className="fc-thumb-name">{plan.name}</div>
                   <div className="fc-thumb-meta">{plan.sqft}</div>
                 </div>
-              </Link>
+              </button>
             ))}
           </div>
 
@@ -762,10 +794,6 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                onClick={(e) => {
-                  // Keep scroll behavior if staying on page, but since we are linking, we can omit it
-                  // or keep it if they prefer just scrolling down. The plan says "update to also pass category as query param to /designs?category=..."
-                }}
               >
                 View Full Collection
                 {iconArrow}
@@ -774,6 +802,7 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: any[] }) {
           </div>
         </div>
       </section>
+      <DesignModal plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
     </div>
   );
 }
