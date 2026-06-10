@@ -88,7 +88,7 @@ export default function CategoriesPage() {
   }, [searchQuery]);
 
   const { data, error, isLoading } = useSWR<CategoriesResponse>(
-    `/api/categories?search=${encodeURIComponent(debouncedSearch)}&page=${currentPage}&limit=9`,
+    `/api/categories?search=${encodeURIComponent(debouncedSearch)}&page=${currentPage}&limit=12`,
     fetcher,
     {
       keepPreviousData: true,
@@ -153,6 +153,10 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-ink text-cream">
       <section className="relative overflow-hidden border-b border-[rgba(240,232,216,0.08)] px-6 pb-12 pt-28 sm:px-10 lg:px-[60px] lg:pt-40">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ backgroundImage: "url('/images/banners/banner1.webp')", backgroundSize: "cover", backgroundPosition: "center top", opacity: 0.08 }}
+        />
         <div className="pointer-events-none absolute inset-0 opacity-70">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_78%_36%,rgba(200,137,42,0.08),transparent_65%),radial-gradient(ellipse_45%_42%_at_18%_82%,rgba(200,137,42,0.04),transparent_65%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(200,137,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,137,42,0.03)_1px,transparent_1px)] bg-[size:88px_88px] [mask-image:linear-gradient(to_bottom,transparent,rgba(0,0,0,0.5)_24%,rgba(0,0,0,0.5)_76%,transparent)]" />
@@ -296,88 +300,55 @@ export default function CategoriesPage() {
           <div
             className={
               viewMode === "grid"
-                ? "grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)] md:grid-cols-2 xl:grid-cols-3"
+                ? "grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 xl:grid-cols-4"
                 : "grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)]"
             }
           >
-            {categories.map((category, index) => (
-              <Link
-                key={category.id}
-                href={`/categories/${category.id}`}
-                className={`group bg-ink transition-colors duration-300 hover:bg-card ${
-                  viewMode === "list" ? "flex flex-col sm:flex-row" : ""
-                }`}
-              >
-                <div
-                  className={`relative overflow-hidden ${
-                    viewMode === "grid"
-                      ? "aspect-[4/3]"
-                      : "aspect-[16/8] sm:aspect-auto sm:h-[220px] sm:w-[320px]"
-                  }`}
+            {categories.map((category, index) => {
+              const imageUrl = getCategoryImageUrl(category);
+              const isFeatureHero = viewMode === "grid" && category.isFeatured && index === 0;
+
+              if (viewMode === "list") {
+                return (
+                  <Link key={category.id} href={`/categories/${category.id}`} className="group flex flex-col bg-ink transition-colors duration-300 hover:bg-card sm:flex-row">
+                    <div className="relative aspect-[16/8] overflow-hidden sm:aspect-auto sm:h-[220px] sm:w-[320px]">
+                      <Image src={imageUrl} alt={category.name} fill sizes="(max-width: 640px) 100vw, 320px" className="object-cover opacity-80 transition-all duration-700 group-hover:scale-105 group-hover:opacity-95" priority={index < 3} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                    </div>
+                    <div className="flex flex-1 flex-col justify-between p-6">
+                      <div>
+                        <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-gold" style={{ fontFamily: monoSystem }}>Category</p>
+                        <h2 className="mb-3 text-3xl font-light text-cream transition-colors group-hover:text-gold-light" style={{ fontFamily: serifSystem }}>{category.name}</h2>
+                        <p className="line-clamp-2 text-[12px] leading-[1.8] text-cream-dim" style={{ fontFamily: monoSystem }}>{category.description || "Explore premium plans curated for this architectural category."}</p>
+                      </div>
+                      <div className="mt-6 flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4">
+                        <span className="text-[11px] uppercase tracking-[0.12em] text-muted" style={{ fontFamily: monoSystem }}>{category._count?.designs || 0} designs</span>
+                        <span className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold" style={{ fontFamily: monoSystem }}>Explore</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              }
+
+              return (
+                <Link
+                  key={category.id}
+                  href={`/categories/${category.id}`}
+                  className={`group relative block overflow-hidden border border-[rgba(240,232,216,0.08)] bg-ink transition-all duration-300 hover:border-[rgba(200,137,42,0.35)] ${isFeatureHero ? "col-span-2 row-span-2 aspect-[4/3]" : "aspect-[4/3]"}`}
                 >
-                  <Image
-                    src={getCategoryImageUrl(category)}
-                    alt={category.name}
-                    fill
-                    sizes={
-                      viewMode === "grid"
-                        ? "(max-width: 1024px) 100vw, 33vw"
-                        : "(max-width: 640px) 100vw, 320px"
-                    }
-                    className="object-cover opacity-80 transition-all duration-700 group-hover:scale-105 group-hover:opacity-95"
-                    priority={index < 3}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                  <Image src={imageUrl} alt={category.name} fill sizes={isFeatureHero ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"} className="object-cover opacity-82 transition-transform duration-700 group-hover:scale-105" priority={index < 4} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/30 to-transparent" />
                   {category.isFeatured && (
-                    <span
-                      className="absolute left-4 top-4 bg-gold px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-ink"
-                      style={{ fontFamily: monoSystem }}
-                    >
-                      Featured
-                    </span>
+                    <span className="absolute right-3 top-3 bg-gold px-2 py-1 text-[9px] uppercase tracking-[0.18em] text-ink" style={{ fontFamily: monoSystem }}>Featured</span>
                   )}
-                </div>
-
-                <div className="flex flex-1 flex-col justify-between p-6">
-                  <div>
-                    <p
-                      className="mb-2 text-[10px] uppercase tracking-[0.2em] text-gold"
-                      style={{ fontFamily: monoSystem }}
-                    >
-                      Category
-                    </p>
-                    <h2
-                      className="mb-3 text-3xl font-light text-cream transition-colors group-hover:text-gold-light"
-                      style={{ fontFamily: serifSystem }}
-                    >
-                      {category.name}
-                    </h2>
-                    <p
-                      className="line-clamp-2 text-[12px] leading-[1.8] text-cream-dim"
-                      style={{ fontFamily: monoSystem }}
-                    >
-                      {category.description ||
-                        "Explore premium plans curated for this architectural category."}
-                    </p>
+                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+                    <h2 className={`${isFeatureHero ? "text-3xl sm:text-5xl" : "text-lg sm:text-2xl"} font-light leading-tight text-cream transition-colors group-hover:text-gold-light`} style={{ fontFamily: serifSystem }}>{category.name}</h2>
+                    <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-gold" style={{ fontFamily: monoSystem }}>{category._count?.designs || 0} Designs</p>
+                    <p className="mt-3 hidden max-w-md text-[12px] leading-[1.7] text-cream-dim sm:line-clamp-2">{category.description || "Explore premium plans curated for this architectural category."}</p>
                   </div>
-
-                  <div className="mt-6 flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4">
-                    <span
-                      className="text-[11px] uppercase tracking-[0.12em] text-muted"
-                      style={{ fontFamily: monoSystem }}
-                    >
-                      {category._count?.designs || 0} plans
-                    </span>
-                    <span
-                      className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold"
-                      style={{ fontFamily: monoSystem }}
-                    >
-                      Explore
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
 

@@ -35,6 +35,10 @@ const DesignShowcasePage = () => {
       transition={{ duration: 0.6 }}
       className="relative min-h-screen w-full overflow-hidden bg-ink text-cream"
     >
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ backgroundImage: "url('/images/banners/banner2.webp')", backgroundSize: "cover", backgroundPosition: "center top", opacity: 0.08 }}
+      />
       <div className="pointer-events-none absolute inset-0 opacity-70">
         <div
           className="absolute inset-0"
@@ -94,6 +98,18 @@ const DesignShowcasePage = () => {
             </div>
           </div>
         </section>
+
+
+        <div className="mb-10 hidden overflow-hidden border-y border-[rgba(240,232,216,0.08)] bg-card py-4 md:block">
+          <div className="animate-[marquee_28s_linear_infinite] whitespace-nowrap">
+            {["Architectural Excellence", "Kenyan Dream Homes", "Bespoke Blueprints", "Structural Drawings", "CAD Files Included", "Custom Designs Welcome", "Architectural Excellence", "Kenyan Dream Homes"].map((item, idx) => (
+              <span key={`${item}-${idx}`} className="px-8 text-[14px] italic text-cream-dim">
+                <span className="mr-7 inline-block h-[5px] w-[5px] rounded-full bg-gold align-middle" />
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
 
         <div className="space-y-12 sm:space-y-16 md:space-y-20">
           <FeaturedDesigns />

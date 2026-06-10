@@ -301,8 +301,16 @@ export default function CategoryPage() {
             </button>
           </form>
 
+          <Link
+            href={`/designs?category=${encodeURIComponent(category.name)}`}
+            className="ml-auto border border-[rgba(200,137,42,0.24)] px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-gold transition-colors hover:bg-[rgba(200,137,42,0.1)]"
+            style={{ fontFamily: monoSystem }}
+          >
+            Explore All
+          </Link>
+
           <p
-            className="ml-auto text-[11px] uppercase tracking-[0.14em] text-muted"
+            className="text-[11px] uppercase tracking-[0.14em] text-muted"
             style={{ fontFamily: monoSystem }}
           >
             <span className="text-gold">{totalDesigns}</span> plans

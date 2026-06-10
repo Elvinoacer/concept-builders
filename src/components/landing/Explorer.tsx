@@ -1,10 +1,39 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import './Explorer.css';
+import DesignModal from './DesignModal';
 
-const allPlans = [
+type LandingDesign = {
+  id?: string;
+  name: string;
+  category?: { name?: string | null } | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  area?: number | null;
+  basePrice?: number;
+  features?: string[];
+  images?: { url: string }[];
+  architecturalDesign?: { pdfFiles?: unknown[] } | null;
+  structuralDesign?: { pdfFiles?: unknown[] } | null;
+};
+
+type ExplorerPlan = {
+  id?: string;
+  tags: string[];
+  name: string;
+  style: string;
+  beds: number | string;
+  baths: number | string;
+  sqft: string;
+  img: string;
+  features: string[];
+  basePrice?: number;
+  hasFiles?: boolean;
+  height: number;
+};
+
+const allPlans: Array<Omit<ExplorerPlan, "id" | "basePrice" | "hasFiles"> & { id: number }> = [
   { id: 0, tags: ["modern", "4bed"], name:"The Horizon House", style:"Modern", beds:4, baths:3, sqft:"3,200", img:"https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg", features:["Open-plan kitchen & living area","Floor-to-ceiling glass facade","Private rooftop terrace","Double garage with EV charging","Energy-rated insulation system"], height: 260 },
   { id: 1, tags: ["luxury", "5bed"], name:"Palazzo Estate", style:"Luxury", beds:5, baths:4.5, sqft:"5,800", img:"https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg", features:["Grand entrance foyer with chandelier","Home theatre & wine cellar","Infinity pool with cabana","Smart home automation throughout","Separate guest suite with kitchenette"], height: 320 },
   { id: 2, tags: ["minimalist", "3bed"], name:"Pure Form Residence", style:"Minimalist", beds:3, baths:2, sqft:"1,950", img:"https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa1.jpg", features:["Clean flat-roof silhouette","Concrete & timber material palette","Hidden storage throughout","Zen courtyard garden","Passive cooling design"], height: 230 },
@@ -19,11 +48,9 @@ const allPlans = [
   { id: 11, tags: ["modern", "luxury", "4bed"], name:"Glass Ridge", style:"Modern", beds:4, baths:3.5, sqft:"3,400", img:"https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa7.jpg", features:["Double-height glazed living wall","Cantilevered upper floor","Private pool & sun deck","Home automation hub","Natural stone cladding"], height: 275 },
 ];
 
-export default function Explorer({ allDesigns = [] }: { allDesigns?: any[] }) {
-  const router = useRouter();
-
-  const mergedPlans = (function mergePlansWithFallback(dbDesigns: any[], fallbacks: any[], count: number) {
-    const merged = dbDesigns.map(d => {
+export default function Explorer({ allDesigns = [] }: { allDesigns?: LandingDesign[] }) {
+  const mergedPlans = (function mergePlansWithFallback(dbDesigns: LandingDesign[], fallbacks: Array<Omit<ExplorerPlan, "id" | "basePrice" | "hasFiles"> & { id: number }>, count: number) {
+    const merged: ExplorerPlan[] = dbDesigns.map(d => {
       let catSlug = d.category?.name?.toLowerCase() || "";
       if (catSlug === "bungalows") catSlug = "bungalow";
       
@@ -36,7 +63,9 @@ export default function Explorer({ allDesigns = [] }: { allDesigns?: any[] }) {
         baths: d.bathrooms || 0,
         sqft: `${d.area ? d.area.toLocaleString() : 0}`,
         img: d.images?.[0]?.url || fallbacks[0]?.img || "",
-        features: d.features?.length > 0 ? d.features : fallbacks[0]?.features || [],
+        features: (d.features?.length ?? 0) > 0 ? d.features ?? [] : fallbacks[0]?.features || [],
+        basePrice: d.basePrice,
+        hasFiles: Boolean(d.architecturalDesign?.pdfFiles?.length || d.structuralDesign?.pdfFiles?.length),
         height: 260
       };
     });
@@ -63,12 +92,6 @@ export default function Explorer({ allDesigns = [] }: { allDesigns?: any[] }) {
   const [hasDragged, setHasDragged] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-
-  useEffect(() => {
-    if (selectedPlan) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
-  }, [selectedPlan]);
 
   const sectionRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -144,7 +167,7 @@ export default function Explorer({ allDesigns = [] }: { allDesigns?: any[] }) {
     engine(); // Init loop
 
     return () => cancelAnimationFrame(rAF);
-  }, [activeFilters, isHovered, isDragging, selectedPlan]);
+  }, [activeFilters, isHovered, isDragging, selectedPlan, mergedPlans.length]);
 
   const toggleFilter = (filter: string) => {
     setActiveFilters(prev => {
@@ -187,29 +210,7 @@ export default function Explorer({ allDesigns = [] }: { allDesigns?: any[] }) {
 
   const handleCardClick = (plan: typeof mergedPlans[0]) => {
     if (hasDragged) return; // prevent click if it was a drag
-    if (typeof plan.id === 'string') {
-      router.push(`/designs/${plan.id}`);
-    } else {
-      setSelectedPlan(plan);
-    }
-  };
-
-  const handleRequestSimilar = (plan: typeof mergedPlans[0]) => {
-    if (typeof plan.id === 'string') {
-      router.push(`/custom-design?inspired_by=${plan.id}`);
-    } else {
-      router.push(`/custom-design?style=${encodeURIComponent(plan.style)}&beds=${plan.beds}`);
-    }
-    setSelectedPlan(null);
-  };
-
-  const handleDownloadPlan = (plan: typeof mergedPlans[0]) => {
-    if (typeof plan.id === 'string') {
-      router.push(`/designs/${plan.id}#documents`);
-    } else {
-      router.push(`/custom-design?style=${encodeURIComponent(plan.style)}`);
-    }
-    setSelectedPlan(null);
+    setSelectedPlan(plan);
   };
 
   return (
@@ -338,64 +339,7 @@ export default function Explorer({ allDesigns = [] }: { allDesigns?: any[] }) {
         )}
       </div>
 
-      {/* MODAL */}
-      <div 
-        className={`ex-modal-overlay ${selectedPlan ? 'open' : ''}`}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) setSelectedPlan(null);
-        }}
-      >
-        <div className="ex-modal">
-          <button className="ex-modal-close" onClick={() => setSelectedPlan(null)}>×</button>
-          
-          {selectedPlan && (
-            <>
-              <div className="ex-modal-img-side">
-                <img src={selectedPlan.img} alt={selectedPlan.name} />
-                <span className="ex-modal-img-badge">{selectedPlan.style}</span>
-              </div>
-              <div className="ex-modal-content-side">
-                <span className="ex-modal-style-tag">{selectedPlan.style}</span>
-                <h3 className="ex-modal-title">{selectedPlan.name}</h3>
-                <div className="ex-modal-stats">
-                  <div className="ex-stat-box">
-                    <span className="ex-stat-value">{selectedPlan.beds}</span>
-                    <span className="ex-stat-label">Bedrooms</span>
-                  </div>
-                  <div className="ex-stat-box">
-                    <span className="ex-stat-value">{selectedPlan.baths}</span>
-                    <span className="ex-stat-label">Bathrooms</span>
-                  </div>
-                  <div className="ex-stat-box">
-                    <span className="ex-stat-value">{selectedPlan.sqft}</span>
-                    <span className="ex-stat-label">Sq. Ft.</span>
-                  </div>
-                </div>
-                <p className="ex-modal-features-title">Key Features</p>
-                <ul className="ex-features-list">
-                  {selectedPlan.features.map((f, i) => (
-                    <li key={i}>{f}</li>
-                  ))}
-                </ul>
-                <button 
-                  className="ex-modal-cta"
-                  onClick={() => handleRequestSimilar(selectedPlan)}
-                >
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M8 2C8 2 3 6.5 3 10a5 5 0 0010 0C13 6.5 8 2 8 2z"/><path d="M8 13v-4m0 0L6 11m2-2 2 2"/></svg>
-                  Request Similar Design
-                </button>
-                <button 
-                  className="ex-modal-cta-secondary"
-                  onClick={() => handleDownloadPlan(selectedPlan)}
-                >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M4 8h8M9 5l3 3-3 3"/></svg>
-                  Download Floor Plan PDF
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+      <DesignModal plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
     </section>
   );
 }

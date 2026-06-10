@@ -30,6 +30,12 @@ interface PublicDesignsInfiniteGridProps {
   category?: string;
   sort?: string;
   isFeatured?: boolean;
+  minPrice?: string;
+  maxPrice?: string;
+  bedrooms?: string;
+  minSize?: string;
+  maxSize?: string;
+  priceType?: string;
   fallbackImage: string;
 }
 
@@ -53,6 +59,12 @@ export default function PublicDesignsInfiniteGrid({
   category,
   sort,
   isFeatured,
+  minPrice,
+  maxPrice,
+  bedrooms,
+  minSize,
+  maxSize,
+  priceType,
   fallbackImage,
 }: PublicDesignsInfiniteGridProps) {
   const normalizedSort = sortMap[sort || "name"];
@@ -75,6 +87,12 @@ export default function PublicDesignsInfiniteGrid({
     if (isFeatured) {
       params.set("isFeatured", "true");
     }
+    if (minPrice) params.set("minPrice", minPrice);
+    if (maxPrice) params.set("maxPrice", maxPrice);
+    if (bedrooms && bedrooms !== "Any") params.set("bedrooms", bedrooms);
+    if (minSize) params.set("minSize", minSize);
+    if (maxSize) params.set("maxSize", maxSize);
+    if (priceType) params.set("priceType", priceType);
     if (pageIndex > 0 && previousPageData?.nextCursor) {
       params.set("cursor", previousPageData.nextCursor);
     }
