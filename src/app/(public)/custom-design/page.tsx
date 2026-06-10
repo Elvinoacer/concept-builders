@@ -1,6 +1,9 @@
+"use client";
+
 import CustomDesignForm from "@/components/custom-design/CustomDesignForm";
 import CustomDesignHeader from "@/components/custom-design/CustomDesignHeader";
 import { Suspense } from "react";
+import { Button } from "@/components/ui/button";
 import {
   DraftingCompass,
   ShieldCheck,
@@ -42,7 +45,22 @@ const CustomDesignPage = () => {
             architectural package tailored to your land, lifestyle, and budget.
           </p>
 
-          <div className="mt-8 grid grid-cols-2 gap-px border border-cb-border bg-cb-border md:grid-cols-4">
+          {/* New CTA Button Section */}
+          <div className="mt-8">
+            <Button
+              onClick={() =>
+                document.getElementById("custom-design-form")?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                })
+              }
+              className="h-12 border border-gold bg-gold px-8 text-[11px] uppercase tracking-[0.16em] text-ink transition-all duration-200 hover:bg-gold-light font-medium"
+            >
+              Start Your Project
+            </Button>
+          </div>
+
+          <div className="mt-10 grid grid-cols-2 gap-px border border-cb-border bg-cb-border md:grid-cols-4">
             {[
               {
                 icon: Sparkles,
@@ -92,7 +110,11 @@ const CustomDesignPage = () => {
         <div className="mx-auto w-full max-w-6xl overflow-hidden border border-cb-border bg-[linear-gradient(180deg,rgba(26,24,19,0.95),rgba(17,16,9,0.98))] shadow-[0_24px_80px_rgba(0,0,0,0.4)]">
           <CustomDesignHeader />
           <div className="border-t border-cb-border px-4 py-6 sm:px-6 md:px-8 lg:px-10">
-            <Suspense fallback={<div className="h-[500px] animate-pulse bg-cb-border/10 rounded-sm" />}>
+            <Suspense
+              fallback={
+                <div className="h-[500px] animate-pulse bg-cb-border/10 rounded-sm" />
+              }
+            >
               <CustomDesignForm />
             </Suspense>
           </div>
