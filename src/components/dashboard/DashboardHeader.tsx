@@ -177,7 +177,7 @@ const DashboardHeader = ({
               <input
                 type="text"
                 placeholder="Search designs, projects, templates..."
-                className="w-full h-12 pl-12 pr-24 rounded-2xl border border-cb-border bg-card/80 focus:outline-none focus:ring-3 focus:ring-gold/30 focus:border-gold transition-all duration-300 text-sm text-cream placeholder:text-cb-muted backdrop-blur-sm hover:bg-card"
+                className="w-full h-12 pl-12 pr-24 rounded-2xl border border-cb-border bg-card focus:outline-none focus:ring-3 focus:ring-gold/30 focus:border-gold transition-all duration-300 text-sm text-cream placeholder:text-cb-muted backdrop-blur-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -204,8 +204,6 @@ const DashboardHeader = ({
 
         {/* Right Section - Actions */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-          {/* Theme Toggle removed */}
-
           {/* Cart */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
@@ -426,7 +424,6 @@ const DashboardHeader = ({
                     <button
                       onClick={() => {
                         setIsUserDropdownOpen(false);
-                        // Add logout logic here
                       }}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-all duration-200 w-full"
                     >
