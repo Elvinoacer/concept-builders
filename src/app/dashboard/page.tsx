@@ -33,17 +33,32 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const checkPhoneNumber = async () => {
-      if (session?.user) {
-        if (!(session.user as { phone?: string }).phone) {
-          const hasDismissed = localStorage.getItem("hasDismissedPhoneModal");
-          if (!hasDismissed) {
-            setShowPhoneNumberModal(true);
-          }
+      if (!session?.user) return;
+
+      try {
+        const response = await fetch("/api/user/profile", { cache: "no-store" });
+        const profile = response.ok ? await response.json() : null;
+        const phone = profile?.phone ?? (session.user as { phone?: string }).phone;
+
+        if (phone) {
+          localStorage.removeItem("phoneModalDismissedUntil");
+          localStorage.removeItem("hasDismissedPhoneModal");
+          return;
         }
+
+        const dismissedUntil = Number(
+          localStorage.getItem("phoneModalDismissedUntil") || "0",
+        );
+
+        if (!dismissedUntil || Date.now() > dismissedUntil) {
+          setShowPhoneNumberModal(true);
+        }
+      } catch (error) {
+        console.error("Failed to check profile phone number", error);
       }
     };
 
-    checkPhoneNumber();
+    void checkPhoneNumber();
   }, [session]);
 
   const handlePhoneNumberSubmit = async (phoneNumber: string) => {
@@ -54,6 +69,8 @@ const DashboardPage = () => {
         body: JSON.stringify({ phone: phoneNumber }),
       });
       if (response.ok) {
+        localStorage.removeItem("phoneModalDismissedUntil");
+        localStorage.removeItem("hasDismissedPhoneModal");
         setShowPhoneNumberModal(false);
       } else {
         console.error("Failed to update phone number");

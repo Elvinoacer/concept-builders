@@ -20,6 +20,8 @@ export async function POST(request: NextRequest) {
     const designType = formData.get("designType") as string;
     const description = formData.get("description") as string;
     const budget = formData.get("budget") as string | null;
+    const referenceDesignId = formData.get("referenceDesignId") as string | null;
+    const referenceImageUrl = formData.get("referenceImage") as string | null;
     const files = formData.getAll("files") as File[];
 
     if (!name || !email || !designType || !description) {
@@ -57,6 +59,8 @@ export async function POST(request: NextRequest) {
         designType,
         description,
         budget,
+        referenceDesignId,
+        referenceImageUrl,
         attachments: uploadedFileUrls,
       },
     });

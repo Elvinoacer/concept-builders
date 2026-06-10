@@ -8,7 +8,6 @@ interface IntasendPaymentProps {
   appliedDiscountAmount: number;
   appliedDiscountId: string | null;
   appliedDiscountCode: string | null;
-  paymentMethod: string;
 }
 
 const IntasendPayment: React.FC<IntasendPaymentProps> = ({
@@ -17,10 +16,7 @@ const IntasendPayment: React.FC<IntasendPaymentProps> = ({
   appliedDiscountAmount,
   appliedDiscountId,
   appliedDiscountCode,
-  paymentMethod,
 }) => {
-  if (paymentMethod !== "mpesa") return null;
-
   return (
     <CheckoutLink
       cart={cart}

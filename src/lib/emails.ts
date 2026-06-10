@@ -397,7 +397,9 @@ export async function sendPurchaseNotificationEmails(orderId: string) {
     }
 
     // Send Admin Email (Always)
-    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminEmail = missingFiles.length > 0
+      ? process.env.ADMIN_DELIVERY_EMAIL || process.env.ADMIN_EMAIL
+      : process.env.ADMIN_EMAIL;
     if (adminEmail) {
       const missingFilesSection =
         missingFiles.length > 0
@@ -407,12 +409,15 @@ export async function sendPurchaseNotificationEmails(orderId: string) {
       await resend.emails.send({
         from: `Concept Builders System <${process.env.ADMIN_EMAIL}>`,
         to: adminEmail,
-        subject: `New Order #${order.id} - ${missingFiles.length > 0 ? "ACTION REQUIRED" : "Confirmed"}`,
+        subject: missingFiles.length > 0
+          ? `Action Required: Customer Purchase Needs Manual Delivery`
+          : `New Order #${order.id} - Confirmed`,
         html: `
-          <h1>New Order Received</h1>
+          <h1>${missingFiles.length > 0 ? "Customer Purchase Needs Manual Delivery" : "New Order Received"}</h1>
           <p><strong>Order ID:</strong> ${order.id}</p>
           <p><strong>Amount:</strong> $${order.amount.toFixed(2)}</p>
           <p><strong>Customer:</strong> ${order.user.name} (${order.user.email})</p>
+          <p><strong>Purchase Date:</strong> ${order.createdAt.toISOString()}</p>
           <p><strong>Phone:</strong> ${order.user.phone || "N/A"}</p>
           
           ${missingFilesSection}

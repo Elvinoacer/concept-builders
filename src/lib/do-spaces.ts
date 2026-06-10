@@ -84,7 +84,7 @@ export const getSignedUrlForFiles = async (keys: string[]) => {
         Bucket: doSpacesBucket,
         Key: key,
       });
-      return getSignedUrl(s3Client, command, { expiresIn: 3600 });
+      return getSignedUrl(s3Client, command, { expiresIn: 900 });
     })
   );
   return signedUrls;

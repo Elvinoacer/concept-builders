@@ -23,7 +23,7 @@ export default function CheckoutClientPage() {
     >
       <div className="layout-container flex h-full grow flex-col">
         <main className="flex flex-1 justify-center bg-background py-8 md:py-12">
-          <div className="w-full max-w-4xl px-4">
+          <div className="w-full max-w-2xl px-4">
             <div className="mb-4 md:mb-8 flex items-center gap-2 text-sm font-medium">
               <a className="text-cream-dim hover:text-cream" href="/cart">
                 Cart
@@ -31,7 +31,7 @@ export default function CheckoutClientPage() {
               <span className="text-cream-dim">/</span>
               <span className="text-cream">Checkout</span>
             </div>
-            <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-8">
               <div className="flex flex-col gap-8">
                 <div className="rounded-xl bg-card p-8 shadow-lg border border-cb-border text-cream-dim">
                   Use the main checkout flow at /checkout for payment method

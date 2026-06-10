@@ -14,7 +14,7 @@ const PaymentMethodsPage = () => {
       title: "Accessing Payment Options",
       content: [
         "When you're ready to purchase your chosen designs, proceed to the secure checkout page.",
-        "After reviewing your order summary, you'll find the 'Select Payment Method' section.",
+        "After reviewing your order summary, use the secure IntaSend checkout section to continue.",
       ],
       delay: 0.1,
     },
@@ -23,9 +23,9 @@ const PaymentMethodsPage = () => {
       icon: "credit_card",
       title: "Choosing Your Payment Method",
       content: [
-        "On the checkout page, you can select from our supported payment gateways:",
-        "**PayPal:** A widely recognized and secure online payment system. Select PayPal to be redirected to their platform to complete your transaction.",
-        "**Intasend:** Our integrated payment solution for various local and international payment options. Select Intasend to proceed with card payments or other local methods.",
+        "On the checkout page, continue with our secure IntaSend payment flow.",
+        "**M-Pesa:** Complete your purchase using a secure mobile-money checkout.",
+        "**Cards and wallets:** IntaSend also supports eligible card, Apple Pay, and Google Pay options.",
       ],
       delay: 0.2,
     },
@@ -36,7 +36,7 @@ const PaymentMethodsPage = () => {
       content: [
         "After selecting your preferred payment method:",
         "Click the 'Proceed to Payment' button.",
-        "You will be securely redirected to the chosen payment gateway (PayPal or Intasend) to finalize your transaction.",
+        "You will be securely redirected to IntaSend to finalize your transaction.",
         "Follow the on-screen instructions to enter your payment details.",
       ],
       delay: 0.3,

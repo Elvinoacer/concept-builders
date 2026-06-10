@@ -67,6 +67,10 @@ const UserPurchaseDetailPage = () => {
     );
   }
 
+  const deliveryStatus = order.deliveryStatus || "PENDING";
+  const isReady = deliveryStatus === "DELIVERED";
+  const isManualReview = deliveryStatus === "MANUAL_REVIEW";
+
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="mb-6 flex items-center justify-between">
@@ -91,6 +95,26 @@ const UserPurchaseDetailPage = () => {
           <p className="flex items-center gap-2"><FiHash className="text-muted" /> <strong>Payment ID:</strong> {order.paymentId}</p>
           <p className="flex items-center gap-2"><FiTag className="text-muted" /> <strong>Discount:</strong> {order.discountCode || "None"} ({order.discountAmount ? `$${order.discountAmount.toFixed(2)}` : "N/A"})</p>
           <p className="flex items-center gap-2"><FiPackage className="text-muted" /> <strong>Status:</strong> {order.status}</p>
+          <p className="flex items-center gap-2"><FiFileText className="text-muted" /> <strong>Delivery:</strong> {deliveryStatus}</p>
+        </CardContent>
+      </Card>
+
+      <Card className="mb-8 shadow-lg">
+        <CardContent className="pt-6">
+          {isReady ? (
+            <div className="border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-200">
+              ✓ Files Ready — your purchased files are available below.
+            </div>
+          ) : isManualReview ? (
+            <div className="border border-gold/40 bg-gold/10 p-4 text-cream-dim">
+              <p className="font-medium text-gold">Files are being prepared.</p>
+              <p className="mt-1 text-sm">Expected delivery: within 3 business days. Our team is reviewing your order and will attach any missing files.</p>
+            </div>
+          ) : (
+            <div className="border border-cb-border bg-surface p-4 text-cream-dim">
+              Payment received. We are preparing your files.
+            </div>
+          )}
         </CardContent>
       </Card>
 

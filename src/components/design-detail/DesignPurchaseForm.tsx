@@ -48,7 +48,7 @@ const DesignPurchaseForm: React.FC<DesignPurchaseFormProps> = ({ design }) => {
           </button>
         </div>
         <div className="mt-6 text-center text-sm text-muted">
-          <p>Secure payment via Stripe & PayPal</p>
+          <p>Secure payment via IntaSend</p>
         </div>
         <div className="mt-4 flex justify-center gap-4 text-muted">
           <span className="text-xs font-semibold">100% Price Guarantee</span>

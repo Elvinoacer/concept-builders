@@ -28,7 +28,9 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
   };
 
   const handleClose = useCallback(() => {
-    localStorage.setItem("hasDismissedPhoneModal", "true");
+    const dismissedUntil = Date.now() + 24 * 60 * 60 * 1000;
+    localStorage.setItem("phoneModalDismissedUntil", String(dismissedUntil));
+    localStorage.removeItem("hasDismissedPhoneModal");
     onClose();
   }, [onClose]);
 
@@ -65,6 +67,8 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({
         throw new Error(message);
       }
 
+      localStorage.removeItem("phoneModalDismissedUntil");
+      localStorage.removeItem("hasDismissedPhoneModal");
       setIsSuccess(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       onSubmit(phoneNumber as string);

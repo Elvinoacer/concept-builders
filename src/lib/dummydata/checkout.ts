@@ -4,8 +4,7 @@ export const checkoutForm = {
     paymentMethod: {
         title: "Payment Method",
         creditCard: "Credit Card",
-        paypal: "PayPal",
-        intasend: "Intasend",
+        intasend: "M-Pesa / Card Checkout",
         nameOnCard: {
             label: "Name on Card",
             placeholder: "Jane Doe"

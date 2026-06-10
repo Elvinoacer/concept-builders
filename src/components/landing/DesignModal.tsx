@@ -24,6 +24,15 @@ interface DesignModalProps {
 export default function DesignModal({ plan, onClose }: DesignModalProps) {
   const router = useRouter();
 
+  const buildCustomDesignUrl = (params: Record<string, string | number | undefined>) => {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "") query.set(key, String(value));
+    });
+    if (plan?.img) query.set("image", plan.img);
+    return `/custom-design?${query.toString()}`;
+  };
+
   useEffect(() => {
     if (!plan) return;
     const previous = document.body.style.overflow;
@@ -44,26 +53,26 @@ export default function DesignModal({ plan, onClose }: DesignModalProps) {
     if (plan.id && plan.hasFiles) {
       router.push(`/designs/${plan.id}`);
     } else if (plan.id) {
-      router.push(`/custom-design?inspired_by=${encodeURIComponent(plan.id)}`);
+      router.push(buildCustomDesignUrl({ inspired_by: plan.id }));
     } else {
-      router.push(`/custom-design?style=${encodeURIComponent(plan.style)}`);
+      router.push(buildCustomDesignUrl({ style: plan.style }));
     }
     onClose();
   };
 
   const handleRequestSimilar = () => {
     if (plan.id) {
-      router.push(`/custom-design?inspired_by=${encodeURIComponent(plan.id)}&style=${encodeURIComponent(plan.style)}`);
+      router.push(buildCustomDesignUrl({ inspired_by: plan.id, style: plan.style }));
     } else {
-      router.push(`/custom-design?style=${encodeURIComponent(plan.style)}&beds=${encodeURIComponent(String(plan.beds))}`);
+      router.push(buildCustomDesignUrl({ style: plan.style, beds: plan.beds }));
     }
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm" onClick={(event) => event.target === event.currentTarget && onClose()} role="dialog" aria-modal="true">
-      <div className="relative grid max-h-[90vh] w-full max-w-5xl overflow-y-auto border border-[rgba(240,232,216,0.14)] bg-[#141414] text-[#FDFCFA] shadow-2xl md:grid-cols-[0.9fr_1.1fr]">
-        <button type="button" onClick={onClose} className="absolute right-3 top-3 z-20 grid h-10 w-10 place-items-center border border-white/15 bg-black/35 text-2xl text-white transition-colors hover:border-[#B8935A] hover:text-[#B8935A]" aria-label="Close design details">×</button>
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-black/75 px-4 pb-8 pt-24 backdrop-blur-sm" onClick={(event) => event.target === event.currentTarget && onClose()} role="dialog" aria-modal="true">
+      <div className="relative grid w-full max-w-5xl overflow-visible border border-[rgba(240,232,216,0.14)] bg-[#141414] text-[#FDFCFA] shadow-2xl md:grid-cols-[0.9fr_1.1fr]">
+        <button type="button" onClick={onClose} className="fixed right-6 top-24 z-20 grid h-10 w-10 place-items-center border border-white/15 bg-black/35 text-2xl text-white transition-colors hover:border-[#B8935A] hover:text-[#B8935A]" aria-label="Close design details">×</button>
 
         <div className="relative min-h-[320px] overflow-hidden md:min-h-[560px]">
           <img src={plan.img} alt={plan.name} className="h-full w-full object-cover opacity-90" />

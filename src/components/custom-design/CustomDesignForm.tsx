@@ -29,12 +29,18 @@ const CustomDesignForm = () => {
   const [loading, setLoading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [referenceDesignId, setReferenceDesignId] = useState<string | null>(null);
+  const [referenceImage, setReferenceImage] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const inspiredBy = searchParams.get("inspired_by");
     const style = searchParams.get("style");
     const beds = searchParams.get("beds");
+    const image = searchParams.get("image");
+
+    setReferenceDesignId(inspiredBy);
+    setReferenceImage(image);
 
     if (inspiredBy) {
       setDescription((prev) =>
@@ -97,6 +103,8 @@ const CustomDesignForm = () => {
     formData.append("description", description);
     if (phone) formData.append("phone", phone);
     if (budget) formData.append("budget", budget);
+    if (referenceDesignId) formData.append("referenceDesignId", referenceDesignId);
+    if (referenceImage) formData.append("referenceImage", referenceImage);
     files.forEach((file) => {
       formData.append("files", file);
     });
@@ -130,8 +138,9 @@ const CustomDesignForm = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles((prevFiles) => [...prevFiles, ...Array.from(e.target.files)]);
+    const selectedFiles = e.target.files;
+    if (selectedFiles) {
+      setFiles((prevFiles) => [...prevFiles, ...Array.from(selectedFiles)]);
     }
   };
 
@@ -171,7 +180,16 @@ const CustomDesignForm = () => {
         onSubmit={handleSubmit}
         className="space-y-6 sm:space-y-8"
       >
-        <div className="grid grid-cols-1 gap-4 border border-cb-border bg-surface p-4 sm:grid-cols-2 sm:gap-5 sm:p-6">
+        <div className="border border-cb-border bg-surface p-4 sm:p-6">
+          <div className="mb-5 border-b border-cb-border pb-4">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold">
+              Project Details
+            </p>
+            <p className="mt-1 text-sm text-cream-dim">
+              Share the essentials so our architects can shape the right brief.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
           <div className="space-y-2">
             <Label
               htmlFor="name"
@@ -314,13 +332,42 @@ const CustomDesignForm = () => {
             />
           </div>
         </div>
+        </div>
+
+        {referenceImage && (
+          <div className="border border-cb-border bg-surface p-4 sm:p-6">
+            <div className="mb-4 border-b border-cb-border pb-4">
+              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold">
+                Reference Design
+              </p>
+              <p className="mt-1 text-sm text-cream-dim">
+                Inspired by {referenceDesignId ? `plan ${referenceDesignId}` : "your selected design"}.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-[220px_1fr] sm:items-center">
+              <div className="overflow-hidden border border-cb-border bg-card">
+                <img
+                  src={referenceImage}
+                  alt="Selected reference design"
+                  className="h-44 w-full object-cover"
+                />
+              </div>
+              <div className="border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.08)] p-4">
+                <p className="text-sm font-medium text-cream">Reference Attached</p>
+                <p className="mt-2 text-sm leading-6 text-cream-dim">
+                  This inspiration image will be saved with your request so the team can review the visual direction.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="border border-dashed border-cb-border bg-surface p-4 sm:p-6">
           <Label
             htmlFor="file-upload"
             className="mb-3 block text-[11px] uppercase tracking-[0.14em] text-cream-dim"
           >
-            Attachments (Optional)
+            Reference Images
           </Label>
           <div
             className={`flex justify-center border border-dashed p-5 sm:p-7 transition-colors ${
@@ -341,7 +388,7 @@ const CustomDesignForm = () => {
                   htmlFor="file-upload"
                   className="inline-flex cursor-pointer items-center justify-center border border-gold/40 px-3 py-1.5 text-[11px] uppercase tracking-[0.12em] text-gold transition-colors hover:bg-gold hover:text-ink"
                 >
-                  Upload Files
+                  Browse Files
                   <Input
                     id="file-upload"
                     type="file"
@@ -350,7 +397,7 @@ const CustomDesignForm = () => {
                     multiple
                   />
                 </label>
-                <p className="text-xs text-muted">or drag and drop here</p>
+                <p className="text-xs text-muted">Drag files here or browse files</p>
               </div>
               <p className="text-xs text-muted">
                 PNG, JPG, GIF, PDF, DOCX up to 10MB

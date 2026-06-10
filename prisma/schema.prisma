@@ -52,6 +52,7 @@ model User {
   readMessages             Message[]         @relation("ReadMessages")
   paymentAttempts          PaymentAttempt[]
   deviceTokens             DeviceToken[]
+  downloadLogs             DownloadLog[]
 }
 
 model DeviceToken {
@@ -314,19 +315,22 @@ model Post {
 }
 
 model Order {
-  id             String      @id @default(cuid())
+  id             String              @id @default(cuid())
   userId         String
-  createdAt      DateTime    @default(now())
+  createdAt      DateTime            @default(now())
   amount         Float
-  status         OrderStatus @default(PENDING)
+  status         OrderStatus         @default(PENDING)
   paymentGateway String?
-  paymentId      String?     @unique
+  paymentId      String?             @unique
   discountAmount Float?
   discountCode   String?
   discountId     String?
-  cartId         String?     @unique
-  discount       Discount?   @relation(fields: [discountId], references: [id])
-  user           User        @relation(fields: [userId], references: [id])
+  cartId         String?             @unique
+  discount       Discount?           @relation(fields: [discountId], references: [id])
+  user           User                @relation(fields: [userId], references: [id])
+  downloadLogs   DownloadLog[]
+  deliveryStatus OrderDeliveryStatus @default(PENDING)
+  missingFiles   String[]
   items          OrderItem[]
 }
 
@@ -337,6 +341,7 @@ model OrderItem {
   quantity          Int
   selectedExtras    Json?
   selectedFileTypes String[]
+  deliveryStatus    OrderItemStatus @default(PENDING)
   deliveredFiles    DeliveredFile[]
   design            Design          @relation(fields: [designId], references: [id], onDelete: Cascade)
   order             Order           @relation(fields: [orderId], references: [id])
@@ -351,6 +356,17 @@ model DeliveredFile {
   orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
 
   @@unique([orderItemId, fileId])
+}
+
+model DownloadLog {
+  id           String   @id @default(cuid())
+  userId       String
+  orderId      String
+  fileUrl      String
+  ipAddress    String?
+  downloadedAt DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Project {
@@ -392,17 +408,19 @@ model Notification {
 }
 
 model CustomDesignRequest {
-  id          String                    @id @default(cuid())
-  name        String
-  email       String
-  phone       String?
-  designType  String
-  description String
-  budget      String?
-  attachments String[]
-  createdAt   DateTime                  @default(now())
-  status      CustomDesignRequestStatus @default(PENDING)
-  updatedAt   DateTime                  @default(now()) @updatedAt
+  id                String                    @id @default(cuid())
+  name              String
+  email             String
+  phone             String?
+  designType        String
+  description       String
+  budget            String?
+  referenceDesignId String?
+  referenceImageUrl String?
+  attachments       String[]
+  createdAt         DateTime                  @default(now())
+  status            CustomDesignRequestStatus @default(PENDING)
+  updatedAt         DateTime                  @default(now()) @updatedAt
 }
 
 model Conversation {
@@ -682,6 +700,20 @@ enum OrderStatus {
   PAID
   REFUND_REQUESTED
   REFUNDED
+}
+
+enum OrderDeliveryStatus {
+  PENDING
+  PARTIAL
+  DELIVERED
+  MANUAL_REVIEW
+}
+
+enum OrderItemStatus {
+  PENDING
+  READY
+  DELIVERED
+  MANUAL_DELIVERY_REQUIRED
 }
 
 enum CustomDesignRequestStatus {
