@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import Link from "next/link";
 import "./DesignJourney.css";
 
 export default function DesignJourney() {
@@ -1842,7 +1841,7 @@ export default function DesignJourney() {
           </p>
         </div>
         <div className="cta-actions dj-reveal dj-reveal-delay-1">
-          <Link href="/contact" className="btn-primary">
+          <a href="#consultation-form" className="btn-primary">
             Start Your Project
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path
@@ -1853,7 +1852,7 @@ export default function DesignJourney() {
                 strokeLinejoin="round"
               />
             </svg>
-          </Link>
+          </a>
         </div>
       </section>
     </div>

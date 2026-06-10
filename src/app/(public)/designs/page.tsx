@@ -187,12 +187,26 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                 <p className="text-[42px] font-light leading-none text-cream">
                   {totalDesigns}+
                 </p>
-                <p
-                  className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted"
-                  style={{ fontFamily: monoSystem }}
-                >
-                  House Plans
-                </p>
+                <div className="mt-1 flex items-center gap-4">
+                  <p
+                    className="text-[10px] uppercase tracking-[0.2em] text-muted"
+                    style={{ fontFamily: monoSystem }}
+                  >
+                    House Plans
+                  </p>
+
+                  <button
+                    onClick={() =>
+                      document
+                        .getElementById("plans-grid")
+                        ?.scrollIntoView({ behavior: "smooth" })
+                    }
+                    className="text-[10px] uppercase tracking-[0.2em] text-gold hover:text-cream transition-colors"
+                    style={{ fontFamily: monoSystem }}
+                  >
+                    View Plans
+                  </button>
+                </div>
               </div>
               <div>
                 <p className="text-[42px] font-light leading-none text-cream">
@@ -535,13 +549,15 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
               </article>
             )}
 
-            <PublicDesignsInfiniteGrid
-              fallbackImage={fallbackImage}
-              search={search}
-              category={category}
-              sort={sort}
-              isFeatured={isFeatured}
-            />
+            <div id="plans-grid">
+              <PublicDesignsInfiniteGrid
+                fallbackImage={fallbackImage}
+                search={search}
+                category={category}
+                sort={sort}
+                isFeatured={isFeatured}
+              />
+            </div>
           </div>
         </div>
       </main>

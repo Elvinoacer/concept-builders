@@ -415,7 +415,7 @@ export default function DreamPlan({
                     />
                   </svg>
                 </a>
-                <a href="/contact" className="dp-btn-secondary">
+                <a href="#consultation-form" className="dp-btn-secondary">
                   <svg
                     width="14"
                     height="14"

@@ -360,7 +360,7 @@ export default function DesignIdeas() {
             </p>
             <Link
               className="featured-cta"
-              href="/contact"
+              href="#consultation-form"
               onMouseEnter={handleLinkEnter}
               onMouseLeave={handleLinkLeave}
             >
@@ -522,7 +522,7 @@ export default function DesignIdeas() {
         </p>
         <Link
           className="cta-main"
-          href="/contact"
+          href="#consultation-form"
           onMouseEnter={handleLinkEnter}
           onMouseLeave={handleLinkLeave}
         >
