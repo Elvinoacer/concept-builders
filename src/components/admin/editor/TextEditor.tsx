@@ -9,8 +9,6 @@ import { StarterKit } from "@tiptap/starter-kit";
 import { useEffect, useState } from "react";
 import MenuBar from "./MenuBar";
 import { VideoExtension } from "./VideoExtension";
-
-import { useTheme } from "next-themes";
 import {
   FiChevronDown,
   FiEye,
@@ -83,7 +81,6 @@ const CollapsibleSection = ({ title, children, defaultOpen = true }) => {
 };
 
 export default function TextEditor() {
-  const { theme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -515,7 +512,7 @@ export default function TextEditor() {
                           </span>
                           <span>
                             {Math.ceil(
-                              editor.storage.characterCount.words() / 200
+                              editor.storage.characterCount.words() / 200,
                             )}{" "}
                             min read
                           </span>
