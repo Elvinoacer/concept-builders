@@ -1,21 +1,19 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import "./DesignIdeas.css";
 
-export default function DesignIdeas() {
+export default function DesignIdeas({ collections }: { collections: any[] }) {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // For cursor animation
   const mouse = useRef({ x: 0, y: 0 });
   const ringPos = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Custom cursor movement
     const handleMouseMove = (e: MouseEvent) => {
       mouse.current.x = e.clientX;
       mouse.current.y = e.clientY;
@@ -39,7 +37,6 @@ export default function DesignIdeas() {
     };
     animateCursor();
 
-    // Scroll progress bar
     const handleScroll = () => {
       if (progressBarRef.current) {
         const scrolled = window.scrollY;
@@ -50,7 +47,6 @@ export default function DesignIdeas() {
     };
     window.addEventListener("scroll", handleScroll);
 
-    // Intersection Observer for reveals
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -70,7 +66,6 @@ export default function DesignIdeas() {
     );
     revealElements.forEach((el) => observerRef.current?.observe(el));
 
-    // Cleanup
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("scroll", handleScroll);
@@ -160,136 +155,35 @@ export default function DesignIdeas() {
         </header>
 
         <div className="cards-grid">
-          {/* Card 1 */}
-          <Link
-            href="/designs?category=Modern"
-            className="card"
-            style={{ transitionDelay: ".05s" }}
-            onMouseEnter={handleLinkEnter}
-            onMouseLeave={handleLinkLeave}
-          >
-            <div className="card-img-wrap">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_3-Bedroom_Flat-Roof_Three-Quarter_Exterior_Perspectives1.jpeg"
-                alt="Modern House Designs"
-              />
-              <span className="card-tag">Collection 01</span>
-            </div>
-            <div className="card-body">
-              <p className="card-meta">Trending · 2024/25</p>
-              <h3 className="card-title">
-                Top 20 Modern
-                <br />
-                House Designs
-              </h3>
-              <p className="card-desc">
-                A curated showcase of the world's most striking contemporary
-                residential architecture — flat rooflines, expansive glazing,
-                and the perfect play of solid and void.
-              </p>
-              <span className="card-link">
-                Read Article <span className="card-link-arrow"></span>
-              </span>
-            </div>
-          </Link>
-
-          {/* Card 2 */}
-          <Link
-            href="/designs?bedrooms=4"
-            className="card"
-            style={{ transitionDelay: ".15s" }}
-            onMouseEnter={handleLinkEnter}
-            onMouseLeave={handleLinkLeave}
-          >
-            <div className="card-img-wrap">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/4-Bedroom_L-Shaped_Bungalow_Front_Elevation1.jpg"
-                alt="4 Bedroom Plans"
-              />
-              <span className="card-tag">Collection 02</span>
-            </div>
-            <div className="card-body">
-              <p className="card-meta">Family Living · Plans</p>
-              <h3 className="card-title">
-                Best 4 Bedroom
-                <br />
-                House Plans
-              </h3>
-              <p className="card-desc">
-                Space, flow, and family life considered in every sq ft. Discover
-                layouts engineered for how modern families actually live.
-              </p>
-              <span className="card-link">
-                Read Article <span className="card-link-arrow"></span>
-              </span>
-            </div>
-          </Link>
-
-          {/* Card 3 */}
-          <Link
-            href="/designs?category=Luxury"
-            className="card"
-            style={{ transitionDelay: ".25s" }}
-            onMouseEnter={handleLinkEnter}
-            onMouseLeave={handleLinkLeave}
-          >
-            <div className="card-img-wrap">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa3.jpg"
-                alt="Luxury Villa"
-              />
-              <span className="card-tag">Collection 03</span>
-            </div>
-            <div className="card-body">
-              <p className="card-meta">Premium · 2025 Trends</p>
-              <h3 className="card-title">
-                Luxury Villa
-                <br />
-                Design Trends
-              </h3>
-              <p className="card-desc">
-                Where architecture meets resort living. Pool pavilions,
-                double-height volumes, and materials that age like wine — the
-                anatomy of a modern villa.
-              </p>
-              <span className="card-link">
-                Read Article <span className="card-link-arrow"></span>
-              </span>
-            </div>
-          </Link>
-
-          {/* Card 4 */}
-          <Link
-            href="/designs?category=Small+Plot"
-            className="card"
-            style={{ transitionDelay: ".35s" }}
-            onMouseEnter={handleLinkEnter}
-            onMouseLeave={handleLinkLeave}
-          >
-            <div className="card-img-wrap">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg"
-                alt="Small Plot"
-              />
-              <span className="card-tag">Collection 04</span>
-            </div>
-            <div className="card-body">
-              <p className="card-meta">Smart Living · Urban</p>
-              <h3 className="card-title">
-                Small Plot
-                <br />
-                Design Ideas
-              </h3>
-              <p className="card-desc">
-                Compact footprint, generous spirit. Discover how clever spatial
-                planning, vertical living, and thoughtful landscaping unlock the
-                full potential of tight urban plots.
-              </p>
-              <span className="card-link">
-                Read Article <span className="card-link-arrow"></span>
-              </span>
-            </div>
-          </Link>
+          {collections.map((item, index) => (
+            <Link
+              key={item.id}
+              href={
+                item.category
+                  ? `/designs?category=${item.category.name}`
+                  : "/designs"
+              }
+              className="card"
+              style={{ transitionDelay: `${index * 0.1 + 0.05}s` }}
+              onMouseEnter={handleLinkEnter}
+              onMouseLeave={handleLinkLeave}
+            >
+              <div className="card-img-wrap">
+                <img src={item.image} alt={item.title} />
+                <span className="card-tag">
+                  Collection {String(index + 1).padStart(2, "0")}
+                </span>
+              </div>
+              <div className="card-body">
+                <p className="card-meta">{item.subtitle}</p>
+                <h3 className="card-title">{item.title}</h3>
+                <p className="card-desc">{item.description}</p>
+                <span className="card-link">
+                  View Designs <span className="card-link-arrow"></span>
+                </span>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 

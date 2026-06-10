@@ -138,11 +138,25 @@ model VerificationToken {
 }
 
 model Category {
-  id         String   @id @default(cuid())
-  name       String   @unique
-  image      String?
-  isFeatured Boolean  @default(false)
-  designs    Design[]
+  id          String             @id @default(cuid())
+  name        String             @unique
+  image       String?
+  isFeatured  Boolean            @default(false)
+  designs     Design[]
+  collections DesignCollection[]
+}
+
+model DesignCollection {
+  id          String    @id @default(cuid())
+  title       String
+  subtitle    String?
+  description String
+  image       String
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  order       Int       @default(0)
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
 }
 
 model Folder {
