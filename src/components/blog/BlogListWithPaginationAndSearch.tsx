@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/pagination";
 
 import FeaturedPost, { FeaturedPostSkeleton } from "./FeaturedPost";
-import { AlertCircle, Search, Loader2 } from "lucide-react";
+import { AlertCircle, Search } from "lucide-react";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -22,16 +22,13 @@ const BlogListWithPaginationAndSearch = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  if (!searchParams) return null;
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams?.get("search") || ""
-  );
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -54,7 +51,7 @@ const BlogListWithPaginationAndSearch = () => {
       setTotalPages(result.data.pagination.totalPages);
     } catch (err: any) {
       setError(
-        err.message || "An unexpected error occurred while fetching posts."
+        err.message || "An unexpected error occurred while fetching posts.",
       );
     } finally {
       setLoading(false);
@@ -62,9 +59,10 @@ const BlogListWithPaginationAndSearch = () => {
   }, [currentPage, searchQuery]);
 
   useEffect(() => {
-    const pageParam = parseInt(searchParams?.get("page") || "1", 10);
+    if (!searchParams) return;
+    const pageParam = parseInt(searchParams.get("page") || "1", 10);
     setCurrentPage(pageParam);
-    setSearchQuery(searchParams?.get("search") || "");
+    setSearchQuery(searchParams.get("search") || "");
   }, [searchParams]);
 
   useEffect(() => {
@@ -72,33 +70,19 @@ const BlogListWithPaginationAndSearch = () => {
   }, [fetchPosts]);
 
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams?.toString() || "");
+    if (!searchParams) return;
+    const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    const params = new URLSearchParams(searchParams?.toString() || "");
-    if (e.target.value) {
-      params.set("search", e.target.value);
-    } else {
-      params.delete("search");
-    }
-    params.set("page", "1");
     router.push(`${pathname}?${params.toString()}`);
   };
 
   const renderPagination = () => {
     const pages = [];
-
-    // Smart pagination - show limited pages on mobile
-    const maxVisiblePages =
-      window.innerWidth < 640 ? 3 : window.innerWidth < 1024 ? 5 : 7;
+    // Safe standard rendering bounds matching mobile displays perfectly
+    const maxVisiblePages = 4;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-    // Adjust start page if we're near the end
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -113,27 +97,28 @@ const BlogListWithPaginationAndSearch = () => {
               e.preventDefault();
               handlePageChange(i);
             }}
-            className="min-w-[2.5rem] xs:min-w-[3rem] text-sm xs:text-base"
+            className="min-w-[2.25rem] h-9 sm:min-w-[2.75rem] sm:h-11 text-xs sm:text-sm rounded-xl"
           >
             {i}
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem>,
       );
     }
 
     return (
-      <Pagination className="mt-6 sm:mt-8 lg:mt-12">
-        <PaginationContent className="flex-wrap gap-1 sm:gap-2 justify-center">
+      <Pagination className="w-full">
+        <PaginationContent className="flex flex-wrap gap-1 sm:gap-2 justify-center items-center w-full">
           <PaginationItem>
             <PaginationPrevious
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                handlePageChange(Math.max(1, currentPage - 1));
+                if (currentPage > 1) handlePageChange(currentPage - 1);
               }}
-              className="text-sm xs:text-base px-2 xs:px-4"
+              className="text-xs sm:text-sm px-2 sm:px-3 h-9 sm:h-11 rounded-xl"
             />
           </PaginationItem>
+
           {startPage > 1 && (
             <>
               <PaginationItem>
@@ -143,24 +128,30 @@ const BlogListWithPaginationAndSearch = () => {
                     e.preventDefault();
                     handlePageChange(1);
                   }}
-                  className="min-w-[2.5rem] xs:min-w-[3rem] text-sm xs:text-base"
+                  className="min-w-[2.25rem] h-9 sm:min-w-[2.75rem] sm:h-11 text-xs sm:text-sm rounded-xl"
                 >
                   1
                 </PaginationLink>
               </PaginationItem>
               {startPage > 2 && (
                 <PaginationItem>
-                  <span className="px-2 text-muted-foreground">...</span>
+                  <span className="px-1 text-muted-foreground text-xs sm:text-sm">
+                    ...
+                  </span>
                 </PaginationItem>
               )}
             </>
           )}
+
           {pages}
+
           {endPage < totalPages && (
             <>
               {endPage < totalPages - 1 && (
                 <PaginationItem>
-                  <span className="px-2 text-muted-foreground">...</span>
+                  <span className="px-1 text-muted-foreground text-xs sm:text-sm">
+                    ...
+                  </span>
                 </PaginationItem>
               )}
               <PaginationItem>
@@ -170,21 +161,22 @@ const BlogListWithPaginationAndSearch = () => {
                     e.preventDefault();
                     handlePageChange(totalPages);
                   }}
-                  className="min-w-[2.5rem] xs:min-w-[3rem] text-sm xs:text-base"
+                  className="min-w-[2.25rem] h-9 sm:min-w-[2.75rem] sm:h-11 text-xs sm:text-sm rounded-xl"
                 >
                   {totalPages}
                 </PaginationLink>
               </PaginationItem>
             </>
           )}
+
           <PaginationItem>
             <PaginationNext
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                handlePageChange(Math.min(totalPages, currentPage + 1));
+                if (currentPage < totalPages) handlePageChange(currentPage + 1);
               }}
-              className="text-sm xs:text-base px-2 xs:px-4"
+              className="text-xs sm:text-sm px-2 sm:px-3 h-9 sm:h-11 rounded-xl"
             />
           </PaginationItem>
         </PaginationContent>
@@ -193,79 +185,86 @@ const BlogListWithPaginationAndSearch = () => {
   };
 
   return (
-    <div className="w-full">
-      {/* Feed Content */}
+    <div className="w-full min-w-0">
       {loading ? (
-        <div className="space-y-12">
-          {/* Featured Skeleton */}
+        <div className="space-y-12 sm:space-y-16">
           <FeaturedPostSkeleton />
-          {/* Grid Skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
             {[...Array(4)].map((_, index) => (
               <BlogPostCardSkeleton key={index} index={index} />
             ))}
           </div>
         </div>
       ) : error ? (
-        <div className="py-20 text-center space-y-8 max-w-md mx-auto">
-          <AlertCircle className="w-20 h-20 text-red-500 mx-auto" />
-          <h2 className="text-3xl font-black text-gold uppercase">Feed Error</h2>
-          <p className="text-cream-dim text-lg leading-relaxed">{error}</p>
+        <div className="py-16 sm:py-24 px-4 text-center space-y-6 max-w-md mx-auto flex flex-col items-center justify-center">
+          <div className="p-4 bg-red-500/10 rounded-full text-red-500">
+            <AlertCircle className="w-10 h-10" />
+          </div>
+          <h2 className="text-2xl font-black text-gold uppercase tracking-tight">
+            Feed Error
+          </h2>
+          <p className="text-cream-dim text-sm sm:text-base leading-relaxed">
+            {error}
+          </p>
           <button
             onClick={fetchPosts}
-            className="px-10 py-4 bg-gold text-ink font-black uppercase tracking-widest rounded-xl hover:bg-gold-light transition-all"
+            className="w-full sm:w-auto px-8 py-3.5 bg-gold text-ink font-black uppercase tracking-widest rounded-xl hover:bg-gold-light transition-all text-xs"
           >
             Retry Fetch
           </button>
         </div>
       ) : posts.length === 0 ? (
-        <div className="py-24 text-center space-y-8 max-w-lg mx-auto">
-          <div className="relative w-32 h-32 mx-auto">
-            <Search className="w-full h-full text-gold/10" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 border-2 border-dashed border-gold/20 rounded-full animate-[spin_10s_linear_infinite]" />
-            </div>
+        <div className="py-16 sm:py-24 px-4 text-center space-y-6 max-w-md mx-auto flex flex-col items-center justify-center">
+          <div className="p-5 bg-surface rounded-full border border-cb-border text-gold/40">
+            <Search className="w-8 h-8" />
           </div>
-          <h2 className="text-4xl font-black text-white uppercase tracking-tight">Empty Archives</h2>
-          <p className="text-cream-dim text-lg leading-relaxed">
+          <h2 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
+            Empty Archives
+          </h2>
+          <p className="text-cream-dim text-sm sm:text-base leading-relaxed">
             {searchQuery
-              ? `No chronicles match the query "${searchQuery}". Try broadening your search.`
-              : "Our scribes are currently crafting new stories. Check back soon for fresh insights."}
+              ? `No chronicles match the query "${searchQuery}". Try widening your keywords.`
+              : "Our design scribes are currently crafting stories. Check back shortly for new layout insights."}
           </p>
           {searchQuery && (
             <button
               onClick={() => {
+                if (!searchParams) return;
                 setSearchQuery("");
-                const params = new URLSearchParams(searchParams?.toString() || "");
+                const params = new URLSearchParams(searchParams.toString());
                 params.delete("search");
                 params.set("page", "1");
                 router.push(`${pathname}?${params.toString()}`);
               }}
-              className="px-10 py-4 border-2 border-gold text-gold font-black uppercase tracking-widest rounded-xl hover:bg-gold/10 transition-all"
+              className="w-full sm:w-auto px-8 py-3.5 border-2 border-gold text-gold font-black uppercase tracking-widest rounded-xl hover:bg-gold/10 transition-all text-xs"
             >
               Clear Search
             </button>
           )}
         </div>
       ) : (
-        <div className="space-y-12 sm:space-y-20">
-          {/* First post is featured only on Page 1 if no search */}
+        <div className="space-y-12 sm:space-y-16 lg:space-y-20">
+          {/* Featured items show only on root feed layout page */}
           {currentPage === 1 && !searchQuery && posts[0] && (
-            <FeaturedPost post={posts[0]} />
+            <div className="w-full">
+              <FeaturedPost post={posts[0]} />
+            </div>
           )}
 
-          {/* Grid of remaining posts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-stretch">
-            {(currentPage === 1 && !searchQuery ? posts.slice(1) : posts).map((post, index) => (
-              <BlogPostCard key={post.id} post={post} index={index} />
-            ))}
+          {/* Clean Unified Fluid Dynamic Grid Matrix */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 items-stretch">
+            {(currentPage === 1 && !searchQuery ? posts.slice(1) : posts).map(
+              (post, index) => (
+                <BlogPostCard key={post.id} post={post} index={index} />
+              ),
+            )}
           </div>
         </div>
       )}
 
-      {/* Pagination Container */}
+      {/* Structured Pagination Box */}
       {totalPages > 1 && !loading && (
-        <div className="mt-16 sm:mt-24 pt-12 border-t border-cb-border flex justify-center">
+        <div className="mt-12 sm:mt-20 pt-8 border-t border-cb-border flex justify-center w-full overflow-x-auto">
           {renderPagination()}
         </div>
       )}
