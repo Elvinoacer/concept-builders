@@ -2,6 +2,7 @@
 
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import { customDesignHeader } from "@/lib/dummydata/customDesign";
 
 const CustomDesignHeader: React.FC = () => {
@@ -33,6 +34,20 @@ const CustomDesignHeader: React.FC = () => {
         >
           {customDesignHeader.description}
         </CardDescription>
+
+        <div className="mt-6">
+          <Button
+            onClick={() =>
+              document.getElementById("custom-design-form")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              })
+            }
+            className="bg-gold text-black hover:bg-gold/90"
+          >
+            Request Design
+          </Button>
+        </div>
       </CardHeader>
     </motion.div>
   );

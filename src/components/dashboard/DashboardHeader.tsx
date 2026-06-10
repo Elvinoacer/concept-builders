@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ModeToggle } from "@/components/ui/mode-toggle";
 import { useSearch } from "@/lib/SearchContext";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/hooks/useCart";
@@ -205,10 +204,7 @@ const DashboardHeader = ({
 
         {/* Right Section - Actions */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-          {/* Theme Toggle */}
-          <div className="hidden sm:flex items-center">
-            <ModeToggle />
-          </div>
+          {/* Theme Toggle removed */}
 
           {/* Cart */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

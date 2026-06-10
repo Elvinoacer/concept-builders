@@ -32,17 +32,25 @@ const CustomDesignForm = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const inspiredBy = searchParams.get('inspired_by');
-    const style = searchParams.get('style');
-    const beds = searchParams.get('beds');
+    const inspiredBy = searchParams.get("inspired_by");
+    const style = searchParams.get("style");
+    const beds = searchParams.get("beds");
 
     if (inspiredBy) {
-      setDescription(prev => prev ? prev : `I would like a custom design inspired by plan ID: ${inspiredBy}.`);
+      setDescription((prev) =>
+        prev
+          ? prev
+          : `I would like a custom design inspired by plan ID: ${inspiredBy}.`,
+      );
       setDesignType("Residential");
     } else if (style || beds) {
       const styleText = style ? ` in ${style} style` : "";
       const bedText = beds ? ` with ${beds} bedrooms` : "";
-      setDescription(prev => prev ? prev : `I'm interested in a custom design${styleText}${bedText}.`);
+      setDescription((prev) =>
+        prev
+          ? prev
+          : `I'm interested in a custom design${styleText}${bedText}.`,
+      );
       setDesignType("Residential");
     }
   }, [searchParams]);
@@ -59,6 +67,27 @@ const CustomDesignForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!name.trim()) {
+      toast.error("Please enter your full name.");
+      return;
+    }
+
+    if (!email.trim()) {
+      toast.error("Please enter your email address.");
+      return;
+    }
+
+    if (!designType) {
+      toast.error("Please select a design type.");
+      return;
+    }
+
+    if (!description.trim()) {
+      toast.error("Please provide a project description.");
+      return;
+    }
+
     setLoading(true);
 
     const formData = new FormData();
@@ -137,7 +166,11 @@ const CustomDesignForm = () => {
       transition={{ duration: 0.5, delay: 0.1 }}
       className="w-full max-w-full mx-auto"
     >
-      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+      <form
+        id="custom-design-form"
+        onSubmit={handleSubmit}
+        className="space-y-6 sm:space-y-8"
+      >
         <div className="grid grid-cols-1 gap-4 border border-cb-border bg-surface p-4 sm:grid-cols-2 sm:gap-5 sm:p-6">
           <div className="space-y-2">
             <Label
@@ -153,8 +186,10 @@ const CustomDesignForm = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
+              className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
             />
+
+            <p className="mt-1 text-xs text-cream-dim">Enter your full name.</p>
           </div>
 
           <div className="space-y-2">
@@ -171,8 +206,12 @@ const CustomDesignForm = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
+              className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
             />
+
+            <p className="mt-1 text-xs text-cream-dim">
+              We'll use this to contact you about your project.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -188,8 +227,12 @@ const CustomDesignForm = () => {
               placeholder="+254 700 000 000"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="h-11 border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
+              className="h-11 border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
             />
+
+            <p className="mt-1 text-xs text-cream-dim">
+              Optional but recommended.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -245,9 +288,13 @@ const CustomDesignForm = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={5}
-              className="min-h-[150px] resize-y border-cb-border bg-card text-cream placeholder:text-muted focus:border-gold"
+              className="min-h-[150px] resize-y border-cb-border bg-card text-cream focus:border-gold focus:ring-2 focus:ring-gold/40"
               required
             />
+
+            <p className="mt-1 text-xs text-cream-dim">
+              Include style preferences, room requirements and project goals.
+            </p>
           </div>
 
           <div className="space-y-2 sm:col-span-2">

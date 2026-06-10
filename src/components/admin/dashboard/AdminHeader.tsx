@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { ModeToggle } from "../../ui/mode-toggle";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -184,10 +183,7 @@ const AdminHeader = (props: {
             </Link>
           </motion.div>
 
-          {/* Theme Toggle */}
-          <div className="hidden xs:block">
-            <ModeToggle />
-          </div>
+          {/* Theme Toggle removed */}
 
           {/* User Profile */}
           <motion.div
