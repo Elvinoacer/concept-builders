@@ -64,7 +64,7 @@ const ShowMoreCard = () => {
       <div className="flex items-center gap-4 text-xs text-muted mb-4">
         <div className="flex items-center gap-1">
           <Grid3X3 className="w-3 h-3" />
-          <span>100+ Designs</span>
+          <span>1,500+ Plans</span>
         </div>
         <div className="w-px h-4 bg-cb-border"></div>
         <div className="flex items-center gap-1">

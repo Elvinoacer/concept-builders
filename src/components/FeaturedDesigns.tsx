@@ -181,10 +181,10 @@ const FeaturedDesigns = ({ featuredDesigns }: FeaturedDesignsProps) => {
                 className="group"
               >
                 <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gold to-gold-light text-transparent bg-clip-text mb-1 xs:mb-2">
-                  100+
+                  1,500+
                 </div>
                 <div className="text-cream-dim text-xs xs:text-sm sm:text-base font-medium">
-                  Happy Clients
+                  Design Plans
                 </div>
               </motion.div>
 

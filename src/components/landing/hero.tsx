@@ -1,11 +1,10 @@
-"use client"
+"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import "./DreamPlan.css";
 
-
-const conceptbuildersStoryLink="https://www.youtube.com/watch?v=HCtSs967dRc"
+const conceptbuildersStoryLink = "https://www.youtube.com/watch?v=HCtSs967dRc";
 // ── House plan data ──
 const PLANS = [
   {
@@ -13,60 +12,58 @@ const PLANS = [
     name: "The Maisonette",
     beds: "5 Bed · 4 Bath",
     area: "4,200 sqft",
-    price: "$3,800",
-    image: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg",
+    image:
+      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg",
   },
   {
     tag: "Modern Bungalow",
     name: "The Zenith",
     beds: "3 Bed · 2 Bath",
     area: "1,850 sqft",
-    price: "$1,600",
-    image: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
+    image:
+      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
   },
   {
     tag: "Apartment Block",
     name: "The Nexus",
     beds: "20 Units · Mixed",
     area: "15,000 sqft",
-    price: "$12,000",
-    image: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
+    image:
+      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
   },
   {
     tag: "Luxury Estate",
     name: "The Oasis Vista",
     beds: "6 Bed · 7 Bath",
     area: "6,500 sqft",
-    price: "$5,200",
-    image: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
+    image:
+      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
   },
   {
     tag: "Country Cottage",
     name: "English Retreat",
     beds: "4 Bed · 3 Bath",
     area: "2,600 sqft",
-    price: "$2,100",
-    image: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg",
+    image:
+      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg",
   },
   {
     tag: "Townhouse Community",
     name: "Urban Haven",
     beds: "3 Bed · 3 Bath",
     area: "2,100 sqft",
-    price: "$1,850",
-    image: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg",
+    image:
+      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg",
   },
   {
     tag: "Luxury Maisonette",
     name: "The Pinnacle",
     beds: "4 Bed · 4 Bath",
     area: "3,400 sqft",
-    price: "$2,900",
-    image: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg",
+    image:
+      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg",
   },
 ];
-
-
 
 // ── Routing Logic ──
 function getCardDestination(plan: any): string {
@@ -78,7 +75,11 @@ function getCardDestination(plan: any): string {
 // ── HouseCard ──
 function HouseCard({ plan, cardStyle }) {
   return (
-    <Link href={getCardDestination(plan)} className="dp-house-card" style={{ ...cardStyle, textDecoration: 'none' }}>
+    <Link
+      href={getCardDestination(plan)}
+      className="dp-house-card"
+      style={{ ...cardStyle, textDecoration: "none" }}
+    >
       <img src={plan.image} alt={plan.name} className="dp-card-img-full" />
       <div className="dp-card-overlay">
         <div className="dp-card-content">
@@ -86,8 +87,19 @@ function HouseCard({ plan, cardStyle }) {
           <div className="dp-card-name-row">
             <h3 className="dp-card-name">{plan.name}</h3>
             <div className="dp-card-arrow">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M5 12h14M12 5l7 7-7 7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M5 12h14M12 5l7 7-7 7"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
           </div>
@@ -103,14 +115,23 @@ function useCarousel(total, interval = 3800) {
   const [animated, setAnimated] = useState(false);
   const timerRef = useRef(null);
 
-  const goTo = useCallback((idx) => {
-    const next = ((idx % total) + total) % total;
-    setAnimated(true);
-    setCurrent(next);
-  }, [total]);
+  const goTo = useCallback(
+    (idx) => {
+      const next = ((idx % total) + total) % total;
+      setAnimated(true);
+      setCurrent(next);
+    },
+    [total],
+  );
 
-  const next = useCallback(() => goTo((current + 1) % total), [current, goTo, total]);
-  const prev = useCallback(() => goTo((current - 1 + total) % total), [current, goTo, total]);
+  const next = useCallback(
+    () => goTo((current + 1) % total),
+    [current, goTo, total],
+  );
+  const prev = useCallback(
+    () => goTo((current - 1 + total) % total),
+    [current, goTo, total],
+  );
 
   const resetTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -122,10 +143,13 @@ function useCarousel(total, interval = 3800) {
     return () => clearInterval(timerRef.current);
   }, [next, interval]);
 
-  const goToWithReset = useCallback((idx) => {
-    goTo(idx);
-    resetTimer();
-  }, [goTo, resetTimer]);
+  const goToWithReset = useCallback(
+    (idx) => {
+      goTo(idx);
+      resetTimer();
+    },
+    [goTo, resetTimer],
+  );
 
   return { current, animated, goTo: goToWithReset, next, prev };
 }
@@ -143,24 +167,53 @@ function getCardPositions(current, total, stageW, stageH) {
     let tx, ty, tz, scale, opacity, zIndex, blur;
 
     if (offset === 0) {
-      tx = cx - W / 2; ty = cy - H / 2; tz = 0;
-      scale = 1; opacity = 1; zIndex = 10; blur = 0;
+      tx = cx - W / 2;
+      ty = cy - H / 2;
+      tz = 0;
+      scale = 1;
+      opacity = 1;
+      zIndex = 10;
+      blur = 0;
     } else if (offset === 1 || offset === -(N - 1)) {
-      tx = cx - W / 2 + W * 0.62; ty = cy - H / 2 + H * 0.06; tz = -120;
-      scale = 0.88; opacity = 0.7; zIndex = 8; blur = 1;
-    } else if (offset === -1 || offset === (N - 1)) {
-      tx = cx - W / 2 - W * 0.62; ty = cy - H / 2 + H * 0.06; tz = -120;
-      scale = 0.88; opacity = 0.7; zIndex = 8; blur = 1;
+      tx = cx - W / 2 + W * 0.62;
+      ty = cy - H / 2 + H * 0.06;
+      tz = -120;
+      scale = 0.88;
+      opacity = 0.7;
+      zIndex = 8;
+      blur = 1;
+    } else if (offset === -1 || offset === N - 1) {
+      tx = cx - W / 2 - W * 0.62;
+      ty = cy - H / 2 + H * 0.06;
+      tz = -120;
+      scale = 0.88;
+      opacity = 0.7;
+      zIndex = 8;
+      blur = 1;
     } else if (offset === 2 || offset === -(N - 2)) {
-      tx = cx - W / 2 + W * 1.05; ty = cy - H / 2 + H * 0.14; tz = -240;
-      scale = 0.72; opacity = 0.35; zIndex = 5; blur = 2;
-    } else if (offset === -2 || offset === (N - 2)) {
-      tx = cx - W / 2 - W * 1.05; ty = cy - H / 2 + H * 0.14; tz = -240;
-      scale = 0.72; opacity = 0.35; zIndex = 5; blur = 2;
+      tx = cx - W / 2 + W * 1.05;
+      ty = cy - H / 2 + H * 0.14;
+      tz = -240;
+      scale = 0.72;
+      opacity = 0.35;
+      zIndex = 5;
+      blur = 2;
+    } else if (offset === -2 || offset === N - 2) {
+      tx = cx - W / 2 - W * 1.05;
+      ty = cy - H / 2 + H * 0.14;
+      tz = -240;
+      scale = 0.72;
+      opacity = 0.35;
+      zIndex = 5;
+      blur = 2;
     } else {
       tx = cx - W / 2 + (offset > 0 ? W * 1.5 : -W * 1.5);
-      ty = cy - H / 2 + H * 0.2; tz = -400;
-      scale = 0.5; opacity = 0; zIndex = 1; blur = 4;
+      ty = cy - H / 2 + H * 0.2;
+      tz = -400;
+      scale = 0.5;
+      opacity = 0;
+      zIndex = 1;
+      blur = 4;
     }
 
     return { tx, ty, tz, scale, opacity, zIndex, blur };
@@ -176,7 +229,7 @@ const BG_SLIDES = [
   "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg",
   "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg",
   "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg",
-  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Top-Down_Aerial_View.jpg"
+  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Top-Down_Aerial_View.jpg",
 ];
 
 function CinematicBackground() {
@@ -221,9 +274,9 @@ function CinematicBackground() {
 
           return (
             <div key={i} className={className}>
-              <div 
-                key={`${i}-${playCounts[i]}`} 
-                className="slide__img" 
+              <div
+                key={`${i}-${playCounts[i]}`}
+                className="slide__img"
                 style={{ backgroundImage: `url('${src}')` }}
               />
               <div className="slide__grade" />
@@ -236,25 +289,34 @@ function CinematicBackground() {
 }
 
 // ── Main DreamPlan Component ──
-export default function DreamPlan({ featuredDesigns = [] }: { featuredDesigns?: any[] }) {
-  const mergedPlans = (function mergePlansWithFallback(dbDesigns: any[], fallbacks: any[], count: number) {
-    const merged = dbDesigns.map(d => ({
+export default function DreamPlan({
+  featuredDesigns = [],
+}: {
+  featuredDesigns?: any[];
+}) {
+  const mergedPlans = (function mergePlansWithFallback(
+    dbDesigns: any[],
+    fallbacks: any[],
+    count: number,
+  ) {
+    const merged = dbDesigns.map((d) => ({
       id: d.id,
       tag: d.category?.name || "Featured",
       name: d.name,
       beds: `${d.bedrooms || 0} Bed · ${d.bathrooms || 0} Bath`,
       area: `${d.area || 0} sqft`,
-      price: d.basePrice ? `KES ${d.basePrice.toLocaleString()}` : "",
       image: d.images?.[0]?.url || fallbacks[0].image,
-      category: d.category?.name
+      category: d.category?.name,
     }));
-    
+
     const remaining = count - merged.length;
     if (remaining > 0) {
-      merged.push(...fallbacks.slice(0, remaining).map(f => ({
-        ...f,
-        id: undefined,
-      })));
+      merged.push(
+        ...fallbacks.slice(0, remaining).map((f) => ({
+          ...f,
+          id: undefined,
+        })),
+      );
     }
     return merged.slice(0, count);
   })(featuredDesigns, PLANS, 7);
@@ -317,33 +379,53 @@ export default function DreamPlan({ featuredDesigns = [] }: { featuredDesigns?: 
           <CinematicBackground />
 
           <div className="dp-hero-body">
-
             {/* LEFT: TEXT */}
             <div className="dp-hero-text">
               <div className="dp-hero-eyebrow">
                 <span className="dp-eyebrow-line" />
-                <span className="dp-eyebrow-text">Award-winning Architecture</span>
+                <span className="dp-eyebrow-text">
+                  Award-winning Architecture
+                </span>
               </div>
 
               <h1 className="dp-hero-headline leading-tight tracking-tight">
-                Your House Should Fit Your<br />
-                Land, Budget, and Family<br />
+                Your House Should Fit Your
+                <br />
+                Land, Budget, and Family
+                <br />
                 <em>— Not the Other Way Around.</em>
               </h1>
 
               <p className="dp-hero-sub">
-                We design practical, beautiful homes that can actually be built on your plot, within your budget, and without costly mistakes during construction.
+                We design practical, beautiful homes that can actually be built
+                on your plot, within your budget, and without costly mistakes
+                during construction.
               </p>
 
               <div className="dp-hero-actions">
                 <a href="#explorer" className="dp-btn-primary">
                   View House Plans
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M3 8h10M9 4l4 4-4 4"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </a>
                 <a href="/contact" className="dp-btn-secondary">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                   </svg>
                   Talk to an Architect
@@ -352,16 +434,12 @@ export default function DreamPlan({ featuredDesigns = [] }: { featuredDesigns?: 
 
               <div className="dp-hero-stats">
                 <div className="dp-stat-item">
-                  <div className="dp-stat-number">100+</div>
-                  <div className="dp-stat-label">House Plans</div>
+                  <div className="dp-stat-number">1,500+</div>
+                  <div className="dp-stat-label">Design Plans</div>
                 </div>
                 <div className="dp-stat-item">
-                  <div className="dp-stat-number">2,400+</div>
-                  <div className="dp-stat-label">Homes Built</div>
-                </div>
-                <div className="dp-stat-item">
-                  <div className="dp-stat-number">18yr</div>
-                  <div className="dp-stat-label">Experience</div>
+                  <div className="dp-stat-number">20</div>
+                  <div className="dp-stat-label">Years Experience</div>
                 </div>
               </div>
             </div>
@@ -415,22 +493,24 @@ export default function DreamPlan({ featuredDesigns = [] }: { featuredDesigns?: 
               <div className="dp-float-badge">
                 <div className="dp-badge-icon">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M7 1l1.5 3.1L12 4.6l-2.5 2.4.6 3.4L7 8.9l-3.1 1.5.6-3.4L2 4.6l3.5-.5L7 1z" fill="#C9A96E" />
+                    <path
+                      d="M7 1l1.5 3.1L12 4.6l-2.5 2.4.6 3.4L7 8.9l-3.1 1.5.6-3.4L2 4.6l3.5-.5L7 1z"
+                      fill="#C9A96E"
+                    />
                   </svg>
                 </div>
                 <div className="dp-badge-title">Featured Collection</div>
                 <div className="dp-badge-sub">Modern Luxury · 2025</div>
               </div>
             </div>
-
-          </div>{/* /hero-body */}
+          </div>
+          {/* /hero-body */}
 
           {/* Scroll hint */}
           <div className="dp-scroll-hint">
             <div className="dp-scroll-line" />
             <span className="dp-scroll-text">Scroll to explore</span>
           </div>
-
         </section>
       </div>
     </>
