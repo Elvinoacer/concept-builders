@@ -4,7 +4,7 @@ import path from 'path';
 
 export async function POST(request) {
   const body = await request.text();
-  const filePath = path.join(process.cwd(), 'paypal-debug.txt');
+  const filePath = path.join(process.cwd(), 'payment-debug.txt');
   fs.writeFileSync(filePath, body);
   return NextResponse.json({ success: true });
 }

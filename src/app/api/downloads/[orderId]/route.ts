@@ -138,6 +138,20 @@ export async function GET(
 
     const signedUrls = await getSignedUrlForFiles(filesToSign);
 
+    const ipAddress =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      null;
+
+    await prisma.downloadLog.createMany({
+      data: filesToSign.map((fileUrl) => ({
+        userId: session.user.id,
+        orderId,
+        fileUrl,
+        ipAddress,
+      })),
+    });
+
     return NextResponse.json(signedUrls);
   } catch (error) {
     console.error(error);

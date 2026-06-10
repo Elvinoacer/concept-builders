@@ -212,7 +212,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   return (
     <div>
       {/* Header */}
-      <h2 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4 xs:mb-6 leading-tight">
+      <h2 className="text-xl xs:text-2xl sm:text-3xl font-bold text-cream mb-4 xs:mb-6 leading-tight">
         Order Summary
       </h2>
 
@@ -224,12 +224,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
               key={item.cartItemId}
               className={`flex items-start gap-3 xs:gap-4 pb-4 xs:pb-6 ${
                 index < items.length - 1
-                  ? "border-b border-gray-200 dark:border-gray-700"
+                  ? "border-b border-cb-border"
                   : ""
               }`}
             >
               {/* Product Image */}
-              <div className="h-14 xs:h-16 sm:h-20 w-14 xs:w-16 sm:w-20 flex-shrink-0 rounded-md xs:rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div className="h-14 xs:h-16 sm:h-20 w-14 xs:w-16 sm:w-20 flex-shrink-0 rounded-md xs:rounded-lg overflow-hidden border border-cb-border">
                 <Image
                   src={
                     item.design.images?.[0]?.url ||
@@ -247,10 +247,10 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
               {/* Product Details */}
               <div className="flex-grow min-w-0">
-                <p className="font-semibold text-gray-900 dark:text-white text-sm xs:text-base leading-tight line-clamp-2 mb-1">
+                <p className="font-semibold text-cream text-sm xs:text-base leading-tight line-clamp-2 mb-1">
                   {item.design.name}
                 </p>
-                <p className="text-xs xs:text-sm text-gray-500 dark:text-gray-400 mb-2 xs:mb-3">
+                <p className="text-xs xs:text-sm text-cream-dim mb-2 xs:mb-3">
                   Quantity: 1
                 </p>
                 <div className="text-xs xs:text-sm">
@@ -263,16 +263,16 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
               </div>
 
               {/* Price */}
-              <p className="font-semibold text-gray-900 dark:text-white text-sm xs:text-base flex-shrink-0 ml-2">
+              <p className="font-semibold text-cream text-sm xs:text-base flex-shrink-0 ml-2">
                 ${calculateItemTotal(item).toFixed(2)}
               </p>
             </div>
           ))
         ) : (
           <div className="text-center py-6 xs:py-8">
-            <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-3 xs:mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 xs:w-20 xs:h-20 mx-auto mb-3 xs:mb-4 bg-surface rounded-full flex items-center justify-center">
               <svg
-                className="w-6 h-6 xs:w-8 xs:h-8 text-gray-400"
+                className="w-6 h-6 xs:w-8 xs:h-8 text-muted"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -285,7 +285,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 />
               </svg>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 text-sm xs:text-base">
+            <p className="text-cream-dim text-sm xs:text-base">
               Your cart is empty.
             </p>
           </div>
@@ -295,20 +295,20 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
         {/* Pricing Breakdown */}
         <div className="space-y-2 xs:space-y-3">
-          <div className="flex justify-between text-gray-700 dark:text-gray-300 text-sm xs:text-base">
+          <div className="flex justify-between text-cream-dim text-sm xs:text-base">
             <span>Subtotal (Base Plans)</span>
             <span>${baseSubtotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-gray-700 dark:text-gray-300 text-sm xs:text-base">
+          <div className="flex justify-between text-cream-dim text-sm xs:text-base">
             <span>Add-ons Total</span>
             <span>${addOnsTotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-gray-700 dark:text-gray-300 text-sm xs:text-base">
+          <div className="flex justify-between text-cream-dim text-sm xs:text-base">
             <span>Taxes</span>
             <span>${taxes.toFixed(2)}</span>
           </div>
           {appliedDiscountAmount > 0 && (
-            <div className="flex justify-between text-green-600 dark:text-green-400 font-medium text-sm xs:text-base">
+            <div className="flex justify-between text-gold font-medium text-sm xs:text-base">
               <span className="flex items-center gap-1 xs:gap-2">
                 <svg
                   className="w-3 h-3 xs:w-4 xs:h-4"
@@ -330,21 +330,21 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
         {/* Discount Code Section */}
         <div className="mt-4 xs:mt-6">
-          <h3 className="text-base xs:text-lg font-medium text-gray-900 dark:text-white mb-2 xs:mb-3">
+          <h3 className="text-base xs:text-lg font-medium text-cream mb-2 xs:mb-3">
             Discount Code
           </h3>
           <div className="flex flex-col xs:flex-row gap-2 xs:gap-3">
             <Input
               type="text"
               placeholder="Enter discount code"
-              className="dark:bg-gray-700 dark:border-gray-600 text-sm xs:text-base py-2.5 xs:py-3 flex-1"
+              className="border-cb-border bg-surface text-cream text-sm xs:text-base py-2.5 xs:py-3 flex-1"
               value={discountCodeInput}
               onChange={(e) => setDiscountCodeInput(e.target.value)}
               disabled={isApplyingDiscount}
             />
             <Button
               variant="outline"
-              className="dark:border-gray-600 dark:text-white dark:hover:bg-gray-600 text-sm xs:text-base py-2.5 xs:py-3 min-w-[80px] xs:min-w-[90px]"
+              className="border-cb-border text-cream hover:bg-surface text-sm xs:text-base py-2.5 xs:py-3 min-w-[80px] xs:min-w-[90px]"
               onClick={handleApplyDiscount}
               disabled={isApplyingDiscount || !discountCodeInput.trim()}
             >
@@ -359,7 +359,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             </Button>
           </div>
           {discountError && (
-            <p className="text-red-500 text-xs xs:text-sm mt-2 flex items-center gap-1 xs:gap-2">
+            <p className="text-red-400 text-xs xs:text-sm mt-2 flex items-center gap-1 xs:gap-2">
               <svg
                 className="w-3 h-3 xs:w-4 xs:h-4 flex-shrink-0"
                 fill="currentColor"
@@ -380,11 +380,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
         {/* Total Amount */}
         <div className="space-y-2">
-          <div className="flex justify-between text-lg xs:text-xl font-bold text-gray-900 dark:text-white">
+          <div className="flex justify-between text-lg xs:text-xl font-bold text-cream">
             <span>Total (USD)</span>
             <span>${total.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-sm xs:text-base text-gray-600 dark:text-gray-400">
+          <div className="flex justify-between text-sm xs:text-base text-cream-dim">
             <span>Total (KES)</span>
             {isFetchingRate ? (
               <span className="flex items-center gap-1 xs:gap-2">
@@ -392,7 +392,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 Loading...
               </span>
             ) : rateError ? (
-              <span className="text-red-500 flex items-center gap-1 xs:gap-2">
+              <span className="text-red-400 flex items-center gap-1 xs:gap-2">
                 <svg
                   className="w-3 h-3 xs:w-4 xs:h-4"
                   fill="currentColor"
@@ -413,13 +413,13 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         </div>
 
         {/* Footer Information */}
-        <div className="text-center text-xs xs:text-sm text-gray-500 dark:text-gray-400 mt-4 xs:mt-6 space-y-2">
+        <div className="text-center text-xs xs:text-sm text-cream-dim mt-4 xs:mt-6 space-y-2">
           <p className="leading-relaxed">
             You will get immediate access to the files after purchase.
           </p>
           <Link
             href={`/currency-converter?amount=${total}`}
-            className="text-blue-500 hover:underline inline-flex items-center gap-1 xs:gap-2 transition-colors"
+            className="text-gold hover:underline inline-flex items-center gap-1 xs:gap-2 transition-colors"
           >
             <span>View more currency conversions</span>
             <svg

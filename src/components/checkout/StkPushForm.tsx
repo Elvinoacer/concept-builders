@@ -125,7 +125,7 @@ export default function StkPushForm({
           stopPolling();
           setStatus("failed");
           setStatusMessage(
-            "Payment failed. Please retry or choose PayPal/Card.",
+            "Payment failed. Please retry or use the secure checkout link.",
           );
           toast.error("Payment failed. Please try again.", {
             id: toastId,

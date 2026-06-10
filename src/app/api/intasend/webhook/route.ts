@@ -4,6 +4,7 @@ import { sendPurchaseNotificationEmails } from "@/lib/emails";
 import { calculateItemTotal } from "@/lib/calculate-total";
 import prisma from "@/lib/prisma";
 import { logPaymentEvent } from "@/lib/payment-logger";
+import { reconcileOrderDelivery } from "@/lib/order-delivery";
 
 const extractCartIdFromApiRef = (apiRef?: string | null) => {
   if (!apiRef) return null;
@@ -232,6 +233,15 @@ export async function POST(req: NextRequest) {
         cartId: userCart.id,
         amountUSD: amountPaidUSD,
       });
+
+      const deliveryResult = await reconcileOrderDelivery(order.id);
+
+      if (!deliveryResult.ready) {
+        logPaymentEvent("WEBHOOK_MANUAL_DELIVERY_REQUIRED", {
+          orderId: order.id,
+          missingFiles: deliveryResult.missingFiles,
+        });
+      }
 
       // Send email notifications
       await sendPurchaseNotificationEmails(order.id);

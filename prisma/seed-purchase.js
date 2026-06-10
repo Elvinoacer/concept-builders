@@ -85,7 +85,7 @@ async function main() {
       userId: userId,
       status: 'PAID',
       amount: amount,
-      paymentGateway: 'paypal',
+      paymentGateway: 'intasend',
       paymentId: `seed-payment-${Date.now()}`,
       items: {
         create: [

@@ -2,7 +2,8 @@
 
 import CustomDesignForm from "@/components/custom-design/CustomDesignForm";
 import CustomDesignHeader from "@/components/custom-design/CustomDesignHeader";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DraftingCompass,
@@ -11,7 +12,19 @@ import {
   TimerReset,
 } from "lucide-react";
 
-const CustomDesignPage = () => {
+const CustomDesignPageContent = () => {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!searchParams.has("inspired_by")) return;
+
+    const form = document.getElementById("custom-design-form");
+    form?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [searchParams]);
+
   return (
     <div className="min-h-screen bg-ink text-cream">
       <section className="relative overflow-hidden border-b border-cb-border px-6 pb-10 pt-28 sm:px-10 lg:px-[60px] lg:pt-36">
@@ -123,5 +136,11 @@ const CustomDesignPage = () => {
     </div>
   );
 };
+
+const CustomDesignPage = () => (
+  <Suspense fallback={<div className="min-h-screen bg-ink" />}>
+    <CustomDesignPageContent />
+  </Suspense>
+);
 
 export default CustomDesignPage;

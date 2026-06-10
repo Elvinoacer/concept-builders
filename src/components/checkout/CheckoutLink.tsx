@@ -30,7 +30,6 @@ export default function CheckoutLink({
   appliedDiscountCode,
 }: CheckoutLinkProps) {
   const [loading, setLoading] = useState(false);
-  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [usdToKesRate, setUsdToKesRate] = useState<number | null>(null);
   const [isFetchingRate, setIsFetchingRate] = useState(true);
   const [rateError, setRateError] = useState<string | null>(null);
@@ -63,9 +62,9 @@ export default function CheckoutLink({
     ? (finalTotal * usdToKesRate).toFixed(2)
     : "N/A";
 
-  const handleGenerateLink = async () => {
+  const handlePayNow = async () => {
     setLoading(true);
-    const loadingToastId = toast.loading("Generating checkout link...", {
+    const loadingToastId = toast.loading("Preparing secure checkout...", {
       duration: 10000,
     });
 
@@ -89,11 +88,11 @@ export default function CheckoutLink({
         throw new Error(result.error || "Failed to generate checkout link");
       }
 
-      setCheckoutUrl(result.url);
-      toast.success("Checkout link ready.", {
+      toast.success("Redirecting to secure checkout...", {
         id: loadingToastId,
-        duration: 3500,
+        duration: 2500,
       });
+      window.location.href = result.url;
     } catch (error: unknown) {
       toast.error(
         getErrorMessage(error) || "Failed to generate checkout link",
@@ -115,7 +114,7 @@ export default function CheckoutLink({
         </p>
         <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-cream-dim">
-            Tap once to generate your secure payment link.
+            Tap once to generate your secure checkout and continue automatically.
           </p>
           <p className="text-sm font-semibold text-cream">
             KES {amountKES}
@@ -126,38 +125,24 @@ export default function CheckoutLink({
         </div>
 
         <div className="mt-3">
-          {!checkoutUrl ? (
-            <button
-              type="button"
-              onClick={() => {
-                void handleGenerateLink();
-              }}
-              disabled={
-                loading ||
-                finalTotal <= 0 ||
-                isFetchingRate ||
-                Boolean(rateError)
-              }
-              className="w-full border border-gold bg-gold px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading
-                ? "Generating Link..."
-                : isFetchingRate
-                  ? "Fetching Rate..."
-                  : rateError
-                    ? "Rate Unavailable"
-                    : "Generate Checkout Link"}
-            </button>
-          ) : (
-            <a
-              href={checkoutUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full border border-gold bg-gold px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-gold-light"
-            >
-              Open Secure Checkout
-            </a>
-          )}
+          <button
+            type="button"
+            onClick={() => {
+              void handlePayNow();
+            }}
+            disabled={
+              loading || finalTotal <= 0 || isFetchingRate || Boolean(rateError)
+            }
+            className="w-full border border-gold bg-gold px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading
+              ? "Redirecting..."
+              : isFetchingRate
+                ? "Fetching Rate..."
+                : rateError
+                  ? "Rate Unavailable"
+                  : "Pay with M-Pesa"}
+          </button>
         </div>
       </div>
 
@@ -200,16 +185,6 @@ export default function CheckoutLink({
           </ul>
         </div>
       </div>
-
-      {checkoutUrl && (
-        <button
-          type="button"
-          onClick={() => setCheckoutUrl(null)}
-          className="mt-3 w-full border border-cb-border bg-surface px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-cream-dim transition-colors hover:text-cream"
-        >
-          Generate New Link
-        </button>
-      )}
     </div>
   );
 }
