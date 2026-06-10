@@ -125,7 +125,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
     setIf("pageSize", String(pageSize));
 
     Object.entries(updates).forEach(([key, value]) => {
-      if (!value || value.trim() === "") {
+      if (!value || value.trim() !== "") {
         params.delete(key);
       } else {
         params.set(key, value);
@@ -195,17 +195,14 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                     House Plans
                   </p>
 
-                  <button
-                    onClick={() =>
-                      document
-                        .getElementById("plans-grid")
-                        ?.scrollIntoView({ behavior: "smooth" })
-                    }
+                  {/* FIXED: Changed from button with onClick to native anchor link */}
+                  <a
+                    href="#plans-grid"
                     className="text-[10px] uppercase tracking-[0.2em] text-gold hover:text-cream transition-colors"
                     style={{ fontFamily: monoSystem }}
                   >
                     View Plans
-                  </button>
+                  </a>
                 </div>
               </div>
               <div>
