@@ -423,35 +423,6 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
           <span>Schedule a Consultation →</span>
         </Link>
       </section>
-
-      <footer>
-        <span>© 2025 Concept Builders. All rights reserved.</span>
-        <span>
-          <Link
-            href="/privacy"
-            onMouseEnter={handleLinkEnter}
-            onMouseLeave={handleLinkLeave}
-          >
-            Privacy
-          </Link>{" "}
-          &nbsp;·&nbsp;
-          <Link
-            href="/terms"
-            onMouseEnter={handleLinkEnter}
-            onMouseLeave={handleLinkLeave}
-          >
-            Terms
-          </Link>{" "}
-          &nbsp;·&nbsp;
-          <Link
-            href="/contact"
-            onMouseEnter={handleLinkEnter}
-            onMouseLeave={handleLinkLeave}
-          >
-            Contact Us
-          </Link>
-        </span>
-      </footer>
     </div>
   );
 }
