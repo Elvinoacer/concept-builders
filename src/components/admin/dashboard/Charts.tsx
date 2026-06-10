@@ -97,10 +97,24 @@ const Charts = ({ stats, monthlySales, clientAcquisition }) => {
         <div className="h-48 sm:h-64 lg:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={monthlySales}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 185, 168, 0.1)" />
+              <XAxis
+                dataKey="month"
+                stroke="#5a5548"
+                tick={{ fill: "#c8bfa8", fontSize: 12 }}
+              />
+              <YAxis
+                stroke="#5a5548"
+                tick={{ fill: "#c8bfa8", fontSize: 12 }}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--cream)',
+                  borderRadius: '8px',
+                }}
+              />
               <Legend />
               <Line
                 type="monotone"

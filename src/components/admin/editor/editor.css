@@ -8,15 +8,7 @@
   --editor-group-border: hsl(var(--border));
 }
 
-[data-theme="dark"] {
-  --editor-bg: hsl(var(--background));
-  --editor-text: hsl(var(--foreground));
-  --editor-border: hsl(var(--border));
-  --editor-button-bg: transparent;
-  --editor-button-hover-bg: hsl(var(--secondary));
-  --editor-button-active-bg: hsl(var(--accent) / 0.2);
-  --editor-group-border: hsl(var(--border));
-}
+
 
 .tiptap .ProseMirror {
   background-color: var(--editor-bg);
@@ -181,7 +173,7 @@
   padding: 10px 14px;
   border: none;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(45, 55, 72, 0.9);
   color: hsl(var(--foreground));
   font-weight: 600;
   cursor: pointer;
@@ -193,7 +185,7 @@
 }
 
 .menu-bar button:hover {
-  background: hsl(var(--background));
+  background: hsl(var(--secondary));
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
@@ -215,7 +207,7 @@
 }
 
 .menu-bar button:disabled:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(45, 55, 72, 0.9);
   transform: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -259,25 +251,7 @@
   transform: translateX(-50%) translateY(-12px);
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .menu-bar {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--chart-1)) 0%,
-      hsl(var(--chart-4)) 100%
-    );
-  }
 
-  .menu-bar button {
-    background: rgba(45, 55, 72, 0.9);
-    color: hsl(var(--foreground));
-  }
-
-  .menu-bar button:hover {
-    background: hsl(var(--secondary));
-  }
-}
 
 /* Responsive design */
 @media (max-width: 768px) {

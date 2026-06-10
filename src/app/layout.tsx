@@ -129,7 +129,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cormorantGaramond.variable}
+      className={`${cormorantGaramond.variable} dark`}
       suppressHydrationWarning
     >
       <head>

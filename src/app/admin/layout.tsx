@@ -59,7 +59,7 @@ export default function AdminLayout({
   return (
     <UploadProvider>
       <div
-        className={`flex h-screen w-full bg-gray-50 dark:bg-gray-900 group/design-root overflow-hidden transition-all duration-300 ease-linear ${
+        className={`flex h-screen w-full bg-surface group/design-root overflow-hidden transition-all duration-300 ease-linear ${
           isDesktopSidebarOpen && !isMobile ? "pl-0" : "pl-0"
         }`}
         onClick={handleMainContentClick}

@@ -5,6 +5,7 @@ import CustomDesignHeader from "@/components/custom-design/CustomDesignHeader";
 import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import {
   DraftingCompass,
   ShieldCheck,
@@ -29,7 +30,7 @@ const CustomDesignPageContent = () => {
     <div className="min-h-screen bg-ink text-cream">
       <section className="relative overflow-hidden border-b border-cb-border px-6 py-12 sm:px-10 lg:px-[60px] lg:py-16">
         <div className="absolute inset-0">
-          <img
+          <Image
             src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg"
             alt="Custom Design"
             className="h-full w-full object-cover"
