@@ -15,6 +15,7 @@ import {
   Sparkles,
   Star,
 } from "lucide-react";
+import { getPrimaryDesignImage } from "@/lib/utils";
 
 interface DesignWithRelations extends Design {
   images: File[];
@@ -101,8 +102,13 @@ const DesignCard = ({
   const rotateY = isHovered && !isMobile ? mousePosition.x / 10 - 20 : 0;
 
   const categoryName = design.category.name;
-  const imageUrl =
-    design.images?.[0]?.url || "/images/category-placeholder.webp";
+  const resolvedImageUrl = getPrimaryDesignImage(design);
+  const [imgSrc, setImgSrc] = useState(resolvedImageUrl);
+
+  useEffect(() => {
+    setImgSrc(resolvedImageUrl);
+  }, [resolvedImageUrl]);
+
   const price = design.basePrice;
   const bedrooms = design.bedrooms;
   const bathrooms = design.bathrooms;
@@ -173,13 +179,12 @@ const DesignCard = ({
           transition={{ duration: 0.5 }}
         >
           <Image
-            src={imageUrl}
+            src={imgSrc}
             alt={design.name}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-110"
             sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+            onError={() => setImgSrc("/images/category-placeholder.webp")}
           />
         </motion.div>
 

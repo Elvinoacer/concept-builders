@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { X, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 interface ModalImage {
   url: string;
@@ -54,6 +55,14 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
     displayImages.length > 0
       ? displayImages
       : [{ url: FALLBACK_IMAGE, type: "IMAGE" }];
+
+  // Active image source state to handle error fallback smoothly
+  const activeImageUrl = images[activeIndex]?.url || FALLBACK_IMAGE;
+  const [activeImgSrc, setActiveImgSrc] = useState(activeImageUrl);
+
+  useEffect(() => {
+    setActiveImgSrc(activeImageUrl);
+  }, [activeImageUrl, activeIndex]);
 
   const paginate = useCallback(
     (newDirection: number) => {
@@ -161,7 +170,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
     <AnimatePresence>
       {id && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6 md:p-8"
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
@@ -175,46 +184,38 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
             onClick={onClose}
           />
 
-          {/* Modal container — constrained height */}
+          {/* Modal container — fixed flex column with max height limits */}
           <motion.div
             ref={modalRef}
             initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 16 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="relative z-10 w-full max-w-4xl bg-ink border border-cb-border shadow-2xl overflow-hidden"
-            style={{ maxHeight: "min(92vh, 720px)" }}
+            className="relative z-10 w-full max-w-4xl bg-[#0F0E0A] border border-cb-border shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh] overflow-hidden"
           >
-            {/* Close button */}
-            <button
-              onClick={onClose}
-              className="absolute top-3 right-3 z-50 p-2 bg-black/60 text-white/70 hover:text-white hover:bg-black/80 transition-colors backdrop-blur-sm rounded-sm"
-              aria-label="Close modal"
-            >
-              <X className="h-4 w-4" />
-            </button>
-
             {loading ? (
               /* ── Loading skeleton ── */
-              <div className="grid lg:grid-cols-[1.1fr_1fr]">
-                <div className="aspect-[4/3] animate-pulse bg-card/40" />
-                <div className="p-6 flex flex-col gap-4">
-                  <div className="h-3 w-20 animate-pulse bg-card/40 rounded" />
-                  <div className="h-8 w-3/4 animate-pulse bg-card/40 rounded" />
-                  <div className="grid grid-cols-4 gap-2 mt-4">
-                    {[...Array(4)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-16 animate-pulse bg-card/40 rounded"
-                      />
-                    ))}
+              <div className="grid lg:grid-cols-[1.1fr_1fr] flex-1">
+                <div className="aspect-[16/10] lg:aspect-auto animate-pulse bg-card/40" />
+                <div className="p-6 flex flex-col gap-4 justify-between">
+                  <div className="space-y-4">
+                    <div className="h-3 w-20 animate-pulse bg-card/40 rounded" />
+                    <div className="h-8 w-3/4 animate-pulse bg-card/40 rounded" />
+                    <div className="grid grid-cols-4 gap-2 mt-4">
+                      {[...Array(4)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-16 animate-pulse bg-card/40 rounded"
+                        />
+                      ))}
+                    </div>
                   </div>
                   <div className="h-16 animate-pulse bg-card/40 mt-4 rounded" />
                 </div>
               </div>
             ) : error ? (
               /* ── Error state ── */
-              <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 p-10 text-center">
+              <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 p-10 text-center flex-1">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-muted">
                   Failed to load design details
                 </p>
@@ -238,206 +239,228 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
               </div>
             ) : design ? (
               /* ── Main content ── */
-              <div
-                className="grid lg:grid-cols-[1.1fr_1fr] overflow-y-auto"
-                style={{ maxHeight: "min(92vh, 720px)" }}
-              >
-                {/* ── Left: Image Carousel ── */}
-                <div className="flex flex-col bg-black/20 border-b lg:border-b-0 lg:border-r border-cb-border">
-                  {/* Main image */}
-                  <div className="relative aspect-[4/3] w-full bg-card/30 overflow-hidden group flex-shrink-0">
-                    <AnimatePresence initial={false} custom={direction}>
-                      <motion.div
-                        key={activeIndex}
-                        custom={direction}
-                        variants={slideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{
-                          x: {
-                            type: "spring",
-                            stiffness: 300,
-                            damping: 30,
-                          },
-                          opacity: { duration: 0.2 },
-                        }}
-                        className="absolute inset-0"
-                      >
-                        <Image
-                          src={images[activeIndex]?.url || FALLBACK_IMAGE}
-                          alt={`${design.name} - View ${activeIndex + 1}`}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                          priority
-                        />
-                      </motion.div>
-                    </AnimatePresence>
-
-                    {images.length > 1 && (
-                      <>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            paginate(-1);
-                          }}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center border border-white/20 bg-black/50 text-white hover:border-gold/50 hover:text-gold transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
-                          aria-label="Previous image"
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            paginate(1);
-                          }}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center border border-white/20 bg-black/50 text-white hover:border-gold/50 hover:text-gold transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
-                          aria-label="Next image"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </button>
-                        <span className="absolute top-3 left-3 bg-black/60 px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-white/80">
-                          {activeIndex + 1} / {images.length}
-                        </span>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Thumbnail strip */}
-                  {images.length > 1 && (
-                    <div className="flex gap-1.5 overflow-x-auto scrollbar-hide px-4 py-3 flex-shrink-0">
-                      {images.map((img, i) => (
-                        <button
-                          key={i}
-                          onClick={() => {
-                            setDirection(i > activeIndex ? 1 : -1);
-                            setActiveIndex(i);
-                          }}
-                          className={`relative flex-shrink-0 h-12 w-16 overflow-hidden border transition-all ${
-                            i === activeIndex
-                              ? "border-gold opacity-100"
-                              : "border-cb-border opacity-50 hover:opacity-90 hover:border-gold/40"
-                          }`}
-                        >
-                          <Image
-                            src={img.url}
-                            alt={`Thumbnail ${i + 1}`}
-                            fill
-                            className="object-cover"
-                            sizes="64px"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* ── Right: Details Panel ── */}
-                <div className="p-5 sm:p-6 flex flex-col justify-between overflow-y-auto">
+              <>
+                {/* 1. FIXED HEADER */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-cb-border bg-[#0C0B08] flex-shrink-0 z-20">
                   <div>
-                    <p className="mb-2 flex items-center gap-3 text-[10px] uppercase tracking-[0.24em] text-gold">
-                      <span className="h-px w-5 bg-gold" />
+                    <p className="text-[11px] uppercase tracking-[0.24em] text-gold font-medium mb-1">
                       {design.category?.name ?? "House Plan"}
                     </p>
                     <h2
                       id="modal-title"
-                      className="text-[clamp(24px,3.5vw,36px)] font-light leading-tight text-cream mb-5"
+                      className="text-xl sm:text-2xl font-light text-cream leading-tight"
                       style={{ fontFamily: serifSystem }}
                     >
                       {design.name}
                     </h2>
+                  </div>
+                  <button
+                    onClick={onClose}
+                    className="p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors rounded-full"
+                    aria-label="Close modal"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
 
-                    {/* Stats grid */}
-                    <div className="grid grid-cols-4 gap-1.5 mb-5">
-                      {[
-                        {
-                          label: "Beds",
-                          value: design.bedrooms ?? "—",
-                        },
-                        {
-                          label: "Baths",
-                          value: design.bathrooms ?? "—",
-                        },
-                        {
-                          label: "Area",
-                          value: design.area
-                            ? `${design.area} m²`
-                            : "—",
-                        },
-                        {
-                          label: "Floors",
-                          value: design.floors ?? "—",
-                        },
-                      ].map((stat) => (
-                        <div
-                          key={stat.label}
-                          className="border border-cb-border bg-ink/60 p-2.5 text-center"
+                {/* 2. SCROLLABLE BODY */}
+                <div className="flex-1 overflow-y-auto grid lg:grid-cols-[1.15fr_1fr] min-h-0 bg-[#0F0E0A]">
+                  {/* Left: Image Carousel Column */}
+                  <div className="flex flex-col bg-black/15 border-b lg:border-b-0 lg:border-r border-cb-border">
+                    {/* Main image */}
+                    <div className="relative aspect-[16/10] w-full bg-card/10 overflow-hidden group flex-shrink-0">
+                      <AnimatePresence initial={false} custom={direction}>
+                        <motion.div
+                          key={activeIndex}
+                          custom={direction}
+                          variants={slideVariants}
+                          initial="enter"
+                          animate="center"
+                          exit="exit"
+                          transition={{
+                            x: {
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 30,
+                            },
+                            opacity: { duration: 0.2 },
+                          }}
+                          className="absolute inset-0"
                         >
-                          <p className="text-lg font-light text-cream leading-tight">
-                            {stat.value}
-                          </p>
-                          <p className="mt-0.5 text-[8px] uppercase tracking-[0.18em] text-muted">
-                            {stat.label}
-                          </p>
-                        </div>
-                      ))}
+                          <Image
+                            src={activeImgSrc}
+                            alt={`${design.name} - View ${activeIndex + 1}`}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                            priority
+                            onError={() => setActiveImgSrc(FALLBACK_IMAGE)}
+                          />
+                        </motion.div>
+                      </AnimatePresence>
+
+                      {images.length > 1 && (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              paginate(-1);
+                            }}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center border border-white/20 bg-black/50 text-white hover:border-gold/50 hover:text-gold transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
+                            aria-label="Previous image"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              paginate(1);
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center border border-white/20 bg-black/50 text-white hover:border-gold/50 hover:text-gold transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
+                            aria-label="Next image"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </button>
+                          <span className="absolute top-3 left-3 bg-black/60 px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-white/80">
+                            {activeIndex + 1} / {images.length}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Thumbnail strip */}
+                    {images.length > 1 && (
+                      <div className="flex gap-1.5 overflow-x-auto scrollbar-hide px-4 py-3 flex-shrink-0 bg-black/5">
+                        {images.map((img, i) => (
+                          <button
+                            key={i}
+                            onClick={() => {
+                              setDirection(i > activeIndex ? 1 : -1);
+                              setActiveIndex(i);
+                            }}
+                            className={`relative flex-shrink-0 h-10 w-14 overflow-hidden border transition-all ${
+                              i === activeIndex
+                                ? "border-gold opacity-100"
+                                : "border-cb-border opacity-50 hover:opacity-90 hover:border-gold/40"
+                            }`}
+                          >
+                            <Image
+                              src={img.url}
+                              alt={`Thumbnail ${i + 1}`}
+                              fill
+                              className="object-cover"
+                              sizes="56px"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right: Details Panel Column */}
+                  <div className="p-6 flex flex-col gap-6 justify-start overflow-y-auto">
+                    {/* Stats grid */}
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.15em] text-gold font-medium mb-3">
+                        Specifications
+                      </p>
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          {
+                            label: "Beds",
+                            value: design.bedrooms ?? "—",
+                          },
+                          {
+                            label: "Baths",
+                            value: design.bathrooms ?? "—",
+                          },
+                          {
+                            label: "Area",
+                            value: design.area
+                              ? `${design.area} m²`
+                              : "—",
+                          },
+                          {
+                            label: "Floors",
+                            value: design.floors ?? "—",
+                          },
+                        ].map((stat) => (
+                          <div
+                            key={stat.label}
+                            className="border border-cb-border bg-ink/40 py-3 text-center"
+                          >
+                            <p className="text-base font-light text-cream leading-tight">
+                              {stat.value}
+                            </p>
+                            <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-muted">
+                              {stat.label}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Description */}
-                    <p className="line-clamp-3 text-[12px] leading-[1.8] text-cream-dim">
-                      {design.description}
-                    </p>
-                  </div>
-
-                  {/* Price + CTAs */}
-                  <div className="mt-6 pt-5 border-t border-cb-border">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-muted mb-1.5">
-                      Design Plan
-                    </p>
-                    <div className="mb-5">
-                      {design.basePrice === 0 ? (
-                        <p
-                          className="text-2xl font-light text-cream"
-                          style={{ fontFamily: serifSystem }}
-                        >
-                          Custom Quote
-                        </p>
-                      ) : (
-                        <p
-                          className="text-2xl font-light text-cream"
-                          style={{ fontFamily: serifSystem }}
-                        >
-                          <span className="text-[10px] uppercase tracking-[0.12em] text-muted mr-1.5 font-sans">
-                            from
-                          </span>
-                          ${design.basePrice.toLocaleString()}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-2.5">
-                      {design.basePrice > 0 && (
-                        <Link
-                          href={`/designs/${design.id}`}
-                          className="group relative flex flex-1 items-center justify-center overflow-hidden border border-gold bg-gold px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-gold-light"
-                        >
-                          View Full Plan
-                          <ArrowRight className="ml-2 h-3 w-3 transition-transform group-hover:translate-x-1" />
-                        </Link>
-                      )}
-                      <Link
-                        href={buildCustomDesignUrl(design)}
-                        className={`flex items-center justify-center border border-cb-border px-4 py-3 text-[10px] uppercase tracking-[0.18em] text-cream-dim transition-colors hover:border-gold/40 hover:text-gold ${
-                          design.basePrice === 0 ? "w-full" : "flex-1"
-                        }`}
-                      >
-                        Request Custom Design
-                      </Link>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.15em] text-gold font-medium mb-2.5">
+                        Plan Description
+                      </p>
+                      <p className="text-xs leading-[1.85] text-cream-dim font-light">
+                        {design.description}
+                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
+
+                {/* 3. STICKY FOOTER */}
+                <div className="px-6 py-4 border-t border-cb-border bg-[#0C0B08] flex flex-col sm:flex-row items-center justify-between gap-4 flex-shrink-0 z-20">
+                  <div className="text-center sm:text-left">
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-muted mb-0.5 leading-none">
+                      Blueprint Package
+                    </p>
+                    {design.basePrice === 0 ? (
+                      <p
+                        className="text-xl font-light text-cream"
+                        style={{ fontFamily: serifSystem }}
+                      >
+                        Custom Quote
+                      </p>
+                    ) : (
+                      <p
+                        className="text-xl font-light text-gold"
+                        style={{ fontFamily: serifSystem }}
+                      >
+                        <span className="text-[10px] uppercase tracking-[0.12em] text-muted mr-1.5 font-sans">
+                          from
+                        </span>
+                        {formatCurrency(design.basePrice)}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3 w-full sm:w-auto">
+                    {design.basePrice > 0 && (
+                      <Link
+                        href={`/designs/${design.id}`}
+                        onClick={onClose}
+                        className="group relative flex flex-1 sm:flex-initial items-center justify-center overflow-hidden border border-gold bg-gold px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-gold-light"
+                      >
+                        View Full Plan
+                        <ArrowRight className="ml-2 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    )}
+                    <Link
+                      href={buildCustomDesignUrl(design)}
+                      onClick={onClose}
+                      className={`flex items-center justify-center border border-cb-border px-6 py-3 text-[11px] uppercase tracking-[0.18em] text-cream-dim transition-colors hover:border-gold/40 hover:text-gold hover:bg-gold/5 ${
+                        design.basePrice === 0 ? "w-full" : "flex-1 sm:flex-initial"
+                      }`}
+                    >
+                      Request Custom Design
+                    </Link>
+                  </div>
+                </div>
+              </>
             ) : null}
           </motion.div>
         </div>

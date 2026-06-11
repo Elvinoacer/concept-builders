@@ -328,7 +328,7 @@ export default function CategoriesPage() {
           <div
             className={
               viewMode === "grid"
-                ? "grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 xl:grid-cols-4"
+                ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 : "grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)]"
             }
           >
@@ -338,20 +338,20 @@ export default function CategoriesPage() {
 
               if (viewMode === "list") {
                 return (
-                  <Link key={category.id} href={`/categories/${category.id}`} className="group flex flex-col bg-ink transition-colors duration-300 hover:bg-card sm:flex-row">
-                    <div className="relative aspect-[16/8] overflow-hidden sm:aspect-auto sm:h-[220px] sm:w-[320px]">
+                  <Link key={category.id} href={`/categories/${category.id}`} className="group flex flex-col bg-ink transition-colors duration-300 hover:bg-card sm:flex-row border border-cb-border hover:border-gold/30">
+                    <div className="relative aspect-[16/8] overflow-hidden sm:aspect-auto sm:h-[220px] sm:w-[320px] bg-black/10">
                       <Image src={imageUrl} alt={category.name} fill sizes="(max-width: 640px) 100vw, 320px" className="object-cover opacity-80 transition-all duration-700 group-hover:scale-105 group-hover:opacity-95" priority={index < 3} />
                       <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
                     </div>
                     <div className="flex flex-1 flex-col justify-between p-6">
                       <div>
-                        <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-gold" style={{ fontFamily: monoSystem }}>Category</p>
+                        <p className="mb-2 text-[11px] uppercase tracking-[0.2em] text-gold font-medium" style={{ fontFamily: monoSystem }}>Category</p>
                         <h2 className="mb-3 text-3xl font-light text-cream transition-colors group-hover:text-gold-light" style={{ fontFamily: serifSystem }}>{category.name}</h2>
-                        <p className="line-clamp-2 text-[12px] leading-[1.8] text-cream-dim" style={{ fontFamily: monoSystem }}>{category.description || "Explore premium plans curated for this architectural category."}</p>
+                        <p className="line-clamp-2 text-xs leading-[1.8] text-cream-dim font-light" style={{ fontFamily: monoSystem }}>{category.description || "Explore premium plans curated for this architectural category."}</p>
                       </div>
                       <div className="mt-6 flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4">
-                        <span className="text-[11px] uppercase tracking-[0.12em] text-muted" style={{ fontFamily: monoSystem }}>{category._count?.designs || 0} designs</span>
-                        <span className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold" style={{ fontFamily: monoSystem }}>Explore</span>
+                        <span className="text-[11px] uppercase tracking-[0.12em] text-muted font-medium" style={{ fontFamily: monoSystem }}>{category._count?.designs || 0} designs</span>
+                        <span className="text-[11px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold font-semibold" style={{ fontFamily: monoSystem }}>Explore →</span>
                       </div>
                     </div>
                   </Link>
@@ -362,17 +362,48 @@ export default function CategoriesPage() {
                 <Link
                   key={category.id}
                   href={`/categories/${category.id}`}
-                  className={`group relative block overflow-hidden border border-[rgba(240,232,216,0.08)] bg-ink transition-all duration-300 hover:border-[rgba(200,137,42,0.35)] ${isFeatureHero ? "col-span-2 row-span-2 aspect-[4/3]" : "aspect-[4/3]"}`}
+                  className={`group relative flex flex-col overflow-hidden border border-cb-border bg-[#13120E] transition-all duration-300 hover:border-gold/50 hover:-translate-y-1 hover:shadow-[0_12px_24px_-10px_rgba(200,137,42,0.15)] ${isFeatureHero ? "sm:col-span-2 sm:row-span-2" : ""}`}
                 >
-                  <Image src={imageUrl} alt={category.name} fill sizes={isFeatureHero ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"} className="object-cover opacity-82 transition-transform duration-700 group-hover:scale-105" priority={index < 4} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/30 to-transparent" />
-                  {category.isFeatured && (
-                    <span className="absolute right-3 top-3 bg-gold px-2 py-1 text-[9px] uppercase tracking-[0.18em] text-ink" style={{ fontFamily: monoSystem }}>Featured</span>
-                  )}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-                    <h2 className={`${isFeatureHero ? "text-3xl sm:text-5xl" : "text-lg sm:text-2xl"} font-light leading-tight text-cream transition-colors group-hover:text-gold-light`} style={{ fontFamily: serifSystem }}>{category.name}</h2>
-                    <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-gold" style={{ fontFamily: monoSystem }}>{category._count?.designs || 0} Designs</p>
-                    <p className="mt-3 hidden max-w-md text-[12px] leading-[1.7] text-cream-dim sm:line-clamp-2">{category.description || "Explore premium plans curated for this architectural category."}</p>
+                  <div className={`relative w-full overflow-hidden bg-black/25 ${isFeatureHero ? "aspect-[16/9]" : "aspect-[16/10]"}`}>
+                    <Image 
+                      src={imageUrl} 
+                      alt={category.name} 
+                      fill 
+                      sizes={isFeatureHero ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"} 
+                      className="object-cover opacity-85 transition-transform duration-700 ease-out group-hover:scale-105" 
+                      priority={index < 4} 
+                    />
+                    {category.isFeatured && (
+                      <span className="absolute right-3 top-3 bg-gold px-2.5 py-1 text-[9px] uppercase tracking-[0.18em] text-ink font-semibold" style={{ fontFamily: monoSystem }}>
+                        Featured
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="p-5 flex flex-col flex-1 justify-between min-h-[150px]">
+                    <div>
+                      <h2 
+                        className={`font-light leading-tight text-cream transition-colors group-hover:text-gold-light line-clamp-1 mb-2 ${isFeatureHero ? "text-2xl sm:text-3xl" : "text-xl"}`} 
+                        style={{ fontFamily: serifSystem }}
+                      >
+                        {category.name}
+                      </h2>
+                      <p 
+                        className="line-clamp-2 text-xs leading-[1.75] text-cream-dim font-light mb-4"
+                        style={{ fontFamily: monoSystem }}
+                      >
+                        {category.description || "Explore premium plans curated for this architectural category."}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4 mt-auto">
+                      <span className="text-[11px] uppercase tracking-[0.12em] text-gold font-medium" style={{ fontFamily: monoSystem }}>
+                        {category._count?.designs || 0} Designs
+                      </span>
+                      <span className="text-[11px] uppercase tracking-[0.16em] text-cream-dim group-hover:text-gold transition-colors duration-300 font-semibold flex items-center gap-1" style={{ fontFamily: monoSystem }}>
+                        Explore →
+                      </span>
+                    </div>
                   </div>
                 </Link>
               );

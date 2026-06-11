@@ -142,9 +142,9 @@ export default function PublicDesignsInfiniteGrid({
 
   if (isLoading && !data) {
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <div key={i} className="aspect-[4/5] animate-pulse bg-card/30 border border-cb-border" />
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="aspect-[16/13] animate-pulse bg-card/30 border border-cb-border" />
         ))}
       </div>
     );
@@ -178,7 +178,7 @@ export default function PublicDesignsInfiniteGrid({
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {designs.map((design, index) => {
           return (
             <article
@@ -188,7 +188,9 @@ export default function PublicDesignsInfiniteGrid({
               <DesignCard 
                 design={{
                   ...design,
-                  images: design.images || [{ url: fallbackImage, type: "image/webp" }]
+                  images: (design.images && design.images.length > 0)
+                    ? design.images
+                    : [{ url: fallbackImage, type: "image/webp" }]
                 } as any} 
                 index={index} 
                 priceType={priceType} 

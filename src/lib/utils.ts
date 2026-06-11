@@ -26,3 +26,21 @@ export function debounce<F extends (...args: any[]) => any>(func: F, waitFor: nu
       timeout = setTimeout(() => resolve(func(...args)), waitFor);
     });
 }
+
+interface ImageLike {
+  url: string;
+  type?: string;
+}
+
+export function getPrimaryDesignImage(design?: { images?: ImageLike[] | null } | null): string {
+  if (!design || !design.images || design.images.length === 0) {
+    return "/images/category-placeholder.webp";
+  }
+  const validImage = design.images.find(
+    (img) =>
+      img.url &&
+      (img.type === "IMAGE" ||
+        img.url.match(/\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|$)/i))
+  );
+  return validImage?.url || "/images/category-placeholder.webp";
+}

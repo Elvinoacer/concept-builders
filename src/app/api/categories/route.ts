@@ -78,9 +78,11 @@ export async function GET(request: NextRequest) {
             select: { designs: true },
           },
           designs: {
-            orderBy: {
-              createdAt: "asc",
-            },
+            orderBy: [
+              { isFeatured: "desc" },
+              { views: "desc" },
+              { createdAt: "desc" },
+            ],
             take: 1,
             select: {
               id: true,

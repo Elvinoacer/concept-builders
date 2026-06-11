@@ -51,11 +51,39 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "conceptbuilders.sfo3.digitaloceanspaces.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.sfo3.digitaloceanspaces.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.sfo2.digitaloceanspaces.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.nyc3.digitaloceanspaces.com",
+      },
+      {
+        protocol: "https",
         hostname: "*.digitaloceanspaces.com",
       },
       {
         protocol: "https",
         hostname: "*.cdn.digitaloceanspaces.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.conceptbuilders.co.ke",
+      },
+      {
+        protocol: "https",
+        hostname: "conceptbuilders.co.ke",
+      },
+      {
+        protocol: "https",
+        hostname: "*.conceptbuilders.co.ke",
       },
       {
         protocol: "https",
