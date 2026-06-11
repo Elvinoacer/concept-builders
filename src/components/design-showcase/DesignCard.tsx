@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { formatCurrency, getPrimaryDesignImage } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaStar } from "react-icons/fa";
@@ -28,8 +28,9 @@ interface OrderItem {
 interface Design {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   images: DesignImage[];
+  files?: DesignImage[];
   isFeatured?: boolean;
   discounts?: Discount[];
   orderItems?: OrderItem[];
@@ -41,11 +42,11 @@ interface Design {
   billOfQuantitiesPrice?: number;
   minBuildingCost?: number;
   maxBuildingCost?: number;
-  bedrooms?: number;
-  bathrooms?: number;
-  area?: number;
-  floors?: number;
-  category?: { id: string; name: string };
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  area?: number | null;
+  floors?: number | null;
+  category?: { id: string; name: string } | null;
   views?: number;
 }
 
@@ -80,7 +81,7 @@ const DesignCard: React.FC<DesignCardProps> = ({
   const discountValue = hasDiscount ? design.discounts![0].discount.value : 0;
   const discountedPrice = minPrice * (1 - discountValue / 100);
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 16 },
     visible: {
       opacity: 1,
@@ -104,18 +105,20 @@ const DesignCard: React.FC<DesignCardProps> = ({
           ? onCardClick(design.id)
           : router.push(`/designs/${design.id}`)
       }
-      className="group relative cursor-pointer w-full bg-[#13120E] border border-cb-border hover:border-gold/50 hover:shadow-[0_12px_24px_-10px_rgba(200,137,42,0.15)] flex flex-col overflow-hidden transition-all duration-300"
-      variants={cardVariants as any}
+      className="group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-[1.35rem] border border-[rgba(240,232,216,0.12)] bg-[linear-gradient(180deg,rgba(30,28,22,0.96),rgba(14,13,10,0.98))] shadow-[0_18px_50px_rgba(0,0,0,0.22)] transition-all duration-300 hover:border-gold/55 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35),0_0_0_1px_rgba(200,137,42,0.12)]"
+      variants={cardVariants}
       initial="hidden"
       whileInView="visible"
       whileHover={{ y: -4, transition: { duration: 0.2, ease: "easeOut" } }}
       viewport={{ once: true, amount: 0.1 }}
     >
+      <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
       {/* Image Container — 16:10 Horizontal aspect ratio for premium architectural layouts */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-black/25">
         <Image
           alt={design.name}
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           src={imgSrc}
           fill
           sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -134,20 +137,21 @@ const DesignCard: React.FC<DesignCardProps> = ({
         )}
 
         {/* Subtle top/bottom gradient mask on image */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 opacity-60 pointer-events-none" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/75 via-black/10 to-black/20 opacity-75" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#13120E] to-transparent" />
       </div>
 
       {/* Information Hierarchy Content Block */}
-      <div className="p-5 flex flex-col flex-1 min-h-[160px] justify-between">
+      <div className="flex min-h-[170px] flex-1 flex-col justify-between p-5 sm:p-6">
         <div>
           {/* Category Label */}
-          <p className="text-[11px] uppercase tracking-[0.2em] text-gold font-medium mb-1.5 leading-none">
+          <p className="mb-2 text-[10px] font-semibold uppercase leading-none tracking-[0.22em] text-gold/90">
             {design.category?.name || "House Plan"}
           </p>
 
           {/* Level 1: Design Name */}
           <h3
-            className="mb-2 line-clamp-1 text-xl font-light text-cream group-hover:text-gold-light transition-colors duration-300"
+            className="mb-3 line-clamp-1 text-[1.35rem] font-light leading-tight text-cream transition-colors duration-300 group-hover:text-gold-light"
             style={{ fontFamily: serifSystem }}
           >
             {design.name}
@@ -155,7 +159,7 @@ const DesignCard: React.FC<DesignCardProps> = ({
 
           {/* Level 2: Quick Specs */}
           {showDetails && (
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] text-muted mb-4 font-medium">
+            <div className="mb-4 flex flex-wrap items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-muted">
               <span>{design.bedrooms ?? "-"} Bed{design.bedrooms === 1 ? "" : "s"}</span>
               <span className="text-gold/30">·</span>
               <span>{design.bathrooms ?? "-"} Bath{design.bathrooms === 1 ? "" : "s"}</span>
@@ -172,7 +176,7 @@ const DesignCard: React.FC<DesignCardProps> = ({
         </div>
 
         {/* Level 3 & 4: Price & CTA footer */}
-        <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4 mt-auto">
+        <div className="mt-auto flex items-end justify-between gap-4 border-t border-[rgba(240,232,216,0.1)] pt-4">
           {priceType === "building" && design.minBuildingCost ? (
             <div>
               <p className="text-[10px] uppercase tracking-[0.12em] text-muted leading-none mb-1">
@@ -223,7 +227,7 @@ const DesignCard: React.FC<DesignCardProps> = ({
           )}
 
           {/* Level 4: CTA */}
-          <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-cream-dim group-hover:text-gold transition-colors duration-300">
+          <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-[rgba(240,232,216,0.1)] bg-cream/5 px-3 py-2 text-[10px] uppercase tracking-[0.14em] text-cream-dim transition-colors duration-300 group-hover:border-gold/35 group-hover:bg-gold/10 group-hover:text-gold">
             <span>View Details</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
           </div>

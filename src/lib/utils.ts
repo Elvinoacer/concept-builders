@@ -14,7 +14,7 @@ export const formatCurrency = (value: number, currency: string = 'USD') => {
   }).format(value);
 };
 
-export function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+export function debounce<F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, waitFor: number) {
   let timeout: NodeJS.Timeout;
 
   return (...args: Parameters<F>): Promise<ReturnType<F>> =>
@@ -28,19 +28,33 @@ export function debounce<F extends (...args: any[]) => any>(func: F, waitFor: nu
 }
 
 interface ImageLike {
-  url: string;
-  type?: string;
+  url?: string | null;
+  type?: string | null;
 }
 
-export function getPrimaryDesignImage(design?: { images?: ImageLike[] | null } | null): string {
-  if (!design || !design.images || design.images.length === 0) {
+const IMAGE_URL_PATTERN = /\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|#|$)/i;
+const NON_IMAGE_FILE_PATTERN = /\.(pdf|dwg|dxf|doc|docx|xls|xlsx|zip|rar)(\?|#|$)/i;
+
+export function getPrimaryDesignImage(
+  design?: { images?: ImageLike[] | null; files?: ImageLike[] | null } | null,
+): string {
+  const candidates = [
+    ...(design?.images ?? []),
+    ...(design?.files ?? []),
+  ].filter((img): img is { url: string; type?: string | null } => Boolean(img?.url));
+
+  if (candidates.length === 0) {
     return "/images/category-placeholder.webp";
   }
-  const validImage = design.images.find(
-    (img) =>
-      img.url &&
-      (img.type === "IMAGE" ||
-        img.url.match(/\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|$)/i))
-  );
-  return validImage?.url || "/images/category-placeholder.webp";
+
+  const validImage = candidates.find((img) => {
+    const normalizedType = img.type?.toUpperCase();
+    return (
+      normalizedType === "IMAGE" ||
+      IMAGE_URL_PATTERN.test(img.url) ||
+      (!normalizedType && !NON_IMAGE_FILE_PATTERN.test(img.url))
+    );
+  });
+
+  return validImage?.url || candidates[0].url || "/images/category-placeholder.webp";
 }

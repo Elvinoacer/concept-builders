@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -142,9 +143,13 @@ const CustomDesignForm = () => {
         "Custom design request submitted successfully! We will contact you soon.",
       );
       setIsModalOpen(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting custom design request:", error);
-      toast.error(error.message || "Failed to submit custom design request.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to submit custom design request.",
+      );
     } finally {
       setLoading(false);
     }
@@ -196,7 +201,7 @@ const CustomDesignForm = () => {
       <form
         id="custom-design-form"
         onSubmit={handleSubmit}
-        className="space-y-6 sm:space-y-8"
+        className="scroll-mt-24 space-y-6 sm:space-y-8"
       >
         <div className="border border-cb-border bg-surface p-4 sm:p-6">
           <div className="mb-5 border-b border-cb-border pb-4">
@@ -248,7 +253,7 @@ const CustomDesignForm = () => {
               />
 
               <p className="mt-1 text-xs text-cream-dim">
-                We'll use this to contact you about your project.
+                We&apos;ll use this to contact you about your project.
               </p>
             </div>
 
@@ -399,11 +404,13 @@ const CustomDesignForm = () => {
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-[220px_1fr] sm:items-center">
-              <div className="overflow-hidden border border-cb-border bg-card">
-                <img
+              <div className="relative h-44 overflow-hidden border border-cb-border bg-card">
+                <Image
                   src={referenceImage}
                   alt="Selected reference design"
-                  className="h-44 w-full object-cover"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 220px"
+                  className="object-cover"
                 />
               </div>
               <div className="border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.08)] p-4">

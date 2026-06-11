@@ -100,7 +100,7 @@ export default function CategoriesPage() {
     },
   );
 
-  const categories = data?.categories || [];
+  const categories = React.useMemo(() => data?.categories || [], [data?.categories]);
   const totalPages = data?.totalPages || 1;
   const totalCategories = data?.totalCategories || 0;
   const errorMessage = error instanceof Error ? error.message : null;
@@ -207,7 +207,7 @@ export default function CategoriesPage() {
         </div>
       </section>
 
-      <section className="sticky top-[73px] z-20 border-b border-[rgba(240,232,216,0.08)] bg-[rgba(10,9,7,0.95)] px-6 backdrop-blur-xl sm:px-10 lg:px-[60px]">
+      <section className="sticky top-[73px] z-20 border-b border-[rgba(240,232,216,0.08)] bg-[rgba(10,9,7,0.95)] px-6 shadow-[0_18px_40px_rgba(0,0,0,0.18)] backdrop-blur-xl sm:px-10 lg:px-[60px]">
         <div className="mx-auto flex min-h-16 w-full max-w-screen-2xl flex-wrap items-center gap-3 py-3 lg:flex-nowrap lg:gap-0">
           <div
             className="pr-6 text-[11px] uppercase tracking-[0.14em] text-muted lg:border-r lg:border-[rgba(240,232,216,0.08)] lg:pr-8"
@@ -216,7 +216,7 @@ export default function CategoriesPage() {
             <span className="text-gold">{totalCategories}</span> categories
           </div>
 
-          <div className="flex flex-1 items-center gap-3 lg:pl-6">
+          <div className="flex flex-1 flex-col items-stretch gap-3 lg:flex-row lg:items-center lg:pl-6">
             <div className="group relative w-full max-w-xl">
               <FiSearch
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted transition-colors group-focus-within:text-gold"
@@ -226,17 +226,17 @@ export default function CategoriesPage() {
                 placeholder="Search categories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 w-full border border-[rgba(240,232,216,0.18)] bg-[rgba(22,20,18,0.72)] py-2 pl-9 pr-3 text-[12px] tracking-[0.08em] text-cream outline-none placeholder:text-[rgba(168,152,128,0.9)] transition-all focus:border-[rgba(200,137,42,0.45)]"
+                className="h-11 w-full rounded-full border border-[rgba(240,232,216,0.18)] bg-[rgba(22,20,18,0.76)] py-2 pl-9 pr-4 text-[12px] tracking-[0.08em] text-cream outline-none placeholder:text-[rgba(168,152,128,0.9)] transition-all focus:border-[rgba(200,137,42,0.55)]"
                 style={{ fontFamily: monoSystem }}
               />
             </div>
 
-            <div className="ml-auto flex items-center gap-4">
+            <div className="flex items-center gap-3 lg:ml-auto">
               <div className="relative group">
                 <select
                   value={categorySort}
                   onChange={(e) => setCategorySort(e.target.value)}
-                  className="appearance-none border border-[rgba(240,232,216,0.1)] bg-[rgba(15,13,11,0.75)] pl-4 pr-10 py-2.5 text-[10px] uppercase tracking-[0.14em] text-cream outline-none focus:border-[rgba(200,137,42,0.45)] cursor-pointer"
+                  className="cursor-pointer appearance-none rounded-full border border-[rgba(240,232,216,0.13)] bg-[rgba(15,13,11,0.8)] py-2.5 pl-4 pr-10 text-[10px] uppercase tracking-[0.14em] text-cream outline-none transition-colors focus:border-[rgba(200,137,42,0.55)] hover:border-gold/30"
                   style={{ fontFamily: monoSystem }}
                 >
                   <option value="name">Name A–Z</option>
@@ -247,13 +247,13 @@ export default function CategoriesPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1 border border-[rgba(240,232,216,0.1)] bg-[rgba(15,13,11,0.75)] p-1">
+              <div className="flex items-center gap-1 rounded-full border border-[rgba(240,232,216,0.12)] bg-[rgba(15,13,11,0.78)] p-1">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`grid h-8 w-8 place-items-center transition-colors ${
+                  className={`grid h-9 w-9 place-items-center rounded-full transition-colors ${
                     viewMode === "grid"
-                      ? "bg-[rgba(200,137,42,0.14)] text-gold"
-                      : "text-muted hover:text-cream"
+                      ? "bg-[rgba(200,137,42,0.18)] text-gold"
+                      : "text-muted hover:bg-white/5 hover:text-cream"
                   }`}
                   aria-label="Grid view"
                 >
@@ -261,10 +261,10 @@ export default function CategoriesPage() {
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`grid h-8 w-8 place-items-center transition-colors ${
+                  className={`grid h-9 w-9 place-items-center rounded-full transition-colors ${
                     viewMode === "list"
-                      ? "bg-[rgba(200,137,42,0.14)] text-gold"
-                      : "text-muted hover:text-cream"
+                      ? "bg-[rgba(200,137,42,0.18)] text-gold"
+                      : "text-muted hover:bg-white/5 hover:text-cream"
                   }`}
                   aria-label="List view"
                 >
@@ -362,7 +362,7 @@ export default function CategoriesPage() {
                 <Link
                   key={category.id}
                   href={`/categories/${category.id}`}
-                  className={`group relative flex flex-col overflow-hidden border border-cb-border bg-[#13120E] transition-all duration-300 hover:border-gold/50 hover:-translate-y-1 hover:shadow-[0_12px_24px_-10px_rgba(200,137,42,0.15)] ${isFeatureHero ? "sm:col-span-2 sm:row-span-2" : ""}`}
+                  className={`group relative flex flex-col overflow-hidden rounded-[1.35rem] border border-[rgba(240,232,216,0.12)] bg-[linear-gradient(180deg,rgba(30,28,22,0.96),rgba(14,13,10,0.98))] shadow-[0_18px_50px_rgba(0,0,0,0.22)] transition-all duration-300 hover:-translate-y-1 hover:border-gold/55 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35),0_0_0_1px_rgba(200,137,42,0.12)] ${isFeatureHero ? "sm:col-span-2 sm:row-span-2" : ""}`}
                 >
                   <div className={`relative w-full overflow-hidden bg-black/25 ${isFeatureHero ? "aspect-[16/9]" : "aspect-[16/10]"}`}>
                     <Image 

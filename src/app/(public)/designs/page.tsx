@@ -104,7 +104,6 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
     totalDesigns,
     totalUsers,
     featuredDesign,
-    priceRange,
     bedroomSummary,
   ] = await Promise.all([
     prisma.category.findMany({ orderBy: { name: "asc" } }),
@@ -117,11 +116,6 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
         category: true,
       },
       orderBy: { updatedAt: "desc" },
-    }),
-    prisma.design.aggregate({
-      where,
-      _min: { basePrice: true },
-      _max: { basePrice: true },
     }),
     prisma.design.groupBy({
       by: ["bedrooms"],
@@ -136,8 +130,6 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
     'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
   const monoSystem =
     'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
-  const displayMinPrice = priceRange._min.basePrice ?? 0;
-  const displayMaxPrice = priceRange._max.basePrice ?? 0;
   const bedroomCounts: Record<string, number> = bedroomSummary.reduce(
     (acc: Record<string, number>, item: BedroomGroup) => {
       const key = item.bedrooms === null ? "Unknown" : String(item.bedrooms);
@@ -315,13 +307,13 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
         </div>
       </div>
 
-      <section className="sticky top-[73px] z-20 border-b border-[rgba(240,232,216,0.08)] bg-[rgba(10,9,7,0.95)] px-6 backdrop-blur-xl sm:px-10 lg:px-[60px]">
+      <section className="sticky top-[73px] z-20 border-b border-[rgba(240,232,216,0.08)] bg-[rgba(10,9,7,0.95)] px-6 shadow-[0_18px_40px_rgba(0,0,0,0.18)] backdrop-blur-xl sm:px-10 lg:px-[60px]">
         <div className="mx-auto flex min-h-16 w-full max-w-screen-2xl flex-wrap items-center gap-3 py-3 lg:flex-nowrap lg:gap-0">
           <div className="pr-6 text-[11px] uppercase tracking-[0.15em] text-muted lg:border-r lg:border-[rgba(240,232,216,0.08)] lg:pr-8">
             <span className="text-gold">{totalDesigns}</span> results
           </div>
 
-          <div className="flex max-w-full flex-1 items-center gap-0 overflow-x-auto px-0 scrollbar-hide lg:px-6">
+          <div className="flex max-w-full flex-1 items-center gap-2 overflow-x-auto px-0 scrollbar-hide lg:px-6">
             {allCategories.map((item) => {
               const active = (category || "All") === item;
               return (
@@ -331,10 +323,10 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                     category: item === "All" ? undefined : item,
                     page: "1",
                   })}
-                  className={`relative whitespace-nowrap px-5 py-2 text-[11px] uppercase tracking-[0.14em] transition-all ${
+                  className={`relative whitespace-nowrap rounded-full border px-4 py-2.5 text-[11px] uppercase tracking-[0.14em] transition-all ${
                     active
-                      ? "text-gold after:absolute after:bottom-0 after:left-5 after:right-5 after:h-px after:bg-gold"
-                      : "text-muted hover:text-cream"
+                      ? "border-gold/50 bg-gold/15 text-gold shadow-[0_0_0_1px_rgba(200,137,42,0.08)]"
+                      : "border-transparent bg-white/[0.03] text-muted hover:border-gold/25 hover:bg-gold/10 hover:text-cream"
                   }`}
                   style={{ fontFamily: monoSystem }}
                 >
@@ -376,7 +368,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                 name="search"
                 defaultValue={search || ""}
                 placeholder="Search plans..."
-                className="h-10 w-full border border-[rgba(240,232,216,0.2)] bg-[rgba(20,18,16,0.7)] py-2 pl-9 pr-3 text-[12px] tracking-[0.07em] text-cream outline-none placeholder:text-[rgba(168,152,128,0.9)] transition-all focus:border-[rgba(200,137,42,0.45)] focus:bg-[rgba(20,18,16,0.92)]"
+                className="h-11 w-full rounded-full border border-[rgba(240,232,216,0.2)] bg-[rgba(20,18,16,0.78)] py-2 pl-9 pr-4 text-[12px] tracking-[0.07em] text-cream outline-none placeholder:text-[rgba(168,152,128,0.9)] transition-all focus:border-[rgba(200,137,42,0.55)] focus:bg-[rgba(20,18,16,0.95)]"
                 style={{ fontFamily: monoSystem }}
               />
             </div>
@@ -385,7 +377,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
       </section>
 
       {/* Secondary Controls Bar (Not sticky) */}
-      <section className="border-b border-[rgba(240,232,216,0.08)] bg-ink px-6 sm:px-10 lg:px-[60px] py-4">
+      <section className="border-b border-[rgba(240,232,216,0.08)] bg-[linear-gradient(180deg,rgba(17,16,9,1),rgba(12,11,8,1))] px-6 py-4 sm:px-10 lg:px-[60px]">
         <div className="mx-auto flex w-full max-w-screen-2xl flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <span
@@ -401,8 +393,8 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                   <Link
                     key={option.value}
                     href={queryWith({ sort: option.value, page: "1" })}
-                    className={`px-3 py-1 text-[11px] uppercase tracking-[0.12em] transition-colors border-b-2 ${
-                      active ? "text-cream border-gold font-medium" : "text-muted border-transparent hover:text-cream hover:border-gold/30"
+                    className={`rounded-full border px-4 py-2 text-[11px] uppercase tracking-[0.12em] transition-colors ${
+                      active ? "border-gold/45 bg-gold/15 text-gold font-medium" : "border-cb-border bg-white/[0.03] text-muted hover:border-gold/30 hover:text-cream"
                     }`}
                     style={{ fontFamily: monoSystem }}
                   >
@@ -418,7 +410,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
               isFeatured: isFeatured ? undefined : "true",
               page: "1",
             })}
-            className={`border px-3 py-2 text-[10px] uppercase tracking-[0.2em] transition-colors ${
+            className={`rounded-full border px-4 py-2.5 text-[10px] uppercase tracking-[0.2em] transition-colors ${
               isFeatured
                 ? "border-[rgba(200,137,42,0.34)] bg-gold text-ink"
                 : "border-[rgba(200,137,42,0.22)] bg-[rgba(200,137,42,0.08)] text-gold hover:bg-[rgba(200,137,42,0.15)]"

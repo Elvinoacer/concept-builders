@@ -18,6 +18,7 @@ type DesignCardType = {
   isFeatured: boolean;
   category: { id: string; name: string } | null;
   images: Array<{ url: string; name: string; type: string }>;
+  files?: Array<{ url: string; name: string; type: string }>;
 };
 
 type PageResponse = {
@@ -188,10 +189,10 @@ export default function PublicDesignsInfiniteGrid({
               <DesignCard 
                 design={{
                   ...design,
-                  images: (design.images && design.images.length > 0)
+                  images: (design.images && design.images.length > 0) || (design.files && design.files.length > 0)
                     ? design.images
-                    : [{ url: fallbackImage, type: "image/webp" }]
-                } as any} 
+                    : [{ url: fallbackImage, name: "Fallback", type: "IMAGE" }]
+                }}
                 index={index} 
                 priceType={priceType} 
                 onCardClick={setSelectedDesignId}

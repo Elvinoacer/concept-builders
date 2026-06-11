@@ -215,6 +215,18 @@ export async function GET(request: NextRequest) {
               type: true,
             },
           },
+          files: {
+            where: { type: "IMAGE" },
+            orderBy: {
+              createdAt: "desc",
+            },
+            take: 1,
+            select: {
+              url: true,
+              name: true,
+              type: true,
+            },
+          },
         }
       : {
           id: true,
@@ -231,6 +243,18 @@ export async function GET(request: NextRequest) {
           views: true,
           category: { select: { id: true, name: true } },
           images: {
+            where: { type: "IMAGE" },
+            orderBy: {
+              createdAt: "desc",
+            },
+            take: 1,
+            select: {
+              url: true,
+              name: true,
+              type: true,
+            },
+          },
+          files: {
             where: { type: "IMAGE" },
             orderBy: {
               createdAt: "desc",

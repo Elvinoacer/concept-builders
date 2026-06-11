@@ -17,13 +17,15 @@ const CustomDesignPageContent = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!searchParams.has("inspired_by")) return;
+    const scrollTimer = window.setTimeout(() => {
+      const form = document.getElementById("custom-design-form");
+      form?.scrollIntoView({
+        behavior: searchParams.has("inspired_by") ? "smooth" : "auto",
+        block: "start",
+      });
+    }, 120);
 
-    const form = document.getElementById("custom-design-form");
-    form?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    return () => window.clearTimeout(scrollTimer);
   }, [searchParams]);
 
   return (
@@ -33,7 +35,9 @@ const CustomDesignPageContent = () => {
           <Image
             src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg"
             alt="Custom Design"
-            className="h-full w-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-black/70" />
         </div>

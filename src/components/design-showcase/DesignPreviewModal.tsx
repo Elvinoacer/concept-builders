@@ -170,7 +170,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
     <AnimatePresence>
       {id && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6 md:p-8"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-3 backdrop-blur-md sm:p-5 md:p-6"
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
@@ -191,7 +191,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 16 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="relative z-10 w-full max-w-4xl bg-[#0F0E0A] border border-cb-border shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh] overflow-hidden"
+            className="relative z-10 flex max-h-[92dvh] w-full max-w-5xl flex-col overflow-hidden rounded-[1.5rem] border border-[rgba(240,232,216,0.14)] bg-[linear-gradient(180deg,rgba(19,18,14,0.98),rgba(10,9,7,0.99))] shadow-[0_30px_90px_rgba(0,0,0,0.6)] sm:max-h-[88dvh]"
           >
             {loading ? (
               /* ── Loading skeleton ── */
@@ -241,14 +241,14 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
               /* ── Main content ── */
               <>
                 {/* 1. FIXED HEADER */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-cb-border bg-[#0C0B08] flex-shrink-0 z-20">
+                <div className="z-20 flex flex-shrink-0 items-center justify-between gap-4 border-b border-[rgba(240,232,216,0.1)] bg-[#0C0B08]/95 px-4 py-3 sm:px-6 sm:py-4">
                   <div>
                     <p className="text-[11px] uppercase tracking-[0.24em] text-gold font-medium mb-1">
                       {design.category?.name ?? "House Plan"}
                     </p>
                     <h2
                       id="modal-title"
-                      className="text-xl sm:text-2xl font-light text-cream leading-tight"
+                      className="line-clamp-1 text-xl font-light leading-tight text-cream sm:text-2xl"
                       style={{ fontFamily: serifSystem }}
                     >
                       {design.name}
@@ -256,7 +256,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                   </div>
                   <button
                     onClick={onClose}
-                    className="p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors rounded-full"
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/5 text-white/75 transition-colors hover:border-gold/40 hover:bg-gold/10 hover:text-gold"
                     aria-label="Close modal"
                   >
                     <X className="h-5 w-5" />
@@ -264,11 +264,11 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                 </div>
 
                 {/* 2. SCROLLABLE BODY */}
-                <div className="flex-1 overflow-y-auto grid lg:grid-cols-[1.15fr_1fr] min-h-0 bg-[#0F0E0A]">
+                <div className="grid min-h-0 flex-1 overflow-y-auto bg-[#0F0E0A] lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.78fr)]">
                   {/* Left: Image Carousel Column */}
-                  <div className="flex flex-col bg-black/15 border-b lg:border-b-0 lg:border-r border-cb-border">
+                  <div className="flex min-h-0 flex-col border-b border-cb-border bg-black/15 lg:border-b-0 lg:border-r">
                     {/* Main image */}
-                    <div className="relative aspect-[16/10] w-full bg-card/10 overflow-hidden group flex-shrink-0">
+                    <div className="group relative aspect-[16/10] max-h-[48vh] w-full flex-shrink-0 overflow-hidden bg-card/10 lg:aspect-auto lg:h-full lg:min-h-[460px] lg:max-h-none">
                       <AnimatePresence initial={false} custom={direction}>
                         <motion.div
                           key={activeIndex}
@@ -358,13 +358,13 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                   </div>
 
                   {/* Right: Details Panel Column */}
-                  <div className="p-6 flex flex-col gap-6 justify-start overflow-y-auto">
+                  <div className="flex flex-col justify-start gap-5 overflow-y-auto p-4 sm:p-6">
                     {/* Stats grid */}
                     <div>
                       <p className="text-[11px] uppercase tracking-[0.15em] text-gold font-medium mb-3">
                         Specifications
                       </p>
-                      <div className="grid grid-cols-4 gap-2">
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
                         {[
                           {
                             label: "Beds",
@@ -387,7 +387,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                         ].map((stat) => (
                           <div
                             key={stat.label}
-                            className="border border-cb-border bg-ink/40 py-3 text-center"
+                            className="rounded-xl border border-[rgba(240,232,216,0.1)] bg-ink/55 px-2 py-3 text-center"
                           >
                             <p className="text-base font-light text-cream leading-tight">
                               {stat.value}
@@ -405,7 +405,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                       <p className="text-[11px] uppercase tracking-[0.15em] text-gold font-medium mb-2.5">
                         Plan Description
                       </p>
-                      <p className="text-xs leading-[1.85] text-cream-dim font-light">
+                      <p className="max-h-40 overflow-y-auto pr-1 text-xs font-light leading-[1.85] text-cream-dim lg:max-h-56">
                         {design.description}
                       </p>
                     </div>
@@ -413,7 +413,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                 </div>
 
                 {/* 3. STICKY FOOTER */}
-                <div className="px-6 py-4 border-t border-cb-border bg-[#0C0B08] flex flex-col sm:flex-row items-center justify-between gap-4 flex-shrink-0 z-20">
+                <div className="z-20 flex flex-shrink-0 flex-col items-stretch justify-between gap-4 border-t border-[rgba(240,232,216,0.1)] bg-[#0C0B08]/95 px-4 py-4 sm:flex-row sm:items-center sm:px-6">
                   <div className="text-center sm:text-left">
                     <p className="text-[10px] uppercase tracking-[0.18em] text-muted mb-0.5 leading-none">
                       Blueprint Package
@@ -438,12 +438,12 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                     )}
                   </div>
 
-                  <div className="flex gap-3 w-full sm:w-auto">
+                  <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
                     {design.basePrice > 0 && (
                       <Link
                         href={`/designs/${design.id}`}
                         onClick={onClose}
-                        className="group relative flex flex-1 sm:flex-initial items-center justify-center overflow-hidden border border-gold bg-gold px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-gold-light"
+                        className="group relative flex flex-1 items-center justify-center overflow-hidden rounded-full border border-gold bg-gold px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-gold-light sm:flex-initial"
                       >
                         View Full Plan
                         <ArrowRight className="ml-2 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -452,7 +452,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                     <Link
                       href={buildCustomDesignUrl(design)}
                       onClick={onClose}
-                      className={`flex items-center justify-center border border-cb-border px-6 py-3 text-[11px] uppercase tracking-[0.18em] text-cream-dim transition-colors hover:border-gold/40 hover:text-gold hover:bg-gold/5 ${
+                      className={`flex items-center justify-center rounded-full border border-cb-border px-6 py-3 text-[11px] uppercase tracking-[0.18em] text-cream-dim transition-colors hover:border-gold/40 hover:bg-gold/5 hover:text-gold ${
                         design.basePrice === 0 ? "w-full" : "flex-1 sm:flex-initial"
                       }`}
                     >
