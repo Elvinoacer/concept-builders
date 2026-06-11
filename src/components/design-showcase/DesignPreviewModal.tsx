@@ -1,16 +1,22 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { X, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
+interface ModalImage {
+  url: string;
+  type: string;
+  name?: string;
+}
+
 interface ModalDesign {
   id: string;
   name: string;
   description: string;
-  images: { url: string; type: string; name?: string }[];
+  images: ModalImage[];
   category?: { id: string; name: string };
   bedrooms?: number | null;
   bathrooms?: number | null;
@@ -24,18 +30,51 @@ interface DesignPreviewModalProps {
   onClose: () => void;
 }
 
+const FALLBACK_IMAGE = "/images/category-placeholder.webp";
+
 const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
   const [design, setDesign] = useState<ModalDesign | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!id) return;
+  // Filter images to only show actual images (not files/documents)
+  const displayImages =
+    design?.images?.filter(
+      (img) =>
+        img.type === "IMAGE" ||
+        img.url?.match(/\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|$)/i)
+    ) ?? [];
 
+  // If no valid images found, use fallback
+  const images =
+    displayImages.length > 0
+      ? displayImages
+      : [{ url: FALLBACK_IMAGE, type: "IMAGE" }];
+
+  const paginate = useCallback(
+    (newDirection: number) => {
+      setDirection(newDirection);
+      setActiveIndex((prev) => {
+        let nextIndex = prev + newDirection;
+        if (nextIndex < 0) nextIndex = images.length - 1;
+        if (nextIndex >= images.length) nextIndex = 0;
+        return nextIndex;
+      });
+    },
+    [images.length]
+  );
+
+  useEffect(() => {
+    if (!id) {
+      setDesign(null);
+      return;
+    }
+
+    let cancelled = false;
     const fetchDesign = async () => {
       setLoading(true);
       setError(false);
@@ -43,20 +82,26 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
         const response = await fetch(`/api/designs/${id}`);
         if (!response.ok) throw new Error("Failed to load design");
         const data = await response.json();
-        setDesign(data);
-        setActiveIndex(0);
-        setDirection(0);
+        if (!cancelled) {
+          setDesign(data);
+          setActiveIndex(0);
+          setDirection(0);
+        }
       } catch (err) {
         console.error(err);
-        setError(true);
+        if (!cancelled) setError(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchDesign();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
+  // Body scroll lock
   useEffect(() => {
     if (id) {
       document.body.style.overflow = "hidden";
@@ -68,39 +113,31 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
     };
   }, [id]);
 
+  // Keyboard handling
   useEffect(() => {
+    if (!id) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      if (!design || design.images.length <= 1) return;
+      if (images.length <= 1) return;
       if (e.key === "ArrowLeft") paginate(-1);
       if (e.key === "ArrowRight") paginate(1);
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [id, design, onClose]);
-
-  const paginate = (newDirection: number) => {
-    if (!design) return;
-    setDirection(newDirection);
-    setActiveIndex((prev) => {
-      let nextIndex = prev + newDirection;
-      if (nextIndex < 0) nextIndex = design.images.length - 1;
-      if (nextIndex >= design.images.length) nextIndex = 0;
-      return nextIndex;
-    });
-  };
+  }, [id, images.length, onClose, paginate]);
 
   const buildCustomDesignUrl = (d: ModalDesign) => {
     const params = new URLSearchParams();
     params.set("inspired_by", d.id);
     if (d.category?.name) params.set("style", d.category.name);
-    if (d.images?.[0]?.url) params.set("image", d.images[0].url);
+    if (images?.[0]?.url && images[0].url !== FALLBACK_IMAGE)
+      params.set("image", images[0].url);
     return `/custom-design?${params.toString()}`;
   };
 
-  const variants = {
+  const slideVariants = {
     enter: (dir: number) => ({
-      x: dir > 0 ? 60 : -60,
+      x: dir > 0 ? 40 : -40,
       opacity: 0,
     }),
     center: {
@@ -110,15 +147,26 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
     },
     exit: (dir: number) => ({
       zIndex: 0,
-      x: dir < 0 ? 60 : -60,
+      x: dir < 0 ? 40 : -40,
       opacity: 0,
     }),
   };
 
+  const serifSystem =
+    'var(--font-cormorant-garamond), "Cormorant Garamond", serif';
+
+  if (!id) return null;
+
   return (
     <AnimatePresence>
       {id && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          {/* Backdrop click-to-close */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -126,175 +174,263 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
             className="absolute inset-0"
             onClick={onClose}
           />
-          
+
+          {/* Modal container — constrained height */}
           <motion.div
             ref={modalRef}
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-5xl bg-ink border border-cb-border shadow-2xl max-h-full overflow-y-auto flex flex-col"
+            exit={{ opacity: 0, scale: 0.96, y: 16 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="relative z-10 w-full max-w-4xl bg-ink border border-cb-border shadow-2xl overflow-hidden"
+            style={{ maxHeight: "min(92vh, 720px)" }}
           >
+            {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-50 p-2 bg-black/50 text-white/70 hover:text-white hover:bg-black/80 transition-colors backdrop-blur-sm"
+              className="absolute top-3 right-3 z-50 p-2 bg-black/60 text-white/70 hover:text-white hover:bg-black/80 transition-colors backdrop-blur-sm rounded-sm"
               aria-label="Close modal"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
 
             {loading ? (
-              <div className="grid lg:grid-cols-2 min-h-[480px]">
-                <div className="aspect-[4/3] animate-pulse bg-card/60" />
-                <div className="p-6 sm:p-8 flex flex-col gap-4">
-                  <div className="h-3 w-24 animate-pulse bg-card/60" />
-                  <div className="h-10 w-3/4 animate-pulse bg-card/60" />
+              /* ── Loading skeleton ── */
+              <div className="grid lg:grid-cols-[1.1fr_1fr]">
+                <div className="aspect-[4/3] animate-pulse bg-card/40" />
+                <div className="p-6 flex flex-col gap-4">
+                  <div className="h-3 w-20 animate-pulse bg-card/40 rounded" />
+                  <div className="h-8 w-3/4 animate-pulse bg-card/40 rounded" />
                   <div className="grid grid-cols-4 gap-2 mt-4">
-                    {[...Array(4)].map((_, i) => <div key={i} className="h-20 animate-pulse bg-card/60" />)}
+                    {[...Array(4)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-16 animate-pulse bg-card/40 rounded"
+                      />
+                    ))}
                   </div>
-                  <div className="h-24 animate-pulse bg-card/60 mt-4" />
+                  <div className="h-16 animate-pulse bg-card/40 mt-4 rounded" />
                 </div>
               </div>
             ) : error ? (
-              <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 p-10 text-center">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-muted">Failed to load design details</p>
-                <button onClick={() => window.location.reload()} className="border border-gold/30 px-4 py-2 text-[10px] uppercase tracking-[0.18em] text-gold hover:border-gold">
-                  Refresh Page
+              /* ── Error state ── */
+              <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 p-10 text-center">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-muted">
+                  Failed to load design details
+                </p>
+                <button
+                  onClick={() => {
+                    setError(false);
+                    setLoading(true);
+                    fetch(`/api/designs/${id}`)
+                      .then((r) => r.json())
+                      .then((d) => {
+                        setDesign(d);
+                        setActiveIndex(0);
+                      })
+                      .catch(() => setError(true))
+                      .finally(() => setLoading(false));
+                  }}
+                  className="border border-gold/30 px-4 py-2 text-[10px] uppercase tracking-[0.18em] text-gold hover:border-gold transition-colors"
+                >
+                  Try Again
                 </button>
               </div>
             ) : design ? (
-              <div className="grid lg:grid-cols-[1.2fr_1fr] min-h-[480px]">
-                {/* Image Carousel */}
+              /* ── Main content ── */
+              <div
+                className="grid lg:grid-cols-[1.1fr_1fr] overflow-y-auto"
+                style={{ maxHeight: "min(92vh, 720px)" }}
+              >
+                {/* ── Left: Image Carousel ── */}
                 <div className="flex flex-col bg-black/20 border-b lg:border-b-0 lg:border-r border-cb-border">
-                  <div className="relative aspect-[4/3] w-full bg-card overflow-hidden group">
+                  {/* Main image */}
+                  <div className="relative aspect-[4/3] w-full bg-card/30 overflow-hidden group flex-shrink-0">
                     <AnimatePresence initial={false} custom={direction}>
                       <motion.div
                         key={activeIndex}
                         custom={direction}
-                        variants={variants}
+                        variants={slideVariants}
                         initial="enter"
                         animate="center"
                         exit="exit"
-                        transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
+                        transition={{
+                          x: {
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 30,
+                          },
+                          opacity: { duration: 0.2 },
+                        }}
                         className="absolute inset-0"
                       >
                         <Image
-                          src={design.images[activeIndex]?.url || "/images/category-placeholder.webp"}
+                          src={images[activeIndex]?.url || FALLBACK_IMAGE}
                           alt={`${design.name} - View ${activeIndex + 1}`}
                           fill
-                          className="object-cover opacity-90"
+                          className="object-cover"
                           sizes="(max-width: 1024px) 100vw, 50vw"
+                          priority
                         />
                       </motion.div>
                     </AnimatePresence>
 
-                    {design.images.length > 1 && (
+                    {images.length > 1 && (
                       <>
                         <button
-                          onClick={(e) => { e.stopPropagation(); paginate(-1); }}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 flex items-center justify-center border border-white/20 bg-black/50 text-white hover:border-gold/50 hover:text-gold transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            paginate(-1);
+                          }}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center border border-white/20 bg-black/50 text-white hover:border-gold/50 hover:text-gold transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
                           aria-label="Previous image"
                         >
-                          <ChevronLeft className="h-5 w-5" />
+                          <ChevronLeft className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={(e) => { e.stopPropagation(); paginate(1); }}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 flex items-center justify-center border border-white/20 bg-black/50 text-white hover:border-gold/50 hover:text-gold transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            paginate(1);
+                          }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center border border-white/20 bg-black/50 text-white hover:border-gold/50 hover:text-gold transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
                           aria-label="Next image"
                         >
-                          <ChevronRight className="h-5 w-5" />
+                          <ChevronRight className="h-4 w-4" />
                         </button>
-                        <span className="absolute top-4 left-4 bg-black/60 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-white/80">
-                          {activeIndex + 1} / {design.images.length}
+                        <span className="absolute top-3 left-3 bg-black/60 px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-white/80">
+                          {activeIndex + 1} / {images.length}
                         </span>
                       </>
                     )}
                   </div>
 
                   {/* Thumbnail strip */}
-                  {design.images.length > 1 && (
-                    <div className="flex gap-2 overflow-x-auto scrollbar-hide p-4">
-                      {design.images.map((img, i) => (
+                  {images.length > 1 && (
+                    <div className="flex gap-1.5 overflow-x-auto scrollbar-hide px-4 py-3 flex-shrink-0">
+                      {images.map((img, i) => (
                         <button
                           key={i}
                           onClick={() => {
                             setDirection(i > activeIndex ? 1 : -1);
                             setActiveIndex(i);
                           }}
-                          className={`relative flex-shrink-0 h-16 w-24 overflow-hidden border transition-all ${
+                          className={`relative flex-shrink-0 h-12 w-16 overflow-hidden border transition-all ${
                             i === activeIndex
                               ? "border-gold opacity-100"
-                              : "border-cb-border opacity-50 hover:opacity-100 hover:border-gold/40"
+                              : "border-cb-border opacity-50 hover:opacity-90 hover:border-gold/40"
                           }`}
                         >
-                          <Image src={img.url} alt={`Thumbnail ${i + 1}`} fill className="object-cover" />
+                          <Image
+                            src={img.url}
+                            alt={`Thumbnail ${i + 1}`}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
 
-                {/* Details Panel */}
-                <div className="p-6 sm:p-8 flex flex-col justify-between">
+                {/* ── Right: Details Panel ── */}
+                <div className="p-5 sm:p-6 flex flex-col justify-between overflow-y-auto">
                   <div>
-                    <p className="mb-3 flex items-center gap-3 text-[10px] uppercase tracking-[0.24em] text-gold">
-                      <span className="h-px w-6 bg-gold" />
+                    <p className="mb-2 flex items-center gap-3 text-[10px] uppercase tracking-[0.24em] text-gold">
+                      <span className="h-px w-5 bg-gold" />
                       {design.category?.name ?? "House Plan"}
                     </p>
                     <h2
                       id="modal-title"
-                      className="text-[clamp(28px,4vw,42px)] font-light leading-tight text-cream mb-6"
-                      style={{ fontFamily: 'var(--font-cormorant-garamond), "Cormorant Garamond", serif' }}
+                      className="text-[clamp(24px,3.5vw,36px)] font-light leading-tight text-cream mb-5"
+                      style={{ fontFamily: serifSystem }}
                     >
                       {design.name}
                     </h2>
 
-                    <div className="grid grid-cols-4 gap-2 mb-6">
+                    {/* Stats grid */}
+                    <div className="grid grid-cols-4 gap-1.5 mb-5">
                       {[
-                        { label: "Beds", value: design.bedrooms ?? "—" },
-                        { label: "Baths", value: design.bathrooms ?? "—" },
-                        { label: "Area", value: design.area ? `${design.area} m²` : "—" },
-                        { label: "Floors", value: design.floors ?? "—" },
+                        {
+                          label: "Beds",
+                          value: design.bedrooms ?? "—",
+                        },
+                        {
+                          label: "Baths",
+                          value: design.bathrooms ?? "—",
+                        },
+                        {
+                          label: "Area",
+                          value: design.area
+                            ? `${design.area} m²`
+                            : "—",
+                        },
+                        {
+                          label: "Floors",
+                          value: design.floors ?? "—",
+                        },
                       ].map((stat) => (
-                        <div key={stat.label} className="border border-cb-border bg-ink/60 p-3 text-center">
-                          <p className="text-xl font-light text-cream">{stat.value}</p>
-                          <p className="mt-1 text-[9px] uppercase tracking-[0.18em] text-muted">{stat.label}</p>
+                        <div
+                          key={stat.label}
+                          className="border border-cb-border bg-ink/60 p-2.5 text-center"
+                        >
+                          <p className="text-lg font-light text-cream leading-tight">
+                            {stat.value}
+                          </p>
+                          <p className="mt-0.5 text-[8px] uppercase tracking-[0.18em] text-muted">
+                            {stat.label}
+                          </p>
                         </div>
                       ))}
                     </div>
 
-                    <p className="line-clamp-4 text-[13px] leading-[1.8] text-cream-dim">
+                    {/* Description */}
+                    <p className="line-clamp-3 text-[12px] leading-[1.8] text-cream-dim">
                       {design.description}
                     </p>
                   </div>
 
-                  <div className="mt-8 pt-6 border-t border-cb-border">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-muted mb-2">Design Plan</p>
-                    <div className="mb-6">
+                  {/* Price + CTAs */}
+                  <div className="mt-6 pt-5 border-t border-cb-border">
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-muted mb-1.5">
+                      Design Plan
+                    </p>
+                    <div className="mb-5">
                       {design.basePrice === 0 ? (
-                        <p className="text-3xl font-light text-cream" style={{ fontFamily: 'var(--font-cormorant-garamond), "Cormorant Garamond", serif' }}>
+                        <p
+                          className="text-2xl font-light text-cream"
+                          style={{ fontFamily: serifSystem }}
+                        >
                           Custom Quote
                         </p>
                       ) : (
-                        <p className="text-3xl font-light text-cream" style={{ fontFamily: 'var(--font-cormorant-garamond), "Cormorant Garamond", serif' }}>
-                          <span className="text-[11px] uppercase tracking-[0.12em] text-muted mr-2 font-sans">from</span>
+                        <p
+                          className="text-2xl font-light text-cream"
+                          style={{ fontFamily: serifSystem }}
+                        >
+                          <span className="text-[10px] uppercase tracking-[0.12em] text-muted mr-1.5 font-sans">
+                            from
+                          </span>
                           ${design.basePrice.toLocaleString()}
                         </p>
                       )}
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex flex-col sm:flex-row gap-2.5">
                       {design.basePrice > 0 && (
                         <Link
                           href={`/designs/${design.id}`}
-                          className="group relative flex flex-1 items-center justify-center overflow-hidden border border-gold bg-gold px-5 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-gold-light"
+                          className="group relative flex flex-1 items-center justify-center overflow-hidden border border-gold bg-gold px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-gold-light"
                         >
                           View Full Plan
-                          <ArrowRight className="ml-2 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                          <ArrowRight className="ml-2 h-3 w-3 transition-transform group-hover:translate-x-1" />
                         </Link>
                       )}
                       <Link
                         href={buildCustomDesignUrl(design)}
-                        className={`flex items-center justify-center border border-cb-border px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] text-cream-dim transition-colors hover:border-gold/40 hover:text-gold ${design.basePrice === 0 ? 'w-full' : 'flex-1'}`}
+                        className={`flex items-center justify-center border border-cb-border px-4 py-3 text-[10px] uppercase tracking-[0.18em] text-cream-dim transition-colors hover:border-gold/40 hover:text-gold ${
+                          design.basePrice === 0 ? "w-full" : "flex-1"
+                        }`}
                       >
                         Request Custom Design
                       </Link>
