@@ -205,8 +205,15 @@ export async function GET(request: NextRequest) {
           category: { select: { id: true, name: true } },
           images: {
             where: { type: "IMAGE" },
+            orderBy: {
+              createdAt: "desc",
+            },
             take: 1,
-            select: { url: true, name: true, type: true },
+            select: {
+              url: true,
+              name: true,
+              type: true,
+            },
           },
         }
       : {
@@ -225,8 +232,15 @@ export async function GET(request: NextRequest) {
           category: { select: { id: true, name: true } },
           images: {
             where: { type: "IMAGE" },
+            orderBy: {
+              createdAt: "desc",
+            },
             take: 1,
-            select: { url: true, name: true, type: true },
+            select: {
+              url: true,
+              name: true,
+              type: true,
+            },
           },
           discounts: {
             select: {
