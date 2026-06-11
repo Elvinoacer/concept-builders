@@ -113,11 +113,13 @@ export async function sendCustomDesignRequestEmail(requestData: any) {
         <p><strong>Phone:</strong> ${requestData.phone || "N/A"}</p>
         <p><strong>Design Type:</strong> ${requestData.designType}</p>
         <p><strong>Budget:</strong> ${requestData.budget || "N/A"}</p>
+        ${requestData.referenceDesignId ? `<p><strong>Reference Design ID:</strong> ${requestData.referenceDesignId}</p>` : ''}
+        ${requestData.referenceImageUrl ? `<p><strong>Reference Image:</strong></p><img src="${requestData.referenceImageUrl}" alt="Reference Design" style="max-width: 600px; height: auto;" />` : ''}
         <p><strong>Description:</strong></p>
         <p>${requestData.description}</p>
         <p><strong>Attachments:</strong></p>
         <ul>
-          ${requestData.attachments.map((url: string) => `<li><a href="${url}">${url}</a></li>`).join("")}
+          ${requestData.attachments && requestData.attachments.length > 0 ? requestData.attachments.map((url: string) => `<li><a href="${url}">${url}</a></li>`).join("") : '<li>No attachments</li>'}
         </ul>`,
     });
 

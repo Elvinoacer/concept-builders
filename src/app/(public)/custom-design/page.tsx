@@ -31,7 +31,7 @@ const CustomDesignPageContent = () => {
       <section className="relative overflow-hidden border-b border-cb-border px-6 py-12 sm:px-10 lg:px-[60px] lg:py-16">
         <div className="absolute inset-0">
           <Image
-            src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg"
+            src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg"
             alt="Custom Design"
             className="h-full w-full object-cover"
           />

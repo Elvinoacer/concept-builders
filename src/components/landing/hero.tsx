@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import "./DreamPlan.css";
 
 const conceptbuildersStoryLink = "https://www.youtube.com/watch?v=HCtSs967dRc";
@@ -13,7 +14,7 @@ const PLANS = [
     beds: "5 Bed · 4 Bath",
     area: "4,200 sqft",
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg",
   },
   {
     tag: "Modern Bungalow",
@@ -21,7 +22,7 @@ const PLANS = [
     beds: "3 Bed · 2 Bath",
     area: "1,850 sqft",
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
   },
   {
     tag: "Apartment Block",
@@ -29,7 +30,7 @@ const PLANS = [
     beds: "20 Units · Mixed",
     area: "15,000 sqft",
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
   },
   {
     tag: "Luxury Estate",
@@ -37,7 +38,7 @@ const PLANS = [
     beds: "6 Bed · 7 Bath",
     area: "6,500 sqft",
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
   },
   {
     tag: "Country Cottage",
@@ -45,7 +46,7 @@ const PLANS = [
     beds: "4 Bed · 3 Bath",
     area: "2,600 sqft",
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg",
   },
   {
     tag: "Townhouse Community",
@@ -53,7 +54,7 @@ const PLANS = [
     beds: "3 Bed · 3 Bath",
     area: "2,100 sqft",
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg",
   },
   {
     tag: "Luxury Maisonette",
@@ -61,7 +62,7 @@ const PLANS = [
     beds: "4 Bed · 4 Bath",
     area: "3,400 sqft",
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg",
   },
 ];
 
@@ -80,7 +81,7 @@ function HouseCard({ plan, cardStyle }) {
       className="dp-house-card"
       style={{ ...cardStyle, textDecoration: "none" }}
     >
-      <img src={plan.image} alt={plan.name} className="dp-card-img-full" />
+      <Image src={plan.image} alt={plan.name} className="dp-card-img-full" fill sizes="(max-width: 768px) 280px, 340px" />
       <div className="dp-card-overlay">
         <div className="dp-card-content">
           <div className="dp-card-tag">{plan.tag}</div>
@@ -222,14 +223,14 @@ function getCardPositions(current, total, stageW, stageH) {
 
 // ── Cinematic Background ──
 const BG_SLIDES = [
-  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg",
-  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
-  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
-  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
-  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg",
-  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg",
-  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg",
-  "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Top-Down_Aerial_View.jpg",
+  "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg",
+  "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
+  "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
+  "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
+  "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg",
+  "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg",
+  "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg",
+  "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Top-Down_Aerial_View.jpg",
 ];
 
 function CinematicBackground() {
@@ -277,8 +278,17 @@ function CinematicBackground() {
               <div
                 key={`${i}-${playCounts[i]}`}
                 className="slide__img"
-                style={{ backgroundImage: `url('${src}')` }}
-              />
+              >
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  style={{ objectFit: "cover" }}
+                  priority={i === 0}
+                  quality={60}
+                />
+              </div>
               <div className="slide__grade" />
             </div>
           );

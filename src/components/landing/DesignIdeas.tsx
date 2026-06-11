@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import "./DesignIdeas.css";
 
 export default function DesignIdeas({ collections }: { collections: any[] }) {
@@ -169,7 +170,7 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
               onMouseLeave={handleLinkLeave}
             >
               <div className="card-img-wrap">
-                <img src={item.image} alt={item.title} />
+                <Image src={item.image} alt={item.title} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover" }} />
                 <span className="card-tag">
                   Collection {String(index + 1).padStart(2, "0")}
                 </span>
@@ -319,9 +320,10 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
             onMouseLeave={handleLinkLeave}
           >
             <div className="mini-img">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg"
+              <Image
+                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg"
                 alt="Guide 05"
+                fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover" }}
               />
             </div>
             <p className="mini-num">Guide 05</p>
@@ -341,9 +343,10 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
             onMouseLeave={handleLinkLeave}
           >
             <div className="mini-img">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg"
+              <Image
+                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg"
                 alt="Guide 06"
+                fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover" }}
               />
             </div>
             <p className="mini-num">Guide 06</p>
@@ -363,9 +366,10 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
             onMouseLeave={handleLinkLeave}
           >
             <div className="mini-img">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Townhouse_Community_Architectural_Detail1.jpg"
+              <Image
+                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Townhouse_Community_Architectural_Detail1.jpg"
                 alt="Guide 07"
+                fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover" }}
               />
             </div>
             <p className="mini-num">Guide 07</p>
@@ -385,9 +389,10 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
             onMouseLeave={handleLinkLeave}
           >
             <div className="mini-img">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg"
+              <Image
+                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg"
                 alt="Guide 08"
+                fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover" }}
               />
             </div>
             <p className="mini-num">Guide 08</p>

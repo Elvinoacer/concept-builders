@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export interface DesignModalPlan {
   id?: string;
@@ -75,7 +76,7 @@ export default function DesignModal({ plan, onClose }: DesignModalProps) {
         <button type="button" onClick={onClose} className="fixed right-6 top-24 z-20 grid h-10 w-10 place-items-center border border-white/15 bg-black/35 text-2xl text-white transition-colors hover:border-[#B8935A] hover:text-[#B8935A]" aria-label="Close design details">×</button>
 
         <div className="relative min-h-[320px] overflow-hidden md:min-h-[560px]">
-          <img src={plan.img} alt={plan.name} className="h-full w-full object-cover opacity-90" />
+          <Image src={plan.img} alt={plan.name} className="opacity-90" fill sizes="(max-width: 900px) 100vw, 50vw" style={{ objectFit: "cover" }} />
           <div className="absolute inset-0 bg-gradient-to-t from-[#141414]/85 via-transparent to-transparent" />
           <span className="absolute bottom-5 left-5 border border-[#B8935A]/40 bg-black/45 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-[#B8935A]">{plan.style}</span>
         </div>

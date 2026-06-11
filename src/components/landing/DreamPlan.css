@@ -91,8 +91,6 @@
   position: absolute;
   inset: -8%;
   width: 116%; height: 116%;
-  background-size: cover;
-  background-position: center;
   will-change: transform, opacity;
   transform: scale(1) translate(0, 0);
   opacity: 0;

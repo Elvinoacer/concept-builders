@@ -244,7 +244,7 @@ const Footer = () => {
     <footer
       className="relative border-t border-cb-border px-6 pb-10 pt-16 lg:px-[60px] bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage: `url('https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow9.jpg')`,
+        backgroundImage: `url('https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow9.jpg')`,
         backgroundAttachment: "fixed",
       }}
     >

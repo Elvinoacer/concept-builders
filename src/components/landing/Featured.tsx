@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import "./Featured.css";
 import DesignModal from "./DesignModal";
 
@@ -46,56 +47,56 @@ const collections = [
         beds: "3 bed · 3 bath",
         sqft: "2,100 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa7.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa7.jpg",
       },
       {
         name: "Vista Pavilion",
         beds: "3 bed · 2 bath",
         sqft: "1,850 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
       },
       {
         name: "Skyline Loft",
         beds: "5 bed · 4 bath",
         sqft: "3,100 sqft",
         badge: "Popular",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Top-Down_Aerial_View.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Top-Down_Aerial_View.jpg",
       },
       {
         name: "Zenith Flat-Roof",
         beds: "3 bed · 3 bath",
         sqft: "2,050 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa1.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa1.jpg",
       },
       {
         name: "Linear House",
         beds: "4 bed · 2 bath",
         sqft: "2,200 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Compound.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Compound.jpg",
       },
       {
         name: "Urban Edge",
         beds: "3 bed · 2 bath",
         sqft: "1,950 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa9.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa9.jpg",
       },
       {
         name: "Glass Pavilion",
         beds: "4 bed · 3 bath",
         sqft: "2,600 sqft",
         badge: "Trendy",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa8.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa8.jpg",
       },
       {
         name: "Horizon Residence",
         beds: "4 bed · 3 bath",
         sqft: "2,400 sqft",
         badge: "New",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
       },
     ],
   },
@@ -111,56 +112,56 @@ const collections = [
         beds: "6 bed · 5 bath",
         sqft: "5,800 sqft",
         badge: "Exclusive",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg",
       },
       {
         name: "The Riviera",
         beds: "5 bed · 5 bath",
         sqft: "4,900 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The_Guest_Wing1.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The_Guest_Wing1.jpg",
       },
       {
         name: "Monte Bellavista",
         beds: "7 bed · 6 bath",
         sqft: "6,500 sqft",
         badge: "Top Rated",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
       },
       {
         name: "Sunset Manor",
         beds: "4 bed · 4 bath",
         sqft: "4,200 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa3.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa3.jpg",
       },
       {
         name: "The Windsor",
         beds: "6 bed · 6 bath",
         sqft: "5,400 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The_Guest_Wing2.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The_Guest_Wing2.jpg",
       },
       {
         name: "Oasis Retreat",
         beds: "5 bed · 5 bath",
         sqft: "5,100 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool2.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool2.jpg",
       },
       {
         name: "Crown Estate",
         beds: "7 bed · 7 bath",
         sqft: "7,200 sqft",
         badge: "Premium",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool3.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool3.jpg",
       },
       {
         name: "Royal Mansion",
         beds: "6 bed · 5 bath",
         sqft: "6,000 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool4.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool4.jpg",
       },
     ],
   },
@@ -176,56 +177,56 @@ const collections = [
         beds: "3 bed · 2 bath",
         sqft: "1,600 sqft",
         badge: "Best Seller",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow2.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow2.jpg",
       },
       {
         name: "Meadow Bungalow",
         beds: "4 bed · 2 bath",
         sqft: "1,900 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow3.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow3.jpg",
       },
       {
         name: "Rosewood Cottage",
         beds: "3 bed · 3 bath",
         sqft: "1,750 sqft",
         badge: "New",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow4.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow4.jpg",
       },
       {
         name: "Prairie House",
         beds: "4 bed · 3 bath",
         sqft: "2,100 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow5.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow5.jpg",
       },
       {
         name: "Garden Retreat",
         beds: "3 bed · 2 bath",
         sqft: "1,500 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow6.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow6.jpg",
       },
       {
         name: "Oakwood Bungalow",
         beds: "4 bed · 2 bath",
         sqft: "1,800 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow7.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow7.jpg",
       },
       {
         name: "Sunrise Villa",
         beds: "3 bed · 2 bath",
         sqft: "1,650 sqft",
         badge: "Popular",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow8.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow8.jpg",
       },
       {
         name: "Harmony Home",
         beds: "4 bed · 3 bath",
         sqft: "2,000 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow9.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow9.jpg",
       },
     ],
   },
@@ -241,56 +242,56 @@ const collections = [
         beds: "2×3 bed · 2×2 bath",
         sqft: "3,200 sqft",
         badge: "Popular",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow7.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow7.jpg",
       },
       {
         name: "Mirror House",
         beds: "2×4 bed · 2×3 bath",
         sqft: "3,800 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow8.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow8.jpg",
       },
       {
         name: "Urban Pair",
         beds: "2×2 bed · 2×2 bath",
         sqft: "2,600 sqft",
         badge: "New",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow9.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow9.jpg",
       },
       {
         name: "Symmetra",
         beds: "2×3 bed · 2×3 bath",
         sqft: "3,400 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow10.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow10.jpg",
       },
       {
         name: "Duo Residence",
         beds: "2×4 bed · 2×2 bath",
         sqft: "3,600 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow11.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow11.jpg",
       },
       {
         name: "City Twins",
         beds: "2×3 bed · 2×2 bath",
         sqft: "3,000 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow12.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow12.jpg",
       },
       {
         name: "Split Level",
         beds: "2×4 bed · 2×3 bath",
         sqft: "4,000 sqft",
         badge: "Premium",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow13.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow13.jpg",
       },
       {
         name: "Harmony Duplex",
         beds: "2×3 bed · 2×3 bath",
         sqft: "3,300 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow14.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow14.jpg",
       },
     ],
   },
@@ -306,56 +307,56 @@ const collections = [
         beds: "2 bed · 1 bath",
         sqft: "900 sqft",
         badge: "Efficient",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow12.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow12.jpg",
       },
       {
         name: "Urban Micro",
         beds: "3 bed · 2 bath",
         sqft: "1,100 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow13.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow13.jpg",
       },
       {
         name: "Corner Plot Special",
         beds: "3 bed · 2 bath",
         sqft: "1,250 sqft",
         badge: "Popular",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow14.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow14.jpg",
       },
       {
         name: "Space Saver",
         beds: "2 bed · 2 bath",
         sqft: "980 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow15.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow15.jpg",
       },
       {
         name: "The Petite",
         beds: "3 bed · 1 bath",
         sqft: "1,050 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow16.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow16.jpg",
       },
       {
         name: "Mini Modern",
         beds: "2 bed · 2 bath",
         sqft: "950 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow_fenceview.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow_fenceview.jpg",
       },
       {
         name: "Smart Layout",
         beds: "3 bed · 2 bath",
         sqft: "1,150 sqft",
         badge: "Clever",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow_gateview.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow_gateview.jpg",
       },
       {
         name: "Tiny Villa",
         beds: "2 bed · 1 bath",
         sqft: "850 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
       },
     ],
   },
@@ -371,56 +372,56 @@ const collections = [
         beds: "4 bed · 3 bath",
         sqft: "2,300 sqft",
         badge: "Award Win",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa4.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa4.jpg",
       },
       {
         name: "Cascade Residence",
         beds: "5 bed · 4 bath",
         sqft: "2,900 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa5.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa5.jpg",
       },
       {
         name: "Open Concept",
         beds: "3 bed · 3 bath",
         sqft: "2,000 sqft",
         badge: "New",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa6.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa6.jpg",
       },
       {
         name: "Floating Volumes",
         beds: "4 bed · 3 bath",
         sqft: "2,500 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa7.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa7.jpg",
       },
       {
         name: "The Glass House",
         beds: "4 bed · 4 bath",
         sqft: "2,700 sqft",
         badge: "Popular",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa8.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa8.jpg",
       },
       {
         name: "Geometric Villa",
         beds: "5 bed · 5 bath",
         sqft: "3,200 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa9.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa9.jpg",
       },
       {
         name: "Luminous Block",
         beds: "4 bed · 3 bath",
         sqft: "2,400 sqft",
         badge: "Sleek",
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Rear_Elevation1.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Rear_Elevation1.jpg",
       },
       {
         name: "Minimalist Retreat",
         beds: "3 bed · 2 bath",
         sqft: "1,800 sqft",
         badge: null,
-        img: "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Side_Elevation1.jpg",
+        img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Side_Elevation1.jpg",
       },
     ],
   },
@@ -637,10 +638,14 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
               tabIndex={0}
               onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedPlan(hero); }}
             >
-              <img
+              <Image
                 className="fc-hero-bg bg-fill"
                 src={hero.img}
                 alt={hero.name}
+                fill
+                sizes="(max-width: 900px) 100vw, 66vw"
+                style={{ objectFit: "cover" }}
+                priority
               />
               <div className="fc-hero-gradient"></div>
               {hero.badge && (
@@ -699,10 +704,13 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
                   onClick={() => plan && setSelectedPlan(plan)}
                   style={{ display: "block", textAlign: "left", border: 0, padding: 0 }}
                 >
-                  <img
+                  <Image
                     className="fc-side-bg bg-fill"
-                    src={plan?.img}
-                    alt={plan?.name}
+                    src={plan?.img || ''}
+                    alt={plan?.name || ''}
+                    fill
+                    sizes="(max-width: 900px) 50vw, 380px"
+                    style={{ objectFit: "cover" }}
                   />
                   <div className="fc-side-grad"></div>
                   {plan?.badge && (
@@ -736,10 +744,13 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
                   padding: 0,
                 }}
               >
-                <img
+                <Image
                   className="fc-thumb-bg bg-fill"
                   src={plan.img}
                   alt={plan.name}
+                  fill
+                  sizes="(max-width: 560px) 50vw, 25vw"
+                  style={{ objectFit: "cover" }}
                 />
                 <div className="fc-thumb-overlay"></div>
                 {plan.badge && (

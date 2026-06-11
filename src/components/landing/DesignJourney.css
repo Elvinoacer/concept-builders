@@ -234,7 +234,7 @@
 /* ─── CTA BANNER ─── */
 .dj-wrapper .cta-banner {
   padding: 6rem 4rem;
-  background: url('https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa5.jpg') center/cover no-repeat;
+  background: url('https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa5.jpg') center/cover no-repeat;
   background-attachment: fixed;
   display: flex;
   align-items: center;

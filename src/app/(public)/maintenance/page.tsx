@@ -10,21 +10,21 @@ const projects = [
     status: "Design Phase",
     progress: 72,
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_3-Bedroom_Flat-Roof_Three-Quarter_Exterior_Perspectives1.jpeg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern_3-Bedroom_Flat-Roof_Three-Quarter_Exterior_Perspectives1.jpeg",
   },
   {
     title: "Luxury Villa Concept",
     status: "Planning",
     progress: 45,
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa3.jpg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa3.jpg",
   },
   {
     title: "Affordable Urban Home",
     status: "Drafting",
     progress: 60,
     image:
-      "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
+      "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
   },
 ];
 

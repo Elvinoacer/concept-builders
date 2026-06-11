@@ -466,6 +466,35 @@ const CustomDesignRequestDetails: React.FC<CustomDesignRequestDetailsProps> = ({
               </div>
             </div>
 
+            {/* Reference Design Section */}
+            {(request.referenceImageUrl || request.referenceDesignId) && (
+              <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <Label className="text-sm font-semibold flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4" />
+                  Reference Design
+                </Label>
+                <div className="flex flex-col sm:flex-row gap-6">
+                  {request.referenceImageUrl && (
+                    <div className="relative w-full sm:w-64 aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                      <img 
+                        src={request.referenceImageUrl} 
+                        alt="Reference Design" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  {request.referenceDesignId && (
+                    <div className="flex flex-col justify-center">
+                      <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Design ID</span>
+                      <code className="text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                        {request.referenceDesignId}
+                      </code>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Project Description */}
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-semibold">

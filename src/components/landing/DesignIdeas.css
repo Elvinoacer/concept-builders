@@ -58,7 +58,7 @@
 
 /* ─── HERO ──────────────────────────────────── */
 .di-wrapper .hero {
-  background: var(--cream) url('https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa1.jpg') center/cover no-repeat;
+  background: var(--cream) url('https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa1.jpg') center/cover no-repeat;
   background-attachment: fixed;
   min-height: 100vh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -395,7 +395,7 @@
 
 /* ─── CTA BAND ──────────────────────────────── */
 .di-wrapper .cta-band {
-  background: var(--sand) url('https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg') center/cover no-repeat;
+  background: var(--sand) url('https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg') center/cover no-repeat;
   background-attachment: fixed;
   padding: 6rem 4rem;
   text-align: center; position: relative; overflow: hidden;

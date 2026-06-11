@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import './SocialProof.css';
 
 export default function SocialProof() {
@@ -119,10 +120,10 @@ export default function SocialProof() {
           {/* ── FEATURED CARD ── */}
           <article className="card card--featured" data-delay="0" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg"
+              <Image
+                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg"
                 alt="Modern family home by the Kamau family"
-                loading="lazy"
+                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />
               <span className="card__badge">Modern Family</span>
               <Stars />
@@ -133,7 +134,7 @@ export default function SocialProof() {
               <div className="card__divider"></div>
               <div className="card__client">
                 <div className="card__avatar">
-                  <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Amelia Kamau" />
+                  <Image src="https://randomuser.me/api/portraits/women/44.jpg" alt="Amelia Kamau" width={48} height={48} />
                 </div>
                 <div className="card__client-info">
                   <p className="card__name">Amelia Kamau</p>
@@ -146,10 +147,10 @@ export default function SocialProof() {
           {/* ── CARD 2 ── */}
           <article className="card" data-delay="120" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg"
+              <Image
+                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg"
                 alt="Cottage-style home"
-                loading="lazy"
+                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />
               <span className="card__badge">Cottage Style</span>
               <Stars />
@@ -160,7 +161,7 @@ export default function SocialProof() {
               <div className="card__divider"></div>
               <div className="card__client">
                 <div className="card__avatar">
-                  <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="James Odhiambo" />
+                  <Image src="https://randomuser.me/api/portraits/men/32.jpg" alt="James Odhiambo" width={48} height={48} />
                 </div>
                 <div className="card__client-info">
                   <p className="card__name">James Odhiambo</p>
@@ -173,10 +174,10 @@ export default function SocialProof() {
           {/* ── CARD 3 ── */}
           <article className="card" data-delay="240" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg"
+              <Image
+                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg"
                 alt="Luxury villa"
-                loading="lazy"
+                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />
               <span className="card__badge">Luxury Villa</span>
               <Stars />
@@ -187,7 +188,7 @@ export default function SocialProof() {
               <div className="card__divider"></div>
               <div className="card__client">
                 <div className="card__avatar">
-                  <img src="https://randomuser.me/api/portraits/women/67.jpg" alt="Wanjiku Muthoni" />
+                  <Image src="https://randomuser.me/api/portraits/women/67.jpg" alt="Wanjiku Muthoni" width={48} height={48} />
                 </div>
                 <div className="card__client-info">
                   <p className="card__name">Wanjiku Muthoni</p>
@@ -200,10 +201,10 @@ export default function SocialProof() {
           {/* ── CARD 4 ── */}
           <article className="card" data-delay="360" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg"
+              <Image
+                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg"
                 alt="Bungalow design"
-                loading="lazy"
+                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />
               <span className="card__badge">Contemporary Bungalow</span>
               <Stars />
@@ -214,7 +215,7 @@ export default function SocialProof() {
               <div className="card__divider"></div>
               <div className="card__client">
                 <div className="card__avatar">
-                  <img src="https://randomuser.me/api/portraits/men/55.jpg" alt="Brian Otieno" />
+                  <Image src="https://randomuser.me/api/portraits/men/55.jpg" alt="Brian Otieno" width={48} height={48} />
                 </div>
                 <div className="card__client-info">
                   <p className="card__name">Brian Otieno</p>
@@ -227,10 +228,10 @@ export default function SocialProof() {
           {/* ── CARD 5 ── */}
           <article className="card" data-delay="480" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
-              <img
-                src="https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg"
+              <Image
+                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg"
                 alt="Townhouse design"
-                loading="lazy"
+                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />
               <span className="card__badge">Townhouse</span>
               <Stars />
@@ -241,7 +242,7 @@ export default function SocialProof() {
               <div className="card__divider"></div>
               <div className="card__client">
                 <div className="card__avatar">
-                  <img src="https://randomuser.me/api/portraits/women/29.jpg" alt="Fatuma Hassan" />
+                  <Image src="https://randomuser.me/api/portraits/women/29.jpg" alt="Fatuma Hassan" width={48} height={48} />
                 </div>
                 <div className="card__client-info">
                   <p className="card__name">Fatuma Hassan</p>
