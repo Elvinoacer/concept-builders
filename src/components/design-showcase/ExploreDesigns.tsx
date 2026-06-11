@@ -4,6 +4,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Search, Filter, ChevronDown } from "lucide-react";
 import FilterAside from "./FilterAside";
 import DesignCard from "./DesignCard";
 import {
@@ -157,15 +158,15 @@ const ExploreDesigns = () => {
         </div>
         <div className="w-full lg:w-auto flex flex-col md:flex-row items-center gap-4">
           <div className="relative w-full lg:w-96">
-            <motion.span
-              className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gold/60 text-2xl"
+            <motion.div
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/60"
               animate={{ rotate: isSearching ? 360 : 0 }}
               transition={{ duration: 1, repeat: isSearching ? Infinity : 0 }}
             >
-              search
-            </motion.span>
+              <Search className="h-5 w-5" />
+            </motion.div>
             <motion.input
-              className="w-full border border-cb-border bg-surface/80 py-4 pl-12 pr-6 text-base text-cream placeholder:text-muted focus:border-gold focus:ring-0 transition-all duration-300"
+              className="w-full border border-cb-border bg-[rgba(240,232,216,0.05)] py-4 pl-12 pr-6 text-base text-cream placeholder:text-muted focus:border-gold focus:ring-0 transition-all duration-300"
               placeholder="Search for designs..."
               type="search"
               value={searchTerm}
@@ -178,28 +179,24 @@ const ExploreDesigns = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center justify-center gap-3 border border-cb-border bg-surface px-6 py-4 text-sm font-semibold uppercase tracking-[0.14em] text-gold transition-all duration-500 hover:border-gold/35"
+              className="flex items-center justify-center gap-3 border border-cb-border bg-[rgba(240,232,216,0.05)] px-6 py-4 text-sm font-semibold uppercase tracking-[0.14em] text-gold transition-all duration-500 hover:border-gold/35"
             >
-              <span className="material-symbols-outlined text-2xl">
-                filter_list
-              </span>
+              <Filter className="h-5 w-5" />
               <span>Filters</span>
             </motion.button>
             <div className="relative flex-1 lg:w-64">
               <motion.select
-                className="appearance-none w-full border border-cb-border bg-surface/80 py-4 pl-5 pr-12 text-sm text-cream font-semibold cursor-pointer focus:border-gold focus:ring-0 transition-all duration-300 uppercase tracking-[0.14em]"
+                className="appearance-none w-full border border-cb-border bg-[rgba(240,232,216,0.05)] py-4 pl-5 pr-12 text-sm text-cream font-semibold cursor-pointer focus:border-gold focus:ring-0 transition-all duration-300 uppercase tracking-[0.14em]"
                 value={searchParams.get("sortBy") || "Newest"}
                 onChange={handleSortChange}
                 whileFocus={{ scale: 1.02 }}
               >
-                <option value="Newest">Newest Arrival</option>
-                <option value="Popular">Most Popular</option>
-                <option value="Price (Low to High)">Price: Low to High</option>
-                <option value="Price (High to Low)">Price: High to Low</option>
+                <option value="Newest" className="bg-ink">Newest Arrival</option>
+                <option value="Popular" className="bg-ink">Most Popular</option>
+                <option value="Price (Low to High)" className="bg-ink">Price: Low to High</option>
+                <option value="Price (High to Low)" className="bg-ink">Price: High to Low</option>
               </motion.select>
-              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gold pointer-events-none text-2xl">
-                expand_more
-              </span>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gold pointer-events-none h-5 w-5" />
             </div>
           </div>
         </div>

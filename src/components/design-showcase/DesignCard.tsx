@@ -265,13 +265,13 @@ const DesignCard: React.FC<DesignCardProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-2 xs:gap-3 mb-3 xs:mb-4">
-            <div className="flex items-center border border-cb-border bg-surface px-2 xs:px-3 py-1.5 xs:py-2 text-xs text-cream xs:text-sm">
+            <div className="flex items-center border border-cb-border bg-[rgba(240,232,216,0.05)] px-2 xs:px-3 py-1.5 xs:py-2 text-xs text-cream xs:text-sm">
               <FaBed className="mr-1 xs:mr-2 text-gold flex-shrink-0 text-xs xs:text-sm" />
               <span className="truncate font-medium">
                 {design.bedrooms || 0} Beds
               </span>
             </div>
-            <div className="flex items-center border border-cb-border bg-surface px-2 xs:px-3 py-1.5 xs:py-2 text-xs text-cream xs:text-sm">
+            <div className="flex items-center border border-cb-border bg-[rgba(240,232,216,0.05)] px-2 xs:px-3 py-1.5 xs:py-2 text-xs text-cream xs:text-sm">
               <FaBath className="mr-1 xs:mr-2 text-gold flex-shrink-0 text-xs xs:text-sm" />
               <span className="truncate font-medium">
                 {design.bathrooms || 0} Baths
@@ -302,7 +302,16 @@ const DesignCard: React.FC<DesignCardProps> = ({
                   </p>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex items-center gap-2 min-w-0">
-                      {hasDiscount ? (
+                      {design.basePrice === 0 ? (
+                        <p
+                          className="truncate text-xl font-light text-cream"
+                          style={{
+                            fontFamily: 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+                          }}
+                        >
+                          Custom Quote
+                        </p>
+                      ) : hasDiscount ? (
                         <>
                           <p className="truncate text-lg font-semibold text-emerald-400">
                             {formatCurrency(discountedPrice)}
