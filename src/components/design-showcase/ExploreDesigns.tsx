@@ -19,12 +19,28 @@ import DesignCardSkeleton from "./DesignCardSkeleton";
 
 const ITEMS_PER_PAGE = 8;
 
+type ShowcaseDesign = {
+  id: string;
+  name: string;
+  description?: string;
+  basePrice: number;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  area?: number | null;
+  floors?: number | null;
+  views?: number;
+  isFeatured?: boolean;
+  category?: { id: string; name: string } | null;
+  images: Array<{ url: string; name?: string; type: string }>;
+  files?: Array<{ url: string; name?: string; type: string }>;
+};
+
 const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  const [designs, setDesigns] = useState([]);
+  const [designs, setDesigns] = useState<ShowcaseDesign[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
@@ -157,7 +173,7 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
-      className="border border-cb-border bg-[rgba(10,9,7,0.45)] p-4 sm:p-6 lg:p-8"
+      className="rounded-[1.5rem] border border-cb-border bg-[rgba(10,9,7,0.55)] p-4 shadow-[0_22px_70px_rgba(0,0,0,0.2)] sm:p-6 lg:p-8"
     >
       <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-6">
         <div>
@@ -190,7 +206,7 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
               <Search className="h-4 w-4" />
             </motion.div>
             <motion.input
-              className="w-full border border-cb-border bg-[rgba(240,232,216,0.05)] py-3 pl-10 pr-4 text-sm text-cream placeholder:text-muted focus:border-gold focus:ring-0 transition-all duration-300"
+              className="w-full rounded-full border border-cb-border bg-[rgba(240,232,216,0.06)] py-3 pl-10 pr-4 text-sm text-cream placeholder:text-muted transition-all duration-300 focus:border-gold focus:ring-0"
               placeholder="Search for designs..."
               type="search"
               value={searchTerm}
@@ -202,7 +218,7 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
           <div className="relative w-full sm:w-56">
             <button
               onClick={() => setIsSortOpen(!isSortOpen)}
-              className="w-full flex items-center justify-between border border-cb-border bg-[rgba(240,232,216,0.05)] py-3 px-4 text-[11px] uppercase tracking-[0.14em] text-cream font-semibold transition-all hover:border-gold/40"
+              className="flex w-full items-center justify-between rounded-full border border-cb-border bg-[rgba(240,232,216,0.06)] px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-cream transition-all hover:border-gold/40 hover:bg-gold/10"
             >
               <span>{sortOptions.find(o => o.value === sortBy)?.label || "Sort"}</span>
               <ChevronDown className="h-4 w-4 text-gold" />
@@ -213,7 +229,7 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 top-full mt-2 w-full z-30 border border-cb-border bg-ink shadow-xl"
+                  className="absolute right-0 top-full z-30 mt-2 w-full overflow-hidden rounded-2xl border border-cb-border bg-ink shadow-xl"
                 >
                   {sortOptions.map((option) => (
                     <button
@@ -235,10 +251,10 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
       </div>
 
       {/* CONTROLS ROW 2 (Pill/Chip filter row) */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="mb-6 flex flex-wrap items-center gap-3 rounded-[1.25rem] border border-[rgba(240,232,216,0.08)] bg-black/15 p-3">
         <button
           onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className={`flex items-center gap-2 border px-4 py-3 text-[11px] uppercase tracking-[0.16em] transition-all ${isFilterOpen ? "border-gold bg-gold/10 text-gold" : "border-cb-border bg-[rgba(240,232,216,0.05)] text-gold hover:border-gold/40"}`}
+          className={`flex items-center gap-2 rounded-full border px-4 py-3 text-[11px] uppercase tracking-[0.16em] transition-all ${isFilterOpen ? "border-gold bg-gold/15 text-gold" : "border-cb-border bg-[rgba(240,232,216,0.06)] text-gold hover:border-gold/40 hover:bg-gold/10"}`}
         >
           <Filter className="h-3.5 w-3.5" />
           <span>Filters</span>
@@ -253,7 +269,7 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
           <button
             key={filter.id}
             onClick={() => clearFilter(filter.id)}
-            className="flex items-center gap-1.5 border border-[rgba(200,137,42,0.3)] bg-[rgba(200,137,42,0.08)] px-3 py-2 text-[10px] uppercase tracking-[0.14em] text-gold hover:bg-[rgba(200,137,42,0.15)]"
+            className="flex items-center gap-1.5 rounded-full border border-[rgba(200,137,42,0.3)] bg-[rgba(200,137,42,0.08)] px-3 py-2 text-[10px] uppercase tracking-[0.14em] text-gold hover:bg-[rgba(200,137,42,0.15)]"
           >
             {filter.label}
             <X className="h-3 w-3" />
@@ -263,7 +279,7 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
         {activeFilters.length > 0 && (
           <button
             onClick={handleClearFilters}
-            className="text-[10px] uppercase tracking-[0.14em] text-muted hover:text-cream ml-2"
+            className="ml-2 rounded-full px-3 py-2 text-[10px] uppercase tracking-[0.14em] text-muted hover:bg-white/5 hover:text-cream"
           >
             Clear All
           </button>
@@ -276,7 +292,7 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-8 border border-cb-border bg-[rgba(240,232,216,0.02)]"
+            className="mb-8 overflow-hidden rounded-[1.25rem] border border-cb-border bg-[rgba(240,232,216,0.03)]"
           >
             <div className="p-4 sm:p-6 lg:p-8">
               <FilterAside
@@ -329,7 +345,7 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <DesignCard
-                  design={design as any}
+                  design={design}
                   index={index}
                   priceType={priceType}
                   onCardClick={onCardClick}
