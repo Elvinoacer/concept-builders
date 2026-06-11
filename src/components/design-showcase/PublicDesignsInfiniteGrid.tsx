@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { preload } from "swr";
 import useSWRInfinite from "swr/infinite";
@@ -71,7 +69,6 @@ export default function PublicDesignsInfiniteGrid({
   fallbackImage,
 }: PublicDesignsInfiniteGridProps) {
   const normalizedSort = sortMap[sort || "name"];
-  const serifSystem = 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
   
   const [selectedDesignId, setSelectedDesignId] = useState<string | null>(null);
 
@@ -145,9 +142,9 @@ export default function PublicDesignsInfiniteGrid({
 
   if (isLoading && !data) {
     return (
-      <div className="grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)] md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 9 }).map((_, i) => (
-          <div key={i} className="h-[440px] animate-pulse bg-card" />
+          <div key={i} className="aspect-[4/5] animate-pulse bg-card/30 border border-cb-border" />
         ))}
       </div>
     );
@@ -181,10 +178,8 @@ export default function PublicDesignsInfiniteGrid({
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)] md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {designs.map((design, index) => {
-          const imageUrl = design.images?.[0]?.url || fallbackImage;
-
           return (
             <article
               key={design.id}
