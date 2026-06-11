@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import "./Explorer.css";
 import DesignModal from "./DesignModal";
@@ -315,12 +315,21 @@ export default function Explorer({
   const trackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Interaction & Auto-scroll states
-  const [isHovered, setIsHovered] = useState(false);
+  // Use refs for transient interaction state to avoid re-triggering the RAF effect
+  const isHoveredRef = useRef(false);
+  const isDraggingRef = useRef(false);
+  const selectedPlanRef = useRef<(typeof mergedPlans)[0] | null>(null);
+
+  // Keep a separate dragging state only used to gate click handler
   const [isDragging, setIsDragging] = useState(false);
-  const [hasDragged, setHasDragged] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const hasDraggedRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+
+  // Sync selectedPlan into ref so the RAF loop can read it without being a dep
+  useEffect(() => {
+    selectedPlanRef.current = selectedPlan;
+  }, [selectedPlan]);
 
   const sectionRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -351,58 +360,66 @@ export default function Explorer({
   }, []);
 
   // Parallax + Auto-Scroll Engine
+  // Only re-mount this effect when the visible plan count changes (filter change),
+  // NOT on every hover/drag/selectedPlan state change — those are read via refs.
+  const visibleCount = mergedPlans.filter(
+    (plan) =>
+      activeFilters.has("all") || plan.tags.some((t) => activeFilters.has(t)),
+  ).length;
+
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
 
-    cardRefs.current = cardRefs.current.slice(0, mergedPlans.length);
-
     let rAF: number;
     let scrollDirection = 1;
+    let active = true;
 
     const engine = () => {
-      rAF = requestAnimationFrame(() => {
-        // 1. Auto-Scroll logic
-        if (!isHovered && !isDragging && !selectedPlan) {
-          track.scrollLeft += 0.8 * scrollDirection;
-          if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 2) {
-            scrollDirection = -1;
-          } else if (track.scrollLeft <= 0) {
-            scrollDirection = 1;
-          }
+      if (!active) return;
+
+      // 1. Auto-Scroll logic — reads refs, no state deps
+      if (
+        !isHoveredRef.current &&
+        !isDraggingRef.current &&
+        !selectedPlanRef.current
+      ) {
+        track.scrollLeft += 0.8 * scrollDirection;
+        if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 2) {
+          scrollDirection = -1;
+        } else if (track.scrollLeft <= 0) {
+          scrollDirection = 1;
         }
+      }
 
-        // 2. Parallax logic
-        const windowCenter = window.innerWidth / 2;
-        cardRefs.current.forEach((card) => {
-          if (!card) return;
-          const rect = card.getBoundingClientRect();
-          const cardCenter = rect.left + rect.width / 2;
-          const offset = cardCenter - windowCenter;
-
-          // Calculate max offset so the effect happens while the card is mostly visible on-screen
-          const maxOffset = Math.max(
-            windowCenter * 0.5,
-            windowCenter - rect.width / 2,
-          );
-          let normalizedOffset = offset / maxOffset;
-
-          // Clamp to prevent exceeding 0-100% range
-          normalizedOffset = Math.max(-1, Math.min(1, normalizedOffset));
-
-          // Linear ease ensures the parallax is steadily noticeable across the entire screen
-          const parallaxPos = 50 + normalizedOffset * 50;
-          card.style.setProperty("--parallax-pos", `${parallaxPos}%`);
-        });
-
-        engine(); // Loop
+      // 2. Parallax logic
+      const windowCenter = window.innerWidth / 2;
+      cardRefs.current.forEach((card) => {
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.left + rect.width / 2;
+        const offset = cardCenter - windowCenter;
+        const maxOffset = Math.max(
+          windowCenter * 0.5,
+          windowCenter - rect.width / 2,
+        );
+        let normalizedOffset = offset / maxOffset;
+        normalizedOffset = Math.max(-1, Math.min(1, normalizedOffset));
+        const parallaxPos = 50 + normalizedOffset * 50;
+        card.style.setProperty("--parallax-pos", `${parallaxPos}%`);
       });
+
+      rAF = requestAnimationFrame(engine);
     };
 
-    engine(); // Init loop
+    rAF = requestAnimationFrame(engine);
 
-    return () => cancelAnimationFrame(rAF);
-  }, [activeFilters, isHovered, isDragging, selectedPlan, mergedPlans.length]);
+    return () => {
+      active = false;
+      cancelAnimationFrame(rAF);
+    };
+    // Only re-run when visible card count changes (i.e. filters change)
+  }, [visibleCount]);
 
   const toggleFilter = (filter: string) => {
     setActiveFilters((prev) => {
@@ -422,30 +439,45 @@ export default function Explorer({
       activeFilters.has("all") || plan.tags.some((t) => activeFilters.has(t)),
   );
 
-  // Drag Handlers
+  // Stable key per plan — no Math.random()
+  const getPlanKey = useCallback(
+    (plan: (typeof mergedPlans)[0], index: number) =>
+      plan.id != null ? String(plan.id) : `fallback-${index}`,
+    [],
+  );
+
+  // Drag Handlers — use refs to avoid re-triggering the RAF effect
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!trackRef.current) return;
+    isDraggingRef.current = true;
     setIsDragging(true);
-    setHasDragged(false);
-    setStartX(e.pageX - trackRef.current.offsetLeft);
-    setScrollLeft(trackRef.current.scrollLeft);
+    hasDraggedRef.current = false;
+    startXRef.current = e.pageX - trackRef.current.offsetLeft;
+    scrollLeftRef.current = trackRef.current.scrollLeft;
   };
+
   const handleMouseLeaveSlider = () => {
+    isDraggingRef.current = false;
+    isHoveredRef.current = false;
     setIsDragging(false);
-    setIsHovered(false);
   };
-  const handleMouseUp = () => setIsDragging(false);
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+    setIsDragging(false);
+  };
+
   const handleMouseMoveSlider = (e: React.MouseEvent) => {
-    if (!isDragging || !trackRef.current) return;
+    if (!isDraggingRef.current || !trackRef.current) return;
     e.preventDefault();
-    setHasDragged(true);
+    hasDraggedRef.current = true;
     const x = e.pageX - trackRef.current.offsetLeft;
-    const walk = (x - startX) * 2.5;
-    trackRef.current.scrollLeft = scrollLeft - walk;
+    const walk = (x - startXRef.current) * 2.5;
+    trackRef.current.scrollLeft = scrollLeftRef.current - walk;
   };
 
   const handleCardClick = (plan: (typeof mergedPlans)[0]) => {
-    if (hasDragged) return; // prevent click if it was a drag
+    if (hasDraggedRef.current) return;
     setSelectedPlan(plan);
   };
 
@@ -524,24 +556,30 @@ export default function Explorer({
             <div
               className="ex-slider-track"
               ref={trackRef}
-              onMouseEnter={() => setIsHovered(true)}
+              onMouseEnter={() => {
+                isHoveredRef.current = true;
+              }}
               onMouseLeave={handleMouseLeaveSlider}
               onMouseDown={handleMouseDown}
               onMouseUp={handleMouseUp}
               onMouseMove={handleMouseMoveSlider}
-              onTouchStart={() => setIsHovered(true)}
-              onTouchEnd={() => setIsHovered(false)}
+              onTouchStart={() => {
+                isHoveredRef.current = true;
+              }}
+              onTouchEnd={() => {
+                isHoveredRef.current = false;
+              }}
             >
               {visiblePlans.map((plan, i) => (
                 <div
                   className="ex-slider-card"
-                  key={`${plan.id}-${activeFilters.size}`}
+                  key={getPlanKey(plan, i)}
                   ref={(el) => {
                     cardRefs.current[i] = el;
                   }}
                   onClick={() => handleCardClick(plan)}
                   onMouseMove={(e) => {
-                    if (isDragging) return;
+                    if (isDraggingRef.current) return;
                     const card = e.currentTarget;
                     const rect = card.getBoundingClientRect();
                     const x = e.clientX - rect.left;
