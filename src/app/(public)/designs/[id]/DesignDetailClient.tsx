@@ -1288,7 +1288,6 @@ export default function DesignDetailClient({
               ))}
               <div className="my-4 h-px bg-[var(--design-border-soft)]" />
               <div className="flex items-end justify-between">
-                <span
                 <div>
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-gold">
                     Total
