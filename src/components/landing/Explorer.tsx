@@ -535,10 +535,7 @@ export default function Explorer({
               {visiblePlans.map((plan, i) => (
                 <div
                   className="ex-slider-card"
-                  key={
-                    `${plan.id}-${activeFilters.size}` +
-                    Math.random().toString()
-                  }
+                  key={`${plan.id}-${activeFilters.size}`}
                   ref={(el) => {
                     cardRefs.current[i] = el;
                   }}
