@@ -51,6 +51,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "randomuser.me",
+        pathname: "/api/portraits/**",
+      },
+      {
+        protocol: "https",
         hostname: "conceptbuilders.sfo3.digitaloceanspaces.com",
       },
       {
