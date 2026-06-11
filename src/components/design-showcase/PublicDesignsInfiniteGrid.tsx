@@ -223,11 +223,11 @@ export default function PublicDesignsInfiniteGrid({
                 </div>
 
                 <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4">
-                  <p className="text-2xl font-light text-cream">
-                    <span className="mr-1 text-[10px] uppercase tracking-[0.15em] text-muted">
-                      from
-                    </span>
-                    ${design.basePrice.toLocaleString()}
+                  <p
+                    className="text-2xl font-light text-cream"
+                    style={{ fontFamily: serifSystem }}
+                  >
+                    {design.basePrice === 0 ? "Custom Quote" : `$${design.basePrice.toLocaleString()}`}
                   </p>
                   <Link
                     href={`/designs/${design.id}`}

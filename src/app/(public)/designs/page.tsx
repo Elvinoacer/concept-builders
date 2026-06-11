@@ -584,13 +584,17 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                   </div>
                   <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-5">
                     <p className="text-2xl font-light text-cream">
-                      <span
-                        className="mr-1 text-[10px] uppercase tracking-[0.15em] text-muted"
-                        style={{ fontFamily: monoSystem }}
-                      >
-                        from
-                      </span>
-                      ${featuredDesign.basePrice.toLocaleString()}
+                      {featuredDesign.basePrice === 0 ? "Custom Quote" : (
+                        <>
+                          <span
+                            className="mr-1 text-[10px] uppercase tracking-[0.15em] text-muted"
+                            style={{ fontFamily: monoSystem }}
+                          >
+                            from
+                          </span>
+                          ${featuredDesign.basePrice.toLocaleString()}
+                        </>
+                      )}
                     </p>
                     <Link
                       href={`/designs/${featuredDesign.id}`}

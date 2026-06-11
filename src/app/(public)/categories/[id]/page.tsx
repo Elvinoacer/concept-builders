@@ -398,7 +398,7 @@ export default function CategoryPage() {
                       className="text-2xl font-light text-cream"
                       style={{ fontFamily: serifSystem }}
                     >
-                      ${design.basePrice.toLocaleString()}
+                      {design.basePrice === 0 ? "Custom Quote" : `$${design.basePrice.toLocaleString()}`}
                     </p>
                     <span
                       className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold"

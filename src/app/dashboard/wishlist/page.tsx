@@ -394,7 +394,7 @@ const WishlistPage = () => {
                         {design.name}
                       </h3>
                       <p className="text-gold font-semibold text-lg mb-4">
-                        ${design.basePrice.toFixed(2)}
+                        {design.basePrice === 0 ? "Custom Quote" : `$${design.basePrice.toFixed(2)}`}
                       </p>
 
                       {/* Actions */}

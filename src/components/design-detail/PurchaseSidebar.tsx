@@ -422,18 +422,24 @@ const PurchaseSidebar: React.FC<{ design: any }> = ({ design }) => {
               </p>
             </div>
             <div className="text-right min-w-0 flex-shrink-0">
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={totalPrice}
-                  variants={priceVariants}
-                  initial="initial"
-                  animate="updated"
-                  className="text-4xl font-extrabold text-gold leading-none tracking-tight"
-                >
-                  ${totalPrice.toLocaleString()}
-                </motion.p>
-              </AnimatePresence>
-              <motion.p
+              {design.basePrice === 0 ? (
+                <p className="text-4xl font-extrabold text-gold leading-none tracking-tight">
+                  Custom Quote
+                </p>
+              ) : (
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={totalPrice}
+                    variants={priceVariants}
+                    initial="initial"
+                    animate="updated"
+                    className="text-4xl font-extrabold text-gold leading-none tracking-tight"
+                  >
+                    ${totalPrice.toLocaleString()}
+                  </motion.p>
+                </AnimatePresence>
+              )}
+              {design.basePrice > 0 && (
                 className="text-sm text-cream-dim mt-2 font-bold"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -443,60 +449,77 @@ const PurchaseSidebar: React.FC<{ design: any }> = ({ design }) => {
                   ? `KES ${kesPrice.toLocaleString()}`
                   : "Converting..."}
               </motion.p>
+              )}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <CostCalculatorModal>
-              <Button
-                variant="ghost"
-                className="w-full h-11 text-sm font-bold border border-cb-border bg-surface text-cream hover:bg-gold hover:text-ink transition-all duration-300"
-              >
-                <Calculator className="w-4 h-4 mr-2" />
-                Calculator
-              </Button>
-            </CostCalculatorModal>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link
-                href={`/currency-converter?amount=${totalPrice}`}
-                className="flex items-center justify-center w-full h-11 px-3 text-sm font-bold text-gold border border-gold/20 rounded-md bg-gold/5 hover:bg-gold/10 transition-colors duration-300"
-              >
-                <Zap className="w-4 h-4 mr-2" />
-                Currencies
-              </Link>
-            </motion.div>
-          </div>
+          {design.basePrice > 0 && (
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <CostCalculatorModal>
+                <Button
+                  variant="ghost"
+                  className="w-full h-11 text-sm font-bold border border-cb-border bg-surface text-cream hover:bg-gold hover:text-ink transition-all duration-300"
+                >
+                  <Calculator className="w-4 h-4 mr-2" />
+                  Calculator
+                </Button>
+              </CostCalculatorModal>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href={`/currency-converter?amount=${totalPrice}`}
+                  className="flex items-center justify-center w-full h-11 px-3 text-sm font-bold text-gold border border-gold/20 rounded-md bg-gold/5 hover:bg-gold/10 transition-colors duration-300"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  Currencies
+                </Link>
+              </motion.div>
+            </div>
+          )}
 
           <div className="space-y-3">
-            <motion.button
-              whileHover={{ scale: 1.02, y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleBuyNow}
-              className="w-full flex items-center justify-center gap-3 rounded-xl h-14 px-6 bg-gold text-ink text-lg font-bold shadow-lg shadow-gold/20 hover:bg-gold-light transition-all duration-300 group"
-            >
-              <Zap className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
-              Purchase Now
-            </motion.button>
+            {design.basePrice === 0 ? (
+              <motion.button
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => router.push(`/custom-design?designId=${design.id}&imageUrl=${encodeURIComponent(design.images?.[0]?.url || "")}`)}
+                className="w-full flex items-center justify-center gap-3 rounded-xl h-14 px-6 bg-gold text-ink text-lg font-bold shadow-lg shadow-gold/20 hover:bg-gold-light transition-all duration-300 group"
+              >
+                <Zap className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                Request Custom Design
+              </motion.button>
+            ) : (
+              <>
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleBuyNow}
+                  className="w-full flex items-center justify-center gap-3 rounded-xl h-14 px-6 bg-gold text-ink text-lg font-bold shadow-lg shadow-gold/20 hover:bg-gold-light transition-all duration-300 group"
+                >
+                  <Zap className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                  Purchase Now
+                </motion.button>
 
-            <motion.button
-              whileHover={{ scale: 1.02, y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleAddToCart}
-              disabled={!!cartItem}
-              className="w-full flex items-center justify-center gap-3 rounded-xl h-14 px-6 bg-surface border-2 border-cb-border text-cream text-lg font-bold hover:border-gold/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {cartItem ? (
-                <>
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  Added to Cart
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="w-5 h-5" />
-                  Add to Cart
-                </>
-              )}
-            </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleAddToCart}
+                  disabled={!!cartItem}
+                  className="w-full flex items-center justify-center gap-3 rounded-xl h-14 px-6 bg-surface border-2 border-cb-border text-cream text-lg font-bold hover:border-gold/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cartItem ? (
+                    <>
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      Added to Cart
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5" />
+                      Add to Cart
+                    </>
+                  )}
+                </motion.button>
+              </>
+            )}
 
             <DesignInquiryModal designId={design.id} designName={design.name} />
           </div>

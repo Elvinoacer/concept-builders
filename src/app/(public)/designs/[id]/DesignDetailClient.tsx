@@ -113,6 +113,7 @@ function asFAQ(value: unknown): FAQItem[] {
 }
 
 function priceLabel(value: number) {
+  if (value === 0) return "Custom Quote";
   return `$${Math.round(value).toLocaleString()}`;
 }
 
@@ -1129,12 +1130,16 @@ export default function DesignDetailClient({
               >
                 {priceLabel(design.basePrice)}
               </p>
-              <p className="mt-1 font-mono text-[11px] tracking-[0.06em] text-muted">
-                ≈ KES {(design.basePrice * exchangeRate).toLocaleString()}
-              </p>
-              <p className="mt-3 font-mono text-[10px] tracking-[0.04em] text-muted">
-                Architectural PDF included in base price
-              </p>
+              {design.basePrice > 0 && (
+                <>
+                  <p className="mt-1 font-mono text-[11px] tracking-[0.06em] text-muted">
+                    ≈ KES {(design.basePrice * exchangeRate).toLocaleString()}
+                  </p>
+                  <p className="mt-3 font-mono text-[10px] tracking-[0.04em] text-muted">
+                    Architectural PDF included in base price
+                  </p>
+                </>
+              )}
             </div>
 
             {(
@@ -1284,16 +1289,16 @@ export default function DesignDetailClient({
               <div className="my-4 h-px bg-[var(--design-border-soft)]" />
               <div className="flex items-end justify-between">
                 <span
-                  className="text-[16px]"
-                  style={{
-                    fontFamily:
-                      'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-                  }}
-                >
-                  Total
-                </span>
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-gold">
+                    Total
+                  </p>
+                  <p className="mt-1 text-[12px] font-medium tracking-tight text-cream-dim">
+                    Selected Package
+                  </p>
+                </div>
                 <span
-                  className="text-[28px] font-light text-gold"
+                  className="text-3xl font-light text-cream"
                   style={{
                     fontFamily:
                       'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
@@ -1302,34 +1307,49 @@ export default function DesignDetailClient({
                   {priceLabel(totalPrice)}
                 </span>
               </div>
-              <p className="mt-1 text-right font-mono text-[11px] text-muted">
-                ≈ KES {(totalPrice * exchangeRate).toLocaleString()}
-              </p>
-              <p className="mt-2 text-right font-mono text-[10px] text-muted">
-                {selectedDocumentExtras.length + selectedExtras.length} add-ons
-                selected
-              </p>
+              {design.basePrice > 0 && (
+                <>
+                  <p className="mt-1 text-right font-mono text-[11px] text-muted">
+                    ≈ KES {(totalPrice * exchangeRate).toLocaleString()}
+                  </p>
+                  <p className="mt-2 text-right font-mono text-[10px] text-muted">
+                    {selectedDocumentExtras.length + selectedExtras.length} add-ons
+                    selected
+                  </p>
+                </>
+              )}
             </div>
 
             <div className="mt-px space-y-px">
-              <button
-                type="button"
-                onClick={handleBuyNow}
-                disabled={isBuyingNow || isAddingToCart}
-                className="flex w-full items-center justify-center gap-2 bg-gold px-5 py-4 font-mono text-[12px] uppercase tracking-[0.18em] text-ink transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                <Download size={16} />
-                {isBuyingNow ? "Processing..." : "Purchase Now"}
-              </button>
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                disabled={isBuyingNow || isAddingToCart}
-                className="flex w-full items-center justify-center gap-2 border border-[var(--design-border-soft)] bg-surface px-5 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                <ShoppingCart size={15} />
-                {isAddingToCart ? "Adding..." : "Add to Cart"}
-              </button>
+              {design.basePrice === 0 ? (
+                <Link
+                  href={`/custom-design?designId=${design.id}&imageUrl=${encodeURIComponent(design.images?.[0]?.url || "")}`}
+                  className="flex w-full items-center justify-center gap-2 bg-gold px-5 py-4 font-mono text-[12px] uppercase tracking-[0.18em] text-ink transition-colors hover:bg-gold-light"
+                >
+                  Request Custom Design
+                </Link>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleBuyNow}
+                    disabled={isBuyingNow || isAddingToCart}
+                    className="flex w-full items-center justify-center gap-2 bg-gold px-5 py-4 font-mono text-[12px] uppercase tracking-[0.18em] text-ink transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    <Download size={16} />
+                    {isBuyingNow ? "Processing..." : "Purchase Now"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    disabled={isBuyingNow || isAddingToCart}
+                    className="flex w-full items-center justify-center gap-2 border border-[var(--design-border-soft)] bg-surface px-5 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    <ShoppingCart size={15} />
+                    {isAddingToCart ? "Adding..." : "Add to Cart"}
+                  </button>
+                </>
+              )}
               <Link
                 href={`/contact?designId=${design.id}`}
                 className="flex w-full items-center justify-center gap-2 border border-[var(--design-border-soft)] px-5 py-4 font-mono text-[10px] uppercase tracking-[0.14em] text-cream-dim transition-colors hover:bg-card hover:text-cream"
@@ -1337,9 +1357,11 @@ export default function DesignDetailClient({
                 Request Consultation
               </Link>
             </div>
-            <p className="mt-2 text-center font-mono text-[10px] text-muted">
-              Secure checkout with instant digital delivery after payment.
-            </p>
+            {design.basePrice > 0 && (
+              <p className="mt-2 text-center font-mono text-[10px] text-muted">
+                Secure checkout with instant digital delivery after payment.
+              </p>
+            )}
 
             <div className="mt-px grid grid-cols-2 gap-px bg-[var(--design-border-soft)]">
               <div className="flex items-center gap-2 bg-card px-4 py-3">
@@ -1477,13 +1499,17 @@ export default function DesignDetailClient({
           <button
             type="button"
             onClick={() => {
+              if (design.basePrice === 0) {
+                router.push(`/custom-design?designId=${design.id}&imageUrl=${encodeURIComponent(design.images?.[0]?.url || "")}`);
+                return;
+              }
               const sidebar = document.getElementById("purchase-options");
               if (sidebar)
                 sidebar.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             className="flex-1 bg-gold px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ink"
           >
-            Purchase Now
+            {design.basePrice === 0 ? "Request Custom Design" : "Purchase Now"}
           </button>
         </div>
       </div>
