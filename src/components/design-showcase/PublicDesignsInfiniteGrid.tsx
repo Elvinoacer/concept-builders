@@ -68,6 +68,7 @@ export default function PublicDesignsInfiniteGrid({
   fallbackImage,
 }: PublicDesignsInfiniteGridProps) {
   const normalizedSort = sortMap[sort || "name"];
+  const serifSystem = 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
 
   const getKey = (pageIndex: number, previousPageData: PageResponse | null) => {
     if (previousPageData && !previousPageData.nextCursor) return null;
