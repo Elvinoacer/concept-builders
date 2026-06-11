@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { preload } from "swr";
 import useSWRInfinite from "swr/infinite";
 
-type DesignCard = {
+import DesignCard from "./DesignCard";
+import DesignPreviewModal from "./DesignPreviewModal";
+
+type DesignCardType = {
   id: string;
   name: string;
   basePrice: number;
@@ -20,7 +23,7 @@ type DesignCard = {
 };
 
 type PageResponse = {
-  designs: DesignCard[];
+  designs: DesignCardType[];
   nextCursor: string | null;
   hasMore: boolean;
 };
@@ -69,6 +72,8 @@ export default function PublicDesignsInfiniteGrid({
 }: PublicDesignsInfiniteGridProps) {
   const normalizedSort = sortMap[sort || "name"];
   const serifSystem = 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
+  
+  const [selectedDesignId, setSelectedDesignId] = useState<string | null>(null);
 
   const getKey = (pageIndex: number, previousPageData: PageResponse | null) => {
     if (previousPageData && !previousPageData.nextCursor) return null;
@@ -184,60 +189,16 @@ export default function PublicDesignsInfiniteGrid({
             <article
               key={design.id}
               data-design-id={design.id}
-              className="group bg-ink transition-colors duration-300 hover:bg-card"
             >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <Image
-                  src={imageUrl}
-                  alt={design.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                  className="object-cover opacity-80 transition-all duration-700 group-hover:scale-105 group-hover:opacity-95"
-                  priority={index === 0}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-                {design.isFeatured && (
-                  <span className="absolute left-4 top-4 bg-gold px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-ink">
-                    Featured
-                  </span>
-                )}
-              </div>
-
-              <div className="p-6">
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-gold">
-                    {design.category?.name || "Uncategorized"}
-                  </p>
-                  <p className="text-[10px] tracking-[0.1em] text-muted">
-                    {(design.views || 0).toLocaleString()} views
-                  </p>
-                </div>
-
-                <h3 className="mb-3 line-clamp-1 text-3xl font-light text-cream transition-colors group-hover:text-gold-light">
-                  {design.name}
-                </h3>
-
-                <div className="mb-5 flex flex-wrap gap-4 text-[11px] uppercase tracking-[0.12em] text-muted">
-                  <span>{design.bedrooms ?? "-"} Beds</span>
-                  <span>{design.bathrooms ?? "-"} Baths</span>
-                  <span>{design.area ?? "-"} m2</span>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4">
-                  <p
-                    className="text-2xl font-light text-cream"
-                    style={{ fontFamily: serifSystem }}
-                  >
-                    {design.basePrice === 0 ? "Custom Quote" : `$${design.basePrice.toLocaleString()}`}
-                  </p>
-                  <Link
-                    href={`/designs/${design.id}`}
-                    className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold"
-                  >
-                    View Plan
-                  </Link>
-                </div>
-              </div>
+              <DesignCard 
+                design={{
+                  ...design,
+                  images: design.images || [{ url: fallbackImage, type: "image/webp" }]
+                } as any} 
+                index={index} 
+                priceType={priceType} 
+                onCardClick={setSelectedDesignId}
+              />
             </article>
           );
         })}
@@ -255,6 +216,8 @@ export default function PublicDesignsInfiniteGrid({
           </button>
         </div>
       )}
+
+      <DesignPreviewModal id={selectedDesignId} onClose={() => setSelectedDesignId(null)} />
     </div>
   );
 }

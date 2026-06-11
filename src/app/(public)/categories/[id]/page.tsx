@@ -21,6 +21,7 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
+import DesignCard from "@/components/design-showcase/DesignCard";
 
 interface Design {
   id: string;
@@ -292,13 +293,6 @@ export default function CategoryPage() {
                 style={{ fontFamily: monoSystem }}
               />
             </div>
-            <button
-              type="submit"
-              className="border border-[rgba(200,137,42,0.34)] bg-[rgba(200,137,42,0.1)] px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-gold transition-colors hover:bg-[rgba(200,137,42,0.16)]"
-              style={{ fontFamily: monoSystem }}
-            >
-              Search
-            </button>
           </form>
 
           <Link
@@ -346,69 +340,16 @@ export default function CategoryPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)] md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {category.designs.map((design, index) => (
-              <Link
-                key={design.id}
-                href={`/designs/${design.id}`}
-                className="group bg-ink transition-colors duration-300 hover:bg-card"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image
-                    src={getDesignImage(design)}
-                    alt={design.name}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 33vw"
-                    className="object-cover opacity-80 transition-all duration-700 group-hover:scale-105 group-hover:opacity-95"
-                    priority={index < 3}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-                  {design.isFeatured && (
-                    <span
-                      className="absolute left-4 top-4 bg-gold px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-ink"
-                      style={{ fontFamily: monoSystem }}
-                    >
-                      Featured
-                    </span>
-                  )}
-                </div>
-
-                <div className="p-6">
-                  <p
-                    className="mb-2 text-[10px] uppercase tracking-[0.2em] text-gold"
-                    style={{ fontFamily: monoSystem }}
-                  >
-                    {category.name}
-                  </p>
-                  <h3
-                    className="mb-3 line-clamp-1 text-3xl font-light text-cream transition-colors group-hover:text-gold-light"
-                    style={{ fontFamily: serifSystem }}
-                  >
-                    {design.name}
-                  </h3>
-                  <p
-                    className="line-clamp-2 text-[12px] leading-[1.8] text-cream-dim"
-                    style={{ fontFamily: monoSystem }}
-                  >
-                    {design.description}
-                  </p>
-
-                  <div className="mt-5 flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4">
-                    <p
-                      className="text-2xl font-light text-cream"
-                      style={{ fontFamily: serifSystem }}
-                    >
-                      {design.basePrice === 0 ? "Custom Quote" : `$${design.basePrice.toLocaleString()}`}
-                    </p>
-                    <span
-                      className="text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold"
-                      style={{ fontFamily: monoSystem }}
-                    >
-                      View Plan
-                    </span>
-                  </div>
-                </div>
-              </Link>
+              <DesignCard 
+                key={design.id} 
+                design={{
+                  ...design, 
+                  category: { id: category.id, name: category.name }
+                } as any} 
+                index={index} 
+              />
             ))}
           </div>
         )}

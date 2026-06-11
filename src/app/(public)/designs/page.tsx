@@ -316,7 +316,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
       </div>
 
       <section className="sticky top-[73px] z-20 border-b border-[rgba(240,232,216,0.08)] bg-[rgba(10,9,7,0.95)] px-6 backdrop-blur-xl sm:px-10 lg:px-[60px]">
-        <div className="mx-auto flex h-16 w-full max-w-screen-2xl flex-wrap items-center gap-3 lg:flex-nowrap lg:gap-0">
+        <div className="mx-auto flex min-h-16 w-full max-w-screen-2xl flex-wrap items-center gap-3 py-3 lg:flex-nowrap lg:gap-0">
           <div className="pr-6 text-[11px] uppercase tracking-[0.15em] text-muted lg:border-r lg:border-[rgba(240,232,216,0.08)] lg:pr-8">
             <span className="text-gold">{totalDesigns}</span> results
           </div>
@@ -344,49 +344,10 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
             })}
           </div>
 
-          <div className="flex items-center gap-2 border-l border-[rgba(240,232,216,0.08)] pl-4">
-            <span
-              className="hidden text-[10px] uppercase tracking-[0.15em] text-muted xl:inline"
-              style={{ fontFamily: monoSystem }}
-            >
-              Sort
-            </span>
-            {sortOptions.map((option) => {
-              const active = sort === option.value;
-              return (
-                <Link
-                  key={option.value}
-                  href={queryWith({ sort: option.value, page: "1" })}
-                  className={`px-2 py-1 text-[11px] uppercase tracking-[0.12em] ${
-                    active ? "text-cream" : "text-muted hover:text-cream"
-                  }`}
-                  style={{ fontFamily: monoSystem }}
-                >
-                  {option.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          <Link
-            href={queryWith({
-              isFeatured: isFeatured ? undefined : "true",
-              page: "1",
-            })}
-            className={`ml-1 border px-3 py-2 text-[10px] uppercase tracking-[0.2em] ${
-              isFeatured
-                ? "border border-[rgba(200,137,42,0.34)] bg-[rgba(200,137,42,0.1)] text-gold"
-                : "border-[rgba(200,137,42,0.22)] bg-[rgba(200,137,42,0.08)] text-gold hover:bg-[rgba(200,137,42,0.15)]"
-            }`}
-            style={{ fontFamily: monoSystem }}
-          >
-            Featured Only
-          </Link>
-
           <form
             action="/designs"
             method="get"
-            className="ml-auto w-full sm:w-[220px] lg:w-[290px]"
+            className="ml-auto w-full sm:w-[220px] lg:w-[290px] mt-2 lg:mt-0"
           >
             <input type="hidden" name="category" value={category || ""} />
             <input type="hidden" name="sort" value={sort || "name"} />
@@ -420,6 +381,52 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
               />
             </div>
           </form>
+        </div>
+      </section>
+
+      {/* Secondary Controls Bar (Not sticky) */}
+      <section className="border-b border-[rgba(240,232,216,0.08)] bg-ink px-6 sm:px-10 lg:px-[60px] py-4">
+        <div className="mx-auto flex w-full max-w-screen-2xl flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <span
+              className="text-[10px] uppercase tracking-[0.15em] text-muted"
+              style={{ fontFamily: monoSystem }}
+            >
+              Sort By
+            </span>
+            <div className="flex gap-2">
+              {sortOptions.map((option) => {
+                const active = sort === option.value;
+                return (
+                  <Link
+                    key={option.value}
+                    href={queryWith({ sort: option.value, page: "1" })}
+                    className={`px-3 py-1 text-[11px] uppercase tracking-[0.12em] transition-colors border-b-2 ${
+                      active ? "text-cream border-gold font-medium" : "text-muted border-transparent hover:text-cream hover:border-gold/30"
+                    }`}
+                    style={{ fontFamily: monoSystem }}
+                  >
+                    {option.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          <Link
+            href={queryWith({
+              isFeatured: isFeatured ? undefined : "true",
+              page: "1",
+            })}
+            className={`border px-3 py-2 text-[10px] uppercase tracking-[0.2em] transition-colors ${
+              isFeatured
+                ? "border-[rgba(200,137,42,0.34)] bg-gold text-ink"
+                : "border-[rgba(200,137,42,0.22)] bg-[rgba(200,137,42,0.08)] text-gold hover:bg-[rgba(200,137,42,0.15)]"
+            }`}
+            style={{ fontFamily: monoSystem }}
+          >
+            ★ Featured Only
+          </Link>
         </div>
       </section>
 
@@ -462,26 +469,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
             </div>
           </div>
 
-          <div className="mb-10">
-            <p
-              className="mb-5 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-gold after:h-px after:flex-1 after:bg-[rgba(200,137,42,0.22)] after:content-['']"
-              style={{ fontFamily: monoSystem }}
-            >
-              Budget (USD)
-            </p>
-            <div className="relative my-4 h-[2px] bg-[rgba(240,232,216,0.08)]">
-              <div className="absolute inset-y-0 left-[10%] right-[30%] bg-gold" />
-            </div>
-            <div
-              className="flex items-center justify-between text-[11px] text-muted"
-              style={{ fontFamily: monoSystem }}
-            >
-              <span>
-                {displayMinPrice ? `$${Math.floor(displayMinPrice / 1000)}K` : "$0"}
-              </span>
-              <span>{displayMaxPrice ? `$${Math.ceil(displayMaxPrice / 1000)}K` : "$0"}</span>
-            </div>
-          </div>
+
 
           <div className="mb-10">
             <p
@@ -523,16 +511,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
             >
               All <em className="italic text-gold">Designs</em>
             </h2>
-            <Link
-              href={queryWith({
-                isFeatured: isFeatured ? undefined : "true",
-                page: "1",
-              })}
-              className="inline-flex items-center gap-2 border border-[rgba(200,137,42,0.22)] bg-[rgba(200,137,42,0.08)] px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-gold transition-colors hover:bg-[rgba(200,137,42,0.15)]"
-              style={{ fontFamily: monoSystem }}
-            >
-              <span className="text-xs">★</span> Featured Only
-            </Link>
+
           </div>
 
           <div className="flex flex-col gap-10">

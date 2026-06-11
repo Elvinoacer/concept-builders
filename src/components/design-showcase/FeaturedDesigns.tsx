@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import DesignCard from "./DesignCard";
 import DesignCardSkeleton from "./DesignCardSkeleton";
 
-const FeaturedDesigns = () => {
+const FeaturedDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [featuredDesigns, setFeaturedDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -132,6 +132,7 @@ const FeaturedDesigns = () => {
                       design={design}
                       index={index}
                       showDetails={false}
+                      onCardClick={onCardClick}
                     />
                   </motion.div>
                 ))}

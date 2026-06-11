@@ -25,9 +25,13 @@
 import { motion } from "framer-motion";
 import FeaturedDesigns from "@/components/design-showcase/FeaturedDesigns";
 import ExploreDesigns from "@/components/design-showcase/ExploreDesigns";
+import DesignPreviewModal from "@/components/design-showcase/DesignPreviewModal";
 import Link from "next/link";
+import { useState } from "react";
 
 const DesignShowcasePage = () => {
+  const [previewId, setPreviewId] = useState<string | null>(null);
+
   return (
     <motion.main
       initial={{ opacity: 0 }}
@@ -112,10 +116,12 @@ const DesignShowcasePage = () => {
         </div>
 
         <div className="space-y-12 sm:space-y-16 md:space-y-20">
-          <FeaturedDesigns />
-          <ExploreDesigns />
+          <FeaturedDesigns onCardClick={setPreviewId} />
+          <ExploreDesigns onCardClick={setPreviewId} />
         </div>
       </div>
+      
+      <DesignPreviewModal id={previewId} onClose={() => setPreviewId(null)} />
     </motion.main>
   );
 };

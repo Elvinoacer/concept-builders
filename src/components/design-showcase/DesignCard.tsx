@@ -3,17 +3,8 @@ import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  FaBath,
-  FaBed,
-  FaLayerGroup,
-  FaExpandArrowsAlt,
-  FaHeart,
-  FaEye,
-  FaShoppingCart,
-  FaStar,
-  FaFire,
-} from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
+import { ArrowRight } from "lucide-react";
 
 interface File {
   url: string;
@@ -53,6 +44,8 @@ interface Design {
   bathrooms?: number;
   area?: number;
   floors?: number;
+  category?: { id: string; name: string };
+  views?: number;
 }
 
 interface DesignCardProps {
@@ -60,6 +53,7 @@ interface DesignCardProps {
   index: number;
   showDetails?: boolean;
   priceType?: string;
+  onCardClick?: (id: string) => void;
 }
 
 const DesignCard: React.FC<DesignCardProps> = ({
@@ -67,11 +61,10 @@ const DesignCard: React.FC<DesignCardProps> = ({
   index,
   showDetails = true,
   priceType,
+  onCardClick,
 }) => {
   const router = useRouter();
 
-  const isBestSeller = design.orderItems && design.orderItems.length > 10;
-  const isPopular = design.orderItems && design.orderItems.length > 5;
   const hasDiscount = design.discounts && design.discounts.length > 0;
   const imageUrl =
     design.images?.[0]?.url || "/images/category-placeholder.webp";
@@ -89,10 +82,7 @@ const DesignCard: React.FC<DesignCardProps> = ({
   const discountedPrice = minPrice * (1 - discountValue / 100);
 
   const cardVariants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-    },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
@@ -106,20 +96,9 @@ const DesignCard: React.FC<DesignCardProps> = ({
     },
   };
 
-  const hoverVariants = {
-    hover: {
-      y: -4,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 25,
-      },
-    },
-  };
-
   const imageHoverVariants = {
     hover: {
-      scale: 1.05,
+      scale: 1.03,
       transition: {
         duration: 0.4,
         ease: "easeOut",
@@ -127,230 +106,103 @@ const DesignCard: React.FC<DesignCardProps> = ({
     },
   };
 
+  const serifSystem = 'var(--font-cormorant-garamond), "Cormorant Garamond", serif';
+
   return (
     <motion.div
-      onClick={() => router.push(`/designs/${design.id}`)}
-      className="group relative cursor-pointer w-full"
+      onClick={() => (onCardClick ? onCardClick(design.id) : router.push(`/designs/${design.id}`))}
+      className="group relative cursor-pointer w-full bg-ink transition-all duration-300 hover:bg-card border border-cb-border hover:border-gold/35 hover:shadow-[inset_0_0_0_1px_rgba(200,137,42,0.4)]"
       variants={cardVariants as any}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
       whileHover="hover"
     >
-      <div className="absolute inset-0 bg-gold/5 opacity-0 transition-opacity duration-700 group-hover:opacity-100 -z-10 blur-xl" />
+      <div className="relative aspect-[3/4] w-full overflow-hidden">
+        <motion.div variants={imageHoverVariants} className="w-full h-full">
+          <Image
+            alt={design.name}
+            className="w-full h-full object-cover"
+            src={imageUrl}
+            fill
+            sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            priority={index < 6}
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
+          />
+        </motion.div>
 
-      <div className="relative w-full overflow-hidden border border-cb-border bg-[linear-gradient(160deg,rgba(26,24,19,0.95)_0%,rgba(17,16,9,0.92)_100%)] transition-all duration-500 group-hover:border-gold/35 group-hover:shadow-[0_24px_40px_rgba(0,0,0,0.35)]">
-        <div className="relative h-40 xs:h-44 sm:h-48 md:h-52 lg:h-56 w-full overflow-hidden">
-          <motion.div variants={imageHoverVariants} className="w-full h-full">
-            <Image
-              alt={design.name}
-              className="w-full h-full object-cover"
-              src={imageUrl}
-              fill
-              sizes="(max-width: 480px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              priority={index < 6}
-              placeholder="blur"
-              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8Dt2fQcAAAAASUVORK5CYII="
-            />
-          </motion.div>
+        {/* Top-left badge only */}
+        {design.isFeatured && (
+          <div className="absolute top-4 left-4 z-20">
+            <span className="flex items-center border border-gold/35 bg-gold/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-ink shadow-sm">
+              <FaStar className="mr-1.5 text-ink text-[10px]" />
+              Featured
+            </span>
+          </div>
+        )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-55" />
+        {/* Gradient overlay for metadata strip */}
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-300" />
 
-          <div className="absolute top-3 left-3 flex flex-wrap gap-2 z-20 max-w-[75%]">
-            {design.isFeatured && (
-              <motion.span
-                className="flex items-center border border-gold/35 bg-gold/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              >
-                <FaStar className="mr-1.5 text-ink" />
-                <span>Featured</span>
-              </motion.span>
-            )}
-            {hasDiscount && (
-              <motion.span
-                className="flex items-center border border-emerald-400/40 bg-emerald-500/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-950"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              >
-                <span className="mr-1.5">🎁</span>
-                {discountValue}% Off
-              </motion.span>
+        {/* Bottom-left metadata strip */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col justify-end">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-gold">
+              {design.category?.name || "Uncategorized"}
+            </p>
+            {design.views !== undefined && (
+              <p className="text-[10px] tracking-[0.1em] text-muted">
+                {design.views.toLocaleString()} views
+              </p>
             )}
           </div>
-
-          <div className="absolute top-3 right-3 flex flex-col gap-2 z-20">
-            {isBestSeller && (
-              <motion.span
-                className="flex items-center border border-gold/35 bg-gold/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              >
-                <FaFire className="mr-1.5" />
-                <span>Best Seller</span>
-              </motion.span>
-            )}
-            {isPopular && !isBestSeller && (
-              <motion.span
-                className="flex items-center border border-gold/25 bg-surface/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              >
-                <FaHeart className="mr-1.5" />
-                <span>Popular</span>
-              </motion.span>
-            )}
+          
+          <h3
+            className="mb-2 line-clamp-1 text-2xl font-light text-cream transition-colors group-hover:text-gold-light"
+            style={{ fontFamily: serifSystem }}
+          >
+            {design.name}
+          </h3>
+          
+          <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.12em] text-muted mb-4">
+            <span>{design.bedrooms ?? "-"} Beds</span>
+            <span className="text-gold/40">•</span>
+            <span>{design.bathrooms ?? "-"} Baths</span>
+            <span className="text-gold/40">•</span>
+            <span>{design.area ?? "-"} m²</span>
           </div>
 
-          <div className="absolute right-2 top-12 z-20 hidden opacity-0 transition-all duration-300 group-hover:opacity-100 xs:right-3 xs:top-14 sm:flex sm:flex-col sm:gap-2">
-            <motion.button
-              className="border border-cb-border bg-surface/90 p-1.5 xs:p-2 transition-all duration-300 hover:border-gold/30"
-              whileHover={{ scale: 1.1, y: -2 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <FaHeart className="text-destructive text-xs xs:text-sm" />
-            </motion.button>
-            <motion.button
-              className="border border-cb-border bg-surface/90 p-1.5 xs:p-2 transition-all duration-300 hover:border-gold/30"
-              whileHover={{ scale: 1.1, y: -2 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <FaEye className="text-gold text-xs xs:text-sm" />
-            </motion.button>
-          </div>
-
-          <div className="absolute bottom-3 left-3 right-3">
-            <div className="flex justify-between items-center">
-              <div className="flex gap-2">
-                <motion.div
-                  className="flex items-center border border-gold/20 bg-ink/65 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <FaLayerGroup className="mr-1.5" />
-                  <span>
-                    {design.floors || 1}{" "}
-                    {design.floors === 1 ? "Floor" : "Floors"}
-                  </span>
-                </motion.div>
-                {design.area && (
-                  <motion.div
-                    className="flex items-center border border-gold/20 bg-ink/65 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <FaExpandArrowsAlt className="mr-1.5" />
-                    <span>{design.area} m²</span>
-                  </motion.div>
+          <div className="flex items-center justify-between border-t border-[rgba(240,232,216,0.08)] pt-4 transition-transform duration-300 group-hover:-translate-y-0.5">
+            {priceType === "building" && design.minBuildingCost && design.maxBuildingCost ? (
+              <p className="text-xl font-light text-cream" style={{ fontFamily: serifSystem }}>
+                <span className="text-[10px] uppercase tracking-[0.15em] text-muted mr-1 font-sans">Build from</span>
+                {formatCurrency(design.minBuildingCost)}
+              </p>
+            ) : (
+              <div className="flex items-center gap-2">
+                {design.basePrice === 0 ? (
+                  <p className="text-xl font-light text-cream" style={{ fontFamily: serifSystem }}>
+                    Custom Quote
+                  </p>
+                ) : hasDiscount ? (
+                  <div className="flex flex-col">
+                    <p className="text-sm text-muted line-through font-light leading-none mb-0.5">{formatCurrency(minPrice)}</p>
+                    <p className="text-xl font-light text-emerald-400 leading-none" style={{ fontFamily: serifSystem }}>{formatCurrency(discountedPrice)}</p>
+                  </div>
+                ) : (
+                  <p className="text-xl font-light text-cream" style={{ fontFamily: serifSystem }}>
+                    {formatCurrency(minPrice)}
+                  </p>
                 )}
               </div>
+            )}
+
+            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-gold">
+              <span className="sr-only sm:not-sr-only">View Plan</span>
+              <ArrowRight className="h-4 w-4" />
             </div>
           </div>
-        </div>
-
-        <div className="p-3 xs:p-4 sm:p-5">
-          <div className="mb-4">
-            <h3
-              className="mb-2 line-clamp-1 text-xl font-light text-cream transition-all duration-500 group-hover:translate-x-1 sm:text-2xl"
-              style={{
-                fontFamily:
-                  'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-              }}
-            >
-              {design.name}
-            </h3>
-            <p className="line-clamp-2 text-sm leading-relaxed text-cream-dim">
-              {design.description}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 xs:gap-3 mb-3 xs:mb-4">
-            <div className="flex items-center border border-cb-border bg-[rgba(240,232,216,0.05)] px-2 xs:px-3 py-1.5 xs:py-2 text-xs text-cream xs:text-sm">
-              <FaBed className="mr-1 xs:mr-2 text-gold flex-shrink-0 text-xs xs:text-sm" />
-              <span className="truncate font-medium">
-                {design.bedrooms || 0} Beds
-              </span>
-            </div>
-            <div className="flex items-center border border-cb-border bg-[rgba(240,232,216,0.05)] px-2 xs:px-3 py-1.5 xs:py-2 text-xs text-cream xs:text-sm">
-              <FaBath className="mr-1 xs:mr-2 text-gold flex-shrink-0 text-xs xs:text-sm" />
-              <span className="truncate font-medium">
-                {design.bathrooms || 0} Baths
-              </span>
-            </div>
-          </div>
-
-          {showDetails && (
-            <div className="mt-4 pt-4 border-t-2 border-cb-border">
-              {priceType === "building" &&
-              design.minBuildingCost &&
-              design.maxBuildingCost ? (
-                <div>
-                  <p className="text-[10px] text-gold/60 mb-2 uppercase tracking-[0.2em] font-black">
-                    Build Cost
-                  </p>
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-base font-semibold text-gold sm:text-lg">
-                      {formatCurrency(design.minBuildingCost)} -{" "}
-                      {formatCurrency(design.maxBuildingCost)}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-[10px] text-gold/60 mb-2 uppercase tracking-[0.15em] font-black">
-                    Design Package
-                  </p>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {design.basePrice === 0 ? (
-                        <p
-                          className="truncate text-xl font-light text-cream"
-                          style={{
-                            fontFamily: 'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-                          }}
-                        >
-                          Custom Quote
-                        </p>
-                      ) : hasDiscount ? (
-                        <>
-                          <p className="truncate text-lg font-semibold text-emerald-400">
-                            {formatCurrency(discountedPrice)}
-                          </p>
-                          <p className="text-xs text-muted line-through font-bold">
-                            {formatCurrency(minPrice)}
-                          </p>
-                        </>
-                      ) : (
-                        <p className="truncate text-lg font-semibold text-gold">
-                          {minPrice === maxPrice
-                            ? formatCurrency(minPrice)
-                            : `${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}`}
-                        </p>
-                      )}
-                    </div>
-                    <motion.div
-                      className="flex w-full items-center justify-center bg-gold px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-ink transition-all duration-500 hover:bg-gold-light sm:w-auto"
-                      whileHover={{ scale: 1.05, x: 2 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <FaShoppingCart className="mr-2" />
-                      <span>View Detail</span>
-                    </motion.div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          <motion.div
-            className="w-0 h-0.5 bg-gold rounded-full mt-3 xs:mt-4 group-hover:w-full transition-all duration-300"
-            initial={false}
-            whileHover={{ width: "100%" }}
-          />
-        </div>
-
-        <div className="absolute right-0 top-0 h-6 w-6 overflow-hidden xs:h-8 xs:w-8">
-          <div className="absolute top-0 right-0 w-0 h-0 border-l-[12px] xs:border-l-[16px] border-l-transparent border-t-[12px] xs:border-t-[16px] border-t-gold opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
       </div>
     </motion.div>

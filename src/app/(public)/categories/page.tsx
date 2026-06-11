@@ -53,6 +53,7 @@ export default function CategoriesPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [categorySort, setCategorySort] = useState("name");
 
   const serifSystem =
     'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
@@ -102,6 +103,15 @@ export default function CategoriesPage() {
   const totalPages = data?.totalPages || 1;
   const totalCategories = data?.totalCategories || 0;
   const errorMessage = error instanceof Error ? error.message : null;
+
+  const sortedCategories = React.useMemo(() => {
+    if (!categories.length) return [];
+    return [...categories].sort((a, b) =>
+      categorySort === "designs"
+        ? (b._count?.designs || 0) - (a._count?.designs || 0)
+        : a.name.localeCompare(b.name)
+    );
+  }, [categories, categorySort]);
 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
@@ -220,29 +230,46 @@ export default function CategoriesPage() {
               />
             </div>
 
-            <div className="ml-auto flex items-center gap-1 border border-[rgba(240,232,216,0.1)] bg-[rgba(15,13,11,0.75)] p-1">
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`grid h-8 w-8 place-items-center transition-colors ${
-                  viewMode === "grid"
-                    ? "bg-[rgba(200,137,42,0.14)] text-gold"
-                    : "text-muted hover:text-cream"
-                }`}
-                aria-label="Grid view"
-              >
-                <FiGrid size={15} />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`grid h-8 w-8 place-items-center transition-colors ${
-                  viewMode === "list"
-                    ? "bg-[rgba(200,137,42,0.14)] text-gold"
-                    : "text-muted hover:text-cream"
-                }`}
-                aria-label="List view"
-              >
-                <FiList size={15} />
-              </button>
+            <div className="ml-auto flex items-center gap-4">
+              <div className="relative group">
+                <select
+                  value={categorySort}
+                  onChange={(e) => setCategorySort(e.target.value)}
+                  className="appearance-none border border-[rgba(240,232,216,0.1)] bg-[rgba(15,13,11,0.75)] pl-4 pr-10 py-2.5 text-[10px] uppercase tracking-[0.14em] text-cream outline-none focus:border-[rgba(200,137,42,0.45)] cursor-pointer"
+                  style={{ fontFamily: monoSystem }}
+                >
+                  <option value="name">Name A–Z</option>
+                  <option value="designs">Most Designs</option>
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none">
+                  ▼
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 border border-[rgba(240,232,216,0.1)] bg-[rgba(15,13,11,0.75)] p-1">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`grid h-8 w-8 place-items-center transition-colors ${
+                    viewMode === "grid"
+                      ? "bg-[rgba(200,137,42,0.14)] text-gold"
+                      : "text-muted hover:text-cream"
+                  }`}
+                  aria-label="Grid view"
+                >
+                  <FiGrid size={15} />
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`grid h-8 w-8 place-items-center transition-colors ${
+                    viewMode === "list"
+                      ? "bg-[rgba(200,137,42,0.14)] text-gold"
+                      : "text-muted hover:text-cream"
+                  }`}
+                  aria-label="List view"
+                >
+                  <FiList size={15} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -304,7 +331,7 @@ export default function CategoriesPage() {
                 : "grid grid-cols-1 gap-px bg-[rgba(240,232,216,0.08)]"
             }
           >
-            {categories.map((category, index) => {
+            {sortedCategories.map((category, index) => {
               const imageUrl = getCategoryImageUrl(category);
               const isFeatureHero = viewMode === "grid" && category.isFeatured && index === 0;
 
