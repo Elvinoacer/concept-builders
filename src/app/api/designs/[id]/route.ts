@@ -18,6 +18,40 @@ export async function GET(
     const session = await getServerSession(authOptions);
     const isAdmin = session?.user.role === "ADMIN";
     const { id } = await params;
+    const preview = request.nextUrl.searchParams.get("preview") === "true";
+
+    if (preview && !isAdmin) {
+      const design = await prisma.design.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          basePrice: true,
+          bedrooms: true,
+          bathrooms: true,
+          area: true,
+          floors: true,
+          category: { select: { id: true, name: true } },
+          images: {
+            where: { type: "IMAGE" },
+            orderBy: { createdAt: "desc" },
+            select: { url: true, type: true, name: true },
+          },
+        },
+      });
+
+      if (!design) {
+        return new NextResponse("Design not found", { status: 404 });
+      }
+
+      return NextResponse.json(design, {
+        status: 200,
+        headers: {
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=900",
+        },
+      });
+    }
 
     const design = await prisma.design.findUnique({
       where: { id },

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import "./Featured.css";
-import DesignModal from "./DesignModal";
+import DesignPreviewModal from "@/components/design-showcase/DesignPreviewModal";
 
 type LandingDesign = {
   id?: string;
@@ -14,14 +14,14 @@ type LandingDesign = {
   bathrooms?: number | null;
   area?: number | null;
   basePrice?: number;
-  images?: { url: string }[];
+  images?: { url: string; type?: string | null }[];
   architecturalDesign?: { pdfFiles?: unknown[] } | null;
   structuralDesign?: { pdfFiles?: unknown[] } | null;
   isFeatured?: boolean;
 };
 
 type FeaturedPlan = {
-  id?: string;
+  id: string;
   tag?: string | null;
   style: string;
   name: string;
@@ -34,398 +34,14 @@ type FeaturedPlan = {
   badge?: string | null;
 };
 
-const collections = [
-  {
-    id: "modern",
-    label: "Modern",
-    dot: "#5B9FD6",
-    count: 18,
-    accent: "#5B9FD6",
-    plans: [
-      {
-        name: "Eco Modern",
-        beds: "3 bed · 3 bath",
-        sqft: "2,100 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa7.jpg",
-      },
-      {
-        name: "Vista Pavilion",
-        beds: "3 bed · 2 bath",
-        sqft: "1,850 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/ELLY%20KUTWA/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
-      },
-      {
-        name: "Skyline Loft",
-        beds: "5 bed · 4 bath",
-        sqft: "3,100 sqft",
-        badge: "Popular",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Top-Down_Aerial_View.jpg",
-      },
-      {
-        name: "Zenith Flat-Roof",
-        beds: "3 bed · 3 bath",
-        sqft: "2,050 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa1.jpg",
-      },
-      {
-        name: "Linear House",
-        beds: "4 bed · 2 bath",
-        sqft: "2,200 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Compound.jpg",
-      },
-      {
-        name: "Urban Edge",
-        beds: "3 bed · 2 bath",
-        sqft: "1,950 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa9.jpg",
-      },
-      {
-        name: "Glass Pavilion",
-        beds: "4 bed · 3 bath",
-        sqft: "2,600 sqft",
-        badge: "Trendy",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa8.jpg",
-      },
-      {
-        name: "Horizon Residence",
-        beds: "4 bed · 3 bath",
-        sqft: "2,400 sqft",
-        badge: "New",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow1.jpg",
-      },
-    ],
-  },
-  {
-    id: "luxury",
-    label: "Luxury",
-    dot: "#C49A3C",
-    count: 14,
-    accent: "#C49A3C",
-    plans: [
-      {
-        name: "Grand Palazzo",
-        beds: "6 bed · 5 bath",
-        sqft: "5,800 sqft",
-        badge: "Exclusive",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa2.jpg",
-      },
-      {
-        name: "The Riviera",
-        beds: "5 bed · 5 bath",
-        sqft: "4,900 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/The_Guest_Wing1.jpg",
-      },
-      {
-        name: "Monte Bellavista",
-        beds: "7 bed · 6 bath",
-        sqft: "6,500 sqft",
-        badge: "Top Rated",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/POOL/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
-      },
-      {
-        name: "Sunset Manor",
-        beds: "4 bed · 4 bath",
-        sqft: "4,200 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa3.jpg",
-      },
-      {
-        name: "The Windsor",
-        beds: "6 bed · 6 bath",
-        sqft: "5,400 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/The_Guest_Wing2.jpg",
-      },
-      {
-        name: "Oasis Retreat",
-        beds: "5 bed · 5 bath",
-        sqft: "5,100 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/POOL/The%20Oasis%20Infinity-Edge%20Vista%20Pool2.jpg",
-      },
-      {
-        name: "Crown Estate",
-        beds: "7 bed · 7 bath",
-        sqft: "7,200 sqft",
-        badge: "Premium",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/POOL/The%20Oasis%20Infinity-Edge%20Vista%20Pool3.jpg",
-      },
-      {
-        name: "Royal Mansion",
-        beds: "6 bed · 5 bath",
-        sqft: "6,000 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/POOL/The%20Oasis%20Infinity-Edge%20Vista%20Pool4.jpg",
-      },
-    ],
-  },
-  {
-    id: "bungalow",
-    label: "Bungalows",
-    dot: "#4EA870",
-    count: 22,
-    accent: "#4EA870",
-    plans: [
-      {
-        name: "The Homestead",
-        beds: "3 bed · 2 bath",
-        sqft: "1,600 sqft",
-        badge: "Best Seller",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow2.jpg",
-      },
-      {
-        name: "Meadow Bungalow",
-        beds: "4 bed · 2 bath",
-        sqft: "1,900 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow3.jpg",
-      },
-      {
-        name: "Rosewood Cottage",
-        beds: "3 bed · 3 bath",
-        sqft: "1,750 sqft",
-        badge: "New",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow4.jpg",
-      },
-      {
-        name: "Prairie House",
-        beds: "4 bed · 3 bath",
-        sqft: "2,100 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow5.jpg",
-      },
-      {
-        name: "Garden Retreat",
-        beds: "3 bed · 2 bath",
-        sqft: "1,500 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow6.jpg",
-      },
-      {
-        name: "Oakwood Bungalow",
-        beds: "4 bed · 2 bath",
-        sqft: "1,800 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow7.jpg",
-      },
-      {
-        name: "Sunrise Villa",
-        beds: "3 bed · 2 bath",
-        sqft: "1,650 sqft",
-        badge: "Popular",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow8.jpg",
-      },
-      {
-        name: "Harmony Home",
-        beds: "4 bed · 3 bath",
-        sqft: "2,000 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow9.jpg",
-      },
-    ],
-  },
-  {
-    id: "duplex",
-    label: "Duplex",
-    dot: "#A85CB0",
-    count: 11,
-    accent: "#A85CB0",
-    plans: [
-      {
-        name: "Twin Peaks Duplex",
-        beds: "2×3 bed · 2×2 bath",
-        sqft: "3,200 sqft",
-        badge: "Popular",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow7.jpg",
-      },
-      {
-        name: "Mirror House",
-        beds: "2×4 bed · 2×3 bath",
-        sqft: "3,800 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow8.jpg",
-      },
-      {
-        name: "Urban Pair",
-        beds: "2×2 bed · 2×2 bath",
-        sqft: "2,600 sqft",
-        badge: "New",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow9.jpg",
-      },
-      {
-        name: "Symmetra",
-        beds: "2×3 bed · 2×3 bath",
-        sqft: "3,400 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow10.jpg",
-      },
-      {
-        name: "Duo Residence",
-        beds: "2×4 bed · 2×2 bath",
-        sqft: "3,600 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow11.jpg",
-      },
-      {
-        name: "City Twins",
-        beds: "2×3 bed · 2×2 bath",
-        sqft: "3,000 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow12.jpg",
-      },
-      {
-        name: "Split Level",
-        beds: "2×4 bed · 2×3 bath",
-        sqft: "4,000 sqft",
-        badge: "Premium",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow13.jpg",
-      },
-      {
-        name: "Harmony Duplex",
-        beds: "2×3 bed · 2×3 bath",
-        sqft: "3,300 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow14.jpg",
-      },
-    ],
-  },
-  {
-    id: "smallplot",
-    label: "Small Plot",
-    dot: "#E06A50",
-    count: 17,
-    accent: "#E06A50",
-    plans: [
-      {
-        name: "The Compact",
-        beds: "2 bed · 1 bath",
-        sqft: "900 sqft",
-        badge: "Efficient",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow12.jpg",
-      },
-      {
-        name: "Urban Micro",
-        beds: "3 bed · 2 bath",
-        sqft: "1,100 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow13.jpg",
-      },
-      {
-        name: "Corner Plot Special",
-        beds: "3 bed · 2 bath",
-        sqft: "1,250 sqft",
-        badge: "Popular",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow14.jpg",
-      },
-      {
-        name: "Space Saver",
-        beds: "2 bed · 2 bath",
-        sqft: "980 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow15.jpg",
-      },
-      {
-        name: "The Petite",
-        beds: "3 bed · 1 bath",
-        sqft: "1,050 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow16.jpg",
-      },
-      {
-        name: "Mini Modern",
-        beds: "2 bed · 2 bath",
-        sqft: "950 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow_fenceview.jpg",
-      },
-      {
-        name: "Smart Layout",
-        beds: "3 bed · 2 bath",
-        sqft: "1,150 sqft",
-        badge: "Clever",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow_gateview.jpg",
-      },
-      {
-        name: "Tiny Villa",
-        beds: "2 bed · 1 bath",
-        sqft: "850 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow1.jpg",
-      },
-    ],
-  },
-  {
-    id: "contemporary",
-    label: "Contemporary",
-    dot: "#4FA3BF",
-    count: 18,
-    accent: "#4FA3BF",
-    plans: [
-      {
-        name: "The Studio Home",
-        beds: "4 bed · 3 bath",
-        sqft: "2,300 sqft",
-        badge: "Award Win",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa4.jpg",
-      },
-      {
-        name: "Cascade Residence",
-        beds: "5 bed · 4 bath",
-        sqft: "2,900 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa5.jpg",
-      },
-      {
-        name: "Open Concept",
-        beds: "3 bed · 3 bath",
-        sqft: "2,000 sqft",
-        badge: "New",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa6.jpg",
-      },
-      {
-        name: "Floating Volumes",
-        beds: "4 bed · 3 bath",
-        sqft: "2,500 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa7.jpg",
-      },
-      {
-        name: "The Glass House",
-        beds: "4 bed · 4 bath",
-        sqft: "2,700 sqft",
-        badge: "Popular",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa8.jpg",
-      },
-      {
-        name: "Geometric Villa",
-        beds: "5 bed · 5 bath",
-        sqft: "3,200 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa9.jpg",
-      },
-      {
-        name: "Luminous Block",
-        beds: "4 bed · 3 bath",
-        sqft: "2,400 sqft",
-        badge: "Sleek",
-        img: "https://cdn.conceptbuilders.co.ke/design_images/ELLY%20KUTWA/Modern_5-Storey_Apartment_Block_Rear_Elevation1.jpg",
-      },
-      {
-        name: "Minimalist Retreat",
-        beds: "3 bed · 2 bath",
-        sqft: "1,800 sqft",
-        badge: null,
-        img: "https://cdn.conceptbuilders.co.ke/design_images/ELLY%20KUTWA/Modern_5-Storey_Apartment_Block_Side_Elevation1.jpg",
-      },
-    ],
-  },
-];
+type FeaturedCategory = {
+  id: string;
+  label: string;
+  dot: string;
+  accent: string;
+  count: number;
+  plans: FeaturedPlan[];
+};
 
 const iconBed = (
   <svg
@@ -471,24 +87,95 @@ const iconTag = (
     <circle cx="5.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
   </svg>
 );
-const CATEGORY_MAP: Record<string, string> = {
-  modern: "Modern",
-  luxury: "Luxury",
-  bungalow: "Bungalows",
-  duplex: "Duplex",
-  smallplot: "Small Plot",
-  contemporary: "Contemporary",
-};
+const categoryPalette = [
+  "#5B9FD6",
+  "#C49A3C",
+  "#4EA870",
+  "#A85CB0",
+  "#E06A50",
+  "#4FA3BF",
+];
 
-export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesign[] }) {
-  const [activeId, setActiveId] = useState(collections[0].id);
+const toSlug = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+const isDisplayImage = (image?: { url?: string; type?: string | null }) =>
+  Boolean(image?.url) &&
+  (image?.type === "IMAGE" ||
+    /\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|$)/i.test(image?.url ?? ""));
+
+export default function Featured({
+  allDesigns = [],
+}: {
+  allDesigns?: LandingDesign[];
+}) {
+  const categories = React.useMemo<FeaturedCategory[]>(() => {
+    const grouped = new Map<string, FeaturedCategory>();
+
+    allDesigns.forEach((design) => {
+      const firstImage = design.images?.find(isDisplayImage);
+      if (!design.id || !firstImage?.url) return;
+
+      const label = design.category?.name?.trim() || "House Plans";
+      const id = toSlug(label);
+      const existing = grouped.get(id);
+      const paletteIndex = grouped.size % categoryPalette.length;
+      const category = existing ?? {
+        id,
+        label,
+        dot: categoryPalette[paletteIndex],
+        accent: categoryPalette[paletteIndex],
+        count: 0,
+        plans: [],
+      };
+
+      category.count += 1;
+      category.plans.push({
+        id: design.id,
+        tag: label,
+        style: label,
+        name: design.name,
+        beds: design.bedrooms ?? "—",
+        baths: design.bathrooms ?? "—",
+        sqft: design.area
+          ? `${design.area.toLocaleString()} sqft`
+          : "Area on request",
+        img: firstImage.url,
+        basePrice: design.basePrice,
+        hasFiles: Boolean(
+          design.architecturalDesign?.pdfFiles?.length ||
+            design.structuralDesign?.pdfFiles?.length,
+        ),
+        badge: design.isFeatured ? "Featured" : null,
+      });
+
+      grouped.set(id, category);
+    });
+
+    return Array.from(grouped.values())
+      .map((category) => ({ ...category, plans: category.plans.slice(0, 8) }))
+      .filter((category) => category.plans.length > 0);
+  }, [allDesigns]);
+
+  const [activeId, setActiveId] = useState(categories[0]?.id ?? "");
   const [shimmerKey, setShimmerKey] = useState(0);
   const [isHeroHovered, setIsHeroHovered] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<FeaturedPlan | null>(null);
+  const [selectedDesignId, setSelectedDesignId] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
-  const activeCol = collections.find((c) => c.id === activeId)!;
-  const totalPlans = collections.reduce((s, c) => s + c.count, 0);
+  useEffect(() => {
+    if (!activeId && categories[0]) setActiveId(categories[0].id);
+    if (activeId && !categories.some((category) => category.id === activeId)) {
+      setActiveId(categories[0]?.id ?? "");
+    }
+  }, [activeId, categories]);
+
+  const activeCol = categories.find((c) => c.id === activeId) ?? categories[0];
+  const totalPlans = categories.reduce((s, c) => s + c.count, 0);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -516,52 +203,14 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
 
   if (!activeCol) return null;
 
-  const dbCategoryName = CATEGORY_MAP[activeId] || activeCol.label;
-  const categoryDbDesigns = allDesigns.filter(
-    (d) =>
-      d.category?.name?.toLowerCase() === dbCategoryName.toLowerCase() ||
-      d.category?.name?.toLowerCase() === activeId.toLowerCase(),
-  );
-
-  const mergedPlans = (function mergePlansWithFallback(
-    dbDesigns: LandingDesign[],
-    fallbacks: Array<Omit<FeaturedPlan, "style" | "basePrice" | "hasFiles" | "id" | "baths">>,
-    count: number,
-  ) {
-    const merged: FeaturedPlan[] = dbDesigns.map((d) => ({
-      id: d.id,
-      tag: d.category?.name,
-      style: d.category?.name || activeCol.label,
-      name: d.name,
-      beds: d.bedrooms || 0,
-      baths: d.bathrooms || 0,
-      sqft: `${d.area || 0} sqft`,
-      img: d.images?.[0]?.url || fallbacks[0]?.img || "",
-      basePrice: d.basePrice,
-      hasFiles: Boolean(d.architecturalDesign?.pdfFiles?.length || d.structuralDesign?.pdfFiles?.length),
-      badge: d.isFeatured ? "Featured" : null,
-    }));
-
-    const remaining = count - merged.length;
-    if (remaining > 0) {
-      merged.push(
-        ...fallbacks.slice(0, remaining).map((f) => ({
-          ...f,
-          id: undefined,
-          style: activeCol.label,
-          baths: String(f.beds || "").match(/·\s*([^·]+)/)?.[1]?.replace("bath", "").trim() || "-",
-        })),
-      );
-    }
-    return merged.slice(0, count);
-  })(categoryDbDesigns, activeCol.plans, activeCol.plans.length);
+  const mergedPlans = activeCol?.plans ?? [];
 
   const [hero, s1, s2, s3, s4] = mergedPlans;
 
+  if (!activeCol || !hero) return null;
+
   return (
     <div className="fc-container">
-
-
       <section
         className="fc"
         id="featured"
@@ -596,7 +245,7 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
           {/* CATEGORY RAIL */}
           <div className="fc-rail-wrapper animate-on-scroll">
             <div className="fc-rail" role="tablist">
-              {collections.map((c) => (
+              {categories.map((c) => (
                 <button
                   key={c.id}
                   className={`fc-cat ${c.id === activeId ? "active" : ""}`}
@@ -624,10 +273,13 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
               key={`hero-${activeId}`}
               onMouseEnter={() => setIsHeroHovered(true)}
               onMouseLeave={() => setIsHeroHovered(false)}
-              onClick={() => setSelectedPlan(hero)}
+              onClick={() => setSelectedDesignId(hero.id)}
               role="button"
               tabIndex={0}
-              onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedPlan(hero); }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ")
+                  setSelectedDesignId(hero.id);
+              }}
             >
               <Image
                 className="fc-hero-bg bg-fill"
@@ -669,7 +321,10 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
                 <button
                   type="button"
                   className="fc-hero-cta"
-                  onClick={(event) => { event.stopPropagation(); setSelectedPlan(hero); }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setSelectedDesignId(hero.id);
+                  }}
                 >
                   View Plan {iconArrow}
                 </button>
@@ -692,13 +347,18 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
                   type="button"
                   className={`fc-side-card card-enter card-enter-delay-${i + 1}`}
                   key={`s${i}-${activeId}`}
-                  onClick={() => plan && setSelectedPlan(plan)}
-                  style={{ display: "block", textAlign: "left", border: 0, padding: 0 }}
+                  onClick={() => plan && setSelectedDesignId(plan.id)}
+                  style={{
+                    display: "block",
+                    textAlign: "left",
+                    border: 0,
+                    padding: 0,
+                  }}
                 >
                   <Image
                     className="fc-side-bg bg-fill"
-                    src={plan?.img || ''}
-                    alt={plan?.name || ''}
+                    src={plan?.img || ""}
+                    alt={plan?.name || ""}
                     fill
                     sizes="(max-width: 900px) 50vw, 380px"
                     style={{ objectFit: "cover" }}
@@ -726,7 +386,7 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
                 type="button"
                 key={`${activeId}-${i}`}
                 className="fc-thumb card-enter"
-                onClick={() => setSelectedPlan(plan)}
+                onClick={() => setSelectedDesignId(plan.id)}
                 style={{
                   animationDelay: `${0.1 + i * 0.07}s`,
                   display: "block",
@@ -804,7 +464,10 @@ export default function Featured({ allDesigns = [] }: { allDesigns?: LandingDesi
           </div>
         </div>
       </section>
-      <DesignModal plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
+      <DesignPreviewModal
+        id={selectedDesignId}
+        onClose={() => setSelectedDesignId(null)}
+      />
     </div>
   );
 }
