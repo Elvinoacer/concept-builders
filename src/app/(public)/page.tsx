@@ -5,7 +5,9 @@ import DreamPlan from "@/components/landing/hero";
 
 const Featured = dynamic(() => import("@/components/landing/Featured"));
 const Explorer = dynamic(() => import("@/components/landing/Explorer"));
-const DesignJourney = dynamic(() => import("@/components/landing/DesignJourney"));
+const DesignJourney = dynamic(
+  () => import("@/components/landing/DesignJourney"),
+);
 const SocialProof = dynamic(() => import("@/components/landing/SocialProof"));
 const DesignIdeas = dynamic(() => import("@/components/landing/DesignIdeas"));
 const ContactForm = dynamic(() => import("@/components/landing/ContactForm"));
@@ -17,21 +19,53 @@ const getLandingData = unstable_cache(
     const [featured, byCategory, collections] = await Promise.all([
       prisma.design.findMany({
         where: { isFeatured: true },
-        include: {
-          images: true,
-          category: true,
-          architecturalDesign: { include: { pdfFiles: true } },
-          structuralDesign: { include: { pdfFiles: true } },
+        select: {
+          id: true,
+          name: true,
+          basePrice: true,
+          bedrooms: true,
+          bathrooms: true,
+          area: true,
+          isFeatured: true,
+          images: {
+            where: { type: "IMAGE" },
+            orderBy: { createdAt: "desc" },
+            take: 4,
+            select: { url: true, type: true },
+          },
+          category: { select: { id: true, name: true } },
+          architecturalDesign: {
+            select: { pdfFiles: { select: { id: true }, take: 1 } },
+          },
+          structuralDesign: {
+            select: { pdfFiles: { select: { id: true }, take: 1 } },
+          },
         },
         orderBy: { views: "desc" },
         take: 12,
       }),
       prisma.design.findMany({
-        include: {
-          images: true,
-          category: true,
-          architecturalDesign: { include: { pdfFiles: true } },
-          structuralDesign: { include: { pdfFiles: true } },
+        select: {
+          id: true,
+          name: true,
+          basePrice: true,
+          bedrooms: true,
+          bathrooms: true,
+          area: true,
+          isFeatured: true,
+          images: {
+            where: { type: "IMAGE" },
+            orderBy: { createdAt: "desc" },
+            take: 4,
+            select: { url: true, type: true },
+          },
+          category: { select: { id: true, name: true } },
+          architecturalDesign: {
+            select: { pdfFiles: { select: { id: true }, take: 1 } },
+          },
+          structuralDesign: {
+            select: { pdfFiles: { select: { id: true }, take: 1 } },
+          },
         },
         orderBy: { views: "desc" },
         take: 48,
@@ -50,8 +84,12 @@ const getLandingData = unstable_cache(
 
 export default async function LandingPage() {
   const { featured, all, collections } = await getLandingData();
-  const featuredIds = new Set(featured.map((design: LandingDesignSummary) => design.id));
-  const explorerDesigns = all.filter((design: LandingDesignSummary) => !featuredIds.has(design.id));
+  const featuredIds = new Set(
+    featured.map((design: LandingDesignSummary) => design.id),
+  );
+  const explorerDesigns = all.filter(
+    (design: LandingDesignSummary) => !featuredIds.has(design.id),
+  );
 
   return (
     <div style={{ backgroundColor: "#141414" }} className="relative">
@@ -62,7 +100,7 @@ export default async function LandingPage() {
       />
       <div className="relative z-10">
         <DreamPlan featuredDesigns={featured.slice(0, 7)} />
-        <Featured allDesigns={featured} />
+        <Featured allDesigns={all} />
         <Explorer allDesigns={explorerDesigns} />
         <DesignJourney />
         <SocialProof />
