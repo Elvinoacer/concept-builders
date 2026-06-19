@@ -121,7 +121,7 @@ export default function SocialProof() {
           <article className="card card--featured" data-delay="0" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
               <Image
-                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg"
+                src="https://cdn.conceptbuilders.co.ke/design_images/JAMES%20MERCY%20NJERI/RENDERS%2001/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg"
                 alt="Modern family home by the Kamau family"
                 fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />
@@ -148,7 +148,7 @@ export default function SocialProof() {
           <article className="card" data-delay="120" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
               <Image
-                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg"
+                src="https://cdn.conceptbuilders.co.ke/design_images/JASON/Modern%20Luxury%20English%20Country%20Cottage1.jpg"
                 alt="Cottage-style home"
                 fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />
@@ -175,7 +175,7 @@ export default function SocialProof() {
           <article className="card" data-delay="240" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
               <Image
-                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg"
+                src="https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa2.jpg"
                 alt="Luxury villa"
                 fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />
@@ -202,7 +202,7 @@ export default function SocialProof() {
           <article className="card" data-delay="360" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
               <Image
-                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg"
+                src="https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow1.jpg"
                 alt="Bungalow design"
                 fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />
@@ -229,7 +229,7 @@ export default function SocialProof() {
           <article className="card" data-delay="480" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
             <div className="card__img-wrap">
               <Image
-                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Townhouse_Community_Streetscape1.jpg"
+                src="https://cdn.conceptbuilders.co.ke/design_images/GICHURU%20REAL%20ESTATE/Townhouse_Community_Streetscape1.jpg"
                 alt="Townhouse design"
                 fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
               />

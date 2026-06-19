@@ -22,7 +22,7 @@ async function main() {
         description:
           "A curated showcase of striking contemporary residential architecture — flat rooflines, expansive glazing, and the perfect play of solid and void.",
         image:
-          "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Modern_3-Bedroom_Flat-Roof_Three-Quarter_Exterior_Perspectives1.jpeg",
+          "https://cdn.conceptbuilders.co.ke/design_images/IRUNGU/Modern_3-Bedroom_Flat-Roof_Three-Quarter_Exterior_Perspectives1.jpeg",
         categoryId: modern?.id,
         order: 1,
       },
@@ -32,7 +32,7 @@ async function main() {
         description:
           "Space, flow, and family life considered in every sq ft. Discover layouts engineered for how modern families actually live.",
         image:
-          "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/4-Bedroom_L-Shaped_Bungalow_Front_Elevation1.jpg",
+          "https://cdn.conceptbuilders.co.ke/design_images/DOUGLAS%20UK/4-Bedroom_L-Shaped_Bungalow_Front_Elevation1.jpg",
         order: 2,
       },
       {
@@ -41,7 +41,7 @@ async function main() {
         description:
           "Where architecture meets resort living. Pool pavilions, double-height volumes, and materials that age like wine — the anatomy of a modern villa.",
         image:
-          "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa3.jpg",
+          "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa3.jpg",
         categoryId: luxury?.id,
         order: 3,
       },
@@ -51,7 +51,7 @@ async function main() {
         description:
           "Compact footprint, generous spirit. Discover how clever spatial planning, vertical living, and thoughtful landscaping unlock tight urban plots.",
         image:
-          "https://conceptbuilders.sfo3.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
+          "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow1.jpg",
         categoryId: smallPlot?.id,
         order: 4,
       },

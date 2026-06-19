@@ -321,7 +321,7 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
           >
             <div className="mini-img">
               <Image
-                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg"
+                src="https://cdn.conceptbuilders.co.ke/design_images/JAMES%20MERCY%20NJERI/RENDERS%2001/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg"
                 alt="Guide 05"
                 fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover" }}
               />
@@ -344,7 +344,7 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
           >
             <div className="mini-img">
               <Image
-                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern%20Luxury%20English%20Country%20Cottage1.jpg"
+                src="https://cdn.conceptbuilders.co.ke/design_images/JASON/Modern%20Luxury%20English%20Country%20Cottage1.jpg"
                 alt="Guide 06"
                 fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover" }}
               />
@@ -367,7 +367,7 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
           >
             <div className="mini-img">
               <Image
-                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Townhouse_Community_Architectural_Detail1.jpg"
+                src="https://cdn.conceptbuilders.co.ke/design_images/GICHURU%20REAL%20ESTATE/Townhouse_Community_Architectural_Detail1.jpg"
                 alt="Guide 07"
                 fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover" }}
               />
@@ -390,7 +390,7 @@ export default function DesignIdeas({ collections }: { collections: any[] }) {
           >
             <div className="mini-img">
               <Image
-                src="https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg"
+                src="https://cdn.conceptbuilders.co.ke/design_images/POOL/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg"
                 alt="Guide 08"
                 fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover" }}
               />

@@ -45,7 +45,7 @@ const allPlans: Array<
     beds: 4,
     baths: 3,
     sqft: "3,200",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow1.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow1.jpg",
     features: [
       "Open-plan kitchen & living area",
       "Floor-to-ceiling glass facade",
@@ -63,7 +63,7 @@ const allPlans: Array<
     beds: 5,
     baths: 4.5,
     sqft: "5,800",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/POOL/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
     features: [
       "Grand entrance foyer with chandelier",
       "Home theatre & wine cellar",
@@ -81,7 +81,7 @@ const allPlans: Array<
     beds: 3,
     baths: 2,
     sqft: "1,950",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa1.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa1.jpg",
     features: [
       "Clean flat-roof silhouette",
       "Concrete & timber material palette",
@@ -99,7 +99,7 @@ const allPlans: Array<
     beds: 3,
     baths: 2,
     sqft: "1,740",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow2.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow2.jpg",
     features: [
       "Wraparound veranda",
       "Low-maintenance landscaping",
@@ -117,7 +117,7 @@ const allPlans: Array<
     beds: 4,
     baths: 3,
     sqft: "2,900",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow7.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow7.jpg",
     features: [
       "Two fully self-contained units",
       "Shared underground parking",
@@ -135,7 +135,7 @@ const allPlans: Array<
     beds: 5,
     baths: 5,
     sqft: "6,200",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa2.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa2.jpg",
     features: [
       "Private forest backdrop",
       "Three-car garage",
@@ -153,7 +153,7 @@ const allPlans: Array<
     beds: 4,
     baths: 3,
     sqft: "2,600",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/ELLY%20KUTWA/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
     features: [
       "All-white exterior cladding",
       "Floating staircase feature",
@@ -171,7 +171,7 @@ const allPlans: Array<
     beds: 4,
     baths: 3,
     sqft: "2,200",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/modern_3-bedroombungalow3.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow3.jpg",
     features: [
       "Central open courtyard",
       "Covered outdoor dining area",
@@ -189,7 +189,7 @@ const allPlans: Array<
     beds: 3,
     baths: 2.5,
     sqft: "2,100",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa8.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa8.jpg",
     features: [
       "Cascading terrace levels",
       "Large sliding glass doors",
@@ -207,7 +207,7 @@ const allPlans: Array<
     beds: 5,
     baths: 4,
     sqft: "4,400",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/The_Guest_Wing1.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/The_Guest_Wing1.jpg",
     features: [
       "Statement marble staircase",
       "Private balcony per unit",
@@ -225,7 +225,7 @@ const allPlans: Array<
     beds: 3,
     baths: 2,
     sqft: "1,680",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Top-Down_Aerial_View.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Top-Down_Aerial_View.jpg",
     features: [
       "Geometric facade detailing",
       "Hidden door hardware",
@@ -243,7 +243,7 @@ const allPlans: Array<
     beds: 4,
     baths: 3.5,
     sqft: "3,400",
-    img: "https://conceptbuilders.sfo3.cdn.digitaloceanspaces.com/designimages/Maisonette_Contemporary_Villa7.jpg",
+    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa7.jpg",
     features: [
       "Double-height glazed living wall",
       "Cantilevered upper floor",
