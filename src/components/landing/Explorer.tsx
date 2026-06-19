@@ -28,7 +28,6 @@ type ExplorerPlan = {
   baths: number | string;
   sqft: string;
   img: string;
-  features: string[];
   basePrice?: number;
   hasFiles?: boolean;
   height: number;
