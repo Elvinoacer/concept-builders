@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteFile } from "@/lib/do-spaces";
+import { deleteFile } from "@/lib/r2-client";
 import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 
 export async function POST(request: NextRequest) {

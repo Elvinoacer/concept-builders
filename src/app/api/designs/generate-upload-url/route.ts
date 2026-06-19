@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { getSignedUrlForUpload } from "../../../../lib/do-spaces";
+import { getSignedUrlForUpload } from "@/lib/r2-client";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
 // Configure route to handle large file uploads

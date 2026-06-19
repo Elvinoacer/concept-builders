@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { uploadFile } from "@/lib/do-spaces";
+import { uploadFile } from "@/lib/r2-client";
 
 const allowedFileTypesByCategory = {
   CAD: [

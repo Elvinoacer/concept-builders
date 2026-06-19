@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSignedUrlForUpload } from "@/lib/do-spaces";
+import { getSignedUrlForUpload } from "@/lib/r2-client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { FileType, Prisma } from "@/generated/prisma/client";

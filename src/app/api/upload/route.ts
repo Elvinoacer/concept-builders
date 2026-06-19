@@ -4,7 +4,7 @@ import {
   s3Client,
   getDoSpacesPublicUrl,
   DO_SPACES_BUCKET_NAME,
-} from '@/lib/do-spaces';
+} from '@/lib/r2-client';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes

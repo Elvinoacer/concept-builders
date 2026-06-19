@@ -4,7 +4,7 @@ import {
   s3Client,
   getDoSpacesKeyFromUrl,
   DO_SPACES_BUCKET_NAME,
-} from "@/lib/do-spaces";
+} from "@/lib/r2-client";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 

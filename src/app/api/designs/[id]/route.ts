@@ -1,4 +1,4 @@
-import { s3Client } from "@/lib/do-spaces";
+import { s3Client } from "@/lib/r2-client";
 import prisma from "@/lib/prisma";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { revalidateTag } from "next/cache";
@@ -436,7 +436,7 @@ async function deleteFilesFromSpacesBackground(fileUrls: string[]) {
         }
 
         const command = new DeleteObjectCommand({
-          Bucket: process.env.DO_SPACES_BUCKET!,
+          Bucket: process.env.R2_BUCKET_NAME!,
           Key: key,
         });
 
@@ -475,7 +475,7 @@ function extractKeyFromUrl(url: string): string | null {
     let key = pathname.startsWith("/") ? pathname.substring(1) : pathname;
 
     // If the URL contains the bucket name in the path, remove it
-    const bucketName = process.env.DO_SPACES_BUCKET;
+    const bucketName = process.env.R2_BUCKET_NAME;
     if (bucketName && key.startsWith(`${bucketName}/`)) {
       key = key.substring(bucketName.length + 1);
     }

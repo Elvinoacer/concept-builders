@@ -8,7 +8,7 @@ import {
   s3Client,
   getDoSpacesPublicUrl,
   DO_SPACES_BUCKET_NAME,
-} from "@/lib/do-spaces";
+} from "@/lib/r2-client";
 
 if (!process.env.DO_SPACES_ACCESS_KEY || !process.env.DO_SPACES_SECRET_KEY) {
   throw new Error(

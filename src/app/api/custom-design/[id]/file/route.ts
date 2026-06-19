@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { sendCustomDesignUpdateRequestEmail } from "@/lib/emails";
 import { Role } from "@/generated/prisma/client";
-import { s3Client, DO_SPACES_BUCKET_NAME } from "@/lib/do-spaces";
+import { s3Client, DO_SPACES_BUCKET_NAME, getR2KeyFromUrl } from "@/lib/r2-client";
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -29,14 +29,14 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return new NextResponse("Missing fileUrl in request body", { status: 400 });
     }
 
-    // Extract file name from URL
-    const urlParts = fileUrl.split('/');
-    const fileName = urlParts[urlParts.length - 1];
+    // Extract the full object key from the URL (handles CDN and R2 URLs)
+    const key = getR2KeyFromUrl(fileUrl);
+    const fileName = key.split('/').pop() ?? key;
 
-    // Delete file from DigitalOcean Spaces
+    // Delete file from Cloudflare R2
     const deleteCommand = new DeleteObjectCommand({
       Bucket: DO_SPACES_BUCKET_NAME,
-      Key: fileName,
+      Key: key,
     });
     await s3Client.send(deleteCommand);
 

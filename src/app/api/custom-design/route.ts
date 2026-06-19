@@ -8,7 +8,7 @@ import {
   s3Client,
   getDoSpacesPublicUrl,
   DO_SPACES_BUCKET_NAME,
-} from "@/lib/do-spaces";
+} from "@/lib/r2-client";
 
 export async function POST(request: NextRequest) {
   try {

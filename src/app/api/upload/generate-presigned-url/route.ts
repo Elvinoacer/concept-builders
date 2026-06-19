@@ -8,7 +8,7 @@ import {
   s3Client,
   getDoSpacesPublicUrl,
   DO_SPACES_BUCKET_NAME,
-} from "@/lib/do-spaces";
+} from "@/lib/r2-client";
 
 // Configure route to handle large file uploads
 export const maxDuration = 300; // 5 minutes

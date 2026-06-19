@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteFile, deleteFiles } from "@/lib/do-spaces";
+import { deleteFile, deleteFiles } from "@/lib/r2-client";
 import prisma from "@/lib/prisma";
 import { requireAdminOrTeam } from "@/lib/admin-api-auth";
 

@@ -54,6 +54,26 @@ const nextConfig: NextConfig = {
         hostname: "randomuser.me",
         pathname: "/api/portraits/**",
       },
+      // ── Cloudflare R2 ───────────────────────────────────────────────────
+      {
+        // R2 direct endpoint — used by presigned upload/download URLs
+        protocol: "https",
+        hostname: "*.r2.cloudflarestorage.com",
+      },
+      // ── Custom CDN (Cloudflare R2 via custom domain) ────────────────────
+      {
+        protocol: "https",
+        hostname: "cdn.conceptbuilders.co.ke",
+      },
+      {
+        protocol: "https",
+        hostname: "conceptbuilders.co.ke",
+      },
+      {
+        protocol: "https",
+        hostname: "*.conceptbuilders.co.ke",
+      },
+      // ── Legacy Digital Ocean Spaces (kept for backward compat) ──────────
       {
         protocol: "https",
         hostname: "conceptbuilders.sfo3.digitaloceanspaces.com",
@@ -78,18 +98,7 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.cdn.digitaloceanspaces.com",
       },
-      {
-        protocol: "https",
-        hostname: "cdn.conceptbuilders.co.ke",
-      },
-      {
-        protocol: "https",
-        hostname: "conceptbuilders.co.ke",
-      },
-      {
-        protocol: "https",
-        hostname: "*.conceptbuilders.co.ke",
-      },
+      // ── Google user content ─────────────────────────────────────────────
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
@@ -108,7 +117,7 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
-  serverExternalPackages: [],
+  serverExternalPackages: ["@aws-sdk/client-s3", "@aws-sdk/lib-storage"],
 };
 
 export default nextConfig;
