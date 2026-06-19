@@ -1,5 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  DM_Sans,
+  Playfair_Display,
+  Barlow,
+  Barlow_Condensed,
+} from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -15,6 +21,35 @@ const cormorantGaramond = Cormorant_Garamond({
   variable: "--font-cormorant-garamond",
   display: "swap",
   preload: true,
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const barlow = Barlow({
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600"],
+  variable: "--font-barlow",
+  display: "swap",
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-barlow-condensed",
+  display: "swap",
 });
 
 // Viewport configuration for mobile responsiveness
@@ -129,7 +164,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorantGaramond.variable} dark`}
+      className={`${cormorantGaramond.variable} ${dmSans.variable} ${playfairDisplay.variable} ${barlow.variable} ${barlowCondensed.variable} dark`}
       suppressHydrationWarning
     >
       <head>

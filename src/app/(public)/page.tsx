@@ -1,12 +1,14 @@
 import prisma from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
+import dynamic from "next/dynamic";
 import DreamPlan from "@/components/landing/hero";
-import Featured from "@/components/landing/Featured";
-import Explorer from "@/components/landing/Explorer";
-import DesignJourney from "@/components/landing/DesignJourney";
-import SocialProof from "@/components/landing/SocialProof";
-import DesignIdeas from "@/components/landing/DesignIdeas";
-import ContactForm from "@/components/landing/ContactForm";
+
+const Featured = dynamic(() => import("@/components/landing/Featured"));
+const Explorer = dynamic(() => import("@/components/landing/Explorer"));
+const DesignJourney = dynamic(() => import("@/components/landing/DesignJourney"));
+const SocialProof = dynamic(() => import("@/components/landing/SocialProof"));
+const DesignIdeas = dynamic(() => import("@/components/landing/DesignIdeas"));
+const ContactForm = dynamic(() => import("@/components/landing/ContactForm"));
 
 type LandingDesignSummary = { id: string };
 

@@ -31,6 +31,10 @@
       "Cormorant Garamond", "Times New Roman", Times, serif;
     --font-outfit:
       "Outfit", "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-dm-sans: var(--font-dm-sans, "DM Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif);
+    --font-playfair: var(--font-playfair, "Playfair Display", "Times New Roman", Times, serif);
+    --font-barlow: var(--font-barlow, "Barlow", "Segoe UI", "Helvetica Neue", Arial, sans-serif);
+    --font-barlow-condensed: var(--font-barlow-condensed, "Barlow Condensed", "Segoe UI", "Helvetica Neue", Arial, sans-serif);
 
     --ink: #0a0907;
     --surface: #111009;

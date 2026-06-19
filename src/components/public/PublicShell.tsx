@@ -1,7 +1,11 @@
 import { SearchProvider } from "@/lib/SearchContext";
+import dynamic from "next/dynamic";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import FloatingCartButton from "@/components/cart/FloatingCartButton";
+
+const FloatingCartButton = dynamic(() => import("@/components/cart/FloatingCartButton"), {
+  ssr: false, // We can disable SSR for this as it's purely client-side interaction
+});
 // removed ThemeProvider
 
 export default function PublicShell({
