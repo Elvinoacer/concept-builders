@@ -53,6 +53,7 @@ const getLandingData = unstable_cache(
           bathrooms: true,
           area: true,
           isFeatured: true,
+          features: true,
           images: {
             where: { type: "IMAGE" },
             orderBy: { createdAt: "desc" },
