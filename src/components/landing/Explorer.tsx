@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import "./Explorer.css";
-import DesignModal from "./DesignModal";
+import DesignPreviewModal from "@/components/design-showcase/DesignPreviewModal";
 
 type LandingDesign = {
   id?: string;
@@ -14,7 +14,7 @@ type LandingDesign = {
   area?: number | null;
   basePrice?: number;
   features?: string[];
-  images?: { url: string }[];
+  images?: { url: string; type?: string | null }[];
   architecturalDesign?: { pdfFiles?: unknown[] } | null;
   structuralDesign?: { pdfFiles?: unknown[] } | null;
 };
@@ -34,283 +34,69 @@ type ExplorerPlan = {
   height: number;
 };
 
-const allPlans: Array<
-  Omit<ExplorerPlan, "id" | "basePrice" | "hasFiles"> & { id: number }
-> = [
-  {
-    id: 0,
-    tags: ["modern", "4bed"],
-    name: "The Horizon House",
-    style: "Modern",
-    beds: 4,
-    baths: 3,
-    sqft: "3,200",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow1.jpg",
-    features: [
-      "Open-plan kitchen & living area",
-      "Floor-to-ceiling glass facade",
-      "Private rooftop terrace",
-      "Double garage with EV charging",
-      "Energy-rated insulation system",
-    ],
-    height: 260,
-  },
-  {
-    id: 1,
-    tags: ["luxury", "5bed"],
-    name: "Palazzo Estate",
-    style: "Luxury",
-    beds: 5,
-    baths: 4.5,
-    sqft: "5,800",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/POOL/The%20Oasis%20Infinity-Edge%20Vista%20Pool1.jpg",
-    features: [
-      "Grand entrance foyer with chandelier",
-      "Home theatre & wine cellar",
-      "Infinity pool with cabana",
-      "Smart home automation throughout",
-      "Separate guest suite with kitchenette",
-    ],
-    height: 320,
-  },
-  {
-    id: 2,
-    tags: ["minimalist", "3bed"],
-    name: "Pure Form Residence",
-    style: "Minimalist",
-    beds: 3,
-    baths: 2,
-    sqft: "1,950",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa1.jpg",
-    features: [
-      "Clean flat-roof silhouette",
-      "Concrete & timber material palette",
-      "Hidden storage throughout",
-      "Zen courtyard garden",
-      "Passive cooling design",
-    ],
-    height: 230,
-  },
-  {
-    id: 3,
-    tags: ["bungalow", "3bed"],
-    name: "Garden Bungalow",
-    style: "Bungalow",
-    beds: 3,
-    baths: 2,
-    sqft: "1,740",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow2.jpg",
-    features: [
-      "Wraparound veranda",
-      "Low-maintenance landscaping",
-      "Open-plan family spaces",
-      "Solar-ready roof structure",
-      "Accessible single-level layout",
-    ],
-    height: 280,
-  },
-  {
-    id: 4,
-    tags: ["duplex", "4bed"],
-    name: "Twin Towers Duplex",
-    style: "Duplex",
-    beds: 4,
-    baths: 3,
-    sqft: "2,900",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow7.jpg",
-    features: [
-      "Two fully self-contained units",
-      "Shared underground parking",
-      "Separate utility meters",
-      "Rental income potential",
-      "Soundproofed party wall",
-    ],
-    height: 295,
-  },
-  {
-    id: 5,
-    tags: ["modern", "luxury", "5bed"],
-    name: "Canopy Villa",
-    style: "Luxury",
-    beds: 5,
-    baths: 5,
-    sqft: "6,200",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa2.jpg",
-    features: [
-      "Private forest backdrop",
-      "Three-car garage",
-      "Home office suite",
-      "Spa & gym pavilion",
-      "Full perimeter security system",
-    ],
-    height: 250,
-  },
-  {
-    id: 6,
-    tags: ["minimalist", "modern", "4bed"],
-    name: "White Line House",
-    style: "Minimalist",
-    beds: 4,
-    baths: 3,
-    sqft: "2,600",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/ELLY%20KUTWA/Modern_5-Storey_Apartment_Block_Front_Facade1.jpg",
-    features: [
-      "All-white exterior cladding",
-      "Floating staircase feature",
-      "Sky bridge connecting wings",
-      "Built-in furniture throughout",
-      "Integrated solar panels",
-    ],
-    height: 270,
-  },
-  {
-    id: 7,
-    tags: ["bungalow", "4bed"],
-    name: "Courtyard Bungalow",
-    style: "Bungalow",
-    beds: 4,
-    baths: 3,
-    sqft: "2,200",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow3.jpg",
-    features: [
-      "Central open courtyard",
-      "Covered outdoor dining area",
-      "Master suite with walk-in closet",
-      "Pitched timber ceiling in living room",
-      "Rainwater harvesting system",
-    ],
-    height: 240,
-  },
-  {
-    id: 8,
-    tags: ["modern", "3bed"],
-    name: "Terrace Modern",
-    style: "Modern",
-    beds: 3,
-    baths: 2.5,
-    sqft: "2,100",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa8.jpg",
-    features: [
-      "Cascading terrace levels",
-      "Large sliding glass doors",
-      "Chef's island kitchen",
-      "Polished concrete floors",
-      "Landscaped front garden",
-    ],
-    height: 290,
-  },
-  {
-    id: 9,
-    tags: ["luxury", "duplex", "5bed"],
-    name: "Imperial Duplex",
-    style: "Luxury",
-    beds: 5,
-    baths: 4,
-    sqft: "4,400",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/The_Guest_Wing1.jpg",
-    features: [
-      "Statement marble staircase",
-      "Private balcony per unit",
-      "High-speed fibre pre-wired",
-      "Separate entrances per unit",
-      "Premium sanitary ware",
-    ],
-    height: 310,
-  },
-  {
-    id: 10,
-    tags: ["minimalist", "3bed"],
-    name: "Quiet Geometry",
-    style: "Minimalist",
-    beds: 3,
-    baths: 2,
-    sqft: "1,680",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Top-Down_Aerial_View.jpg",
-    features: [
-      "Geometric facade detailing",
-      "Hidden door hardware",
-      "Monochrome interior palette",
-      "Fully insulated slab floor",
-      "Skylights throughout hallways",
-    ],
-    height: 255,
-  },
-  {
-    id: 11,
-    tags: ["modern", "luxury", "4bed"],
-    name: "Glass Ridge",
-    style: "Modern",
-    beds: 4,
-    baths: 3.5,
-    sqft: "3,400",
-    img: "https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa7.jpg",
-    features: [
-      "Double-height glazed living wall",
-      "Cantilevered upper floor",
-      "Private pool & sun deck",
-      "Home automation hub",
-      "Natural stone cladding",
-    ],
-    height: 275,
-  },
-];
+const toSlug = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+const isDisplayImage = (image?: { url?: string; type?: string | null }) =>
+  Boolean(image?.url) &&
+  (image?.type === "IMAGE" ||
+    /\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|$)/i.test(image?.url ?? ""));
 
 export default function Explorer({
   allDesigns = [],
 }: {
   allDesigns?: LandingDesign[];
 }) {
-  const mergedPlans = (function mergePlansWithFallback(
-    dbDesigns: LandingDesign[],
-    fallbacks: Array<
-      Omit<ExplorerPlan, "id" | "basePrice" | "hasFiles"> & { id: number }
-    >,
-    count: number,
-  ) {
-    const merged: ExplorerPlan[] = dbDesigns.map((d) => {
-      let catSlug = d.category?.name?.toLowerCase() || "";
-      if (catSlug === "bungalows") catSlug = "bungalow";
+  const mergedPlans = React.useMemo<ExplorerPlan[]>(
+    () =>
+      allDesigns
+        .map((design, index) => {
+          const firstImage = design.images?.find(isDisplayImage);
+          if (!design.id || !firstImage?.url) return null;
 
-      return {
-        id: d.id,
-        tags: [catSlug, `${d.bedrooms || 0}bed`].filter(Boolean),
-        name: d.name,
-        style: d.category?.name || "Modern",
-        beds: d.bedrooms || 0,
-        baths: d.bathrooms || 0,
-        sqft: `${d.area ? d.area.toLocaleString() : 0}`,
-        img: d.images?.[0]?.url || fallbacks[0]?.img || "",
-        features:
-          (d.features?.length ?? 0) > 0
-            ? (d.features ?? [])
-            : fallbacks[0]?.features || [],
-        basePrice: d.basePrice,
-        hasFiles: Boolean(
-          d.architecturalDesign?.pdfFiles?.length ||
-            d.structuralDesign?.pdfFiles?.length,
-        ),
-        height: 260,
-      };
-    });
+          const categoryName = design.category?.name || "House Plans";
+          const categorySlug = toSlug(categoryName);
 
-    const remaining = count - merged.length;
-    if (remaining > 0) {
-      merged.push(
-        ...fallbacks.slice(0, remaining).map((f) => ({
-          ...f,
-          id: undefined,
-        })),
-      );
-    }
-    return merged.slice(0, count);
-  })(allDesigns, allPlans, 12);
+          return {
+            id: design.id,
+            tags: [categorySlug, `${design.bedrooms || 0}bed`].filter(Boolean),
+            name: design.name,
+            style: categoryName,
+            beds: design.bedrooms ?? "—",
+            baths: design.bathrooms ?? "—",
+            sqft: design.area ? design.area.toLocaleString() : "—",
+            img: firstImage.url,
+            features: design.features ?? [],
+            basePrice: design.basePrice,
+            hasFiles: Boolean(
+              design.architecturalDesign?.pdfFiles?.length ||
+                design.structuralDesign?.pdfFiles?.length,
+            ),
+            height: 240 + (index % 4) * 20,
+          };
+        })
+        .filter((plan): plan is ExplorerPlan => Boolean(plan))
+        .slice(0, 12),
+    [allDesigns],
+  );
+
+  const styleFilters = React.useMemo(
+    () =>
+      Array.from(new Set(mergedPlans.map((plan) => toSlug(plan.style)))).slice(
+        0,
+        5,
+      ),
+    [mergedPlans],
+  );
 
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
   );
-  const [selectedPlan, setSelectedPlan] = useState<
-    (typeof mergedPlans)[0] | null
-  >(null);
+  const [selectedDesignId, setSelectedDesignId] = useState<string | null>(null);
 
   const trackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -318,18 +104,17 @@ export default function Explorer({
   // Use refs for transient interaction state to avoid re-triggering the RAF effect
   const isHoveredRef = useRef(false);
   const isDraggingRef = useRef(false);
-  const selectedPlanRef = useRef<(typeof mergedPlans)[0] | null>(null);
+  const selectedDesignIdRef = useRef<string | null>(null);
 
   // Keep a separate dragging state only used to gate click handler
-  const [isDragging, setIsDragging] = useState(false);
   const hasDraggedRef = useRef(false);
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
 
   // Sync selectedPlan into ref so the RAF loop can read it without being a dep
   useEffect(() => {
-    selectedPlanRef.current = selectedPlan;
-  }, [selectedPlan]);
+    selectedDesignIdRef.current = selectedDesignId;
+  }, [selectedDesignId]);
 
   const sectionRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -353,7 +138,7 @@ export default function Explorer({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelectedPlan(null);
+      if (e.key === "Escape") setSelectedDesignId(null);
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -382,7 +167,7 @@ export default function Explorer({
       if (
         !isHoveredRef.current &&
         !isDraggingRef.current &&
-        !selectedPlanRef.current
+        !selectedDesignIdRef.current
       ) {
         track.scrollLeft += 0.8 * scrollDirection;
         if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 2) {
@@ -450,7 +235,6 @@ export default function Explorer({
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!trackRef.current) return;
     isDraggingRef.current = true;
-    setIsDragging(true);
     hasDraggedRef.current = false;
     startXRef.current = e.pageX - trackRef.current.offsetLeft;
     scrollLeftRef.current = trackRef.current.scrollLeft;
@@ -459,12 +243,10 @@ export default function Explorer({
   const handleMouseLeaveSlider = () => {
     isDraggingRef.current = false;
     isHoveredRef.current = false;
-    setIsDragging(false);
   };
 
   const handleMouseUp = () => {
     isDraggingRef.current = false;
-    setIsDragging(false);
   };
 
   const handleMouseMoveSlider = (e: React.MouseEvent) => {
@@ -478,12 +260,11 @@ export default function Explorer({
 
   const handleCardClick = (plan: (typeof mergedPlans)[0]) => {
     if (hasDraggedRef.current) return;
-    setSelectedPlan(plan);
+    setSelectedDesignId(plan.id);
   };
 
   return (
     <section className="ex-section" id="explorer" ref={sectionRef}>
-
       <div className="ex-container">
         {/* HEADER */}
         <div className="ex-section-header ex-reveal">
@@ -515,7 +296,7 @@ export default function Explorer({
         <div className="ex-filter-bar ex-reveal ex-delay-1">
           <span className="ex-filter-label">Style</span>
           <div className="ex-filter-group">
-            {["all", "modern", "luxury", "minimalist", "bungalow"].map((f) => (
+            {["all", ...styleFilters].map((f) => (
               <button
                 key={f}
                 className={`ex-pill ${activeFilters.has(f) ? "active" : ""}`}
@@ -667,7 +448,10 @@ export default function Explorer({
         )}
       </div>
 
-      <DesignModal plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
+      <DesignPreviewModal
+        id={selectedDesignId}
+        onClose={() => setSelectedDesignId(null)}
+      />
     </section>
   );
 }

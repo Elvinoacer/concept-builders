@@ -31,6 +31,8 @@ interface DesignPreviewModalProps {
   onClose: () => void;
 }
 
+const previewCache = new Map<string, ModalDesign>();
+
 const FALLBACK_IMAGE = "/images/category-placeholder.webp";
 
 const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
@@ -47,7 +49,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
     design?.images?.filter(
       (img) =>
         img.type === "IMAGE" ||
-        img.url?.match(/\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|$)/i)
+        img.url?.match(/\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|$)/i),
     ) ?? [];
 
   // If no valid images found, use fallback
@@ -74,7 +76,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
         return nextIndex;
       });
     },
-    [images.length]
+    [images.length],
   );
 
   useEffect(() => {
@@ -85,12 +87,23 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
 
     let cancelled = false;
     const fetchDesign = async () => {
+      const cached = previewCache.get(id);
+      if (cached) {
+        setDesign(cached);
+        setActiveIndex(0);
+        setDirection(0);
+        setLoading(false);
+        setError(false);
+        return;
+      }
+
       setLoading(true);
       setError(false);
       try {
-        const response = await fetch(`/api/designs/${id}`);
+        const response = await fetch(`/api/designs/${id}?preview=true`);
         if (!response.ok) throw new Error("Failed to load design");
         const data = await response.json();
+        previewCache.set(id, data);
         if (!cancelled) {
           setDesign(data);
           setActiveIndex(0);
@@ -223,7 +236,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                   onClick={() => {
                     setError(false);
                     setLoading(true);
-                    fetch(`/api/designs/${id}`)
+                    fetch(`/api/designs/${id}?preview=true`)
                       .then((r) => r.json())
                       .then((d) => {
                         setDesign(d);
@@ -376,9 +389,7 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                           },
                           {
                             label: "Area",
-                            value: design.area
-                              ? `${design.area} m²`
-                              : "—",
+                            value: design.area ? `${design.area} m²` : "—",
                           },
                           {
                             label: "Floors",
@@ -453,7 +464,9 @@ const DesignPreviewModal = ({ id, onClose }: DesignPreviewModalProps) => {
                       href={buildCustomDesignUrl(design)}
                       onClick={onClose}
                       className={`flex items-center justify-center rounded-full border border-cb-border px-6 py-3 text-[11px] uppercase tracking-[0.18em] text-cream-dim transition-colors hover:border-gold/40 hover:bg-gold/5 hover:text-gold ${
-                        design.basePrice === 0 ? "w-full" : "flex-1 sm:flex-initial"
+                        design.basePrice === 0
+                          ? "w-full"
+                          : "flex-1 sm:flex-initial"
                       }`}
                     >
                       Request Custom Design
