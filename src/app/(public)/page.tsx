@@ -79,17 +79,11 @@ const getLandingData = unstable_cache(
     return { featured, all: byCategory, collections };
   },
   ["landing-data"],
-  { revalidate: 300 }, // 5 minute cache
+  { revalidate: 300, tags: ["landing-data", "designs", "featured-designs"] }, // 5 minute cache + tags for on-demand revalidation
 );
 
 export default async function LandingPage() {
   const { featured, all, collections } = await getLandingData();
-  const featuredIds = new Set(
-    featured.map((design: LandingDesignSummary) => design.id),
-  );
-  const explorerDesigns = all.filter(
-    (design: LandingDesignSummary) => !featuredIds.has(design.id),
-  );
 
   return (
     <div style={{ backgroundColor: "#141414" }} className="relative">
@@ -100,8 +94,8 @@ export default async function LandingPage() {
       />
       <div className="relative z-10">
         <DreamPlan featuredDesigns={featured.slice(0, 7)} />
-        <Featured allDesigns={all} />
-        <Explorer allDesigns={explorerDesigns} />
+        <Featured allDesigns={featured} />
+        <Explorer allDesigns={all} />
         <DesignJourney />
         <SocialProof />
         <DesignIdeas collections={collections} />

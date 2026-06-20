@@ -342,7 +342,7 @@ export default function Featured({
 
             {/* SIDE STACK */}
             <div className="fc-side">
-              {[s1, s2, s3, s4].map((plan, i) => (
+              {[s1, s2, s3, s4].filter(Boolean).map((plan, i) => (
                 <button
                   type="button"
                   className={`fc-side-card card-enter card-enter-delay-${i + 1}`}
