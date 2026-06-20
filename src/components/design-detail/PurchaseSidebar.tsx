@@ -440,15 +440,16 @@ const PurchaseSidebar: React.FC<{ design: any }> = ({ design }) => {
                 </AnimatePresence>
               )}
               {design.basePrice > 0 && (
-                className="text-sm text-cream-dim mt-2 font-bold"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                {kesPrice
-                  ? `KES ${kesPrice.toLocaleString()}`
-                  : "Converting..."}
-              </motion.p>
+                <motion.p
+                  className="text-sm text-cream-dim mt-2 font-bold"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  {kesPrice
+                    ? `KES ${kesPrice.toLocaleString()}`
+                    : "Converting..."}
+                </motion.p>
               )}
             </div>
           </div>
