@@ -13,7 +13,6 @@ type LandingDesign = {
   bathrooms?: number | null;
   area?: number | null;
   basePrice?: number;
-  features?: string[];
   images?: { url: string; type?: string | null }[];
   architecturalDesign?: { pdfFiles?: unknown[] } | null;
   structuralDesign?: { pdfFiles?: unknown[] } | null;
@@ -69,7 +68,6 @@ export default function Explorer({
             baths: design.bathrooms ?? "—",
             sqft: design.area ? design.area.toLocaleString() : "—",
             img: firstImage.url,
-            features: design.features ?? [],
             basePrice: design.basePrice,
             hasFiles: Boolean(
               design.architecturalDesign?.pdfFiles?.length ||
