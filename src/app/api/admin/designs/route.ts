@@ -37,6 +37,11 @@ export async function GET(request: Request) {
         include: {
           category: true,
           files: true,
+          images: {
+            where: { type: "IMAGE" },
+            take: 1,
+            select: { url: true },
+          },
           architecturalDesign: {
             include: {
               pdfFiles: true,

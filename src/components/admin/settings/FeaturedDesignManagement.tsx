@@ -42,6 +42,7 @@ import { toast } from "sonner";
 interface DesignWithCategoryAndFiles extends Design {
   category: { name: string } | null;
   files: { url: string }[];
+  images?: { url: string }[];
   architecturalDesign?: {
     pdfFiles: { url: string }[];
     cadFiles: { url: string }[];
@@ -241,24 +242,24 @@ const FeaturedDesignManagement = () => {
       className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-all duration-300 group"
     >
       {/* Image/Thumbnail Area */}
-      <div className="relative aspect-square bg-gray-100 dark:bg-gray-700 overflow-hidden">
-        {design.files?.[0]?.url ? (
+      <div className="relative aspect-[4/3] bg-gray-100 dark:bg-gray-800 overflow-hidden">
+        {design.images?.[0]?.url ? (
           <img
-            src={design.files[0].url}
+            src={design.images[0].url}
             alt={design.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <ImageIcon className="w-12 h-12 text-gray-400" />
+          <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900/50">
+            <ImageIcon className="w-12 h-12 text-gray-300 dark:text-gray-600" />
           </div>
         )}
 
         {/* Featured Badge */}
         {design.isFeatured && (
           <div className="absolute top-3 left-3">
-            <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white">
-              <Star className="w-3 h-3 mr-1 fill-current" />
+            <Badge className="bg-yellow-500/90 hover:bg-yellow-500 text-white backdrop-blur-sm border-0 shadow-lg font-medium tracking-wide">
+              <Star className="w-3 h-3 mr-1.5 fill-current" />
               Featured
             </Badge>
           </div>
@@ -368,16 +369,16 @@ const FeaturedDesignManagement = () => {
     >
       <div className="flex items-center gap-4">
         {/* Thumbnail */}
-        <div className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-700 overflow-hidden flex-shrink-0">
-          {design.files?.[0]?.url ? (
+        <div className="w-20 h-20 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden flex-shrink-0 border border-gray-200 dark:border-gray-700">
+          {design.images?.[0]?.url ? (
             <img
-              src={design.files[0].url}
+              src={design.images[0].url}
               alt={design.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <ImageIcon className="w-6 h-6 text-gray-400" />
+            <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900/50">
+              <ImageIcon className="w-6 h-6 text-gray-300 dark:text-gray-600" />
             </div>
           )}
         </div>
@@ -477,63 +478,76 @@ const FeaturedDesignManagement = () => {
           {/* Featured Designs Section */}
           {featuredDesigns.length > 0 && (
             <motion.section
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-2xl p-6 border border-yellow-200 dark:border-yellow-800"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-900 dark:to-black rounded-3xl p-6 sm:p-8 border border-gray-800 shadow-2xl relative overflow-hidden"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center">
-                  <Star className="w-5 h-5 text-yellow-600 dark:text-yellow-400 fill-current" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Currently Featured Designs
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    These designs are currently featured on the homepage
-                  </p>
+              {/* Decorative background glow */}
+              <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 relative z-10">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-500/20">
+                    <Star className="w-6 h-6 text-white fill-current" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 tracking-tight">
+                      Currently Featured
+                    </h3>
+                    <p className="text-sm text-gray-400 font-medium">
+                      These {featuredDesigns.length} designs are highlighted on the homepage
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x relative z-10">
                 {featuredDesigns.map((design) => (
                   <motion.div
                     key={design.id}
-                    layoutId={design.id}
-                    className="bg-white dark:bg-gray-800 rounded-xl border border-yellow-200 dark:border-yellow-800 p-3 flex items-center justify-between"
+                    layoutId={`featured-${design.id}`}
+                    className="snap-start flex-shrink-0 w-72 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-3 hover:bg-white/10 transition-colors group relative"
                   >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 overflow-hidden flex-shrink-0">
-                        {design.files?.[0]?.url && (
-                          <img
-                            src={design.files[0].url}
-                            alt={design.name}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-gray-900 dark:text-white truncate text-sm">
-                          {design.name}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {design.category?.name}
-                        </p>
+                    <div className="relative h-40 rounded-xl overflow-hidden mb-4 bg-black/50 border border-white/5">
+                      {design.images?.[0]?.url ? (
+                        <img
+                          src={design.images[0].url}
+                          alt={design.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ImageIcon className="w-8 h-8 text-white/20" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80" />
+                      <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+                        <Badge className="bg-yellow-500/90 text-white border-0 backdrop-blur-sm shadow-lg font-medium">
+                          {design.category?.name || "Uncategorized"}
+                        </Badge>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => updateIsFeatured(design.id, false)}
+                          disabled={updatingDesigns.has(design.id)}
+                          className="w-8 h-8 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0"
+                        >
+                          {updatingDesigns.has(design.id) ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <XCircle className="w-4 h-4" />
+                          )}
+                        </Button>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => updateIsFeatured(design.id, false)}
-                      disabled={updatingDesigns.has(design.id)}
-                      className="flex-shrink-0 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                    >
-                      {updatingDesigns.has(design.id) ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <XCircle className="w-4 h-4" />
-                      )}
-                    </Button>
+                    <div className="px-2 pb-1">
+                      <p className="font-semibold text-white truncate text-base mb-1">
+                        {design.name}
+                      </p>
+                      <p className="text-xs text-gray-400 flex items-center gap-2 font-medium uppercase tracking-wider">
+                        <span>{design.files?.length || 0} files</span>
+                      </p>
+                    </div>
                   </motion.div>
                 ))}
               </div>
