@@ -262,6 +262,7 @@ const DesignFilePreview = ({ designId }: DesignFilePreviewProps) => {
       },
       cancel: {
         label: "Cancel",
+        onClick: () => {},
       },
     });
   };
