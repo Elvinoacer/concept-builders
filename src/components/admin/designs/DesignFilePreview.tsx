@@ -39,7 +39,7 @@ interface DesignFilePreviewProps {
 
 const getFileIcon = (fileName: string, fileType?: string) => {
   const extension = fileName.split(".").pop()?.toLowerCase() || "";
-  const isImage = [
+  const isImage = fileType === "IMAGE" || [
     "png",
     "jpg",
     "jpeg",
@@ -74,8 +74,9 @@ const getFileIcon = (fileName: string, fileType?: string) => {
   return <FiFile className="w-6 h-6 text-gray-500 flex-shrink-0" />;
 };
 
-const formatFileSize = (bytes?: number) => {
-  if (!bytes || bytes === 0) return "0 Bytes";
+const formatFileSize = (bytes?: number | null) => {
+  if (bytes === undefined || bytes === null) return "Unknown Size";
+  if (bytes === 0) return "0 Bytes";
   const k = 1024;
   const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -407,12 +408,10 @@ const DesignFilePreview = ({ designId }: DesignFilePreviewProps) => {
                             const fileName =
                               file.name ||
                               file.originalFileName ||
-                              decodeURIComponent(
-                                file.url.split("/").pop() || "Unknown File"
-                              );
+                              (file.url ? decodeURIComponent(file.url.split("/").pop() || "Unknown File") : "Unknown File");
                             const isDeleting = deletingFiles.has(file.id);
                             const isDownloading = downloadingFiles.has(file.id);
-                            const isImage = [
+                            const isImage = file.type === "IMAGE" || [
                               "png",
                               "jpg",
                               "jpeg",
