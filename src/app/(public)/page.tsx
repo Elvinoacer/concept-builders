@@ -78,7 +78,7 @@ const getLandingData = unstable_cache(
     ]);
     return { featured, all: byCategory, collections };
   },
-  ["landing-data"],
+  ["landing-data-v2"],
   { revalidate: 300, tags: ["landing-data", "designs", "featured-designs"] }, // 5 minute cache + tags for on-demand revalidation
 );
 

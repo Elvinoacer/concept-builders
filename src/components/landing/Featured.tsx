@@ -116,9 +116,40 @@ export default function Featured({
   const categories = React.useMemo<FeaturedCategory[]>(() => {
     const grouped = new Map<string, FeaturedCategory>();
 
+    const allFeaturedCategory: FeaturedCategory = {
+      id: "all-featured",
+      label: "All Featured",
+      dot: "#FFF",
+      accent: "#FFF",
+      count: 0,
+      plans: [],
+    };
+
     allDesigns.forEach((design) => {
       const firstImage = design.images?.find(isDisplayImage);
       if (!design.id || !firstImage?.url) return;
+
+      const planData: FeaturedPlan = {
+        id: design.id,
+        tag: design.category?.name?.trim() || "House Plans",
+        style: design.category?.name?.trim() || "House Plans",
+        name: design.name,
+        beds: design.bedrooms ?? "—",
+        baths: design.bathrooms ?? "—",
+        sqft: design.area
+          ? `${design.area.toLocaleString()} sqft`
+          : "Area on request",
+        img: firstImage.url,
+        basePrice: design.basePrice,
+        hasFiles: Boolean(
+          design.architecturalDesign?.pdfFiles?.length ||
+            design.structuralDesign?.pdfFiles?.length,
+        ),
+        badge: design.isFeatured ? "Featured" : null,
+      };
+
+      allFeaturedCategory.count += 1;
+      allFeaturedCategory.plans.push(planData);
 
       const label = design.category?.name?.trim() || "House Plans";
       const id = toSlug(label);
@@ -134,31 +165,21 @@ export default function Featured({
       };
 
       category.count += 1;
-      category.plans.push({
-        id: design.id,
-        tag: label,
-        style: label,
-        name: design.name,
-        beds: design.bedrooms ?? "—",
-        baths: design.bathrooms ?? "—",
-        sqft: design.area
-          ? `${design.area.toLocaleString()} sqft`
-          : "Area on request",
-        img: firstImage.url,
-        basePrice: design.basePrice,
-        hasFiles: Boolean(
-          design.architecturalDesign?.pdfFiles?.length ||
-            design.structuralDesign?.pdfFiles?.length,
-        ),
-        badge: design.isFeatured ? "Featured" : null,
-      });
+      category.plans.push(planData);
 
       grouped.set(id, category);
     });
 
-    return Array.from(grouped.values())
+    const result = Array.from(grouped.values())
       .map((category) => ({ ...category, plans: category.plans.slice(0, 8) }))
       .filter((category) => category.plans.length > 0);
+
+    if (allFeaturedCategory.plans.length > 0) {
+      allFeaturedCategory.plans = allFeaturedCategory.plans.slice(0, 8);
+      result.unshift(allFeaturedCategory);
+    }
+
+    return result;
   }, [allDesigns]);
 
   const [activeId, setActiveId] = useState(categories[0]?.id ?? "");
