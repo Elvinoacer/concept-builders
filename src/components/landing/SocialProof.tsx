@@ -5,7 +5,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import './SocialProof.css';
 
-export default function SocialProof() {
+export type SocialProofProject = {
+  id: string;
+  title: string;
+  description: string | null;
+  featuredImage: string | null;
+  clientName: string | null;
+  location: string | null;
+  status: string;
+  category: string;
+};
+
+export default function SocialProof({ projects = [] }: { projects?: SocialProofProject[] }) {
   const cursorRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const statsObserverRef = useRef<IntersectionObserver | null>(null);
@@ -74,7 +85,7 @@ export default function SocialProof() {
       if (observerRef.current) observerRef.current.disconnect();
       if (statsObserverRef.current) statsObserverRef.current.disconnect();
     };
-  }, []);
+  }, [projects]);
 
   const handleCardMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const card = e.currentTarget;
@@ -91,17 +102,8 @@ export default function SocialProof() {
     card.style.transform = '';
   };
 
-  const StarIcon = () => (
-    <svg viewBox="0 0 24 24">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-    </svg>
-  );
-
-  const Stars = () => (
-    <div className="card__stars">
-      <StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon />
-    </div>
-  );
+  // Hardcoded projects if none passed to match original design structure
+  const displayProjects = projects.length > 0 ? projects : [];
 
   return (
     <div className="sp-wrapper">
@@ -109,149 +111,41 @@ export default function SocialProof() {
       <section className="social-section" id="testimonials">
         {/* Heading */}
         <div className="section-head sp-reveal">
-          <p className="eyebrow"><span></span> Client Stories <span></span></p>
-          <h2 className="section-title">The Best Proof Is a Family Living in a Home They Love</h2>
+          <p className="eyebrow"><span></span> Work Proof <span></span></p>
+          <h2 className="section-title">The Best Proof Is Our Ongoing Projects</h2>
           <p className="section-sub">Every project starts as a conversation and ends as a place people proudly call home.</p>
         </div>
 
         {/* Cards */}
         <div className="testimonials-grid" id="grid">
-
-          {/* ── FEATURED CARD ── */}
-          <article className="card card--featured" data-delay="0" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
-            <div className="card__img-wrap">
-              <Image
-                src="https://cdn.conceptbuilders.co.ke/design_images/JAMES%20MERCY%20NJERI/RENDERS%2001/Modern%204-Bedroom%20Luxury%20Maisonette1.jpg"
-                alt="Modern family home by the Kamau family"
-                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
-              />
-              <span className="card__badge">Modern Family</span>
-              <Stars />
-            </div>
-            <div className="card__body">
-              <span className="card__quote-mark">"</span>
-              <p className="card__text">We handed BluePrint &amp; Co a rough sketch on a napkin and they handed us back the home we'd been dreaming about for fifteen years. The level of detail in the plan—every window orientation, every storage nook—was extraordinary. Our builder said it was the most thorough set of drawings he'd ever worked from.</p>
-              <div className="card__divider"></div>
-              <div className="card__client">
-                <div className="card__avatar">
-                  <Image src="https://randomuser.me/api/portraits/women/44.jpg" alt="Amelia Kamau" width={48} height={48} />
-                </div>
-                <div className="card__client-info">
-                  <p className="card__name">Amelia Kamau</p>
-                  <p className="card__meta">4-Bedroom Modern · Runda, Nairobi</p>
+          {displayProjects.map((project, index) => (
+            <article 
+              key={project.id}
+              className={`card ${index === 0 ? 'card--featured' : ''}`} 
+              data-delay={index * 120} 
+              onMouseMove={handleCardMouseMove} 
+              onMouseLeave={handleCardMouseLeave}
+            >
+              <div className="card__img-wrap">
+                <Image
+                  src={project.featuredImage || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=800&auto=format&fit=crop"}
+                  alt={project.title}
+                  fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
+                />
+                <span className="card__badge">{project.status === "IN_PROGRESS" ? "In Progress" : project.status.replace(/_/g, " ")}</span>
+              </div>
+              <div className="card__body">
+                <p className="card__text">{project.description || "A wonderful ongoing project by Concept Builders."}</p>
+                <div className="card__divider"></div>
+                <div className="card__client">
+                  <div className="card__client-info">
+                    <p className="card__name">{project.title}</p>
+                    <p className="card__meta">{project.clientName ? `${project.clientName} · ` : ''}{project.location || 'Kenya'}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </article>
-
-          {/* ── CARD 2 ── */}
-          <article className="card" data-delay="120" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
-            <div className="card__img-wrap">
-              <Image
-                src="https://cdn.conceptbuilders.co.ke/design_images/JASON/Modern%20Luxury%20English%20Country%20Cottage1.jpg"
-                alt="Cottage-style home"
-                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
-              />
-              <span className="card__badge">Cottage Style</span>
-              <Stars />
-            </div>
-            <div className="card__body">
-              <span className="card__quote-mark">"</span>
-              <p className="card__text">I was worried a standard plan couldn't capture the warmth I wanted. Three weeks after delivery, I had a home full of light and character. Worth every shilling.</p>
-              <div className="card__divider"></div>
-              <div className="card__client">
-                <div className="card__avatar">
-                  <Image src="https://randomuser.me/api/portraits/men/32.jpg" alt="James Odhiambo" width={48} height={48} />
-                </div>
-                <div className="card__client-info">
-                  <p className="card__name">James Odhiambo</p>
-                  <p className="card__meta">3-Bed Cottage · Eldoret</p>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* ── CARD 3 ── */}
-          <article className="card" data-delay="240" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
-            <div className="card__img-wrap">
-              <Image
-                src="https://cdn.conceptbuilders.co.ke/design_images/DAVENS%20NJORO/Maisonette_Contemporary_Villa2.jpg"
-                alt="Luxury villa"
-                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
-              />
-              <span className="card__badge">Luxury Villa</span>
-              <Stars />
-            </div>
-            <div className="card__body">
-              <span className="card__quote-mark">"</span>
-              <p className="card__text">Our villa looks like it belongs on the cover of a design magazine. The spatial flow is flawless—something you can only get from an architect who truly listens.</p>
-              <div className="card__divider"></div>
-              <div className="card__client">
-                <div className="card__avatar">
-                  <Image src="https://randomuser.me/api/portraits/women/67.jpg" alt="Wanjiku Muthoni" width={48} height={48} />
-                </div>
-                <div className="card__client-info">
-                  <p className="card__name">Wanjiku Muthoni</p>
-                  <p className="card__meta">5-Bed Villa · Karen, Nairobi</p>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* ── CARD 4 ── */}
-          <article className="card" data-delay="360" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
-            <div className="card__img-wrap">
-              <Image
-                src="https://cdn.conceptbuilders.co.ke/design_images/DAVID%203BD/modern_3-bedroombungalow1.jpg"
-                alt="Bungalow design"
-                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
-              />
-              <span className="card__badge">Contemporary Bungalow</span>
-              <Stars />
-            </div>
-            <div className="card__body">
-              <span className="card__quote-mark">"</span>
-              <p className="card__text">Single storey, big dreams. They fit a home office, guest wing, and open kitchen into our modest plot without it ever feeling cramped. Pure genius.</p>
-              <div className="card__divider"></div>
-              <div className="card__client">
-                <div className="card__avatar">
-                  <Image src="https://randomuser.me/api/portraits/men/55.jpg" alt="Brian Otieno" width={48} height={48} />
-                </div>
-                <div className="card__client-info">
-                  <p className="card__name">Brian Otieno</p>
-                  <p className="card__meta">3-Bed Bungalow · Kisumu</p>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* ── CARD 5 ── */}
-          <article className="card" data-delay="480" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
-            <div className="card__img-wrap">
-              <Image
-                src="https://cdn.conceptbuilders.co.ke/design_images/GICHURU%20REAL%20ESTATE/Townhouse_Community_Streetscape1.jpg"
-                alt="Townhouse design"
-                fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: "cover" }}
-              />
-              <span className="card__badge">Townhouse</span>
-              <Stars />
-            </div>
-            <div className="card__body">
-              <span className="card__quote-mark">"</span>
-              <p className="card__text">Bought plans on a Thursday, submitted to the county on Monday. The documentation package was so complete we sailed through approvals in under six weeks.</p>
-              <div className="card__divider"></div>
-              <div className="card__client">
-                <div className="card__avatar">
-                  <Image src="https://randomuser.me/api/portraits/women/29.jpg" alt="Fatuma Hassan" width={48} height={48} />
-                </div>
-                <div className="card__client-info">
-                  <p className="card__name">Fatuma Hassan</p>
-                  <p className="card__meta">Duplex Townhouse · Mombasa</p>
-                </div>
-              </div>
-            </div>
-          </article>
-
+            </article>
+          ))}
         </div>
 
         {/* Stats Strip */}

@@ -16,7 +16,7 @@ type LandingDesignSummary = { id: string };
 
 const getLandingData = unstable_cache(
   async () => {
-    const [featured, byCategory, collections] = await Promise.all([
+    const [featured, byCategory, collections, ongoingProjects] = await Promise.all([
       prisma.design.findMany({
         where: { isFeatured: true },
         select: {
@@ -75,15 +75,30 @@ const getLandingData = unstable_cache(
         include: { category: true },
         orderBy: { order: "asc" },
       }),
+      prisma.ongoingProject.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          featuredImage: true,
+          clientName: true,
+          location: true,
+          status: true,
+          category: true,
+        }
+      })
     ]);
-    return { featured, all: byCategory, collections };
+    return { featured, all: byCategory, collections, ongoingProjects };
   },
-  ["landing-data-v2"],
-  { revalidate: 300, tags: ["landing-data", "designs", "featured-designs"] }, // 5 minute cache + tags for on-demand revalidation
+  ["landing-data-v3"],
+  { revalidate: 300, tags: ["landing-data", "designs", "featured-designs", "ongoing-projects"] }, // 5 minute cache + tags for on-demand revalidation
 );
 
 export default async function LandingPage() {
-  const { featured, all, collections } = await getLandingData();
+  const { featured, all, collections, ongoingProjects } = await getLandingData();
 
   return (
     <div style={{ backgroundColor: "#141414" }} className="relative">
@@ -97,7 +112,7 @@ export default async function LandingPage() {
         <Featured allDesigns={featured} />
         <Explorer allDesigns={all} />
         <DesignJourney />
-        <SocialProof />
+        <SocialProof projects={ongoingProjects} />
         <DesignIdeas collections={collections} />
         <ContactForm />
       </div>
