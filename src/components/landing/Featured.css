@@ -416,6 +416,10 @@
   font-weight: 400;
   color: #fff;
   line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .fc-side-beds {
   font-size: 11px;
@@ -489,6 +493,10 @@
   font-weight: 400;
   color: #fff;
   line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .fc-thumb-meta {
   font-size: 9px;

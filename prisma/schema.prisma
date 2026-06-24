@@ -189,6 +189,7 @@ model Design {
   buildingCostEstimates    Json[]
   faq                      Json[]
   isFeatured               Boolean          @default(false)
+  featuredPriority         Int              @default(0)
   maxBuildingCost          Float?
   minBuildingCost          Float?
   buildingCostFactors      Json?

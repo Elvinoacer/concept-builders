@@ -54,6 +54,7 @@ interface DesignWithCategoryAndFiles extends Design {
   billOfQuantities?: {
     excelFiles: { url: string }[];
   } | null;
+  featuredPriority?: number;
 }
 
 const FeaturedDesignManagement = () => {
@@ -72,6 +73,7 @@ const FeaturedDesignManagement = () => {
   const [updatingDesigns, setUpdatingDesigns] = useState<Set<string>>(
     new Set()
   );
+  const [selectedImagesDesign, setSelectedImagesDesign] = useState<DesignWithCategoryAndFiles | null>(null);
 
   const fetchDesigns = async () => {
     setLoading(true);
@@ -136,6 +138,45 @@ const FeaturedDesignManagement = () => {
       );
     } catch (err: any) {
       setError(err.message);
+      toast.error(err.message);
+      setDesigns(originalDesigns);
+    } finally {
+      setUpdatingDesigns((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(designId);
+        return newSet;
+      });
+    }
+  };
+
+  const updateFeaturedPriority = async (designId: string, priority: number) => {
+    setUpdatingDesigns((prev) => new Set(prev).add(designId));
+
+    const originalDesigns = [...designs];
+    setDesigns((prevDesigns) =>
+      prevDesigns.map((design) =>
+        design.id === designId ? { ...design, featuredPriority: priority } : design
+      )
+    );
+
+    try {
+      const response = await fetch(`/api/admin/designs/${designId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ featuredPriority: priority }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to update featured priority"
+        );
+      }
+
+      toast.success("Priority updated!");
+    } catch (err: any) {
       toast.error(err.message);
       setDesigns(originalDesigns);
     } finally {
@@ -271,7 +312,10 @@ const FeaturedDesignManagement = () => {
             variant="secondary"
             size="icon"
             className="w-8 h-8 bg-white/90 hover:bg-white"
-            onClick={() => window.open(design.files?.[0]?.url, "_blank")}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedImagesDesign(design);
+            }}
           >
             <Eye className="w-3 h-3" />
           </Button>
@@ -296,9 +340,12 @@ const FeaturedDesignManagement = () => {
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div 
+        className="p-4 cursor-pointer"
+        onClick={() => setSelectedImagesDesign(design)}
+      >
         <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 flex-1 mr-2">
+          <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 flex-1 mr-2" title={design.name}>
             {design.name}
           </h3>
           <div className="flex-shrink-0">
@@ -310,6 +357,7 @@ const FeaturedDesignManagement = () => {
                 onCheckedChange={(checked) =>
                   updateIsFeatured(design.id, checked)
                 }
+                onClick={(e) => e.stopPropagation()}
                 className="data-[state=checked]:bg-yellow-500"
               />
             )}
@@ -322,6 +370,13 @@ const FeaturedDesignManagement = () => {
             <Badge variant="outline" className="text-xs">
               {design.category?.name || "Uncategorized"}
             </Badge>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-500 dark:text-gray-400">Images</span>
+            <span className="text-gray-900 dark:text-white font-medium">
+              {design.images?.length || 0}
+            </span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
@@ -384,9 +439,9 @@ const FeaturedDesignManagement = () => {
         </div>
 
         {/* Design Info */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setSelectedImagesDesign(design)}>
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+            <h3 className="font-semibold text-gray-900 dark:text-white truncate" title={design.name}>
               {design.name}
             </h3>
             {design.isFeatured && (
@@ -398,6 +453,8 @@ const FeaturedDesignManagement = () => {
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <span>{design.category?.name || "Uncategorized"}</span>
+            <span>•</span>
+            <span>{design.images?.length || 0} images</span>
             <span>•</span>
             <span>{design.files?.length || 0} files</span>
             {design.createdAt && (
@@ -430,7 +487,7 @@ const FeaturedDesignManagement = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedImagesDesign(design)}>
                 <Eye className="w-4 h-4 mr-2" />
                 View Design
               </DropdownMenuItem>
@@ -541,12 +598,23 @@ const FeaturedDesignManagement = () => {
                       </div>
                     </div>
                     <div className="px-2 pb-1">
-                      <p className="font-semibold text-white truncate text-base mb-1">
+                      <p className="font-semibold text-white line-clamp-2 text-base mb-1" title={design.name}>
                         {design.name}
                       </p>
-                      <p className="text-xs text-gray-400 flex items-center gap-2 font-medium uppercase tracking-wider">
+                      <p className="text-xs text-gray-400 flex items-center gap-2 font-medium tracking-wider">
+                        <span>{design.images?.length || 0} images</span>
+                        <span>•</span>
                         <span>{design.files?.length || 0} files</span>
                       </p>
+                      <div className="mt-2 flex items-center justify-between">
+                        <Label className="text-xs text-gray-300">Priority:</Label>
+                        <Input
+                          type="number"
+                          value={design.featuredPriority || 0}
+                          onChange={(e) => updateFeaturedPriority(design.id, parseInt(e.target.value) || 0)}
+                          className="w-16 h-7 text-xs bg-black/40 border-white/20 text-white"
+                        />
+                      </div>
                     </div>
                   </motion.div>
                 ))}
@@ -743,6 +811,40 @@ const FeaturedDesignManagement = () => {
           </section>
         </CardContent>
       </Card>
+
+      {/* Image Preview Modal */}
+      {selectedImagesDesign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedImagesDesign(null)}>
+          <div 
+            className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-gray-200 dark:border-gray-800"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{selectedImagesDesign.name} Images</h3>
+              <Button variant="ghost" size="icon" onClick={() => setSelectedImagesDesign(null)}>
+                <XCircle className="w-5 h-5" />
+              </Button>
+            </div>
+            
+            <div className="p-4 overflow-y-auto flex-1">
+              {selectedImagesDesign.images && selectedImagesDesign.images.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {selectedImagesDesign.images.map((img, idx) => (
+                    <div key={idx} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                      <img src={img.url} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <ImageIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400">No images available for this design.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };

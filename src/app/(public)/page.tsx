@@ -41,7 +41,7 @@ const getLandingData = unstable_cache(
             select: { pdfFiles: { select: { id: true }, take: 1 } },
           },
         },
-        orderBy: { views: "desc" },
+        orderBy: [{ featuredPriority: "desc" }, { views: "desc" }],
         take: 12,
       }),
       prisma.design.findMany({

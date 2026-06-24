@@ -18,20 +18,19 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { isFeatured } = body; // Expecting a boolean
+    const { isFeatured, featuredPriority } = body;
 
-    if (typeof isFeatured !== "boolean") {
-      return NextResponse.json(
-        { message: "isFeatured must be a boolean value" },
-        { status: 400 },
-      );
+    const dataToUpdate: any = {};
+    if (typeof isFeatured === "boolean") {
+      dataToUpdate.isFeatured = isFeatured;
+    }
+    if (typeof featuredPriority === "number") {
+      dataToUpdate.featuredPriority = featuredPriority;
     }
 
     const updatedDesign = await prisma.design.update({
       where: { id },
-      data: {
-        isFeatured: isFeatured,
-      },
+      data: dataToUpdate,
     });
 
     return NextResponse.json(updatedDesign);
