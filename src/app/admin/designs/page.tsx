@@ -10,6 +10,7 @@ import type { DesignToEdit } from "@/components/admin/designs/NewDesignForm";
 import CreateFolderModal from "@/components/admin/designs/CreateFolderModal";
 import CategoriesModal from "@/components/admin/designs/CategoriesModal";
 import RenameFolderModal from "@/components/admin/designs/RenameFolderModal";
+import QuickDesignUpload from "@/components/admin/designs/QuickDesignUpload";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -233,6 +234,7 @@ const DesignsPage = () => {
               refreshKey={designsRefreshKey}
             />
           )}
+          {activeTab === "quick-upload" && <QuickDesignUpload />}
           {activeTab === "folders" && (
             <div className="space-y-4">
               {/* Folders Header with Refresh */}

@@ -9,6 +9,7 @@ import {
   FiArchive,
   FiTrendingUp,
   FiChevronDown,
+  FiUploadCloud,
 } from "react-icons/fi";
 
 interface DesignsTabsProps {
@@ -18,6 +19,7 @@ interface DesignsTabsProps {
 
 const initialTabs = [
   { id: "all", label: "All Designs", icon: FiGrid, count: 0 },
+  { id: "quick-upload", label: "Quick Upload", icon: FiUploadCloud, count: 0 },
   { id: "folders", label: "Folders", icon: FiFolder, count: 0 },
   { id: "featured", label: "Featured", icon: FiStar, count: 0 },
   { id: "archived", label: "Archived", icon: FiArchive, count: 0 },
