@@ -181,7 +181,7 @@ const AdminOrderDetailPage = () => {
                         initialFiles={[]}
                         fileTypeCategory={FileType.CAD}
                         multiple={false}
-                        accept=".dwg, .dxf"
+                        accept=".dwg, .dxf, .pln"
                         uploadUrl={`/api/admin/orders/${order.id}/items/${item.id}/files`}
                       />
                     </div>

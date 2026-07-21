@@ -1140,7 +1140,7 @@ const CreateDesignPage = () => {
                                 initialFiles={architecturalDesign.cadFiles}
                                 fileTypeCategory="CAD"
                                 multiple
-                                accept=".dwg, .dxf"
+                                accept=".dwg, .dxf, .pln"
                               />
                             </div>
                           </CardContent>
@@ -1245,7 +1245,7 @@ const CreateDesignPage = () => {
                                 initialFiles={structuralDesign.cadFiles}
                                 fileTypeCategory="CAD"
                                 multiple
-                                accept=".dwg, .dxf"
+                                accept=".dwg, .dxf, .pln"
                               />
                             </div>
                           </CardContent>

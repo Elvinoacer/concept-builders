@@ -1427,7 +1427,7 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
               {
                 id: "cadFiles",
                 label: "CAD Files",
-                accept: ".dwg, .dxf",
+                accept: ".dwg, .dxf, .pln",
               },
             ],
           },
@@ -1447,7 +1447,7 @@ const FilesStepComponent: React.FC<FilesStepProps> = ({
               {
                 id: "cadFiles",
                 label: "CAD Files",
-                accept: ".dwg, .dxf",
+                accept: ".dwg, .dxf, .pln",
               },
             ],
           },

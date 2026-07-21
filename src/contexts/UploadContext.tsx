@@ -139,7 +139,9 @@ export const UploadProvider = ({ children }: { children: ReactNode }) => {
         try {
           await axios.put(signedUrl, file, {
             headers: {
-              "Content-Type": file.type,
+              // PLN/DWG/DXF often have an empty browser MIME type; must match the
+              // ContentType used when generating the presigned URL.
+              "Content-Type": file.type || "application/octet-stream",
             },
             timeout: 0,
             onUploadProgress: (progressEvent) => {

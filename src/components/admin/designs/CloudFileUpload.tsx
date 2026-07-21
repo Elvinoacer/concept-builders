@@ -129,10 +129,26 @@ const CloudFileUpload = ({
     [uploadedFiles, onUploadSuccess, fileTypeCategory, multiple]
   );
 
+  const buildAcceptObject = (acceptInput?: string) => {
+    if (!acceptInput) return undefined;
+
+    const values = acceptInput
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean);
+
+    if (values.length === 0) return undefined;
+
+    return values.reduce<Record<string, string[]>>((acc, value) => {
+      acc[value] = [];
+      return acc;
+    }, {});
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple,
-    accept: accept ? { [accept]: [] } : undefined,
+    accept: buildAcceptObject(accept),
     maxSize: 50 * 1024 * 1024, // 50MB max file size
   });
 
@@ -165,7 +181,7 @@ const CloudFileUpload = ({
       return <FiImage className="text-blue-500 flex-shrink-0" size={20} />;
     } else if (/\.pdf$/i.test(fileName)) {
       return <FiFileText className="text-red-500 flex-shrink-0" size={20} />;
-    } else if (/\.(dwg|dxf)$/i.test(fileName)) {
+    } else if (/\.(dwg|dxf|pln)$/i.test(fileName)) {
       return <FiFileText className="text-orange-500 flex-shrink-0" size={20} />;
     } else if (/\.(xls|xlsx)$/i.test(fileName)) {
       return <FiFileText className="text-green-500 flex-shrink-0" size={20} />;
@@ -188,7 +204,12 @@ const CloudFileUpload = ({
     const types = accept.split(",").map((type) => {
       if (type.includes("image/")) return "images";
       if (type.includes("application/pdf")) return "PDFs";
-      if (type.includes(".dwg") || type.includes(".dxf")) return "CAD files";
+      if (
+        type.includes(".dwg") ||
+        type.includes(".dxf") ||
+        type.includes(".pln")
+      )
+        return "CAD files";
       if (type.includes(".xls") || type.includes(".xlsx")) return "Excel files";
       return type;
     });

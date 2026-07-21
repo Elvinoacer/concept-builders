@@ -139,7 +139,7 @@ const FileUpload = ({
       return <FiImage className="text-blue-500 flex-shrink-0" size={20} />;
     } else if (/\.pdf$/i.test(fileName)) {
       return <FiFileText className="text-red-500 flex-shrink-0" size={20} />;
-    } else if (/\.(dwg|dxf)$/i.test(fileName)) {
+    } else if (/\.(dwg|dxf|pln)$/i.test(fileName)) {
       return <FiFileText className="text-orange-500 flex-shrink-0" size={20} />;
     } else if (/\.(xls|xlsx)$/i.test(fileName)) {
       return <FiFileText className="text-green-500 flex-shrink-0" size={20} />;

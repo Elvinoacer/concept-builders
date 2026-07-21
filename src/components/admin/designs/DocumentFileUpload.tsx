@@ -37,7 +37,7 @@ export default function DocumentFileUpload({
       case "PDF":
         return ".pdf";
       case "CAD":
-        return ".dwg,.dxf,.dgn,.stp,.step,.iges,.igs";
+        return ".dwg,.dxf,.pln,.dgn,.stp,.step,.iges,.igs";
       case "EXCEL":
         return ".xls,.xlsx,.csv";
       default:

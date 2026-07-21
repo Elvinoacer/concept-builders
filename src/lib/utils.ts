@@ -33,7 +33,7 @@ interface ImageLike {
 }
 
 const IMAGE_URL_PATTERN = /\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|#|$)/i;
-const NON_IMAGE_FILE_PATTERN = /\.(pdf|dwg|dxf|doc|docx|xls|xlsx|zip|rar)(\?|#|$)/i;
+const NON_IMAGE_FILE_PATTERN = /\.(pdf|dwg|dxf|pln|doc|docx|xls|xlsx|zip|rar)(\?|#|$)/i;
 
 export function getPrimaryDesignImage(
   design?: { images?: ImageLike[] | null; files?: ImageLike[] | null } | null,
