@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import DesignCard from "./DesignCard";
 import DesignCardSkeleton from "./DesignCardSkeleton";
 
-const FeaturedDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void }) => {
+const FeaturedDesigns = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [featuredDesigns, setFeaturedDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +17,7 @@ const FeaturedDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void }
       setLoading(true);
       try {
         const response = await fetch(
-          "/api/designs?limit=5&isFeatured=true&mode=cursor&includeTotals=false&lite=true",
+          "/api/designs?limit=12&isFeatured=true&mode=cursor&includeTotals=false&lite=true",
         );
         const data = await response.json();
         setFeaturedDesigns(data.designs);
@@ -78,27 +79,35 @@ const FeaturedDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void }
             beautiful facades, and build-ready documentation.
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-3">
-          <motion.button
-            whileHover={{ scale: 1.1, x: -5 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => scroll(-400)}
-            className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center border border-cb-border bg-surface text-gold transition-all duration-300 hover:border-gold/40 hover:text-gold-light"
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+          <Link
+            href="/designs?isFeatured=true"
+            className="order-last border border-[rgba(200,137,42,0.34)] px-4 py-2.5 text-center text-[10px] uppercase tracking-[0.16em] text-gold transition-colors hover:bg-[rgba(200,137,42,0.1)] sm:order-first"
           >
-            <span className="material-symbols-outlined text-2xl sm:text-3xl">
-              chevron_left
-            </span>
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1, x: 5 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => scroll(400)}
-            className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center border border-cb-border bg-surface text-gold transition-all duration-300 hover:border-gold/40 hover:text-gold-light"
-          >
-            <span className="material-symbols-outlined text-2xl sm:text-3xl">
-              chevron_right
-            </span>
-          </motion.button>
+            See all featured
+          </Link>
+          <div className="hidden sm:flex items-center gap-3">
+            <motion.button
+              whileHover={{ scale: 1.1, x: -5 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => scroll(-400)}
+              className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center border border-cb-border bg-surface text-gold transition-all duration-300 hover:border-gold/40 hover:text-gold-light"
+            >
+              <span className="material-symbols-outlined text-2xl sm:text-3xl">
+                chevron_left
+              </span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.1, x: 5 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => scroll(400)}
+              className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center border border-cb-border bg-surface text-gold transition-all duration-300 hover:border-gold/40 hover:text-gold-light"
+            >
+              <span className="material-symbols-outlined text-2xl sm:text-3xl">
+                chevron_right
+              </span>
+            </motion.button>
+          </div>
         </div>
       </div>
 
@@ -132,7 +141,6 @@ const FeaturedDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void }
                       design={design}
                       index={index}
                       showDetails={false}
-                      onCardClick={onCardClick}
                     />
                   </motion.div>
                 ))}

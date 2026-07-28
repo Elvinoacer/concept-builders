@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import "./Featured.css";
-import DesignPreviewModal from "@/components/design-showcase/DesignPreviewModal";
+import { useRouter } from "next/navigation";
 
 type LandingDesign = {
   id?: string;
@@ -110,8 +110,10 @@ const isDisplayImage = (image?: { url?: string; type?: string | null }) =>
 
 export default function Featured({
   allDesigns = [],
+  totalDesignCount,
 }: {
   allDesigns?: LandingDesign[];
+  totalDesignCount?: number;
 }) {
   const categories = React.useMemo<FeaturedCategory[]>(() => {
     const grouped = new Map<string, FeaturedCategory>();
@@ -185,8 +187,13 @@ export default function Featured({
   const [activeId, setActiveId] = useState(categories[0]?.id ?? "");
   const [shimmerKey, setShimmerKey] = useState(0);
   const [isHeroHovered, setIsHeroHovered] = useState(false);
-  const [selectedDesignId, setSelectedDesignId] = useState<string | null>(null);
+  const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
+
+  const openDesign = (id?: string | null) => {
+    if (!id) return;
+    router.push(`/designs/${id}`);
+  };
 
   useEffect(() => {
     if (!activeId && categories[0]) setActiveId(categories[0].id);
@@ -256,7 +263,12 @@ export default function Featured({
             <div className="fc-header-right">
               <div className="fc-stat">
                 <span className="fc-stat-num">
-                  <em id="totalCount">{totalPlans}</em>+
+                  <em id="totalCount">
+                    {totalDesignCount && totalDesignCount > 0
+                      ? totalDesignCount
+                      : totalPlans}
+                  </em>
+                  {totalDesignCount && totalDesignCount > 0 ? "" : "+"}
                 </span>
                 <span className="fc-stat-label">Plans Available</span>
               </div>
@@ -294,12 +306,12 @@ export default function Featured({
               key={`hero-${activeId}`}
               onMouseEnter={() => setIsHeroHovered(true)}
               onMouseLeave={() => setIsHeroHovered(false)}
-              onClick={() => setSelectedDesignId(hero.id)}
+              onClick={() => openDesign(hero.id)}
               role="button"
               tabIndex={0}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ")
-                  setSelectedDesignId(hero.id);
+                  openDesign(hero.id);
               }}
             >
               <Image
@@ -344,7 +356,7 @@ export default function Featured({
                   className="fc-hero-cta"
                   onClick={(event) => {
                     event.stopPropagation();
-                    setSelectedDesignId(hero.id);
+                    openDesign(hero.id);
                   }}
                 >
                   View Plan {iconArrow}
@@ -368,7 +380,7 @@ export default function Featured({
                   type="button"
                   className={`fc-side-card card-enter card-enter-delay-${i + 1}`}
                   key={`s${i}-${activeId}`}
-                  onClick={() => plan && setSelectedDesignId(plan.id)}
+                  onClick={() => plan && openDesign(plan.id)}
                   style={{
                     display: "block",
                     textAlign: "left",
@@ -407,7 +419,7 @@ export default function Featured({
                 type="button"
                 key={`${activeId}-${i}`}
                 className="fc-thumb card-enter"
-                onClick={() => setSelectedDesignId(plan.id)}
+                onClick={() => openDesign(plan.id)}
                 style={{
                   animationDelay: `${0.1 + i * 0.07}s`,
                   display: "block",
@@ -469,7 +481,11 @@ export default function Featured({
                 Filter Plans
               </Link>
               <Link
-                href={`/designs?category=${encodeURIComponent(activeCol.label)}`}
+                href={
+                  activeCol.id === "all-featured"
+                    ? "/designs?isFeatured=true"
+                    : `/designs?category=${encodeURIComponent(activeCol.label)}`
+                }
                 className="fc-btn-primary"
                 style={{
                   textDecoration: "none",
@@ -485,10 +501,6 @@ export default function Featured({
           </div>
         </div>
       </section>
-      <DesignPreviewModal
-        id={selectedDesignId}
-        onClose={() => setSelectedDesignId(null)}
-      />
     </div>
   );
 }

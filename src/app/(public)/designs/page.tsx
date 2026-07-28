@@ -593,6 +593,7 @@ const AllDesignsPage = async ({ searchParams }: AllDesignsPageProps) => {
                 minSize={minSize}
                 maxSize={maxSize}
                 priceType={priceType}
+                totalDesignsHint={totalDesigns}
               />
             </div>
           </div>

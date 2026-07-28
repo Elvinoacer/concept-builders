@@ -208,7 +208,8 @@ export async function GET(request: NextRequest) {
             orderBy: {
               createdAt: "desc",
             },
-            take: 1,
+            // Multi-image teasers for inspiration cards (hover cycle)
+            take: 4,
             select: {
               url: true,
               name: true,
@@ -220,7 +221,7 @@ export async function GET(request: NextRequest) {
             orderBy: {
               createdAt: "desc",
             },
-            take: 1,
+            take: 4,
             select: {
               url: true,
               name: true,
@@ -276,13 +277,18 @@ export async function GET(request: NextRequest) {
         };
 
     if (!isAdmin && useCursorPagination) {
-      const designs = await prisma.design.findMany({
+      const designsPromise = prisma.design.findMany({
         where,
         take: limit + 1,
         ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
         select: publicSelect,
         orderBy,
       });
+
+      // Only count on first page when totals requested — keeps infinite scroll cheap
+      const [designs, totalDesigns] = includeTotals && !cursor
+        ? await Promise.all([designsPromise, prisma.design.count({ where })])
+        : [await designsPromise, undefined];
 
       const hasMore = designs.length > limit;
       const items = hasMore ? designs.slice(0, -1) : designs;
@@ -293,6 +299,7 @@ export async function GET(request: NextRequest) {
           designs: items,
           nextCursor,
           hasMore,
+          ...(typeof totalDesigns === "number" ? { totalDesigns } : {}),
         },
         {
           headers: {

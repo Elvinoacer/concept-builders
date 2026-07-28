@@ -35,26 +35,41 @@ interface ImageLike {
 const IMAGE_URL_PATTERN = /\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|#|$)/i;
 const NON_IMAGE_FILE_PATTERN = /\.(pdf|dwg|dxf|pln|doc|docx|xls|xlsx|zip|rar)(\?|#|$)/i;
 
-export function getPrimaryDesignImage(
+function isDisplayableDesignImage(img: { url: string; type?: string | null }) {
+  const normalizedType = img.type?.toUpperCase();
+  return (
+    normalizedType === "IMAGE" ||
+    IMAGE_URL_PATTERN.test(img.url) ||
+    (!normalizedType && !NON_IMAGE_FILE_PATTERN.test(img.url))
+  );
+}
+
+/** All displayable design images (deduped), for multi-image card teasers. */
+export function getDesignImages(
   design?: { images?: ImageLike[] | null; files?: ImageLike[] | null } | null,
-): string {
+  limit = 4,
+): string[] {
   const candidates = [
     ...(design?.images ?? []),
     ...(design?.files ?? []),
   ].filter((img): img is { url: string; type?: string | null } => Boolean(img?.url));
 
-  if (candidates.length === 0) {
-    return "/images/category-placeholder.webp";
+  const urls: string[] = [];
+  const seen = new Set<string>();
+
+  for (const img of candidates) {
+    if (!isDisplayableDesignImage(img) || seen.has(img.url)) continue;
+    seen.add(img.url);
+    urls.push(img.url);
+    if (urls.length >= limit) break;
   }
 
-  const validImage = candidates.find((img) => {
-    const normalizedType = img.type?.toUpperCase();
-    return (
-      normalizedType === "IMAGE" ||
-      IMAGE_URL_PATTERN.test(img.url) ||
-      (!normalizedType && !NON_IMAGE_FILE_PATTERN.test(img.url))
-    );
-  });
+  return urls;
+}
 
-  return validImage?.url || candidates[0].url || "/images/category-placeholder.webp";
+export function getPrimaryDesignImage(
+  design?: { images?: ImageLike[] | null; files?: ImageLike[] | null } | null,
+): string {
+  const images = getDesignImages(design, 1);
+  return images[0] || "/images/category-placeholder.webp";
 }

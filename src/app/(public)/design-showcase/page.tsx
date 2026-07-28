@@ -2,13 +2,9 @@
 import { motion } from "framer-motion";
 import FeaturedDesigns from "@/components/design-showcase/FeaturedDesigns";
 import ExploreDesigns from "@/components/design-showcase/ExploreDesigns";
-import DesignPreviewModal from "@/components/design-showcase/DesignPreviewModal";
 import Link from "next/link";
-import { useState } from "react";
 
 const DesignShowcasePage = () => {
-  const [previewId, setPreviewId] = useState<string | null>(null);
-
   return (
     <motion.main
       initial={{ opacity: 0 }}
@@ -18,7 +14,12 @@ const DesignShowcasePage = () => {
     >
       <div
         className="pointer-events-none absolute inset-0"
-        style={{ backgroundImage: "url('/images/banners/banner2.webp')", backgroundSize: "cover", backgroundPosition: "center top", opacity: 0.08 }}
+        style={{
+          backgroundImage: "url('/images/banners/banner2.webp')",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+          opacity: 0.08,
+        }}
       />
       <div className="pointer-events-none absolute inset-0 opacity-70">
         <div
@@ -60,6 +61,7 @@ const DesignShowcasePage = () => {
               <p className="text-sm leading-[1.8] text-cream-dim sm:text-[15px]">
                 Browse our signature concepts, discover practical floor plans,
                 and find the exact design language for your next home build.
+                Click any plan to explore full galleries and details.
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-4">
                 <Link
@@ -80,11 +82,22 @@ const DesignShowcasePage = () => {
           </div>
         </section>
 
-
         <div className="mb-10 hidden overflow-hidden border-y border-[rgba(240,232,216,0.08)] bg-card py-4 md:block">
           <div className="animate-[marquee_28s_linear_infinite] whitespace-nowrap">
-            {["Architectural Excellence", "Kenyan Dream Homes", "Bespoke Blueprints", "Structural Drawings", "CAD Files Included", "Custom Designs Welcome", "Architectural Excellence", "Kenyan Dream Homes"].map((item, idx) => (
-              <span key={`${item}-${idx}`} className="px-8 text-[14px] italic text-cream-dim">
+            {[
+              "Architectural Excellence",
+              "Kenyan Dream Homes",
+              "Bespoke Blueprints",
+              "Structural Drawings",
+              "CAD Files Included",
+              "Custom Designs Welcome",
+              "Architectural Excellence",
+              "Kenyan Dream Homes",
+            ].map((item, idx) => (
+              <span
+                key={`${item}-${idx}`}
+                className="px-8 text-[14px] italic text-cream-dim"
+              >
                 <span className="mr-7 inline-block h-[5px] w-[5px] rounded-full bg-gold align-middle" />
                 {item}
               </span>
@@ -93,12 +106,10 @@ const DesignShowcasePage = () => {
         </div>
 
         <div className="space-y-12 sm:space-y-16 md:space-y-20">
-          <FeaturedDesigns onCardClick={setPreviewId} />
-          <ExploreDesigns onCardClick={setPreviewId} />
+          <FeaturedDesigns />
+          <ExploreDesigns />
         </div>
       </div>
-      
-      <DesignPreviewModal id={previewId} onClose={() => setPreviewId(null)} />
     </motion.main>
   );
 };

@@ -16,89 +16,101 @@ type LandingDesignSummary = { id: string };
 
 const getLandingData = unstable_cache(
   async () => {
-    const [featured, byCategory, collections, ongoingProjects] = await Promise.all([
-      prisma.design.findMany({
-        where: { isFeatured: true },
-        select: {
-          id: true,
-          name: true,
-          basePrice: true,
-          bedrooms: true,
-          bathrooms: true,
-          area: true,
-          isFeatured: true,
-          images: {
-            where: { type: "IMAGE" },
-            orderBy: { createdAt: "desc" },
-            take: 4,
-            select: { url: true, type: true },
+    const [featured, byCategory, collections, ongoingProjects, totalDesignCount] =
+      await Promise.all([
+        prisma.design.findMany({
+          where: { isFeatured: true },
+          select: {
+            id: true,
+            name: true,
+            basePrice: true,
+            bedrooms: true,
+            bathrooms: true,
+            area: true,
+            isFeatured: true,
+            images: {
+              where: { type: "IMAGE" },
+              orderBy: { createdAt: "desc" },
+              take: 4,
+              select: { url: true, type: true },
+            },
+            category: { select: { id: true, name: true } },
+            architecturalDesign: {
+              select: { pdfFiles: { select: { id: true }, take: 1 } },
+            },
+            structuralDesign: {
+              select: { pdfFiles: { select: { id: true }, take: 1 } },
+            },
           },
-          category: { select: { id: true, name: true } },
-          architecturalDesign: {
-            select: { pdfFiles: { select: { id: true }, take: 1 } },
+          orderBy: [{ featuredPriority: "desc" }, { views: "desc" }],
+          take: 12,
+        }),
+        prisma.design.findMany({
+          select: {
+            id: true,
+            name: true,
+            basePrice: true,
+            bedrooms: true,
+            bathrooms: true,
+            area: true,
+            isFeatured: true,
+            images: {
+              where: { type: "IMAGE" },
+              orderBy: { createdAt: "desc" },
+              take: 4,
+              select: { url: true, type: true },
+            },
+            category: { select: { id: true, name: true } },
+            architecturalDesign: {
+              select: { pdfFiles: { select: { id: true }, take: 1 } },
+            },
+            structuralDesign: {
+              select: { pdfFiles: { select: { id: true }, take: 1 } },
+            },
           },
-          structuralDesign: {
-            select: { pdfFiles: { select: { id: true }, take: 1 } },
+          orderBy: { views: "desc" },
+          take: 48,
+        }),
+        prisma.designCollection.findMany({
+          where: { active: true },
+          include: { category: true },
+          orderBy: { order: "asc" },
+        }),
+        prisma.ongoingProject.findMany({
+          where: { published: true },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            featuredImage: true,
+            clientName: true,
+            location: true,
+            status: true,
+            category: true,
           },
-        },
-        orderBy: [{ featuredPriority: "desc" }, { views: "desc" }],
-        take: 12,
-      }),
-      prisma.design.findMany({
-        select: {
-          id: true,
-          name: true,
-          basePrice: true,
-          bedrooms: true,
-          bathrooms: true,
-          area: true,
-          isFeatured: true,
-          images: {
-            where: { type: "IMAGE" },
-            orderBy: { createdAt: "desc" },
-            take: 4,
-            select: { url: true, type: true },
-          },
-          category: { select: { id: true, name: true } },
-          architecturalDesign: {
-            select: { pdfFiles: { select: { id: true }, take: 1 } },
-          },
-          structuralDesign: {
-            select: { pdfFiles: { select: { id: true }, take: 1 } },
-          },
-        },
-        orderBy: { views: "desc" },
-        take: 48,
-      }),
-      prisma.designCollection.findMany({
-        where: { active: true },
-        include: { category: true },
-        orderBy: { order: "asc" },
-      }),
-      prisma.ongoingProject.findMany({
-        where: { published: true },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          featuredImage: true,
-          clientName: true,
-          location: true,
-          status: true,
-          category: true,
-        }
-      })
-    ]);
-    return { featured, all: byCategory, collections, ongoingProjects };
+        }),
+        prisma.design.count(),
+      ]);
+    return {
+      featured,
+      all: byCategory,
+      collections,
+      ongoingProjects,
+      totalDesignCount,
+    };
   },
-  ["landing-data-v3"],
-  { revalidate: 300, tags: ["landing-data", "designs", "featured-designs", "ongoing-projects"] }, // 5 minute cache + tags for on-demand revalidation
+  ["landing-data-v4"],
+  {
+    revalidate: 300,
+    tags: ["landing-data", "designs", "featured-designs", "ongoing-projects"],
+  },
 );
 
 export default async function LandingPage() {
-  const { featured, all, collections, ongoingProjects } = await getLandingData();
+  const { featured, all, collections, ongoingProjects, totalDesignCount } =
+    await getLandingData();
 
   return (
     <div style={{ backgroundColor: "#141414" }} className="relative">
@@ -109,8 +121,8 @@ export default async function LandingPage() {
       />
       <div className="relative z-10">
         <DreamPlan featuredDesigns={featured.slice(0, 7)} />
-        <Featured allDesigns={featured} />
-        <Explorer allDesigns={all} />
+        <Featured allDesigns={featured} totalDesignCount={totalDesignCount} />
+        <Explorer allDesigns={all} totalDesignCount={totalDesignCount} />
         <DesignJourney />
         <SocialProof projects={ongoingProjects} />
         <DesignIdeas collections={collections} />

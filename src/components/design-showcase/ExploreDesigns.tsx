@@ -35,7 +35,7 @@ type ShowcaseDesign = {
   files?: Array<{ url: string; name?: string; type: string }>;
 };
 
-const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void }) => {
+const ExploreDesigns = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -348,7 +348,6 @@ const ExploreDesigns = ({ onCardClick }: { onCardClick?: (id: string) => void })
                   design={design}
                   index={index}
                   priceType={priceType}
-                  onCardClick={onCardClick}
                 />
               </motion.div>
             ))

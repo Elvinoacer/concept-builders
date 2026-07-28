@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import "./Explorer.css";
-import DesignPreviewModal from "@/components/design-showcase/DesignPreviewModal";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type LandingDesign = {
   id?: string;
@@ -46,40 +47,44 @@ const isDisplayImage = (image?: { url?: string; type?: string | null }) =>
 
 export default function Explorer({
   allDesigns = [],
+  totalDesignCount,
 }: {
   allDesigns?: LandingDesign[];
+  totalDesignCount?: number;
 }) {
-  const mergedPlans = React.useMemo<ExplorerPlan[]>(
-    () =>
-      allDesigns
-        .map((design, index) => {
-          const firstImage = design.images?.find(isDisplayImage);
-          if (!design.id || !firstImage?.url) return null;
+  const mergedPlans = React.useMemo<ExplorerPlan[]>(() => {
+    const plans: ExplorerPlan[] = [];
 
-          const categoryName = design.category?.name || "House Plans";
-          const categorySlug = toSlug(categoryName);
+    for (let index = 0; index < allDesigns.length; index++) {
+      const design = allDesigns[index];
+      const firstImage = design.images?.find(isDisplayImage);
+      if (!design.id || !firstImage?.url) continue;
 
-          return {
-            id: design.id,
-            tags: [categorySlug, `${design.bedrooms || 0}bed`].filter(Boolean),
-            name: design.name,
-            style: categoryName,
-            beds: design.bedrooms ?? "—",
-            baths: design.bathrooms ?? "—",
-            sqft: design.area ? design.area.toLocaleString() : "—",
-            img: firstImage.url,
-            basePrice: design.basePrice,
-            hasFiles: Boolean(
-              design.architecturalDesign?.pdfFiles?.length ||
-                design.structuralDesign?.pdfFiles?.length,
-            ),
-            height: 240 + (index % 4) * 20,
-          };
-        })
-        .filter((plan): plan is ExplorerPlan => Boolean(plan))
-        .slice(0, 12),
-    [allDesigns],
-  );
+      const categoryName = design.category?.name || "House Plans";
+      const categorySlug = toSlug(categoryName);
+
+      plans.push({
+        id: design.id,
+        tags: [categorySlug, `${design.bedrooms || 0}bed`].filter(Boolean),
+        name: design.name,
+        style: categoryName,
+        beds: design.bedrooms ?? "—",
+        baths: design.bathrooms ?? "—",
+        sqft: design.area ? design.area.toLocaleString() : "—",
+        img: firstImage.url,
+        basePrice: design.basePrice,
+        hasFiles: Boolean(
+          design.architecturalDesign?.pdfFiles?.length ||
+            design.structuralDesign?.pdfFiles?.length,
+        ),
+        height: 240 + (index % 4) * 20,
+      });
+
+      if (plans.length >= 24) break;
+    }
+
+    return plans;
+  }, [allDesigns]);
 
   const styleFilters = React.useMemo(
     () =>
@@ -93,25 +98,18 @@ export default function Explorer({
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
   );
-  const [selectedDesignId, setSelectedDesignId] = useState<string | null>(null);
-
+  const router = useRouter();
   const trackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Use refs for transient interaction state to avoid re-triggering the RAF effect
   const isHoveredRef = useRef(false);
   const isDraggingRef = useRef(false);
-  const selectedDesignIdRef = useRef<string | null>(null);
 
   // Keep a separate dragging state only used to gate click handler
   const hasDraggedRef = useRef(false);
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
-
-  // Sync selectedPlan into ref so the RAF loop can read it without being a dep
-  useEffect(() => {
-    selectedDesignIdRef.current = selectedDesignId;
-  }, [selectedDesignId]);
 
   const sectionRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -131,14 +129,6 @@ export default function Explorer({
       els.forEach((el) => observer.observe(el));
     }
     return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelectedDesignId(null);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   // Parallax + Auto-Scroll Engine
@@ -163,8 +153,7 @@ export default function Explorer({
       // 1. Auto-Scroll logic — reads refs, no state deps
       if (
         !isHoveredRef.current &&
-        !isDraggingRef.current &&
-        !selectedDesignIdRef.current
+        !isDraggingRef.current
       ) {
         track.scrollLeft += 0.8 * scrollDirection;
         if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 2) {
@@ -257,7 +246,8 @@ export default function Explorer({
 
   const handleCardClick = (plan: (typeof mergedPlans)[0]) => {
     if (hasDraggedRef.current) return;
-    setSelectedDesignId(plan.id);
+    if (!plan.id) return;
+    router.push(`/designs/${plan.id}`);
   };
 
   return (
@@ -284,8 +274,18 @@ export default function Explorer({
               your reality.
             </p>
           </div>
-          <div className="ex-result-count">
-            <span>{visiblePlans.length}</span> designs shown
+          <div className="ex-header-actions">
+            <div className="ex-result-count">
+              <span>{visiblePlans.length}</span>
+              {typeof totalDesignCount === "number" && totalDesignCount > 0
+                ? ` of ${totalDesignCount} plans`
+                : allDesigns.length > visiblePlans.length
+                  ? ` of ${allDesigns.length}+ in gallery`
+                  : " designs shown"}
+            </div>
+            <Link href="/designs" className="ex-explore-all">
+              Explore all designs →
+            </Link>
           </div>
         </div>
 
@@ -430,7 +430,7 @@ export default function Explorer({
                           <circle cx="8" cy="8" r="6" />
                           <path d="M8 5v3l2 2" />
                         </svg>
-                        Explore Details
+                        Explore design
                       </div>
                     </div>
                   </div>
@@ -445,10 +445,19 @@ export default function Explorer({
         )}
       </div>
 
-      <DesignPreviewModal
-        id={selectedDesignId}
-        onClose={() => setSelectedDesignId(null)}
-      />
+
+      <div className="ex-footer-cta ex-reveal">
+        <p>
+          Looking for more inspiration? Browse
+          {typeof totalDesignCount === "number" && totalDesignCount > 0
+            ? ` all ${totalDesignCount} architectural plans`
+            : " the full catalog of architectural plans"}
+          .
+        </p>
+        <Link href="/designs" className="ex-explore-all-btn">
+          Browse all designs
+        </Link>
+      </div>
     </section>
   );
 }

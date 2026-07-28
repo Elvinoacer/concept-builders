@@ -188,6 +188,27 @@ export default async function DesignDetailPage({
 
   sanitizePrivateFileUrls(design);
 
+  const relatedSelect = {
+    id: true,
+    name: true,
+    basePrice: true,
+    bedrooms: true,
+    bathrooms: true,
+    area: true,
+    category: { select: { name: true } },
+    images: {
+      where: { type: "IMAGE" as const },
+      take: 4,
+      orderBy: { createdAt: "desc" as const },
+      select: {
+        id: true,
+        url: true,
+        name: true,
+        type: true,
+      },
+    },
+  };
+
   const related = design.categoryId
     ? await unstable_cache(
         async () =>
@@ -196,35 +217,78 @@ export default async function DesignDetailPage({
               categoryId: design.categoryId,
               id: { not: design.id },
             },
-            take: 3,
-            orderBy: { createdAt: "desc" },
-            select: {
-              id: true,
-              name: true,
-              basePrice: true,
-              category: { select: { name: true } },
-              images: {
-                where: { type: "IMAGE" },
-                take: 1,
-                select: {
-                  id: true,
-                  url: true,
-                  name: true,
-                  type: true,
-                },
-              },
-            },
+            take: 12,
+            orderBy: [{ views: "desc" }, { createdAt: "desc" }],
+            select: relatedSelect,
           }),
-        [`design-related-${id}`],
+        [`design-related-v2-${id}`],
         { revalidate: 120, tags: ["designs", `design-${id}`] },
       )()
     : [];
+
+  // Prev/next neighbors in the same category (by name) for continuous inspiration
+  const neighbors = design.categoryId
+    ? await unstable_cache(
+        async () => {
+          const [prev, next] = await Promise.all([
+            prisma.design.findFirst({
+              where: {
+                categoryId: design.categoryId,
+                name: { lt: design.name },
+              },
+              orderBy: { name: "desc" },
+              select: { id: true, name: true },
+            }),
+            prisma.design.findFirst({
+              where: {
+                categoryId: design.categoryId,
+                name: { gt: design.name },
+              },
+              orderBy: { name: "asc" },
+              select: { id: true, name: true },
+            }),
+          ]);
+
+          // Wrap around category edges so browsing never dead-ends
+          const [first, last] = await Promise.all([
+            !prev
+              ? prisma.design.findFirst({
+                  where: {
+                    categoryId: design.categoryId,
+                    id: { not: design.id },
+                  },
+                  orderBy: { name: "desc" },
+                  select: { id: true, name: true },
+                })
+              : Promise.resolve(null),
+            !next
+              ? prisma.design.findFirst({
+                  where: {
+                    categoryId: design.categoryId,
+                    id: { not: design.id },
+                  },
+                  orderBy: { name: "asc" },
+                  select: { id: true, name: true },
+                })
+              : Promise.resolve(null),
+          ]);
+
+          return {
+            prev: prev ?? first,
+            next: next ?? last,
+          };
+        },
+        [`design-neighbors-v1-${id}`],
+        { revalidate: 120, tags: ["designs", `design-${id}`] },
+      )()
+    : { prev: null, next: null };
 
   return (
     <DesignDetailClient
       designId={id}
       initialDesign={design as unknown as DesignDetailPayload}
       initialRelated={related as unknown as RelatedDesignPayload[]}
+      initialNeighbors={neighbors}
     />
   );
 }

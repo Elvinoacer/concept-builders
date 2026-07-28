@@ -90,12 +90,24 @@ type RelatedDesign = {
   id: string;
   name: string;
   basePrice: number;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  area?: number | null;
   category?: { name: string } | null;
   images?: FileAsset[];
 };
 
+type NeighborDesign = {
+  id: string;
+  name: string;
+} | null;
+
 export type DesignDetailPayload = DesignDetail;
 export type RelatedDesignPayload = RelatedDesign;
+export type NeighborDesignPayload = {
+  prev: NeighborDesign;
+  next: NeighborDesign;
+};
 
 type ActiveTab = "details" | "floorplans" | "specs" | "faq";
 
@@ -121,12 +133,14 @@ interface DesignDetailClientProps {
   designId: string;
   initialDesign: DesignDetail;
   initialRelated: RelatedDesign[];
+  initialNeighbors?: NeighborDesignPayload;
 }
 
 export default function DesignDetailClient({
   designId,
   initialDesign,
   initialRelated,
+  initialNeighbors = { prev: null, next: null },
 }: DesignDetailClientProps) {
   const router = useRouter();
   const { status } = useSession();
@@ -134,6 +148,7 @@ export default function DesignDetailClient({
 
   const [design] = useState<DesignDetail | null>(initialDesign);
   const [related] = useState<RelatedDesign[]>(initialRelated);
+  const neighbors = initialNeighbors;
   const [loading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -217,6 +232,15 @@ export default function DesignDetailClient({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [design, lightboxOpen]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [lightboxOpen]);
 
   const faqItems = useMemo(() => asFAQ(design?.faq), [design?.faq]);
 
@@ -585,25 +609,63 @@ export default function DesignDetailClient({
               </div>
             )}
 
-            <nav
-              className="mb-5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em]"
-              style={{ color: "var(--design-hero-breadcrumb)" }}
-            >
-              <Link href="/" className="transition-colors hover:text-gold">
-                Home
-              </Link>
-              <ChevronRight size={10} />
-              <Link
-                href="/designs"
-                className="transition-colors hover:text-gold"
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <nav
+                className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em]"
+                style={{ color: "var(--design-hero-breadcrumb)" }}
               >
-                Plans
-              </Link>
-              <ChevronRight size={10} />
-              <span className="line-clamp-1 max-w-[220px] sm:max-w-full">
-                {design.name}
-              </span>
-            </nav>
+                <Link href="/" className="transition-colors hover:text-gold">
+                  Home
+                </Link>
+                <ChevronRight size={10} />
+                <Link
+                  href="/designs"
+                  className="transition-colors hover:text-gold"
+                >
+                  Plans
+                </Link>
+                {design.category?.name && (
+                  <>
+                    <ChevronRight size={10} />
+                    <Link
+                      href={`/designs?category=${encodeURIComponent(design.category.name)}`}
+                      className="transition-colors hover:text-gold"
+                    >
+                      {design.category.name}
+                    </Link>
+                  </>
+                )}
+                <ChevronRight size={10} />
+                <span className="line-clamp-1 max-w-[160px] sm:max-w-full">
+                  {design.name}
+                </span>
+              </nav>
+
+              {(neighbors.prev || neighbors.next) && (
+                <div className="flex items-center gap-2">
+                  {neighbors.prev && (
+                    <Link
+                      href={`/designs/${neighbors.prev.id}`}
+                      className="group flex max-w-[160px] items-center gap-1.5 border border-[rgba(240,232,216,0.14)] bg-black/35 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.14em] text-cream-dim backdrop-blur-md transition-colors hover:border-gold/40 hover:text-gold sm:max-w-[220px]"
+                      title={neighbors.prev.name}
+                    >
+                      <ChevronLeft size={14} />
+                      <span className="truncate">{neighbors.prev.name}</span>
+                    </Link>
+                  )}
+                  {neighbors.next && (
+                    <Link
+                      href={`/designs/${neighbors.next.id}`}
+                      className="group flex max-w-[160px] items-center gap-1.5 border border-[rgba(240,232,216,0.14)] bg-black/35 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.14em] text-cream-dim backdrop-blur-md transition-colors hover:border-gold/40 hover:text-gold sm:max-w-[220px]"
+                      title={neighbors.next.name}
+                    >
+                      <span className="truncate">{neighbors.next.name}</span>
+                      <ChevronRight size={14} />
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
 
             <p className="mb-4 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-gold">
               <span className="h-px w-7 bg-gold" />
@@ -1412,69 +1474,174 @@ export default function DesignDetailClient({
 
       {related.length > 0 && (
         <section className="mx-auto mb-20 w-full max-w-[1440px] border-t border-[var(--design-border-soft)] px-5 pt-16 sm:px-8 lg:px-[60px]">
-          <div className="mb-10 flex items-end justify-between gap-3">
-            <h2
-              className="text-[clamp(32px,4vw,52px)] font-light leading-[1.1]"
-              style={{
-                fontFamily:
-                  'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
-              }}
-            >
-              Similar <em className="text-gold">Designs</em>
-            </h2>
-            <Link
-              href="/designs"
-              className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-cream-dim transition-colors hover:text-gold"
-            >
-              View All
-              <ArrowRight size={14} />
-            </Link>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="mb-3 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-gold">
+                Keep exploring
+                <span className="h-px w-7 bg-[rgba(200,137,42,0.22)]" />
+              </p>
+              <h2
+                className="text-[clamp(32px,4vw,52px)] font-light leading-[1.1]"
+                style={{
+                  fontFamily:
+                    'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+                }}
+              >
+                Similar <em className="text-gold">Designs</em>
+              </h2>
+              <p className="mt-3 max-w-xl font-mono text-[12px] leading-[1.7] text-cream-dim">
+                More plans in{" "}
+                <span className="text-gold">
+                  {design.category?.name || "this style"}
+                </span>{" "}
+                — keep scrolling for inspiration.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {design.category?.name && (
+                <Link
+                  href={`/designs?category=${encodeURIComponent(design.category.name)}`}
+                  className="flex items-center gap-2 border border-[rgba(200,137,42,0.28)] px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-[rgba(200,137,42,0.1)]"
+                >
+                  All in {design.category.name}
+                  <ArrowRight size={14} />
+                </Link>
+              )}
+              <Link
+                href="/designs"
+                className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-cream-dim transition-colors hover:text-gold"
+              >
+                Browse all
+                <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
 
-          <div className="grid gap-px bg-[var(--design-border-soft)] md:grid-cols-3">
-            {related.map((item) => (
-              <Link
-                key={item.id}
-                href={`/designs/${item.id}`}
-                className="group bg-ink transition-colors hover:bg-card"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  {item.images?.[0]?.url ? (
-                    <Image
-                      src={item.images[0].url}
-                      alt={item.name}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover brightness-[0.78] transition-all duration-700 group-hover:scale-105 group-hover:brightness-90"
-                    />
-                  ) : (
-                    <div className="grid h-full place-items-center bg-surface text-muted">
-                      No image
+          <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 [scrollbar-width:none] sm:-mx-8 sm:px-8 [&::-webkit-scrollbar]:hidden lg:-mx-[60px] lg:px-[60px]">
+            {related.map((item) => {
+              const thumb = item.images?.[0]?.url;
+              const viewCount = item.images?.filter((img) => img.url).length ?? 0;
+              return (
+                <Link
+                  key={item.id}
+                  href={`/designs/${item.id}`}
+                  className="group w-[78%] max-w-[340px] flex-shrink-0 snap-start border border-[rgba(240,232,216,0.08)] bg-card transition-colors hover:border-gold/40 sm:w-[46%] lg:w-[31%]"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden bg-surface">
+                    {thumb ? (
+                      <Image
+                        src={thumb}
+                        alt={item.name}
+                        fill
+                        sizes="(max-width: 768px) 80vw, 33vw"
+                        className="object-cover brightness-[0.82] transition-all duration-700 group-hover:scale-105 group-hover:brightness-95"
+                      />
+                    ) : (
+                      <div className="grid h-full place-items-center text-muted">
+                        No image
+                      </div>
+                    )}
+                    {viewCount > 1 && (
+                      <span className="absolute bottom-3 left-3 bg-black/55 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-white/90">
+                        {viewCount} views
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-4 sm:p-5">
+                    <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.2em] text-gold">
+                      {item.category?.name || "Design"}
+                    </p>
+                    <p
+                      className="mb-3 line-clamp-1 text-[22px] font-light leading-[1.1] transition-colors group-hover:text-gold-light"
+                      style={{
+                        fontFamily:
+                          'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+                      }}
+                    >
+                      {item.name}
+                    </p>
+                    <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                      {item.bedrooms ?? "—"} bed · {item.bathrooms ?? "—"} bath
+                      {item.area ? ` · ${Math.round(item.area)} m²` : ""}
+                    </p>
+                    <div className="flex items-center justify-between border-t border-[var(--design-border-soft)] pt-3">
+                      <span className="font-mono text-[12px] text-cream-dim">
+                        {priceLabel(item.basePrice)}
+                      </span>
+                      <span className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.14em] text-gold">
+                        Explore
+                        <ArrowRight
+                          size={12}
+                          className="transition-transform group-hover:translate-x-0.5"
+                        />
+                      </span>
                     </div>
-                  )}
-                </div>
-                <div className="p-5">
-                  <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.2em] text-gold">
-                    {item.category?.name || "Design"}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Continuous inspiration footer nav */}
+      {(neighbors.prev || neighbors.next) && (
+        <section className="mx-auto mb-28 w-full max-w-[1440px] px-5 sm:px-8 lg:px-[60px]">
+          <div className="grid gap-px border border-[var(--design-border-soft)] bg-[var(--design-border-soft)] sm:grid-cols-2">
+            {neighbors.prev ? (
+              <Link
+                href={`/designs/${neighbors.prev.id}`}
+                className="group flex items-center gap-4 bg-ink p-5 transition-colors hover:bg-card sm:p-7"
+              >
+                <ChevronLeft
+                  size={18}
+                  className="shrink-0 text-gold transition-transform group-hover:-translate-x-1"
+                />
+                <div className="min-w-0">
+                  <p className="mb-1 font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+                    Previous plan
                   </p>
                   <p
-                    className="mb-4 text-[24px] font-light leading-[1.1]"
+                    className="truncate text-[22px] font-light text-cream transition-colors group-hover:text-gold"
                     style={{
                       fontFamily:
                         'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
                     }}
                   >
-                    {item.name}
+                    {neighbors.prev.name}
                   </p>
-                  <div className="flex items-center justify-between border-t border-[var(--design-border-soft)] pt-3">
-                    <span className="font-mono text-[12px] text-cream-dim">
-                      {priceLabel(item.basePrice)}
-                    </span>
-                    <ArrowRight size={14} className="text-gold" />
-                  </div>
                 </div>
               </Link>
-            ))}
+            ) : (
+              <div className="bg-ink p-5 sm:p-7" />
+            )}
+            {neighbors.next ? (
+              <Link
+                href={`/designs/${neighbors.next.id}`}
+                className="group flex items-center justify-end gap-4 bg-ink p-5 text-right transition-colors hover:bg-card sm:p-7"
+              >
+                <div className="min-w-0">
+                  <p className="mb-1 font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+                    Next plan
+                  </p>
+                  <p
+                    className="truncate text-[22px] font-light text-cream transition-colors group-hover:text-gold"
+                    style={{
+                      fontFamily:
+                        'var(--font-cormorant-garamond), "Cormorant Garamond", serif',
+                    }}
+                  >
+                    {neighbors.next.name}
+                  </p>
+                </div>
+                <ChevronRight
+                  size={18}
+                  className="shrink-0 text-gold transition-transform group-hover:translate-x-1"
+                />
+              </Link>
+            ) : (
+              <div className="bg-ink p-5 sm:p-7" />
+            )}
           </div>
         </section>
       )}
@@ -1515,53 +1682,101 @@ export default function DesignDetailClient({
 
       {lightboxOpen && images.length > 0 && (
         <div
-          className="fixed inset-0 z-[500] flex items-center justify-center bg-[var(--design-lightbox-bg)] p-4 backdrop-blur-xl"
+          className="fixed inset-0 z-[500] flex flex-col bg-black/95 backdrop-blur-xl"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${design.name} gallery`}
           onClick={(event) => {
             if (event.target === event.currentTarget) setLightboxOpen(false);
           }}
         >
-          <div className="relative">
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-3 sm:px-6">
+            <div className="min-w-0">
+              <p className="truncate font-mono text-[10px] uppercase tracking-[0.16em] text-gold">
+                {design.name}
+              </p>
+              <p className="font-mono text-[11px] text-white/55">
+                {String(lightboxIndex + 1).padStart(2, "0")} /{" "}
+                {String(images.length).padStart(2, "0")}
+              </p>
+            </div>
             <button
               type="button"
               onClick={() => setLightboxOpen(false)}
-              className="absolute -top-12 right-0 grid h-10 w-10 place-items-center border border-[var(--design-border-soft)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
+              className="grid h-10 w-10 place-items-center border border-white/15 text-cream transition-colors hover:border-gold/50 hover:text-gold"
+              aria-label="Close gallery"
             >
               <Plus className="rotate-45" size={18} />
             </button>
+          </div>
+
+          <div className="relative flex min-h-0 flex-1 items-center justify-center px-3 py-4 sm:px-12">
+            {images.length > 1 && (
+              <button
+                type="button"
+                onClick={() =>
+                  setLightboxIndex(
+                    (prev) => (prev - 1 + images.length) % images.length,
+                  )
+                }
+                className="absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-white/15 bg-black/40 text-cream transition-colors hover:border-gold/50 hover:text-gold sm:left-6"
+                aria-label="Previous image"
+              >
+                <ChevronLeft size={18} />
+              </button>
+            )}
+
             {images[lightboxIndex]?.url && (
               <Image
                 src={images[lightboxIndex].url || ""}
                 alt={`${design.name} enlarged ${lightboxIndex + 1}`}
-                width={1600}
+                width={1800}
                 height={1200}
-                className="max-h-[85vh] w-auto max-w-[90vw] object-contain"
+                className="max-h-[min(78vh,900px)] w-auto max-w-[min(96vw,1400px)] object-contain"
+                priority
               />
             )}
+
             {images.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setLightboxIndex(
-                      (prev) => (prev - 1 + images.length) % images.length,
-                    )
-                  }
-                  className="absolute -left-12 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[var(--design-border-soft)] bg-[var(--design-control-bg)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setLightboxIndex((prev) => (prev + 1) % images.length)
-                  }
-                  className="absolute -right-12 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[var(--design-border-soft)] bg-[var(--design-control-bg)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={() =>
+                  setLightboxIndex((prev) => (prev + 1) % images.length)
+                }
+                className="absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-white/15 bg-black/40 text-cream transition-colors hover:border-gold/50 hover:text-gold sm:right-6"
+                aria-label="Next image"
+              >
+                <ChevronRight size={18} />
+              </button>
             )}
           </div>
+
+          {images.length > 1 && (
+            <div className="flex justify-center gap-1.5 overflow-x-auto border-t border-white/10 px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {images.map((img, idx) => (
+                <button
+                  key={img.id}
+                  type="button"
+                  onClick={() => setLightboxIndex(idx)}
+                  className={`relative h-14 w-20 flex-shrink-0 overflow-hidden border transition-all ${
+                    idx === lightboxIndex
+                      ? "border-gold opacity-100"
+                      : "border-transparent opacity-50 hover:opacity-85"
+                  }`}
+                >
+                  {img.url ? (
+                    <Image
+                      src={img.url}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
