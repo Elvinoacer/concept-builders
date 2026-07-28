@@ -175,11 +175,23 @@ export default function DesignDetailClient({
     setHeroIndex(0);
     setGalleryIndex(0);
     setActiveFloorPlan(0);
+    setLightboxOpen(false);
     setSelectedFileTypes(
       (initialDesign.architecturalDesign?.pdfFiles?.length || 0) > 0
         ? ["architecturalPdf"]
         : [],
     );
+
+    // Always land at the top when moving between designs (prev/next, related)
+    if (typeof window !== "undefined" && !window.location.hash) {
+      const root = document.documentElement;
+      const previousBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      root.scrollTop = 0;
+      document.body.scrollTop = 0;
+      root.style.scrollBehavior = previousBehavior;
+    }
   }, [initialDesign, designId]);
 
   useEffect(() => {

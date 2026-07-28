@@ -2,6 +2,7 @@ import { SearchProvider } from "@/lib/SearchContext";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import FloatingCartButton from "@/components/cart/FloatingCartButtonWrapper";
+import ScrollToTop from "@/components/public/ScrollToTop";
 // removed ThemeProvider
 
 export default function PublicShell({
@@ -12,11 +13,17 @@ export default function PublicShell({
   hideSharedChrome: boolean;
 }) {
   if (hideSharedChrome) {
-    return <main className="w-full">{children}</main>;
+    return (
+      <>
+        <ScrollToTop />
+        <main className="w-full">{children}</main>
+      </>
+    );
   }
 
   return (
     <SearchProvider>
+      <ScrollToTop />
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 w-full">{children}</main>

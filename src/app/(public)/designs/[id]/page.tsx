@@ -285,6 +285,8 @@ export default async function DesignDetailPage({
 
   return (
     <DesignDetailClient
+      // Force a fresh client tree per design so state + scroll never carry over
+      key={id}
       designId={id}
       initialDesign={design as unknown as DesignDetailPayload}
       initialRelated={related as unknown as RelatedDesignPayload[]}
