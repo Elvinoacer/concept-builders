@@ -153,10 +153,11 @@ export default function DesignDetailClient({
   const [error, setError] = useState<string | null>(null);
 
   const [heroIndex, setHeroIndex] = useState(0);
-  const [heroAutoplayTick, setHeroAutoplayTick] = useState(0);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  /** Pause auto-advance once the customer picks an image to inspect in detail. */
+  const [isSlideshowPaused, setIsSlideshowPaused] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const [activeTab, setActiveTab] = useState<ActiveTab>("details");
@@ -176,6 +177,7 @@ export default function DesignDetailClient({
     setGalleryIndex(0);
     setActiveFloorPlan(0);
     setLightboxOpen(false);
+    setIsSlideshowPaused(false);
     setSelectedFileTypes(
       (initialDesign.architecturalDesign?.pdfFiles?.length || 0) > 0
         ? ["architecturalPdf"]
@@ -232,12 +234,23 @@ export default function DesignDetailClient({
       if (!design) return;
       const media = design.images;
       if (!lightboxOpen || media.length === 0) return;
-      if (event.key === "Escape") setLightboxOpen(false);
-      if (event.key === "ArrowLeft") {
-        setLightboxIndex((prev) => (prev - 1 + media.length) % media.length);
+      if (event.key === "Escape") {
+        setLightboxOpen(false);
+        return;
       }
-      if (event.key === "ArrowRight") {
-        setLightboxIndex((prev) => (prev + 1) % media.length);
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        // Keep hero/gallery/lightbox in sync and hold the chosen frame.
+        event.preventDefault();
+        setIsSlideshowPaused(true);
+        setLightboxIndex((prev) => {
+          const next =
+            event.key === "ArrowLeft"
+              ? (prev - 1 + media.length) % media.length
+              : (prev + 1) % media.length;
+          setHeroIndex(next);
+          setGalleryIndex(next);
+          return next;
+        });
       }
     };
 
@@ -359,27 +372,34 @@ export default function DesignDetailClient({
   const safeFloorPlanIndex =
     floorPlans.length > 0 ? activeFloorPlan % floorPlans.length : 0;
 
-  const selectHeroImage = (index: number) => {
+  const selectImage = (index: number, options?: { openLightbox?: boolean }) => {
     if (images.length === 0) return;
     const normalized =
       ((index % images.length) + images.length) % images.length;
     setHeroIndex(normalized);
     setGalleryIndex(normalized);
-    setHeroAutoplayTick((prev) => prev + 1);
+    setLightboxIndex(normalized);
+    // Customer chose a specific image — hold it so they can inspect details.
+    setIsSlideshowPaused(true);
+    if (options?.openLightbox) {
+      setLightboxOpen(true);
+    }
   };
 
   const goToNextHeroImage = () => {
     if (images.length <= 1) return;
-    selectHeroImage(safeHeroIndex + 1);
+    selectImage(safeHeroIndex + 1);
   };
 
   const goToPreviousHeroImage = () => {
     if (images.length <= 1) return;
-    selectHeroImage(safeHeroIndex - 1);
+    selectImage(safeHeroIndex - 1);
   };
 
   useEffect(() => {
-    if (images.length <= 1) return;
+    // Autoplay only while idle; stop when the lightbox is open or the user
+    // has selected a specific image to view in detail.
+    if (images.length <= 1 || isSlideshowPaused || lightboxOpen) return;
 
     const interval = window.setInterval(() => {
       setHeroIndex((prev) => (prev + 1) % images.length);
@@ -387,7 +407,7 @@ export default function DesignDetailClient({
     }, 5200);
 
     return () => window.clearInterval(interval);
-  }, [images.length, heroAutoplayTick]);
+  }, [images.length, isSlideshowPaused, lightboxOpen]);
 
   const toggleDocument = (key: string) => {
     const option = documentOptions.find((item) => item.key === key);
@@ -529,7 +549,7 @@ export default function DesignDetailClient({
               <button
                 key={img.id}
                 type="button"
-                onClick={() => selectHeroImage(idx)}
+                onClick={() => selectImage(idx)}
                 className={`h-[54px] w-[72px] overflow-hidden border transition-all ${
                   idx === safeHeroIndex
                     ? "border-gold opacity-100"
@@ -609,7 +629,7 @@ export default function DesignDetailClient({
                   <button
                     key={`hero-dot-${img.id}`}
                     type="button"
-                    onClick={() => selectHeroImage(idx)}
+                    onClick={() => selectImage(idx)}
                     className={`h-2.5 rounded-full transition-all ${
                       idx === safeHeroIndex
                         ? "w-7 bg-gold"
@@ -881,10 +901,9 @@ export default function DesignDetailClient({
                     fill
                     sizes="(max-width: 1024px) 100vw, 70vw"
                     className="object-cover transition-transform duration-700 hover:scale-[1.03]"
-                    onClick={() => {
-                      setLightboxIndex(safeGalleryIndex);
-                      setLightboxOpen(true);
-                    }}
+                    onClick={() =>
+                      selectImage(safeGalleryIndex, { openLightbox: true })
+                    }
                   />
                 ) : (
                   <div className="grid h-full place-items-center text-center">
@@ -898,20 +917,14 @@ export default function DesignDetailClient({
                   <>
                     <button
                       type="button"
-                      onClick={() =>
-                        setGalleryIndex(
-                          (prev) => (prev - 1 + images.length) % images.length,
-                        )
-                      }
+                      onClick={() => selectImage(safeGalleryIndex - 1)}
                       className="absolute left-4 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[var(--design-border-soft)] bg-[var(--design-control-bg)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
                     >
                       <ChevronLeft size={18} />
                     </button>
                     <button
                       type="button"
-                      onClick={() =>
-                        setGalleryIndex((prev) => (prev + 1) % images.length)
-                      }
+                      onClick={() => selectImage(safeGalleryIndex + 1)}
                       className="absolute right-4 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-[var(--design-border-soft)] bg-[var(--design-control-bg)] text-cream transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
                     >
                       <ChevronRight size={18} />
@@ -925,10 +938,9 @@ export default function DesignDetailClient({
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
-                    setLightboxIndex(safeGalleryIndex);
-                    setLightboxOpen(true);
-                  }}
+                  onClick={() =>
+                    selectImage(safeGalleryIndex, { openLightbox: true })
+                  }
                   className="absolute bottom-4 left-4 flex items-center gap-2 border border-[var(--design-border-soft)] bg-[var(--design-control-bg-soft)] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-cream-dim transition-colors hover:border-[var(--design-border-accent)] hover:text-gold"
                 >
                   <Expand size={13} />
@@ -942,7 +954,7 @@ export default function DesignDetailClient({
                     <button
                       key={img.id}
                       type="button"
-                      onClick={() => setGalleryIndex(idx)}
+                      onClick={() => selectImage(idx)}
                       className={`aspect-[3/2] overflow-hidden border transition-all ${
                         idx === safeGalleryIndex
                           ? "border-gold opacity-100"
@@ -1726,11 +1738,7 @@ export default function DesignDetailClient({
             {images.length > 1 && (
               <button
                 type="button"
-                onClick={() =>
-                  setLightboxIndex(
-                    (prev) => (prev - 1 + images.length) % images.length,
-                  )
-                }
+                onClick={() => selectImage(lightboxIndex - 1)}
                 className="absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-white/15 bg-black/40 text-cream transition-colors hover:border-gold/50 hover:text-gold sm:left-6"
                 aria-label="Previous image"
               >
@@ -1752,9 +1760,7 @@ export default function DesignDetailClient({
             {images.length > 1 && (
               <button
                 type="button"
-                onClick={() =>
-                  setLightboxIndex((prev) => (prev + 1) % images.length)
-                }
+                onClick={() => selectImage(lightboxIndex + 1)}
                 className="absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center border border-white/15 bg-black/40 text-cream transition-colors hover:border-gold/50 hover:text-gold sm:right-6"
                 aria-label="Next image"
               >
@@ -1769,7 +1775,7 @@ export default function DesignDetailClient({
                 <button
                   key={img.id}
                   type="button"
-                  onClick={() => setLightboxIndex(idx)}
+                  onClick={() => selectImage(idx)}
                   className={`relative h-14 w-20 flex-shrink-0 overflow-hidden border transition-all ${
                     idx === lightboxIndex
                       ? "border-gold opacity-100"
