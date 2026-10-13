@@ -1,105 +1,118 @@
 import prisma from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import DreamPlan from "@/components/landing/hero";
 
-const Featured = dynamic(() => import("@/components/landing/Featured"));
-const Explorer = dynamic(() => import("@/components/landing/Explorer"));
-const DesignJourney = dynamic(
+export const dynamic = "force-dynamic";
+
+const Featured = nextDynamic(() => import("@/components/landing/Featured"));
+const Explorer = nextDynamic(() => import("@/components/landing/Explorer"));
+const DesignJourney = nextDynamic(
   () => import("@/components/landing/DesignJourney"),
 );
-const SocialProof = dynamic(() => import("@/components/landing/SocialProof"));
-const DesignIdeas = dynamic(() => import("@/components/landing/DesignIdeas"));
-const ContactForm = dynamic(() => import("@/components/landing/ContactForm"));
+const SocialProof = nextDynamic(() => import("@/components/landing/SocialProof"));
+const DesignIdeas = nextDynamic(() => import("@/components/landing/DesignIdeas"));
+const ContactForm = nextDynamic(() => import("@/components/landing/ContactForm"));
 
 type LandingDesignSummary = { id: string };
 
 const getLandingData = unstable_cache(
   async () => {
-    const [featured, byCategory, collections, ongoingProjects, totalDesignCount] =
-      await Promise.all([
-        prisma.design.findMany({
-          where: { isFeatured: true },
-          select: {
-            id: true,
-            name: true,
-            basePrice: true,
-            bedrooms: true,
-            bathrooms: true,
-            area: true,
-            isFeatured: true,
-            images: {
-              where: { type: "IMAGE" },
-              orderBy: { createdAt: "desc" },
-              take: 4,
-              select: { url: true, type: true },
+    try {
+      const [featured, byCategory, collections, ongoingProjects, totalDesignCount] =
+        await Promise.all([
+          prisma.design.findMany({
+            where: { isFeatured: true },
+            select: {
+              id: true,
+              name: true,
+              basePrice: true,
+              bedrooms: true,
+              bathrooms: true,
+              area: true,
+              isFeatured: true,
+              images: {
+                where: { type: "IMAGE" },
+                orderBy: { createdAt: "desc" },
+                take: 4,
+                select: { url: true, type: true },
+              },
+              category: { select: { id: true, name: true } },
+              architecturalDesign: {
+                select: { pdfFiles: { select: { id: true }, take: 1 } },
+              },
+              structuralDesign: {
+                select: { pdfFiles: { select: { id: true }, take: 1 } },
+              },
             },
-            category: { select: { id: true, name: true } },
-            architecturalDesign: {
-              select: { pdfFiles: { select: { id: true }, take: 1 } },
+            orderBy: [{ featuredPriority: "desc" }, { views: "desc" }],
+            take: 12,
+          }),
+          prisma.design.findMany({
+            select: {
+              id: true,
+              name: true,
+              basePrice: true,
+              bedrooms: true,
+              bathrooms: true,
+              area: true,
+              isFeatured: true,
+              images: {
+                where: { type: "IMAGE" },
+                orderBy: { createdAt: "desc" },
+                take: 4,
+                select: { url: true, type: true },
+              },
+              category: { select: { id: true, name: true } },
+              architecturalDesign: {
+                select: { pdfFiles: { select: { id: true }, take: 1 } },
+              },
+              structuralDesign: {
+                select: { pdfFiles: { select: { id: true }, take: 1 } },
+              },
             },
-            structuralDesign: {
-              select: { pdfFiles: { select: { id: true }, take: 1 } },
+            orderBy: { views: "desc" },
+            take: 48,
+          }),
+          prisma.designCollection.findMany({
+            where: { active: true },
+            include: { category: true },
+            orderBy: { order: "asc" },
+          }),
+          prisma.ongoingProject.findMany({
+            where: { published: true },
+            orderBy: { createdAt: "desc" },
+            take: 5,
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              featuredImage: true,
+              clientName: true,
+              location: true,
+              status: true,
+              category: true,
             },
-          },
-          orderBy: [{ featuredPriority: "desc" }, { views: "desc" }],
-          take: 12,
-        }),
-        prisma.design.findMany({
-          select: {
-            id: true,
-            name: true,
-            basePrice: true,
-            bedrooms: true,
-            bathrooms: true,
-            area: true,
-            isFeatured: true,
-            images: {
-              where: { type: "IMAGE" },
-              orderBy: { createdAt: "desc" },
-              take: 4,
-              select: { url: true, type: true },
-            },
-            category: { select: { id: true, name: true } },
-            architecturalDesign: {
-              select: { pdfFiles: { select: { id: true }, take: 1 } },
-            },
-            structuralDesign: {
-              select: { pdfFiles: { select: { id: true }, take: 1 } },
-            },
-          },
-          orderBy: { views: "desc" },
-          take: 48,
-        }),
-        prisma.designCollection.findMany({
-          where: { active: true },
-          include: { category: true },
-          orderBy: { order: "asc" },
-        }),
-        prisma.ongoingProject.findMany({
-          where: { published: true },
-          orderBy: { createdAt: "desc" },
-          take: 5,
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            featuredImage: true,
-            clientName: true,
-            location: true,
-            status: true,
-            category: true,
-          },
-        }),
-        prisma.design.count(),
-      ]);
-    return {
-      featured,
-      all: byCategory,
-      collections,
-      ongoingProjects,
-      totalDesignCount,
-    };
+          }),
+          prisma.design.count(),
+        ]);
+      return {
+        featured,
+        all: byCategory,
+        collections,
+        ongoingProjects,
+        totalDesignCount,
+      };
+    } catch (error) {
+      console.error("Error fetching landing data:", error);
+      return {
+        featured: [],
+        all: [],
+        collections: [],
+        ongoingProjects: [],
+        totalDesignCount: 0,
+      };
+    }
   },
   ["landing-data-v4"],
   {

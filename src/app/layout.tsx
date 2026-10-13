@@ -12,6 +12,7 @@ import "./globals.css";
 import { TrackingScript } from "@/components/TrackingScript";
 import { VercelAnalytics } from "@/components/VercelAnalytics";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import PausedDeployment from "@/components/pause-deploy";
 import Providers from "./Providers";
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -250,13 +251,16 @@ export default function RootLayout({
         {/* Disable auto-translation on some browsers */}
         <meta name="google" content="notranslate" />
       </head>
-      <body className="antialiased min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary-foreground">
-        <Providers>
-          {/* Main content container with mobile-safe areas */}
-          <div className="min-h-screen flex flex-col safe-top safe-bottom">
-            {children}
-          </div>
-        </Providers>
+      <body className="antialiased min-h-screen bg-black text-foreground overflow-hidden selection:bg-primary/20 selection:text-primary-foreground">
+        <PausedDeployment />
+        <div style={{ display: "none" }} aria-hidden="true">
+          <Providers>
+            {/* Main content container with mobile-safe areas */}
+            <div className="min-h-screen flex flex-col safe-top safe-bottom">
+              {children}
+            </div>
+          </Providers>
+        </div>
 
         {/* Performance and Analytics */}
         <VercelAnalytics />
