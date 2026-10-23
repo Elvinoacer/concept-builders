@@ -425,7 +425,7 @@ const Header = () => {
         }`}
       >
         {/* Vine fills the entire header as a living background */}
-        <VineCanvas />
+        {pathname !== "/" && <VineCanvas />}
 
         {/* All nav content sits on top with z-10 */}
         <div className="relative z-10 mx-auto flex w-full max-w-screen-2xl items-center justify-between px-5 py-4 sm:px-6 lg:px-[60px]">

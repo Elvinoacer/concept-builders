@@ -51,6 +51,8 @@ const pool =
   global.prismaPool ||
   new Pool({
     connectionString: normalizedConnectionString,
+    // Fail unavailable connections instead of leaving streamed pages pending indefinitely.
+    connectionTimeoutMillis: 10000,
   });
 
 const prisma =

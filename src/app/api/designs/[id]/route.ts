@@ -15,12 +15,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    const isAdmin = session?.user.role === "ADMIN";
     const { id } = await params;
     const preview = request.nextUrl.searchParams.get("preview") === "true";
 
-    if (preview && !isAdmin) {
+    if (preview) {
       const design = await prisma.design.findUnique({
         where: { id },
         select: {
@@ -34,8 +32,8 @@ export async function GET(
           floors: true,
           category: { select: { id: true, name: true } },
           images: {
-            where: { type: "IMAGE" },
-            orderBy: { createdAt: "desc" },
+            where: { type: "IMAGE", status: "COMPLETED", isLatest: true },
+            orderBy: [{ createdAt: "asc" }, { id: "asc" }],
             select: { url: true, type: true, name: true },
           },
         },
@@ -53,6 +51,8 @@ export async function GET(
       });
     }
 
+    const session = await getServerSession(authOptions);
+    const isAdmin = session?.user?.role === "ADMIN";
     const design = await prisma.design.findUnique({
       where: { id },
       include: {
