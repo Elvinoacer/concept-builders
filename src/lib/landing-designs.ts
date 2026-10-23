@@ -1,3 +1,5 @@
+import { landingImageUrl } from "./landing-media";
+
 export type LandingImage = { url: string; name?: string; type?: string | null };
 
 export type LandingDesign = {
@@ -40,7 +42,10 @@ export function toLandingPlan(design: LandingDesign): LandingPlan | null {
     bathrooms: design.bathrooms,
     area: design.area,
     basePrice: design.basePrice,
-    images,
+    images: images.map((image) => ({
+      ...image,
+      url: landingImageUrl(image.url),
+    })),
   };
 }
 
@@ -71,13 +76,31 @@ export function planFacts(plan: LandingPlan): string[] {
   ].filter((fact): fact is string => Boolean(fact));
 }
 
+// Verified against the published catalog on 24 October 2026. The local poster
+// is an optimized copy of this record's A_2 exterior, keeping arrival independent
+// of database latency. Opening the preview fetches all current published views.
+export const CINEMATIC_HOME: LandingPlan = {
+  id: "cmtw3ljrq001b04leoivjo3py",
+  name: "FIVE BEDROOM VILLA MAISONETTE (CB3023)",
+  category: "Villas",
+  images: [
+    {
+      url: "/images/landing/cb3023-arrival.webp",
+      name: "Front elevation",
+      type: "IMAGE",
+    },
+  ],
+};
+
 // Existing public architectural renders from public/cloudimages.md. These are
 // inspiration galleries, with no invented catalog IDs, prices, or room counts.
 const cdn = "https://cdn.conceptbuilders.co.ke/design_images";
 function publicImages(folder: string, names: string[]): LandingImage[] {
   return names.map((name) => ({
     name,
-    url: `${cdn}/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`,
+    url: landingImageUrl(
+      `${cdn}/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`,
+    ),
   }));
 }
 

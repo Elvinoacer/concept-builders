@@ -1,44 +1,76 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import Image from "next/image";
 import {
   ArrowDown,
+  ArrowLeft,
+  ArrowRight,
   ArrowUpRight,
   Expand,
-  MoveUpRight,
   Pause,
   Play,
 } from "lucide-react";
 import {
-  imageLabel,
   planFacts,
+  type LandingImage,
   type LandingPlan,
   type PreviewHandler,
 } from "@/lib/landing-designs";
+import "./CinematicHero.css";
 
-const CHAPTERS = [
-  {
-    title: "A place to arrive.",
-    copy: "Architecture for the way you want to live.",
-    name: "Arrival",
-  },
-  {
-    title: "Consider every angle.",
-    copy: "Discover the character of a home, one perspective at a time.",
-    name: "Perspective",
-  },
-  {
-    title: "See the bigger picture.",
-    copy: "Space. Form. A new point of view.",
-    name: "Discovery",
-  },
-  {
-    title: "Imagine life here.",
-    copy: "A considered beginning. A home to make your own.",
-    name: "At home",
-  },
-];
+type HeroSlide = { key: string; plan: LandingPlan; image: LandingImage };
+const HOLD_MS = 7600;
+
+function buildSlides(
+  lead: LandingPlan,
+  collection: LandingPlan[],
+): HeroSlide[] {
+  const homes = new Set<string>();
+  const images = new Set<string>();
+  const slides: HeroSlide[] = [];
+  for (const plan of [lead, ...collection]) {
+    const identity = plan.id ?? plan.name;
+    const image = plan.images[0];
+    if (!image || homes.has(identity) || images.has(image.url)) continue;
+    homes.add(identity);
+    images.add(image.url);
+    slides.push({ key: `${identity}:${image.url}`, plan, image });
+    if (slides.length === 5) break;
+  }
+  if (slides.length === 1) {
+    for (const image of lead.images.slice(1, 4)) {
+      if (!images.has(image.url)) {
+        slides.push({
+          key: `${lead.id ?? lead.name}:${image.url}`,
+          plan: lead,
+          image,
+        });
+        images.add(image.url);
+      }
+    }
+  }
+  return slides;
+}
+
+function headline(name: string) {
+  const code = name.match(/\s*\((CB[\w-]+)\)\s*$/i)?.[1];
+  const title = name.replace(/\s*\(CB[\w-]+\)\s*$/i, "").trim();
+  return {
+    code,
+    title:
+      title === title.toUpperCase()
+        ? title.charAt(0) + title.slice(1).toLowerCase()
+        : title,
+  };
+}
 
 export default function DreamPlan({
   plan,
@@ -52,317 +84,321 @@ export default function DreamPlan({
   paused: boolean;
 }) {
   const rootRef = useRef<HTMLElement>(null);
-  const activeRef = useRef(0);
-  const [active, setActive] = useState(0);
-  const [posterReady, setPosterReady] = useState(false);
+  const slides = useMemo(
+    () => buildSlides(plan, collection),
+    [plan, collection],
+  );
+  const [active, setActive] = useState(slides[0]);
+  const [previous, setPrevious] = useState<HeroSlide | null>(null);
+  const [requestedKey, setRequestedKey] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState<Set<string>>(() => new Set());
+  const [failed, setFailed] = useState<Set<string>>(() => new Set());
+  const [inView, setInView] = useState(true);
+  const [pageVisible, setPageVisible] = useState(true);
   const [systemReduced, setSystemReduced] = useState(false);
   const [motionChoice, setMotionChoice] = useState<boolean | null>(null);
-  const [imageFailed, setImageFailed] = useState(false);
-  const views = useMemo(() => plan.images.slice(0, 4), [plan.images]);
-  const motionEnabled = (motionChoice ?? !systemReduced) && views.length > 1;
-  const currentView = Math.min(active, views.length - 1);
-  const facts = planFacts(plan);
-  const chapter =
-    CHAPTERS[
-      views.length === 1
-        ? 0
-        : Math.round((currentView / (views.length - 1)) * 3)
-    ];
+  const [entered, setEntered] = useState(false);
+  const firstTransition = useRef(true);
+  const index = Math.max(
+    0,
+    slides.findIndex((slide) => slide.key === active.key),
+  );
+  const next = slides[(index + 1) % slides.length];
+  const motionEnabled = motionChoice ?? !systemReduced;
+  const playing = motionEnabled && !paused && inView && pageVisible;
+  const name = headline(active.plan.name);
+  const facts = planFacts(active.plan);
 
   useEffect(() => {
-    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const timer = window.setTimeout(() => setEntered(true), 1000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const connection = (
       navigator as Navigator & { connection?: { saveData?: boolean } }
     ).connection;
     const update = () =>
-      setSystemReduced(preference.matches || Boolean(connection?.saveData));
+      setSystemReduced(media.matches || Boolean(connection?.saveData));
     update();
-    preference.addEventListener("change", update);
+    media.addEventListener("change", update);
     try {
-      const stored = localStorage.getItem("cb:cinema-motion:v1");
-      if (stored === "on" || stored === "off") setMotionChoice(stored === "on");
+      const saved = localStorage.getItem("cb:cinema-motion:v1");
+      if (saved === "on" || saved === "off") setMotionChoice(saved === "on");
     } catch {
-      /* Motion preferences are optional when browser storage is unavailable. */
+      /* This visit still supports the motion control without storage. */
     }
-    return () => preference.removeEventListener("change", update);
+    return () => media.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-    const header = document.querySelector("header");
-    const measure = () =>
-      root.style.setProperty(
-        "--cinema-header",
-        `${header?.getBoundingClientRect().height ?? 88}px`,
-      );
-    measure();
-    const observer = new ResizeObserver(measure);
-    if (header) observer.observe(header);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    let frame = 0;
-    let inView = false;
-    const invitation = root.querySelector<HTMLElement>(
-      ".home-cinema__invitation",
-    );
-    if (invitation && !motionEnabled) invitation.inert = false;
-    const paint = () => {
-      frame = 0;
-      if (!inView || document.hidden || paused || !motionEnabled) return;
-      const rect = root.getBoundingClientRect();
-      const header =
-        parseFloat(root.style.getPropertyValue("--cinema-header")) || 88;
-      const distance = Math.max(
-        1,
-        root.offsetHeight - (window.innerHeight - header),
-      );
-      const progress = Math.max(0, Math.min(1, (header - rect.top) / distance));
-      const position = Math.max(
-        0,
-        Math.min(
-          views.length - 1,
-          ((progress - 0.12) / 0.76) * (views.length - 1),
-        ),
-      );
-      const base = Math.floor(position);
-      const blend = Math.max(0, Math.min(1, (position - base - 0.55) / 0.45));
-      views.forEach((_, index) =>
-        root.style.setProperty(
-          `--view-${index}`,
-          String(index <= base ? 1 : index === base + 1 ? blend : 0),
-        ),
-      );
-      root.style.setProperty("--story-progress", String(progress));
-      root.style.setProperty(
-        "--intro-opacity",
-        String(Math.max(0, 1 - progress * 4)),
-      );
-      if (invitation) invitation.inert = progress >= 0.25;
-      root.style.setProperty(
-        "--intro-shift",
-        `${Math.min(progress * 180, 45)}px`,
-      );
-      root.style.setProperty(
-        "--image-top",
-        `${Math.max(40, 200 - progress * 390)}px`,
-      );
-      root.style.setProperty(
-        "--image-left",
-        `${Math.max(5, 41 - progress * 80)}%`,
-      );
-      const next = Math.min(views.length - 1, base + (blend > 0.5 ? 1 : 0));
-      if (next !== activeRef.current) {
-        activeRef.current = next;
-        setActive(next);
-      }
-    };
-    const schedule = () => {
-      if (!frame && inView && !document.hidden && !paused && motionEnabled)
-        frame = requestAnimationFrame(paint);
-    };
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        inView = entry.isIntersecting;
-        if (inView) schedule();
-      },
-      { rootMargin: "100px" },
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.15 },
     );
     observer.observe(root);
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule, { passive: true });
-    document.addEventListener("visibilitychange", schedule);
-    schedule();
+    const update = () => setPageVisible(!document.hidden);
+    update();
+    document.addEventListener("visibilitychange", update);
     return () => {
-      cancelAnimationFrame(frame);
       observer.disconnect();
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-      document.removeEventListener("visibilitychange", schedule);
+      document.removeEventListener("visibilitychange", update);
     };
-  }, [motionEnabled, paused, views]);
+  }, []);
 
-  function selectView(index: number) {
-    const root = rootRef.current;
-    if (!root) return;
-    if (!motionEnabled) {
-      activeRef.current = index;
-      setActive(index);
-      views.forEach((_, i) =>
-        root.style.setProperty(`--view-${i}`, String(i <= index ? 1 : 0)),
-      );
+  // A streamed catalog update also waits for its first image before replacing
+  // the editorial opening. The entrance itself remains mounted throughout.
+  useEffect(() => {
+    const current = slides.find((slide) => slide.key === active.key);
+    if (!current) setRequestedKey(slides[0].key);
+    else setActive(current);
+  }, [slides, active.key]);
+
+  // The current image stays visible until the requested image is decoded.
+  useEffect(() => {
+    if (
+      paused ||
+      !pageVisible ||
+      !inView ||
+      !requestedKey ||
+      !loaded.has(requestedKey)
+    )
+      return;
+    const target = slides.find((slide) => slide.key === requestedKey);
+    if (!target) {
+      setRequestedKey(null);
       return;
     }
-    const header =
-      parseFloat(root.style.getPropertyValue("--cinema-header")) || 88;
-    const distance = root.offsetHeight - (window.innerHeight - header);
-    const fraction =
-      views.length <= 1 ? 0 : 0.12 + (index / (views.length - 1)) * 0.76;
-    window.scrollTo({
-      top:
-        window.scrollY +
-        root.getBoundingClientRect().top -
-        header +
-        distance * fraction,
-      behavior: systemReduced ? "instant" : "smooth",
-    });
+    setPrevious(active);
+    setActive(target);
+    setRequestedKey(null);
+    firstTransition.current = false;
+  }, [requestedKey, loaded, slides, active, paused, pageVisible, inView]);
+
+  useEffect(() => {
+    if (
+      !playing ||
+      slides.length < 2 ||
+      !loaded.has(active.key) ||
+      requestedKey
+    )
+      return;
+    const timer = window.setTimeout(
+      () => {
+        for (let offset = 1; offset < slides.length; offset++) {
+          const target = slides[(index + offset) % slides.length];
+          if (!failed.has(target.key)) {
+            setRequestedKey(target.key);
+            break;
+          }
+        }
+      },
+      HOLD_MS + (firstTransition.current ? 1300 : 0),
+    );
+    return () => window.clearTimeout(timer);
+  }, [playing, slides, index, active.key, loaded, requestedKey, failed]);
+
+  function selectSlide(targetIndex: number) {
+    const direction = targetIndex < index ? -1 : 1;
+    const target = Array.from(
+      { length: slides.length },
+      (_, offset) =>
+        slides[
+          (targetIndex + direction * offset + slides.length * 2) % slides.length
+        ],
+    ).find((slide) => !failed.has(slide.key));
+    if (!target) return;
+    if (target.key === active.key) {
+      setRequestedKey(null);
+      return;
+    }
+    setRequestedKey(target.key);
   }
 
   function toggleMotion() {
-    const next = !motionEnabled;
-    setMotionChoice(next);
+    const choice = !motionEnabled;
+    setMotionChoice(choice);
     try {
-      localStorage.setItem("cb:cinema-motion:v1", next ? "on" : "off");
+      localStorage.setItem("cb:cinema-motion:v1", choice ? "on" : "off");
     } catch {
-      /* Preference still applies for this visit. */
-    }
-    if (!next && rootRef.current) {
-      // Keep the viewport stable when collapsing the long sticky section.
-      const header =
-        parseFloat(rootRef.current.style.getPropertyValue("--cinema-header")) ||
-        88;
-      const top = Math.max(
-        0,
-        window.scrollY + rootRef.current.getBoundingClientRect().top - header,
-      );
-      if (window.scrollY > top) window.scrollTo({ top, behavior: "instant" });
+      /* Storage is optional. */
     }
   }
+
+  const mounted = new Map<string, HeroSlide>();
+  if (previous) mounted.set(previous.key, previous);
+  mounted.set(active.key, active);
+  if (loaded.has(active.key) && next.key !== active.key)
+    mounted.set(next.key, next);
+  const requested = slides.find((slide) => slide.key === requestedKey);
+  if (requested) mounted.set(requested.key, requested);
 
   return (
     <section
       ref={rootRef}
-      className="home-cinema"
+      className="film-hero"
       id="hero"
+      data-entered={entered}
+      data-playing={playing}
       data-motion={motionEnabled ? "enabled" : "reduced"}
-      aria-label="Discover a home from every perspective"
+      aria-label="Discover our house plans"
+      onKeyDown={(event) => {
+        if (event.altKey || event.metaKey || event.ctrlKey) return;
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          selectSlide(index + 1);
+        }
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          selectSlide(index - 1);
+        }
+      }}
     >
-      <div className="home-cinema__stage">
-        <div className="home-cinema__intro">
-          <p className="home-eyebrow">
-            <span /> Architecture for real life
-          </p>
-          <h1>
-            A better house.
-            <br />A better <em>beginning.</em>
-          </h1>
-        </div>
-        <div className="home-cinema__invitation">
-          <p>
-            Beautiful, practical house plans.
-            <br />
-            Considered around your life.
-          </p>
-          <div>
-            <a href="#explorer">
-              Explore house plans <ArrowUpRight size={16} aria-hidden="true" />
-            </a>
-            <a href="#consultation-form">
-              Design my home <ArrowUpRight size={16} aria-hidden="true" />
-            </a>
+      <div className="film-hero__images">
+        {[...mounted.values()].map((slide) => (
+          <div
+            key={slide.key}
+            className="film-hero__image"
+            data-active={slide.key === active.key}
+            data-outgoing={slide.key === previous?.key}
+            aria-hidden={slide.key !== active.key}
+          >
+            <Image
+              src={slide.image.url}
+              alt={slide.plan.name}
+              fill
+              sizes="100vw"
+              priority={slide.key === slides[0].key}
+              loading={slide.key === slides[0].key ? undefined : "eager"}
+              className="film-hero__photo"
+              onLoad={() =>
+                setLoaded((current) =>
+                  current.has(slide.key)
+                    ? current
+                    : new Set(current).add(slide.key),
+                )
+              }
+              onError={() => {
+                setFailed((current) => new Set(current).add(slide.key));
+                setRequestedKey((current) =>
+                  current === slide.key ? null : current,
+                );
+              }}
+            />
           </div>
+        ))}
+      </div>
+      <div className="film-hero__shade" aria-hidden="true" />
+      <div className="film-hero__entrance" aria-hidden="true">
+        <div className="film-hero__entrance-brand">
+          Concept Builders<span>Considered from the beginning.</span>
         </div>
-        <div className="home-cinema__visual">
-          <div className="home-cinema__frame-line" aria-hidden="true" />
-          {views.map(
-            (image, index) =>
-              (index === 0 ||
-                index === currentView ||
-                index === currentView - 1 ||
-                (posterReady && index === currentView + 1)) && (
-                <div
-                  className="home-cinema__frame"
-                  key={image.url}
-                  style={{
-                    opacity: index === 0 ? 1 : `var(--view-${index}, 0)`,
-                  }}
-                  aria-hidden={currentView !== index}
-                >
-                  <Image
-                    src={image.url}
-                    alt={`${plan.name} — ${imageLabel(image, index)}`}
-                    fill
-                    sizes="(max-width: 760px) 94vw, (max-width: 1600px) 90vw, 1440px"
-                    priority={index === 0}
-                    loading={index === 0 ? undefined : "eager"}
-                    className="home-cinema__render"
-                    onLoad={() => {
-                      if (index === 0) setPosterReady(true);
-                    }}
-                    onError={() => setImageFailed(true)}
-                  />
-                </div>
-              ),
+      </div>
+      <div className="film-hero__overline">
+        <span>Architecture for the way you live</span>
+        <span>Kenya · Designed around you</span>
+      </div>
+      <div
+        className="film-hero__headline"
+        key={active.plan.id ?? active.plan.name}
+      >
+        <p className="film-hero__category">
+          {active.plan.category}
+          {name.code && (
+            <>
+              <span />
+              {name.code}
+            </>
           )}
-          <span className="home-cinema__index" aria-hidden="true">
-            {String(currentView + 1).padStart(2, "0")}
-            <span> / {String(views.length).padStart(2, "0")}</span>
+        </p>
+        <h1 aria-label={active.plan.name}>
+          {name.title.split(/\s+/).map((word, wordIndex) => (
+            <Fragment key={`${word}-${wordIndex}`}>
+              {wordIndex > 0 && " "}
+              <span className="film-hero__word-mask">
+                <span style={{ "--word-index": wordIndex } as CSSProperties}>
+                  {word}
+                </span>
+              </span>
+            </Fragment>
+          ))}
+        </h1>
+        <p className="film-hero__description">
+          Beautiful, practical house plans. A place to make your own.
+        </p>
+      </div>
+      <div className="film-hero__actions">
+        <button
+          type="button"
+          className="film-hero__preview"
+          onClick={() =>
+            onPreview(
+              active.plan,
+              collection.some(
+                (home) =>
+                  (home.id ?? home.name) ===
+                  (active.plan.id ?? active.plan.name),
+              )
+                ? collection
+                : [active.plan, ...collection],
+            )
+          }
+        >
+          <span>Experience this home</span>
+          <Expand size={15} aria-hidden="true" />
+        </button>
+        <a href="#explorer">
+          Explore house plans <ArrowUpRight size={16} aria-hidden="true" />
+        </a>
+      </div>
+      <div className="film-hero__bottom">
+        <div className="film-hero__detail">
+          <span>
+            {facts.length
+              ? facts.join(" · ")
+              : "Your land. Your family. Your home."}
+          </span>
+          <a href="#consultation-form">
+            Begin your own story <ArrowUpRight size={12} aria-hidden="true" />
+          </a>
+        </div>
+        <a href="#featured" className="film-hero__scroll">
+          <span>Discover more</span>
+          <ArrowDown size={15} aria-hidden="true" />
+        </a>
+        <div
+          className="film-hero__controls"
+          aria-label="Featured home slideshow"
+        >
+          <button
+            type="button"
+            aria-label="Previous featured home"
+            disabled={slides.length < 2}
+            onClick={() => selectSlide(index - 1)}
+          >
+            <ArrowLeft size={16} aria-hidden="true" />
+          </button>
+          <span className="film-hero__counter">
+            {String(index + 1).padStart(2, "0")}
+            <span> / {String(slides.length).padStart(2, "0")}</span>
           </span>
           <button
             type="button"
-            className="home-cinema__expand"
-            onClick={() =>
-              onPreview(
-                plan,
-                collection.some((p) => p.id === plan.id && p.name === plan.name)
-                  ? collection
-                  : [plan, ...collection],
-              )
-            }
+            aria-label="Next featured home"
+            disabled={slides.length < 2}
+            onClick={() => selectSlide(index + 1)}
           >
-            <Expand size={16} aria-hidden="true" />
-            <span>Experience this home</span>
+            <ArrowRight size={16} aria-hidden="true" />
           </button>
-          {imageFailed && (
-            <p className="home-cinema__image-note">
-              Explore available perspectives in the full preview.
-            </p>
-          )}
-        </div>
-        <div className="home-cinema__caption">
-          <div className="home-cinema__chapter" aria-live="polite">
-            <span>
-              {String(currentView + 1).padStart(2, "0")} — {chapter.name}
-            </span>
-            <h2>{chapter.title}</h2>
-            <p>{chapter.copy}</p>
-          </div>
-          <div className="home-cinema__identity">
-            <p>{plan.category}</p>
-            <h3>{plan.name}</h3>
-            {facts.length > 0 && <span>{facts.join(" · ")}</span>}
-          </div>
-        </div>
-        <div className="home-cinema__footer">
-          <a href="#featured" className="home-cinema__scroll">
-            <ArrowDown size={14} aria-hidden="true" />
-            <span>
-              {motionEnabled ? "Scroll to discover" : "Discover more homes"}
-            </span>
-          </a>
-          <div
-            className="home-cinema__chapters"
-            aria-label="House perspectives"
-          >
-            {views.map((view, index) => (
-              <button
-                type="button"
-                key={view.url}
-                aria-label={`Show ${imageLabel(view, index)}`}
-                aria-pressed={currentView === index}
-                onClick={() => selectView(index)}
-              >
-                <span>{String(index + 1).padStart(2, "0")}</span>
-              </button>
-            ))}
-          </div>
           <button
             type="button"
-            className="home-cinema__motion"
+            className="film-hero__motion"
+            aria-label={
+              motionEnabled ? "Pause hero animation" : "Play hero animation"
+            }
             aria-pressed={motionEnabled}
             onClick={toggleMotion}
           >
@@ -371,19 +407,14 @@ export default function DreamPlan({
             ) : (
               <Play size={12} aria-hidden="true" />
             )}
-            <span>Motion {motionEnabled ? "on" : "off"}</span>
           </button>
         </div>
-        <div className="home-cinema__progress" aria-hidden="true" />
       </div>
-      <div className="home-cinema__after">
-        <a href="#explorer">
-          Explore house plans <MoveUpRight size={16} aria-hidden="true" />
-        </a>
-        <a href="#consultation-form">
-          Design my home <ArrowUpRight size={16} aria-hidden="true" />
-        </a>
-      </div>
+      {failed.has(active.key) && (
+        <p className="film-hero__notice">
+          Explore this home’s available views in the full preview.
+        </p>
+      )}
     </section>
   );
 }

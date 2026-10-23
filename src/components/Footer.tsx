@@ -44,10 +44,13 @@ const Footer = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const ctx: CanvasRenderingContext2D = context;
 
-    let animFrameId: number;
+    let animFrameId: number | null = null;
+    let inView = false;
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const numPoints = 20;
     type Leaf = { angleOffset: number; scale: number; phase: number };
     type Point = {
@@ -229,14 +232,35 @@ const Footer = () => {
       animFrameId = requestAnimationFrame(animate);
     }
 
-    const handleResize = () => init();
+    function updatePlayback() {
+      const playing = inView && !document.hidden && !motionPreference.matches;
+      if (playing && animFrameId === null) animate();
+      else if (!playing && animFrameId !== null) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      updatePlayback();
+    });
+    const handleResize = () => {
+      init();
+      draw();
+    };
     window.addEventListener("resize", handleResize);
+    document.addEventListener("visibilitychange", updatePlayback);
+    motionPreference.addEventListener("change", updatePlayback);
+    observer.observe(canvas);
     init();
-    animate();
+    draw();
 
     return () => {
-      cancelAnimationFrame(animFrameId);
+      if (animFrameId !== null) cancelAnimationFrame(animFrameId);
+      observer.disconnect();
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", updatePlayback);
+      motionPreference.removeEventListener("change", updatePlayback);
     };
   }, []);
 

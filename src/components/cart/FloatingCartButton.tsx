@@ -55,7 +55,7 @@ export default function FloatingCartButton() {
     <Link
       href="/cart"
       aria-label={`Open cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}
-      className="fixed right-4 z-[140] bottom-[max(1rem,env(safe-area-inset-bottom))] sm:right-5 sm:bottom-5"
+      className={`fixed right-4 z-[140] bottom-[max(1rem,env(safe-area-inset-bottom))] sm:right-5 sm:bottom-5 ${pathname === "/" ? "landing-floating-cart" : ""}`}
     >
       <div
         className={`group relative flex min-h-[44px] items-center gap-2 rounded-full border border-[var(--border-gold)] bg-[rgba(10,9,7,0.88)] px-3 py-2 shadow-[0_18px_36px_rgba(0,0,0,0.35)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-gold hover:shadow-[0_20px_44px_rgba(0,0,0,0.45)] sm:gap-3 sm:px-4 sm:py-2.5 ${isBumping ? "animate-cart-bump" : ""}`}
@@ -64,7 +64,7 @@ export default function FloatingCartButton() {
           <ShoppingBag className="h-4 w-4" />
         </span>
 
-        <div className="hidden sm:flex flex-col leading-tight">
+        <div className="floating-cart-details hidden sm:flex flex-col leading-tight">
           <span className="text-[11px] uppercase tracking-[0.12em] text-cream-dim">
             Cart
           </span>
@@ -73,7 +73,7 @@ export default function FloatingCartButton() {
           </span>
         </div>
 
-        <span className="hidden sm:inline-flex rounded-full border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.14)] px-2.5 py-1 text-xs font-semibold text-gold">
+        <span className="floating-cart-total hidden sm:inline-flex rounded-full border border-[rgba(200,137,42,0.35)] bg-[rgba(200,137,42,0.14)] px-2.5 py-1 text-xs font-semibold text-gold">
           ${cartTotal.toFixed(0)}
         </span>
 

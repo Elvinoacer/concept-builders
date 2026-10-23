@@ -15,6 +15,7 @@ import DreamPlan from "./hero";
 import Featured from "./Featured";
 import Explorer from "./Explorer";
 import {
+  CINEMATIC_HOME,
   EDITORIAL_HOMES,
   toLandingPlan,
   type LandingDesign,
@@ -74,8 +75,15 @@ export default function LandingExperience({
       .filter((p): p is LandingPlan => p !== null);
     return plans.length ? plans : featured;
   }, [allDesigns, featured]);
-  const lead =
-    (cinematicDesign && toLandingPlan(cinematicDesign)) || featured[0];
+  const heroHomes = useMemo(() => {
+    const cinematic = cinematicDesign && toLandingPlan(cinematicDesign);
+    // The atmospheric slideshow uses curated exteriors. The catalog's first
+    // thumbnail can be a roof view or a drawing and remains in the library.
+    const lead = cinematic
+      ? { ...cinematic, images: CINEMATIC_HOME.images }
+      : CINEMATIC_HOME;
+    return [lead, ...EDITORIAL_HOMES];
+  }, [cinematicDesign]);
   const openPreview = useCallback<PreviewHandler>((plan, collection) => {
     openerRef.current =
       document.activeElement instanceof HTMLElement
@@ -87,7 +95,7 @@ export default function LandingExperience({
   const restoreFocus = useCallback(() => {
     const target = openerRef.current?.isConnected
       ? openerRef.current
-      : document.querySelector<HTMLElement>(".home-cinema__expand");
+      : document.querySelector<HTMLElement>(".film-hero__preview");
     target?.focus({ preventScroll: true });
   }, []);
 
@@ -95,8 +103,8 @@ export default function LandingExperience({
     <CatalogContext.Provider value={setIncoming}>
       <div className="landing-experience" data-preview-open={preview !== null}>
         <DreamPlan
-          plan={lead}
-          collection={all}
+          plan={heroHomes[0]}
+          collection={heroHomes}
           onPreview={openPreview}
           paused={preview !== null}
         />

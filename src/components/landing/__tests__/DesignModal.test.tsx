@@ -1,9 +1,11 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
-import { afterEach, expect, jest, test } from "@jest/globals";
+import { afterEach, expect, test } from "@jest/globals";
 import "@testing-library/jest-dom/jest-globals";
 import type { LandingPlan } from "@/lib/landing-designs";
 import DesignModal from "../DesignModal";
+
+declare const jest: typeof import("@jest/globals").jest;
 
 jest.mock("next/image", () => ({
   __esModule: true,

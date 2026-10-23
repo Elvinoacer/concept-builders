@@ -1,8 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 export default function PublicLoading() {
+  const pathname = usePathname();
+  // The landing hero owns the opening reveal, including on a cold visit.
+  if (pathname === "/") return null;
   const monoSystem =
     'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
 
@@ -39,7 +43,11 @@ export default function PublicLoading() {
           style={{ fontFamily: monoSystem }}
           initial={{ opacity: 0.5 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse" }}
+          transition={{
+            duration: 0.8,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
         >
           Loading...
         </motion.p>

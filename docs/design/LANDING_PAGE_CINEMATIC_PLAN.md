@@ -1,9 +1,16 @@
 # Concept Builders: cinematic landing page plan
 
-Date: 23 October 2026  
-Status: the image-based cinematic foundation is implemented; final browser and build verification is in progress. The continuous model-based 3D stage remains dependent on reconstruction references and model production.
+Date: 24 October 2026
+
+Status: the image-based cinematic hero and browsing foundation are implemented and verified; the production build passes. The continuous model-based 3D stage remains dependent on reconstruction references and model production.
 
 Confirmed asset constraint: the user has architectural renders or photographs only, with no original editable 3D model supplied. The plan therefore distinguishes the immediately buildable image-based cinematic foundation from the model reconstruction needed to complete a continuous true-3D journey.
+
+### Hero direction update — 24 October 2026
+
+The supplied reference video (`the_hero_i_need_act.mp4`) updates the opening direction below. The hero now occupies one viewport, with a translucent navigation bar over full-bleed architectural imagery. A brief curtain reveal opens directly onto that same scene; there is no second hero or repeated scroll stage. Homes dissolve smoothly into one another, with restrained camera drift and staggered word reveals for each actual plan name. The header changes to a light surface after scrolling. Manual navigation, pause, reduced-motion support, and off-screen suspension accompany the timed slideshow.
+
+This full-bleed crop applies to the atmospheric hero only. Customers can open the existing complete-image gallery, move through perspectives, and switch homes without leaving the page. Featured plans, search/filter browsing, projects, the design process, and contact remain available below. CB3023's real front exterior now opens the hero; the additional editorial homes retain their own truthful names. Continuous reconstructed 3D remains an asset-production stage.
 
 ## Design intent
 
@@ -32,9 +39,9 @@ These are code observations, not measured performance results.
 
 ### CB3023 verification status
 
-The exact record and its available image angles remain unverified. The user confirmed that the available source material consists of architectural renders or photographs. A read-only connection using the configured database URL timed out. The public search request `/api/designs?search=CB3023&limit=3&includeTotals=false` returned HTTP 500 during this audit. A browser attempt to load the published homepage also timed out. These observations do not establish the cause or prove a site-wide outage.
+Verified on 24 October 2026 through a read-only database query: `cmtw3ljrq001b04leoivjo3py` is FIVE BEDROOM VILLA MAISONETTE (CB3023), with 17 current, completed public render images. The first four exterior views were visually inspected. The initial `A_2 - Photo.jpg` is a front elevation; an optimized 1920px WebP copy is stored at `public/images/landing/cb3023-arrival.webp` (approximately 418 KB). It is the immediate hero poster, with current catalog facts streamed into the stable scene and the full public gallery fetched on demand. Earlier connection failures were transient during this audit.
 
-The checked repository contains catalog image lists, including multiple views of other houses, but no verified CB3023 mapping or local GLB, glTF, FBX, SketchUp, Blender, MP4, or WebM asset was found. Do not substitute a similar villa and label it CB3023. The implementation must not assume that a database render image also provides editable geometry.
+The checked repository contains catalog image lists, including multiple views of other houses, but no local GLB, glTF, FBX, SketchUp, Blender, MP4, or WebM house asset was found. The verified renders do not provide editable geometry. Poster provenance is the published CB3023 image `uploads/f2462146-6c37-49c7-a29f-bdf6ae1a3e2a-A_2 - Photo.jpg` on the existing Concept Builders CDN.
 
 ## 1. Art direction and scroll storyboard
 
@@ -172,13 +179,22 @@ Do not estimate final cinematic asset production until the reconstruction refere
 
 ### Implementation record
 
-The landing page now has a scroll-linked, complete-image house presentation, persistent motion controls, featured-home previews, a searchable/filterable plan library, and a shared gallery with image navigation, zoom-to-detail, and navigation between homes. The original process steps, project proof, collections, design guidance, consultation form, and navigation remain available in a calmer layout.
+The landing page now opens with a single full-viewport photographic scene, a translucent header, a brief curtain reveal, gentle camera drift, image dissolves, and animated plan names. Persistent motion controls, featured-home previews, a searchable/filterable library, and a shared complete-image gallery remain available. The original process steps, project proof, collections, design guidance, consultation form, cart, and navigation remain available in a calmer layout. Homepage loading boundaries defer to the hero's single entrance instead of introducing additional spinner screens.
 
-The catalog streams into an already-rendered shell so an unavailable database does not delay the opening presentation. Exact CB3023 selection uses the `(CB3023)` code in the stored design name. Existing public inspiration renders provide a clearly named fallback; they are not represented as CB3023 and do not carry invented prices, bedroom counts, or catalog IDs.
+The catalog streams into an already-rendered shell so an unavailable database does not delay the opening presentation. The verified CB3023 poster renders immediately; exact live selection uses the `(CB3023)` code in the stored design name. Its 17 public images have optimized WebP copies served locally on demand, mapped by original source URL so ordering changes remain safe. Other curated exterior renders retain their own truthful names. They do not carry invented prices, bedroom counts, or catalog IDs. Catalog thumbnails that happen to show roof views or drawings stay in the library rather than being selected automatically for the atmospheric hero.
 
-Public preview responses contain only completed, current images and the existing basic design fields. Gallery requests are cancelled when switching homes, successful galleries are cached with a bounded entry count, and failed requests preserve the available image with a retry action. Decorative header/cursor/carousel loops have been removed from the landing experience; supporting content is rendered without those client animation engines.
+Public preview responses contain only completed, current images and the existing basic design fields. Gallery requests are cancelled when switching homes, successful galleries are cached with a bounded entry count, and failed requests preserve the available image with a retry action. Decorative header/cursor/carousel loops have been removed from the landing experience; supporting content is rendered without those client animation engines. The existing footer vine now renders only while visible and suspends in hidden tabs or under reduced-motion preferences.
 
-The implementation uses the supplied renders. It does not claim a continuous 3D orbit or a reconstructed model. Live CB3023 asset verification and model production remain separate outstanding work.
+CB3023's 17 source images total 33,007,156 bytes; their uncropped WebP copies total 7,587,080 bytes, a 77% reduction before the responsive image optimizer. Four additional curated hero exteriors also have local optimized copies. Gallery assets remain lazy-loaded rather than entering the initial hero payload.
+
+The implementation uses verified renders. It does not claim a continuous 3D orbit or a reconstructed model. Model production remains separate outstanding work.
+
+### Verification record — 24 October 2026
+
+- Browser checks at 1280×800 and 390×844: full-screen hero, translucent navigation, scrolled header, mobile menu, complete-image preview, 17 CB3023 perspectives, and switching homes inside the gallery.
+- Seven passing Jest checks cover image-ready slideshow transitions, reduced-motion manual navigation, late catalog delivery, preview suspension, stale gallery cancellation, gallery failure recovery, and the public preview response boundary.
+- Scoped TypeScript diagnostics pass for all 21 implementation and support files checked. ESLint passes for the changed React components, helpers, and tests. This does not assert that unrelated repository-wide type errors have been repaired.
+- The optimized production build passes, including compilation, page-data collection, and generation of all 179 static pages. The Next.js configuration skips repository-wide build-time type checking; the scoped TypeScript check above is reported separately.
 
 ### Reference documentation
 

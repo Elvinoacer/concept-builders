@@ -12,8 +12,9 @@ function VineCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const ctx: CanvasRenderingContext2D = context;
 
     let animId: number;
     let time = 0;
@@ -382,6 +383,7 @@ function VineCanvas() {
 // ─── Header ───────────────────────────────────────────────────────────────────
 const Header = () => {
   const pathname = usePathname();
+  const isLanding = pathname === "/";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -400,6 +402,7 @@ const Header = () => {
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 20);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -418,10 +421,12 @@ const Header = () => {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 border-b transition-all duration-300 ${
-          isScrolled
-            ? "border-cb-border bg-[rgba(10,9,7,0.92)] backdrop-blur-[20px]"
-            : "border-cb-border bg-card"
+        className={`${isLanding ? "landing-header fixed" : "sticky"} top-0 z-50 w-full border-b transition-all duration-300 ${
+          isLanding
+            ? `${isScrolled ? "landing-header--scrolled" : ""} ${mobileMenuOpen ? "landing-header--menu-open" : ""}`
+            : isScrolled
+              ? "border-cb-border bg-[rgba(10,9,7,0.92)] backdrop-blur-[20px]"
+              : "border-cb-border bg-card"
         }`}
       >
         {/* Vine fills the entire header as a living background */}
@@ -478,6 +483,8 @@ const Header = () => {
               className="relative z-[110] flex h-10 w-10 flex-col items-center justify-center gap-[5px]"
               onClick={() => setMobileMenuOpen((open) => !open)}
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="public-mobile-navigation"
             >
               <span
                 className={`block h-[1.5px] w-6 bg-cream transition-all duration-300 ${mobileMenuOpen ? "translate-y-[6.5px] rotate-45" : ""}`}
@@ -494,7 +501,10 @@ const Header = () => {
       </header>
 
       <div
-        className={`fixed inset-0 z-[49] bg-ink/95 backdrop-blur-md transition-all duration-500 lg:pointer-events-none lg:hidden ${
+        id="public-mobile-navigation"
+        inert={!mobileMenuOpen}
+        aria-hidden={!mobileMenuOpen}
+        className={`${isLanding ? "landing-mobile-menu" : ""} fixed inset-0 z-[49] bg-ink/95 backdrop-blur-md transition-all duration-500 lg:pointer-events-none lg:hidden ${
           mobileMenuOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"

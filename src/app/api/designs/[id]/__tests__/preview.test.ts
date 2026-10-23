@@ -3,7 +3,10 @@ import { NextRequest } from "next/server";
 import { GET } from "../route";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { expect, jest, test } from "@jest/globals";
+import { expect, test } from "@jest/globals";
+import type { Mock } from "jest-mock";
+
+declare const jest: typeof import("@jest/globals").jest;
 
 jest.mock("@/lib/prisma", () => ({
   __esModule: true,
@@ -21,7 +24,7 @@ test("public previews retrieve published images without session or purchase-docu
       { url: "https://example.com/render.jpg", type: "IMAGE", name: "Front" },
     ],
   };
-  const findUnique = prisma.design.findUnique as unknown as jest.Mock<
+  const findUnique = prisma.design.findUnique as unknown as Mock<
     (query: {
       select: { images: { where: Record<string, unknown> } };
     }) => Promise<unknown>

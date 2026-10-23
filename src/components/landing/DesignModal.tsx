@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { landingImageUrl } from "@/lib/landing-media";
 import {
   imageLabel,
   planDestination,
@@ -57,17 +58,19 @@ function useGallery(plan: LandingPlan) {
         if (data.id !== id || !Array.isArray(data.images))
           throw new Error("Invalid preview");
         const seen = new Set<string>();
-        const images = data.images.filter((image) => {
-          if (
-            typeof image.url !== "string" ||
-            !image.url ||
-            seen.has(image.url) ||
-            (image.type && image.type !== "IMAGE")
-          )
-            return false;
-          seen.add(image.url);
-          return true;
-        });
+        const images = data.images
+          .filter((image) => {
+            if (
+              typeof image.url !== "string" ||
+              !image.url ||
+              seen.has(image.url) ||
+              (image.type && image.type !== "IMAGE")
+            )
+              return false;
+            seen.add(image.url);
+            return true;
+          })
+          .map((image) => ({ ...image, url: landingImageUrl(image.url) }));
         if (!images.length) throw new Error("No published perspectives");
         if (disposed) return;
         galleries.set(id, images);
@@ -100,6 +103,9 @@ function PreviewGallery({ plan }: { plan: LandingPlan }) {
   const [zoomed, setZoomed] = useState(false);
   const [loadedUrl, setLoadedUrl] = useState("");
   const [failedUrl, setFailedUrl] = useState("");
+  const [failedThumbnails, setFailedThumbnails] = useState<Set<string>>(
+    () => new Set(),
+  );
   const touchRef = useRef({ x: 0, y: 0 });
   const current = Math.max(
     0,
@@ -152,6 +158,7 @@ function PreviewGallery({ plan }: { plan: LandingPlan }) {
               fill
               sizes="(max-width: 760px) 96vw, 80vw"
               className="home-preview__render"
+              style={{ opacity: failedUrl === image.url ? 0 : 1 }}
               onLoad={() => setLoadedUrl(image.url)}
               onError={() => setFailedUrl(image.url)}
             />
@@ -211,13 +218,20 @@ function PreviewGallery({ plan }: { plan: LandingPlan }) {
               aria-pressed={index === current}
               onClick={() => select(index)}
             >
-              <Image
-                src={view.url}
-                alt=""
-                fill
-                sizes="88px"
-                className="home-preview__render"
-              />
+              {!failedThumbnails.has(view.url) && (
+                <Image
+                  src={view.url}
+                  alt=""
+                  fill
+                  sizes="88px"
+                  className="home-preview__render"
+                  onError={() =>
+                    setFailedThumbnails((current) =>
+                      new Set(current).add(view.url),
+                    )
+                  }
+                />
+              )}
               <span>{String(index + 1).padStart(2, "0")}</span>
             </button>
           ))}
