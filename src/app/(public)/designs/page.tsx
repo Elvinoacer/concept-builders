@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowUpRight, Check, MoveUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import DesignsExplorer from "@/components/design-showcase/DesignsExplorer";
+import DesignsIntroduction from "@/components/design-showcase/DesignsIntroduction";
 import styles from "@/components/design-showcase/designs.module.css";
 
 export const metadata: Metadata = {
@@ -15,50 +16,7 @@ export const metadata: Metadata = {
 export default function AllDesignsPage() {
   return (
     <div className={styles.page}>
-      <section className={styles.hero} aria-labelledby="designs-heading">
-        <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}>
-            <span className={styles.shortRule} /> The house plan collection
-          </p>
-          <h1 id="designs-heading">
-            Good design.
-            <br />
-            <em>Great beginnings.</em>
-          </h1>
-          <p className={styles.heroDescription}>
-            Your next chapter starts with a plan. Discover thoughtfully designed
-            homes and find the one that feels like you.
-          </p>
-          <div className={styles.heroNotes}>
-            <span>
-              <Check size={13} aria-hidden="true" /> Architect-designed
-            </span>
-            <span>
-              <Check size={13} aria-hidden="true" /> Made for Kenyan living
-            </span>
-          </div>
-        </div>
-        <Link href="/custom-design" className={styles.heroVisual}>
-          <Image
-            src="/images/landing/modern-bungalow.webp"
-            alt="Contemporary bungalow with a landscaped garden"
-            fill
-            sizes="(max-width: 767px) 0px, (max-width: 1023px) 40vw, 42vw"
-            className={styles.heroImage}
-            priority
-          />
-          <span className={styles.heroVisualTop}>
-            A little inspiration, a world of possibility.
-          </span>
-          <span className={styles.heroVisualBottom}>
-            <span>
-              <small>Something uniquely yours?</small>Let&apos;s design it
-              together.
-            </span>
-            <ArrowUpRight size={23} aria-hidden="true" />
-          </span>
-        </Link>
-      </section>
+      <DesignsIntroduction />
       <Suspense
         fallback={
           <div className={styles.explorerLoading}>
@@ -72,23 +30,33 @@ export default function AllDesignsPage() {
         className={styles.customBanner}
         aria-label="Custom house designs"
       >
-        <div className={styles.customIcon}>
-          <MoveUpRight size={30} strokeWidth={1} aria-hidden="true" />
+        <div className={styles.customImage}>
+          <Image
+            src="/images/landing/modern-bungalow.webp"
+            alt="Stone-clad bungalow with a covered terrace and a lush garden"
+            fill
+            sizes="(max-width: 767px) 100vw, 55vw"
+          />
+          <span>A home, with your name on it.</span>
         </div>
-        <div>
-          <p className={styles.eyebrow}>
-            Your land. Your lifestyle. Your home.
-          </p>
+        <div className={styles.customCopy}>
+          <p className={styles.eyebrow}>Beyond the collection</p>
           <h2>
-            Love a plan, but want to <em>make it yours?</em>
+            Your life doesn&apos;t
+            <br />
+            follow a template.
+            <br />
+            <em>Neither should your home.</em>
           </h2>
           <p>
-            We can adapt a design to your needs, or start with a blank page.
+            A different layout. A little more room. Something entirely you.
+            Let&apos;s adapt a plan to your land and lifestyle, or imagine
+            something new together.
           </p>
+          <Link href="/custom-design" className={styles.outlineButton}>
+            Create something yours <ArrowUpRight size={17} aria-hidden="true" />
+          </Link>
         </div>
-        <Link href="/custom-design" className={styles.outlineButton}>
-          Talk to our team <ArrowUpRight size={17} aria-hidden="true" />
-        </Link>
       </section>
     </div>
   );

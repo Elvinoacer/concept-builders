@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition, type FormEvent } from "react";
 import useSWR from "swr";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowUpRight,
   BedDouble,
@@ -31,7 +31,7 @@ import styles from "./designs.module.css";
 type FilterUpdates = Record<string, string | undefined>;
 type FilterChip = { label: string; updates: FilterUpdates };
 
-type Category = { id: string; name: string };
+type Category = { id: string; name: string; image?: string | null };
 const emptySearchParams = new URLSearchParams();
 const categoryOrder = [
   "Bungalows",
@@ -41,6 +41,12 @@ const categoryOrder = [
   "Townhouses",
   "Cottages",
 ];
+const categoryImages: Record<string, string> = {
+  Bungalows: "/images/landing/courtyard-bungalow.webp",
+  Maisonettes: "/images/landing/contemporary-villa.webp",
+  Villas: "/images/landing/cb3023-arrival.webp",
+  Apartments: "/images/landing/urban-apartment.webp",
+};
 const fetchCategories = async (url: string): Promise<Category[]> => {
   const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });
   if (!response.ok) throw new Error("Unable to load styles");
@@ -88,6 +94,9 @@ export default function DesignsExplorer() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useState<"gallery" | "list">("gallery");
   const category = searchParams.get("category") || undefined;
+  const visualCategories = categories.filter(
+    (item) => item.image || categoryImages[item.name] || item.name === category,
+  );
   const search = searchParams.get("search")?.trim() || undefined;
   const bedroomsParam = searchParams.get("bedrooms");
   const bedrooms =
@@ -117,7 +126,9 @@ export default function DesignsExplorer() {
   const rangeKey = `${priceType}:${minPrice || ""}:${maxPrice || ""}`;
 
   function updateFilters(updates: FilterUpdates) {
-    const params = new URLSearchParams(searchParams.toString());
+    // Read the latest URL so consecutive clicks compose even while React is
+    // finishing the previous filter transition.
+    const params = new URLSearchParams(window.location.search);
     params.delete("page");
     params.delete("pageSize");
     Object.entries(updates).forEach(([key, value]) => {
@@ -202,6 +213,33 @@ export default function DesignsExplorer() {
             </span>
           )}
         </fieldset>
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel} htmlFor={`${prefix}-style`}>
+            <House size={16} aria-hidden="true" /> Home style
+          </label>
+          <p>Explore every architectural direction.</p>
+          <div className={styles.selectWrap}>
+            <select
+              id={`${prefix}-style`}
+              value={category || ""}
+              onChange={(event) =>
+                updateFilters({ category: event.target.value || undefined })
+              }
+            >
+              <option value="">All styles</option>
+              {categories.map((item) => (
+                <option key={item.id} value={item.name}>
+                  {item.name}
+                </option>
+              ))}
+              {category &&
+                !categories.some((item) => item.name === category) && (
+                  <option value={category}>{category}</option>
+                )}
+            </select>
+            <ChevronDown size={14} aria-hidden="true" />
+          </div>
+        </div>
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel} htmlFor={`${prefix}-area`}>
             <Ruler size={16} aria-hidden="true" /> Floor area
@@ -361,12 +399,19 @@ export default function DesignsExplorer() {
       aria-busy={isPending}
     >
       <div className={styles.collectionTopline}>
-        <h2>
-          The collection <span>Find a plan that feels like home</span>
-        </h2>
-        <span className={styles.collectionNote}>
-          Find your fit. Imagine the possibilities.
-        </span>
+        <div>
+          <p className={styles.eyebrow}>
+            <span className={styles.shortRule} /> Spaces for every story
+          </p>
+          <h2>
+            Find your <em>kind of home.</em>
+          </h2>
+        </div>
+        <p className={styles.collectionNote}>
+          Start with a style. Follow a feeling.
+          <br />
+          Make room for what matters to you.
+        </p>
       </div>
       <div
         className={styles.categoryTabs}
@@ -377,17 +422,52 @@ export default function DesignsExplorer() {
           type="button"
           aria-pressed={!category || category === "All"}
           onClick={() => updateFilters({ category: undefined })}
+          className={styles.allPlansCategory}
         >
-          <House size={15} aria-hidden="true" /> All plans
+          <span className={styles.allPlansIcon}>
+            <House size={28} strokeWidth={1} aria-hidden="true" />
+          </span>
+          <span className={styles.categoryName}>
+            All plans <ArrowUpRight size={17} aria-hidden="true" />
+          </span>
+          <span className={styles.categorySubtitle}>
+            Every possibility, in one place.
+          </span>
         </button>
-        {categories.map((item) => (
+        {visualCategories.map((item) => (
           <button
             key={item.id}
             type="button"
             aria-pressed={category === item.name}
             onClick={() => updateFilters({ category: item.name })}
+            data-photographic={Boolean(item.image || categoryImages[item.name])}
           >
-            {item.name}
+            {item.image || categoryImages[item.name] ? (
+              <Image
+                src={item.image || categoryImages[item.name]}
+                alt=""
+                fill
+                sizes="(max-width: 767px) 180px, 250px"
+              />
+            ) : (
+              <span className={styles.allPlansIcon}>
+                <House size={28} strokeWidth={1} aria-hidden="true" />
+              </span>
+            )}
+            <span className={styles.categoryName}>
+              {item.name} <ArrowUpRight size={17} aria-hidden="true" />
+            </span>
+            <span className={styles.categorySubtitle}>
+              {category === item.name
+                ? "Exploring this style"
+                : "Explore the possibilities"}
+            </span>
+            {category === item.name && (
+              <span className={styles.categorySelected}>
+                <Check size={13} aria-hidden="true" />
+                <span className={styles.srOnly}>Selected</span>
+              </span>
+            )}
           </button>
         ))}
         {category &&
@@ -408,25 +488,6 @@ export default function DesignsExplorer() {
         )}
       </div>
       <div className={styles.discoveryLayout}>
-        <aside className={styles.sidebar} aria-label="Filter house plans">
-          <div className={styles.sidebarHeading}>
-            <h3>Find your fit</h3>
-            <SlidersHorizontal size={16} aria-hidden="true" />
-          </div>
-          {renderFilters()}
-          <Link href="/custom-design" className={styles.sidebarHelp}>
-            <span className={styles.helpIcon}>
-              <House size={19} strokeWidth={1.25} aria-hidden="true" />
-            </span>
-            <strong>A little guidance?</strong>
-            <span>
-              Let&apos;s find a plan that works for your land and lifestyle.
-            </span>
-            <b>
-              Talk to an architect <ArrowUpRight size={14} aria-hidden="true" />
-            </b>
-          </Link>
-        </aside>
         <div className={styles.results}>
           <div className={styles.toolbar}>
             <form
@@ -461,7 +522,7 @@ export default function DesignsExplorer() {
             </form>
             <Dialog open={filtersOpen} onOpenChange={setFiltersOpen}>
               <DialogTrigger asChild>
-                <button type="button" className={styles.mobileFilterButton}>
+                <button type="button" className={styles.filterButton}>
                   <SlidersHorizontal size={17} aria-hidden="true" /> Filters{" "}
                   {chips.length > 0 && <span>{chips.length}</span>}
                 </button>
@@ -537,6 +598,27 @@ export default function DesignsExplorer() {
                 <List size={19} aria-hidden="true" />
               </button>
             </div>
+          </div>
+          <div
+            className={styles.quickFilters}
+            role="group"
+            aria-label="Quick bedroom filters"
+          >
+            <span>
+              <BedDouble size={16} aria-hidden="true" /> Room for your life
+            </span>
+            {["", "1", "2", "3", "4+"].map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={(bedrooms || "") === value}
+                onClick={() => updateFilters({ bedrooms: value || undefined })}
+              >
+                {value
+                  ? `${value} bed${value === "1" ? "" : "s"}`
+                  : "Any bedrooms"}
+              </button>
+            ))}
           </div>
           {chips.length > 0 && (
             <div className={styles.activeFilters} aria-label="Active filters">

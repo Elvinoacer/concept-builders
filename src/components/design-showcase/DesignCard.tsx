@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { formatCurrency, getDesignImages } from "@/lib/utils";
+import { designImageUrl } from "@/lib/design-media";
 import styles from "./designs.module.css";
 
 interface DesignImage {
@@ -66,7 +67,6 @@ const FALLBACK_IMAGE = "/images/category-placeholder.webp";
 
 export default function DesignCard({
   design,
-  index,
   showDetails = true,
   priceType,
   onCardClick,
@@ -76,7 +76,7 @@ export default function DesignCard({
       { images: design.images, files: design.files },
       4,
     );
-    return images.length ? images : [FALLBACK_IMAGE];
+    return images.length ? images.map(designImageUrl) : [FALLBACK_IMAGE];
   }, [design.images, design.files]);
   const [imageIndex, setImageIndex] = useState(0);
   const [failedImages, setFailedImages] = useState<string[]>([]);
@@ -139,8 +139,7 @@ export default function DesignCard({
             src={currentImage}
             alt={`${design.name} — view ${activeImage + 1}`}
             fill
-            sizes="(max-width: 539px) calc(100vw - 40px), (max-width: 767px) 45vw, (max-width: 1023px) 46vw, (max-width: 1279px) 35vw, 27vw"
-            priority={index < 3}
+            sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) 50vw, 60vw"
             unoptimized={directImages.includes(currentImage)}
             onError={() => {
               // If the optimiser cannot reach the CDN, try its original image
