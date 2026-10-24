@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     const lite = searchParams.get("lite") === "true";
     const includeTotals = searchParams.get("includeTotals") !== "false";
     const useCursorPagination =
-      !isAdmin &&
+      (!isAdmin || (mode === "cursor" && lite)) &&
       (mode === "cursor" || Boolean(cursor) || !searchParams.has("page"));
 
     const maxLimit = lite ? 200 : 50;
@@ -80,39 +80,13 @@ export async function GET(request: NextRequest) {
     const where: DesignWhere = {};
 
     if (search) {
-      const ftsMatches = await prisma.$queryRaw<Array<{ id: string }>>`
-        SELECT "id"
-        FROM "public"."Design"
-        WHERE "search_vector" @@ plainto_tsquery('english', ${search})
-        ORDER BY ts_rank("search_vector", plainto_tsquery('english', ${search})) DESC
-        LIMIT 2000
-      `;
-
-      const matchedIds = ftsMatches.map((row) => row.id);
-      if (matchedIds.length === 0) {
-        return NextResponse.json(
-          useCursorPagination
-            ? {
-                designs: [],
-                nextCursor: null,
-                hasMore: false,
-              }
-            : {
-                designs: [],
-                totalPages: 0,
-                totalDesigns: 0,
-              },
-          {
-            headers: {
-              "Cache-Control": isAdmin
-                ? "private, no-store"
-                : "public, s-maxage=60, stale-while-revalidate=300",
-            },
-          },
-        );
-      }
-
-      where.id = { in: matchedIds };
+      // Search partial plan codes, names, and styles without requiring a
+      // separately provisioned search_vector column in the catalogue database.
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        { category: { name: { contains: search, mode: "insensitive" } } },
+      ];
     }
 
     if (priceType === "design" && (minPrice || maxPrice)) {
@@ -177,6 +151,16 @@ export async function GET(request: NextRequest) {
     };
     if (sortBy) {
       switch (sortBy) {
+        case "Featured":
+          orderBy = [
+            { isFeatured: "desc" },
+            { views: "desc" },
+            { createdAt: "desc" },
+          ];
+          break;
+        case "Name":
+          orderBy = { name: "asc" };
+          break;
         case "Popular":
           orderBy = { views: "desc" };
           break;
@@ -196,6 +180,8 @@ export async function GET(request: NextRequest) {
           id: true,
           name: true,
           basePrice: true,
+          minBuildingCost: true,
+          maxBuildingCost: true,
           bedrooms: true,
           bathrooms: true,
           area: true,
@@ -234,6 +220,8 @@ export async function GET(request: NextRequest) {
           name: true,
           description: true,
           basePrice: true,
+          minBuildingCost: true,
+          maxBuildingCost: true,
           bedrooms: true,
           bathrooms: true,
           area: true,
@@ -276,19 +264,23 @@ export async function GET(request: NextRequest) {
           },
         };
 
-    if (!isAdmin && useCursorPagination) {
+    if (useCursorPagination) {
       const designsPromise = prisma.design.findMany({
         where,
         take: limit + 1,
         ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
         select: publicSelect,
-        orderBy,
+        orderBy: [
+          ...(Array.isArray(orderBy) ? orderBy : [orderBy]),
+          { id: "asc" },
+        ],
       });
 
       // Only count on first page when totals requested — keeps infinite scroll cheap
-      const [designs, totalDesigns] = includeTotals && !cursor
-        ? await Promise.all([designsPromise, prisma.design.count({ where })])
-        : [await designsPromise, undefined];
+      const [designs, totalDesigns] =
+        includeTotals && !cursor
+          ? await Promise.all([designsPromise, prisma.design.count({ where })])
+          : [await designsPromise, undefined];
 
       const hasMore = designs.length > limit;
       const items = hasMore ? designs.slice(0, -1) : designs;
@@ -303,7 +295,9 @@ export async function GET(request: NextRequest) {
         },
         {
           headers: {
-            "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+            "Cache-Control": isAdmin
+              ? "private, no-store"
+              : "public, s-maxage=60, stale-while-revalidate=300",
           },
         },
       );

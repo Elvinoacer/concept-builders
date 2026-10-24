@@ -1,30 +1,27 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { formatCurrency, getDesignImages } from "@/lib/utils";
-import { motion, type Variants } from "framer-motion";
+
+import { useMemo, useState, type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaStar } from "react-icons/fa";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  Bath,
+  BedDouble,
+  ChevronLeft,
+  ChevronRight,
+  House,
+  Images,
+  Layers3,
+  Ruler,
+  Sparkles,
+} from "lucide-react";
+import { formatCurrency, getDesignImages } from "@/lib/utils";
+import styles from "./designs.module.css";
 
 interface DesignImage {
   url: string;
   type: string;
 }
-
-interface Discount {
-  discount: {
-    id: string;
-    code: string;
-    type: string;
-    value: number;
-  };
-}
-
-interface OrderItem {
-  id: string;
-}
-
 interface Design {
   id: string;
   name: string;
@@ -32,16 +29,24 @@ interface Design {
   images: DesignImage[];
   files?: DesignImage[];
   isFeatured?: boolean;
-  discounts?: Discount[];
-  orderItems?: OrderItem[];
+  discounts?: {
+    discount: {
+      id?: string;
+      code?: string;
+      type?: string;
+      value: number;
+      isActive?: boolean;
+    };
+  }[];
+  orderItems?: { id: string }[];
   basePrice: number;
   architecturalPdfPrice?: number;
   architecturalCadPrice?: number;
   structuralPdfPrice?: number;
   structuralCadPrice?: number;
   billOfQuantitiesPrice?: number;
-  minBuildingCost?: number;
-  maxBuildingCost?: number;
+  minBuildingCost?: number | null;
+  maxBuildingCost?: number | null;
   bedrooms?: number | null;
   bathrooms?: number | null;
   area?: number | null;
@@ -49,254 +54,223 @@ interface Design {
   category?: { id: string; name: string } | null;
   views?: number;
 }
-
 interface DesignCardProps {
   design: Design;
   index: number;
   showDetails?: boolean;
   priceType?: string;
-  /** @deprecated Prefer default navigation to /designs/[id]. Kept for rare non-navigation cases. */
   onCardClick?: (id: string) => void;
 }
 
 const FALLBACK_IMAGE = "/images/category-placeholder.webp";
 
-const DesignCard: React.FC<DesignCardProps> = ({
+export default function DesignCard({
   design,
   index,
   showDetails = true,
   priceType,
   onCardClick,
-}) => {
-  const hasDiscount = design.discounts && design.discounts.length > 0;
-  const imageUrls = getDesignImages(design, 4);
-  const gallery = imageUrls.length > 0 ? imageUrls : [FALLBACK_IMAGE];
+}: DesignCardProps) {
+  const gallery = useMemo(() => {
+    const images = getDesignImages(
+      { images: design.images, files: design.files },
+      4,
+    );
+    return images.length ? images : [FALLBACK_IMAGE];
+  }, [design.images, design.files]);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [failedImages, setFailedImages] = useState<string[]>([]);
+  const [directImages, setDirectImages] = useState<string[]>([]);
+  const activeImage = imageIndex % gallery.length;
+  const currentImage = gallery[activeImage];
+  const codeMatch = design.name.match(/\s*\((CB[\w-]+)\)\s*$/i);
+  const originalTitle = codeMatch
+    ? design.name.slice(0, codeMatch.index).trim()
+    : design.name;
+  const title =
+    originalTitle === originalTitle.toUpperCase()
+      ? originalTitle
+          .toLowerCase()
+          .replace(/\b\w/g, (letter) => letter.toUpperCase())
+      : originalTitle;
+  const discount = design.discounts?.find(
+    (item) => item.discount.isActive !== false,
+  )?.discount;
+  const discountedPrice = discount
+    ? Math.max(
+        0,
+        discount.type === "FIXED_AMOUNT"
+          ? design.basePrice - discount.value
+          : design.basePrice * (1 - discount.value / 100),
+      )
+    : design.basePrice;
+  const showBuildCost = priceType === "building";
 
-  const [activeImage, setActiveImage] = useState(0);
-  const [imgSrc, setImgSrc] = useState(gallery[0]);
-  const hoverIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    setActiveImage(0);
-    setImgSrc(gallery[0] || FALLBACK_IMAGE);
-    // gallery identity is derived from design images; re-sync when design changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [design.id, gallery.join("|")]);
-
-  useEffect(() => {
-    setImgSrc(gallery[activeImage] || FALLBACK_IMAGE);
-  }, [activeImage, gallery]);
-
-  const stopImageCycle = useCallback(() => {
-    if (hoverIntervalRef.current) {
-      clearInterval(hoverIntervalRef.current);
-      hoverIntervalRef.current = null;
-    }
-  }, []);
-
-  const startImageCycle = useCallback(() => {
-    if (gallery.length <= 1) return;
-    stopImageCycle();
-    hoverIntervalRef.current = setInterval(() => {
-      setActiveImage((prev) => (prev + 1) % gallery.length);
-    }, 900);
-  }, [gallery.length, stopImageCycle]);
-
-  useEffect(() => () => stopImageCycle(), [stopImageCycle]);
-
-  const minPrice = design.basePrice;
-  const discountValue = hasDiscount ? design.discounts![0].discount.value : 0;
-  const discountedPrice = minPrice * (1 - discountValue / 100);
-
-  const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 120,
-        damping: 18,
-        delay: index * 0.04,
-      },
-    },
-  };
-
-  const serifSystem =
-    'var(--font-cormorant-garamond), "Cormorant Garamond", serif';
-
-  const href = `/designs/${design.id}`;
-
-  const handleActivate = (e: React.MouseEvent) => {
+  function handleActivate(event: MouseEvent<HTMLAnchorElement>) {
     if (onCardClick) {
-      e.preventDefault();
+      event.preventDefault();
       onCardClick(design.id);
     }
-  };
+  }
 
   return (
-    <motion.div
-      className="group relative flex h-full w-full flex-col overflow-hidden rounded-[1.35rem] border border-[rgba(240,232,216,0.12)] bg-[linear-gradient(180deg,rgba(30,28,22,0.96),rgba(14,13,10,0.98))] shadow-[0_18px_50px_rgba(0,0,0,0.22)] transition-all duration-300 hover:border-gold/55 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35),0_0_0_1px_rgba(200,137,42,0.12)]"
-      variants={cardVariants}
-      initial="hidden"
-      whileInView="visible"
-      whileHover={{ y: -4, transition: { duration: 0.2, ease: "easeOut" } }}
-      viewport={{ once: true, amount: 0.1 }}
-      onMouseEnter={startImageCycle}
-      onMouseLeave={() => {
-        stopImageCycle();
-        setActiveImage(0);
-      }}
-    >
+    <div className={styles.card}>
       <Link
-        href={href}
+        href={`/designs/${design.id}`}
         onClick={handleActivate}
-        className="absolute inset-0 z-10"
+        className={styles.cardLink}
         aria-label={`Explore ${design.name}`}
-        prefetch={index < 6}
+        prefetch={false}
       />
-
-      <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-      {/* Image — multi-view teaser for architectural inspiration */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-black/25">
-        <Image
-          alt={`${design.name}${gallery.length > 1 ? ` — view ${activeImage + 1}` : ""}`}
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          src={imgSrc}
-          fill
-          sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          priority={index < 4}
-          onError={() => setImgSrc(FALLBACK_IMAGE)}
-        />
-
-        {design.isFeatured && (
-          <div className="absolute top-3 left-3 z-20 pointer-events-none">
-            <span className="flex items-center bg-gold/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink shadow-lg">
-              <FaStar className="mr-1 text-ink text-[10px]" />
-              Featured
-            </span>
-          </div>
-        )}
-
-        {gallery.length > 1 && (
-          <div className="absolute bottom-3 left-3 z-20 pointer-events-none flex items-center gap-1.5">
-            <span className="bg-black/55 px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-white/90 backdrop-blur-sm">
-              {activeImage + 1}/{gallery.length} views
-            </span>
-            <div className="flex gap-1">
-              {gallery.map((_, i) => (
-                <span
-                  key={i}
-                  className={`h-1 w-1 rounded-full transition-colors ${
-                    i === activeImage ? "bg-gold" : "bg-white/35"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/75 via-black/10 to-black/20 opacity-75" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#13120E] to-transparent" />
-      </div>
-
-      <div className="relative z-[5] flex min-h-[170px] flex-1 flex-col justify-between p-5 sm:p-6 pointer-events-none">
-        <div>
-          <p className="mb-2 text-[10px] font-semibold uppercase leading-none tracking-[0.22em] text-gold/90">
-            {design.category?.name || "House Plan"}
-          </p>
-
-          <h3
-            className="mb-3 line-clamp-1 text-[1.35rem] font-light leading-tight text-cream transition-colors duration-300 group-hover:text-gold-light"
-            style={{ fontFamily: serifSystem }}
+      <div className={styles.cardImage}>
+        {failedImages.includes(currentImage) ||
+        currentImage === FALLBACK_IMAGE ? (
+          <div
+            className={styles.imageUnavailable}
+            role="img"
+            aria-label={`Image preview unavailable for ${design.name}`}
           >
-            {design.name}
-          </h3>
-
-          {showDetails && (
-            <div className="mb-4 flex flex-wrap items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-muted">
+            <House size={42} strokeWidth={0.8} aria-hidden="true" />
+            <span>Image preview unavailable</span>
+            <small>Discover the details inside.</small>
+          </div>
+        ) : (
+          <Image
+            src={currentImage}
+            alt={`${design.name} — view ${activeImage + 1}`}
+            fill
+            sizes="(max-width: 539px) calc(100vw - 40px), (max-width: 767px) 45vw, (max-width: 1023px) 46vw, (max-width: 1279px) 35vw, 27vw"
+            priority={index < 3}
+            unoptimized={directImages.includes(currentImage)}
+            onError={() => {
+              // If the optimiser cannot reach the CDN, try its original image
+              // directly before showing an honest, neutral unavailable state.
+              if (
+                currentImage.startsWith("https://") &&
+                !directImages.includes(currentImage)
+              ) {
+                setDirectImages((previous) => [...previous, currentImage]);
+              } else {
+                setFailedImages((previous) =>
+                  previous.includes(currentImage)
+                    ? previous
+                    : [...previous, currentImage],
+                );
+              }
+            }}
+          />
+        )}
+        {design.isFeatured && (
+          <span className={styles.featuredBadge}>
+            <Sparkles size={10} aria-hidden="true" /> Featured plan
+          </span>
+        )}
+        {gallery.length > 1 && (
+          <>
+            <button
+              type="button"
+              className={`${styles.galleryArrow} ${styles.previousImage}`}
+              onClick={() =>
+                setImageIndex(
+                  (previous) =>
+                    (previous + gallery.length - 1) % gallery.length,
+                )
+              }
+              aria-label={`Previous photo of ${design.name}`}
+            >
+              <ChevronLeft size={15} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className={`${styles.galleryArrow} ${styles.nextImage}`}
+              onClick={() =>
+                setImageIndex((previous) => (previous + 1) % gallery.length)
+              }
+              aria-label={`Next photo of ${design.name}`}
+            >
+              <ChevronRight size={15} aria-hidden="true" />
+            </button>
+            <span className={styles.galleryProgress} aria-hidden="true">
+              {gallery.map((url, position) => (
+                <span key={url} data-active={position === activeImage} />
+              ))}
+            </span>
+            <span className={styles.imageCount}>
+              <Images size={11} aria-hidden="true" />
+              {activeImage + 1} / {gallery.length}
+            </span>
+          </>
+        )}
+      </div>
+      <div className={styles.cardBody}>
+        <p className={styles.cardCategory}>
+          <span>{design.category?.name || "House plan"}</span>
+          {codeMatch && <span>{codeMatch[1]}</span>}
+        </p>
+        <h3 className={styles.cardTitle}>{title}</h3>
+        {showDetails && (
+          <div className={styles.cardSpecs}>
+            {design.bedrooms != null && (
               <span>
-                {design.bedrooms ?? "-"} Bed
-                {design.bedrooms === 1 ? "" : "s"}
+                <BedDouble size={14} strokeWidth={1.4} aria-hidden="true" />
+                {design.bedrooms} bed{design.bedrooms === 1 ? "" : "s"}
               </span>
-              <span className="text-gold/30">·</span>
+            )}
+            {design.bathrooms != null && (
               <span>
-                {design.bathrooms ?? "-"} Bath
-                {design.bathrooms === 1 ? "" : "s"}
+                <Bath size={14} strokeWidth={1.4} aria-hidden="true" />
+                {design.bathrooms} bath{design.bathrooms === 1 ? "" : "s"}
               </span>
-              <span className="text-gold/30">·</span>
-              <span>{design.area ?? "-"} m²</span>
-              {design.floors !== undefined && design.floors !== null && (
+            )}
+            {design.area != null && design.area > 0 && (
+              <span>
+                <Ruler size={14} strokeWidth={1.4} aria-hidden="true" />
+                {design.area.toLocaleString()} m²
+              </span>
+            )}
+            {design.area == null && design.floors != null && (
+              <span>
+                <Layers3 size={14} strokeWidth={1.4} aria-hidden="true" />
+                {design.floors} floor{design.floors === 1 ? "" : "s"}
+              </span>
+            )}
+            {design.bedrooms == null &&
+              design.bathrooms == null &&
+              design.area == null &&
+              design.floors == null && <span>Explore plan details</span>}
+          </div>
+        )}
+        <div className={styles.cardFooter}>
+          <div>
+            <span className={styles.priceLabel}>
+              {showBuildCost
+                ? "Estimated build cost · USD"
+                : "Plan price · USD"}
+            </span>
+            <span className={styles.cardPrice}>
+              {showBuildCost ? (
+                design.minBuildingCost ? (
+                  `From ${formatCurrency(design.minBuildingCost)}`
+                ) : (
+                  "Ask for an estimate"
+                )
+              ) : design.basePrice === 0 ? (
+                "Request a quote"
+              ) : (
                 <>
-                  <span className="text-gold/30">·</span>
-                  <span>
-                    {design.floors} Floor{design.floors === 1 ? "" : "s"}
-                  </span>
+                  {discount && discountedPrice < design.basePrice && (
+                    <del>{formatCurrency(design.basePrice)}</del>
+                  )}
+                  {formatCurrency(discountedPrice)}
                 </>
               )}
-            </div>
-          )}
-        </div>
-
-        <div className="mt-auto flex items-end justify-between gap-4 border-t border-[rgba(240,232,216,0.1)] pt-4">
-          {priceType === "building" && design.minBuildingCost ? (
-            <div>
-              <p className="mb-1 text-[10px] uppercase leading-none tracking-[0.12em] text-muted">
-                Est. Build Cost
-              </p>
-              <p
-                className="text-base font-light text-cream"
-                style={{ fontFamily: serifSystem }}
-              >
-                from {formatCurrency(design.minBuildingCost)}
-              </p>
-            </div>
-          ) : (
-            <div>
-              <p className="mb-1 text-[10px] uppercase leading-none tracking-[0.12em] text-muted">
-                Plan Price
-              </p>
-              <div className="flex items-center gap-2">
-                {design.basePrice === 0 ? (
-                  <p
-                    className="text-base font-light text-cream"
-                    style={{ fontFamily: serifSystem }}
-                  >
-                    Custom Quote
-                  </p>
-                ) : hasDiscount ? (
-                  <div className="flex items-baseline gap-2">
-                    <p className="text-xs font-light text-muted line-through">
-                      {formatCurrency(minPrice)}
-                    </p>
-                    <p
-                      className="text-base font-light text-emerald-400"
-                      style={{ fontFamily: serifSystem }}
-                    >
-                      {formatCurrency(discountedPrice)}
-                    </p>
-                  </div>
-                ) : (
-                  <p
-                    className="text-base font-light text-cream"
-                    style={{ fontFamily: serifSystem }}
-                  >
-                    {formatCurrency(minPrice)}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-[rgba(240,232,216,0.1)] bg-cream/5 px-3 py-2 text-[10px] uppercase tracking-[0.14em] text-cream-dim transition-colors duration-300 group-hover:border-gold/35 group-hover:bg-gold/10 group-hover:text-gold">
-            <span>Explore design</span>
-            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+            </span>
           </div>
+          <span className={styles.cardCta}>
+            View plan <ArrowUpRight size={15} aria-hidden="true" />
+          </span>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
-};
-
-export default DesignCard;
+}

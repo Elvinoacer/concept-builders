@@ -48,7 +48,11 @@ function ScrollToTopInner() {
     }
 
     if (previousRoute.current === routeKey) return;
+    const previousPathname = previousRoute.current.split("?")[0];
     previousRoute.current = routeKey;
+
+    // Catalogue filters update the URL while the visitor stays at their place.
+    if (pathname === "/designs" && previousPathname === pathname) return;
 
     // Keep intentional in-page anchors
     if (window.location.hash) return;
