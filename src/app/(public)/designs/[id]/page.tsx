@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { unstable_cache } from "next/cache";
 
 import prisma from "@/lib/prisma";
+import { getPublicDesignDetail } from "@/lib/public-design-detail";
 import DesignDetailClient from "./DesignDetailClient";
 import type {
   DesignDetailPayload,
@@ -53,139 +54,13 @@ export default async function DesignDetailPage({
 }: DesignDetailPageProps) {
   const { id } = await params;
 
-  const getCachedDesign = unstable_cache(
-    async (designId: string) =>
-      prisma.design.findUnique({
-        where: { id: designId },
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          basePrice: true,
-          bedrooms: true,
-          bathrooms: true,
-          area: true,
-          floors: true,
-          views: true,
-          categoryId: true,
-          planDetails: true,
-          isFeatured: true,
-          faq: true,
-          architecturalPdfPrice: true,
-          architecturalCadPrice: true,
-          structuralPdfPrice: true,
-          structuralCadPrice: true,
-          billOfQuantitiesPrice: true,
-          billOfQuantitiesPdfPrice: true,
-          images: {
-            select: {
-              id: true,
-              url: true,
-              name: true,
-              type: true,
-            },
-          },
-          floorPlans: {
-            select: {
-              id: true,
-              url: true,
-              name: true,
-              type: true,
-            },
-          },
-          category: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          architecturalDesign: {
-            select: {
-              pdfFiles: {
-                select: {
-                  id: true,
-                  url: true,
-                  name: true,
-                  type: true,
-                },
-              },
-              cadFiles: {
-                select: {
-                  id: true,
-                  url: true,
-                  name: true,
-                  type: true,
-                },
-              },
-            },
-          },
-          structuralDesign: {
-            select: {
-              pdfFiles: {
-                select: {
-                  id: true,
-                  url: true,
-                  name: true,
-                  type: true,
-                },
-              },
-              cadFiles: {
-                select: {
-                  id: true,
-                  url: true,
-                  name: true,
-                  type: true,
-                },
-              },
-            },
-          },
-          billOfQuantities: {
-            select: {
-              excelFiles: {
-                select: {
-                  id: true,
-                  url: true,
-                  name: true,
-                  type: true,
-                },
-              },
-              pdfFiles: {
-                select: {
-                  id: true,
-                  url: true,
-                  name: true,
-                  type: true,
-                },
-              },
-            },
-          },
-          packageOptions: {
-            select: {
-              id: true,
-              name: true,
-              price: true,
-              file: {
-                select: {
-                  id: true,
-                  url: true,
-                  name: true,
-                  type: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-    [`design-detail-${id}`],
-    { revalidate: 120, tags: ["designs", `design-${id}`] },
-  );
+  const record = await getPublicDesignDetail(id);
 
-  const design = await getCachedDesign(id);
-
-  if (!design) {
+  if (!record) {
     notFound();
   }
 
+  const design = structuredClone(record);
   sanitizePrivateFileUrls(design);
 
   const relatedSelect = {
@@ -209,8 +84,8 @@ export default async function DesignDetailPage({
     },
   };
 
-  const related = design.categoryId
-    ? await unstable_cache(
+  const relatedPromise = design.categoryId
+    ? unstable_cache(
         async () =>
           prisma.design.findMany({
             where: {
@@ -224,11 +99,11 @@ export default async function DesignDetailPage({
         [`design-related-v2-${id}`],
         { revalidate: 120, tags: ["designs", `design-${id}`] },
       )()
-    : [];
+    : Promise.resolve([]);
 
   // Prev/next neighbors in the same category (by name) for continuous inspiration
-  const neighbors = design.categoryId
-    ? await unstable_cache(
+  const neighborsPromise = design.categoryId
+    ? unstable_cache(
         async () => {
           const [prev, next] = await Promise.all([
             prisma.design.findFirst({
@@ -281,7 +156,12 @@ export default async function DesignDetailPage({
         [`design-neighbors-v1-${id}`],
         { revalidate: 120, tags: ["designs", `design-${id}`] },
       )()
-    : { prev: null, next: null };
+    : Promise.resolve({ prev: null, next: null });
+
+  const [related, neighbors] = await Promise.all([
+    relatedPromise,
+    neighborsPromise,
+  ]);
 
   return (
     <DesignDetailClient
