@@ -39,6 +39,7 @@ export default function DetailImage({
       src={source}
       alt={alt}
       fill
+      draggable={false}
       sizes={sizes}
       priority={priority}
       className={contain ? styles.containedImage : styles.coverImage}

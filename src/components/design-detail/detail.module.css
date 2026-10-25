@@ -15,6 +15,10 @@
   outline: 2px solid var(--detail-gold);
   outline-offset: 4px;
 }
+.zoomScroll:focus-visible {
+  outline: 2px solid var(--detail-gold);
+  outline-offset: -3px;
+}
 .page button,
 .lightbox button {
   cursor: pointer;
@@ -188,6 +192,7 @@
   pointer-events: none;
 }
 .photoButton {
+  touch-action: pan-y pinch-zoom;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -326,6 +331,7 @@
   font-style: italic;
 }
 .thumbnailStrip {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -1340,7 +1346,7 @@
   border: 1px solid var(--detail-line);
   color: var(--cream);
 }
-.zoomControls > span {
+.zoomControls > :is(span, output) {
   min-width: 40px;
   color: var(--detail-muted);
   font-size: 10px;
@@ -1562,7 +1568,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 14px;
     padding: 13px 25px max(13px, env(safe-area-inset-bottom));
     border-top: 1px solid #e3bd7e40;
     background: #11150ff5;
@@ -1582,6 +1588,35 @@
   }
   .mobilePurchase > .primaryButton {
     min-width: 200px;
+    margin-left: auto;
+  }
+  .mobileCart {
+    position: relative;
+    flex: 0 0 44px;
+    display: grid;
+    place-items: center;
+    align-self: stretch;
+    min-height: 44px;
+    border: 1px solid var(--detail-line);
+    color: var(--detail-gold);
+    transition: border-color 150ms;
+  }
+  .mobileCart:hover {
+    border-color: var(--detail-gold);
+  }
+  .mobileCart > span {
+    position: absolute;
+    top: -7px;
+    right: -5px;
+    display: grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding-inline: 3px;
+    border-radius: 50%;
+    background: var(--detail-gold);
+    color: #11150f;
+    font-size: 10px;
   }
   .page {
     padding-bottom: 115px;
@@ -1947,7 +1982,7 @@
     border-top: 1px solid var(--detail-line);
   }
   .mobilePurchase {
-    gap: 14px;
+    gap: 10px;
     padding: 12px 20px max(12px, env(safe-area-inset-bottom));
   }
   .mobilePurchase > .primaryButton {
@@ -2110,5 +2145,20 @@
   }
   .purchaseContents {
     overflow: visible;
+  }
+}
+
+.zoomScroll[data-zoomed="true"] {
+  cursor: grab;
+}
+.zoomScroll[data-dragging="true"] {
+  cursor: grabbing;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loadingTitle,
+  .loadingPhoto {
+    animation: none;
   }
 }

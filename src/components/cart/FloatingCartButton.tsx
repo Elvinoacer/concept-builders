@@ -55,7 +55,7 @@ export default function FloatingCartButton() {
     <Link
       href="/cart"
       aria-label={`Open cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}
-      className={`fixed right-4 z-[140] bottom-[max(1rem,env(safe-area-inset-bottom))] sm:right-5 sm:bottom-5 ${pathname === "/" ? "landing-floating-cart" : ""}`}
+      className={`fixed right-4 z-[140] bottom-[max(1rem,env(safe-area-inset-bottom))] sm:right-5 sm:bottom-5 ${pathname === "/" ? "landing-floating-cart" : ""} ${pathname?.startsWith("/designs/") ? "hidden lg:block" : ""}`}
     >
       <div
         className={`group relative flex min-h-[44px] items-center gap-2 rounded-full border border-[var(--border-gold)] bg-[rgba(10,9,7,0.88)] px-3 py-2 shadow-[0_18px_36px_rgba(0,0,0,0.35)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-gold hover:shadow-[0_20px_44px_rgba(0,0,0,0.45)] sm:gap-3 sm:px-4 sm:py-2.5 ${isBumping ? "animate-cart-bump" : ""}`}

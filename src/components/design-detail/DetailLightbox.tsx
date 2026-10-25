@@ -33,6 +33,14 @@ export default function DetailLightbox({
 }) {
   const [zoom, setZoom] = useState(1);
   const returnFocus = useRef<HTMLElement | null>(null);
+  const zoomCanvas = useRef<HTMLDivElement | null>(null);
+  const drag = useRef<{
+    x: number;
+    y: number;
+    left: number;
+    top: number;
+  } | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   function next(direction: number) {
     setZoom(1);
@@ -54,6 +62,7 @@ export default function DetailLightbox({
             returnFocus.current?.focus();
           }}
           onKeyDown={(event) => {
+            if (zoom > 1 && event.target === zoomCanvas.current) return;
             if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
               event.preventDefault();
               next(event.key === "ArrowRight" ? 1 : -1);
@@ -79,12 +88,59 @@ export default function DetailLightbox({
             className={styles.srOnly}
           >
             Use the arrow keys to explore views. Use the zoom controls for a
-            closer look. Press Escape to close.
+            closer look. When zoomed in, focus the image and use the arrow keys
+            to pan. Press Escape to close.
           </Dialog.Description>
           <div
             className={`${styles.lightboxCanvas} ${floorPlan ? styles.lightboxPlan : ""}`}
           >
-            <div className={styles.zoomScroll}>
+            <div
+              className={styles.zoomScroll}
+              ref={zoomCanvas}
+              tabIndex={zoom > 1 ? 0 : -1}
+              role="region"
+              aria-label={
+                zoom > 1
+                  ? "Zoomed image, use arrow keys to pan"
+                  : "Image preview"
+              }
+              data-zoomed={zoom > 1}
+              data-dragging={dragging}
+              onPointerDown={(event) => {
+                if (
+                  zoom <= 1 ||
+                  event.pointerType !== "mouse" ||
+                  event.button !== 0
+                )
+                  return;
+                event.preventDefault();
+                drag.current = {
+                  x: event.clientX,
+                  y: event.clientY,
+                  left: event.currentTarget.scrollLeft,
+                  top: event.currentTarget.scrollTop,
+                };
+                event.currentTarget.setPointerCapture(event.pointerId);
+                setDragging(true);
+              }}
+              onPointerMove={(event) => {
+                if (!drag.current) return;
+                event.currentTarget.scrollLeft =
+                  drag.current.left - (event.clientX - drag.current.x);
+                event.currentTarget.scrollTop =
+                  drag.current.top - (event.clientY - drag.current.y);
+              }}
+              onPointerUp={(event) => {
+                drag.current = null;
+                setDragging(false);
+                if (event.currentTarget.hasPointerCapture(event.pointerId))
+                  event.currentTarget.releasePointerCapture(event.pointerId);
+              }}
+              onPointerCancel={() => {
+                drag.current = null;
+                setDragging(false);
+              }}
+            >
               <div
                 className={styles.zoomFrame}
                 style={{ width: `${zoom * 100}%`, height: `${zoom * 100}%` }}
@@ -141,7 +197,9 @@ export default function DetailLightbox({
               >
                 <Minus size={17} aria-hidden="true" />
               </button>
-              <span>{Math.round(zoom * 100)}%</span>
+              <output aria-label="Image zoom level" aria-live="polite">
+                {Math.round(zoom * 100)}%
+              </output>
               <button
                 type="button"
                 aria-label="Zoom in"

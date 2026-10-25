@@ -29,6 +29,7 @@ export default function DetailPurchasePanel({
   onBuy,
   adding,
   buying,
+  sessionLoading,
   customHref,
 }: {
   design: DesignDetailPayload;
@@ -43,6 +44,7 @@ export default function DetailPurchasePanel({
   onBuy: () => void;
   adding: boolean;
   buying: boolean;
+  sessionLoading: boolean;
   customHref: string;
 }) {
   const selectedOptions = options.filter(
@@ -213,7 +215,7 @@ export default function DetailPurchasePanel({
             <button
               type="button"
               onClick={onBuy}
-              disabled={adding || buying}
+              disabled={adding || buying || sessionLoading}
               className={styles.primaryButton}
             >
               {buying ? (
@@ -230,7 +232,7 @@ export default function DetailPurchasePanel({
             <button
               type="button"
               onClick={onAdd}
-              disabled={adding || buying}
+              disabled={adding || buying || sessionLoading}
               className={styles.secondaryButton}
             >
               {adding ? (

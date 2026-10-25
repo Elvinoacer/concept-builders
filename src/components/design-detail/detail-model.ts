@@ -140,8 +140,13 @@ export function documentOptions(design: DesignDetailPayload): DocumentOption[] {
 }
 export function floorPlanName(file: FileAsset, index: number) {
   const text = file.name || file.url || "";
-  if (/ground/i.test(text)) return "Ground floor";
-  if (/first|1st/i.test(text)) return "First floor";
+  if (/^(g|gf)\.(jpg|jpeg|png|webp)$/i.test(file.name) || /ground/i.test(text))
+    return "Ground floor";
+  if (
+    /^(f|ff)\.(jpg|jpeg|png|webp)$/i.test(file.name) ||
+    /first|1st/i.test(text)
+  )
+    return "First floor";
   if (/second|2nd/i.test(text)) return "Second floor";
   if (/roof/i.test(text)) return "Roof plan";
   return `Floor plan ${String(index + 1).padStart(2, "0")}`;

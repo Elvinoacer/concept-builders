@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -22,6 +22,7 @@ import {
   Images,
   Layers3,
   Ruler,
+  ShoppingBag,
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { designImageUrl } from "@/lib/design-media";
@@ -84,12 +85,19 @@ export default function DesignDetailClient({
   const titleWords = title.split(" ");
   const photos = useMemo(() => {
     const seen = new Set<string>();
-    return design.images.filter((image): image is DetailPhoto => {
+    const images = design.images.filter((image): image is DetailPhoto => {
       if (!image.url || image.type !== "IMAGE" || seen.has(image.url))
         return false;
       seen.add(image.url);
       return true;
     });
+    const viewOrder = (image: DetailPhoto) =>
+      /front|facade|exterior/i.test(image.name)
+        ? 0
+        : /aerial|top.down|floor.?plan/i.test(image.name)
+          ? 2
+          : 1;
+    return images.sort((a, b) => viewOrder(a) - viewOrder(b));
   }, [design.images]);
   const floorPlans = design.floorPlans.filter((file): file is DetailPhoto =>
     Boolean(file.url),
@@ -98,10 +106,16 @@ export default function DesignDetailClient({
     (file) => file.type !== "PDF" && !/\.pdf(?:[?#]|$)/i.test(file.url),
   );
   const [imageIndex, setImageIndex] = useState(0);
+  const thumbnailStrip = useRef<HTMLDivElement>(null);
+  const swipeStart = useRef<{ x: number; y: number; pointer: number } | null>(
+    null,
+  );
+  const suppressPhotoClick = useRef(false);
   const [activeFloor, setActiveFloor] = useState(0);
   const [viewer, setViewer] = useState<"photos" | "plans" | null>(null);
   const [viewerIndex, setViewerIndex] = useState(0);
   const [activeSection, setActiveSection] = useState("design-overview");
+  const [purchaseInView, setPurchaseInView] = useState(false);
   const [saved, setSaved] = useState(false);
   const options = useMemo(() => documentOptions(design), [design]);
   const [selectedFiles, setSelectedFiles] = useState<string[]>(() =>
@@ -120,7 +134,7 @@ export default function DesignDetailClient({
     selectedFiles,
     selectedExtras,
   );
-  const customHref = `/custom-design?${new URLSearchParams({ designId: design.id, imageUrl: design.images[0]?.url || "" })}`;
+  const customHref = `/custom-design?${new URLSearchParams({ designId: design.id, imageUrl: photos[0]?.url || "" })}`;
   const currentPhoto = photos[imageIndex];
   const description = /[a-z]{3}/i.test(design.description)
     ? design.description
@@ -190,11 +204,34 @@ export default function DesignDetailClient({
       window.clearTimeout(timeout);
     };
   }, []);
+  useEffect(() => {
+    const panel = document.getElementById("purchase-options");
+    if (!panel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setPurchaseInView(entry.isIntersecting),
+      { rootMargin: "-145px 0px -90px 0px", threshold: 0 },
+    );
+    observer.observe(panel);
+    return () => observer.disconnect();
+  }, []);
   function selectPhoto(index: number) {
-    if (photos.length) setImageIndex((index + photos.length) % photos.length);
+    if (!photos.length) return;
+    const normalized = (index + photos.length) % photos.length;
+    setImageIndex(normalized);
+    const strip = thumbnailStrip.current;
+    const thumbnail = strip?.children.item(normalized) as HTMLElement | null;
+    if (strip && thumbnail)
+      strip.scrollTo({
+        left:
+          thumbnail.offsetLeft -
+          (strip.clientWidth - thumbnail.clientWidth) / 2,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
   }
   function openPhoto(index: number) {
-    setImageIndex(index);
+    selectPhoto(index);
     setViewerIndex(index);
     setViewer("photos");
   }
@@ -251,7 +288,7 @@ export default function DesignDetailClient({
     );
   }
   async function handleAdd() {
-    if (adding || buying) return;
+    if (adding || buying || status === "loading") return;
     setAdding(true);
     try {
       const added = await addToCart(design, selectedFiles, selectedExtras);
@@ -266,7 +303,7 @@ export default function DesignDetailClient({
     }
   }
   async function handleBuy() {
-    if (adding || buying) return;
+    if (adding || buying || status === "loading") return;
     setBuying(true);
     try {
       const existing = cart.some(
@@ -398,7 +435,45 @@ export default function DesignDetailClient({
                   type="button"
                   className={styles.photoButton}
                   aria-label={`Enlarge ${title}, view ${imageIndex + 1}`}
-                  onClick={() => openPhoto(imageIndex)}
+                  onClick={() => {
+                    if (suppressPhotoClick.current) return;
+                    openPhoto(imageIndex);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ")
+                      suppressPhotoClick.current = false;
+                    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight")
+                      return;
+                    event.preventDefault();
+                    selectPhoto(
+                      imageIndex + (event.key === "ArrowLeft" ? -1 : 1),
+                    );
+                  }}
+                  onPointerDown={(event) => {
+                    suppressPhotoClick.current = false;
+                    if (event.pointerType === "touch")
+                      swipeStart.current = {
+                        x: event.clientX,
+                        y: event.clientY,
+                        pointer: event.pointerId,
+                      };
+                  }}
+                  onPointerUp={(event) => {
+                    const start = swipeStart.current;
+                    swipeStart.current = null;
+                    if (!start || start.pointer !== event.pointerId) return;
+                    const dx = event.clientX - start.x;
+                    if (
+                      Math.abs(dx) > 50 &&
+                      Math.abs(dx) > Math.abs(event.clientY - start.y) * 1.4
+                    ) {
+                      suppressPhotoClick.current = true;
+                      selectPhoto(imageIndex + (dx < 0 ? 1 : -1));
+                    }
+                  }}
+                  onPointerCancel={() => {
+                    swipeStart.current = null;
+                  }}
                 >
                   <DetailImage
                     src={currentPhoto.url}
@@ -486,6 +561,7 @@ export default function DesignDetailClient({
             </div>
             <div
               className={styles.thumbnailStrip}
+              ref={thumbnailStrip}
               role="group"
               aria-label="Choose a perspective"
             >
@@ -808,6 +884,7 @@ export default function DesignDetailClient({
           onBuy={() => void handleBuy()}
           adding={adding}
           buying={buying}
+          sessionLoading={status === "loading"}
           customHref={customHref}
         />
       </div>
@@ -965,11 +1042,34 @@ export default function DesignDetailClient({
         <button
           type="button"
           className={styles.primaryButton}
-          onClick={showPlans}
+          disabled={
+            adding || buying || (purchaseInView && status === "loading")
+          }
+          onClick={
+            purchaseInView
+              ? design.basePrice > 0
+                ? handleBuy
+                : () => router.push(customHref)
+              : showPlans
+          }
         >
-          {design.basePrice > 0 ? "Choose your plan" : "Discuss this design"}
+          {buying
+            ? "Opening checkout…"
+            : design.basePrice > 0
+              ? purchaseInView
+                ? "Checkout"
+                : "Choose your plan"
+              : "Discuss this design"}
           <ArrowUpRight size={17} aria-hidden="true" />
         </button>
+        <Link
+          href="/cart"
+          className={styles.mobileCart}
+          aria-label={`Open cart with ${cart.length} item${cart.length === 1 ? "" : "s"}`}
+        >
+          <ShoppingBag size={18} aria-hidden="true" />
+          {cart.length > 0 && <span aria-hidden="true">{cart.length}</span>}
+        </Link>
       </div>
       <DetailLightbox
         open={viewer !== null}
@@ -980,7 +1080,7 @@ export default function DesignDetailClient({
         index={viewerIndex}
         onIndexChange={(index) => {
           setViewerIndex(index);
-          if (viewer === "photos") setImageIndex(index);
+          if (viewer === "photos") selectPhoto(index);
         }}
         title={title}
         floorPlan={viewer === "plans"}
