@@ -153,6 +153,9 @@
 
   html {
     scroll-behavior: smooth;
+    /* Prevent page-wide sideways panning while retaining local carousels. */
+    max-width: 100%;
+    overflow-x: clip;
   }
 
   body {
@@ -160,7 +163,9 @@
     background: var(--ink);
     color: var(--cream);
     font-family: var(--font-outfit), "Outfit", sans-serif;
-    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
   }
 }
 
