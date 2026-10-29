@@ -253,7 +253,7 @@ export default function RootLayout({
       <body className="antialiased min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary-foreground">
         <Providers>
           {/* Main content container with mobile-safe areas */}
-          <div className="min-h-screen flex flex-col safe-top safe-bottom">
+          <div className="min-h-screen flex w-full min-w-0 max-w-full flex-col safe-top safe-bottom">
             {children}
           </div>
         </Providers>
