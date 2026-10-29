@@ -408,9 +408,15 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = mobileMenuOpen ? "hidden" : "unset";
+    if (!mobileMenuOpen) return;
+
+    // Lock scrolling only while the mobile navigation is open. Restoring the
+    // previous inline value keeps the global horizontal overflow rule intact.
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = previousOverflow;
     };
   }, [mobileMenuOpen]);
 
